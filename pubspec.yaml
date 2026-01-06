@@ -1,0 +1,66 @@
+name: rent_khata
+description: "Offline-first rental management app for Indian landlords."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # UI
+  cupertino_icons: ^1.0.8
+  google_fonts: ^6.2.1
+  
+  # State Management
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+  
+  # Navigation
+  go_router: ^14.8.1
+  
+  # Database
+  drift: ^2.23.1
+  sqlite3_flutter_libs: ^0.5.28
+  path_provider: ^2.1.5
+  path: ^1.9.1
+  
+  # Data Serialization
+  freezed_annotation: ^2.4.4
+  json_annotation: ^4.9.0
+  
+  # Image handling
+  flutter_image_compress: ^2.3.0
+  image_picker: ^1.1.2
+  
+  # QR & Sharing
+  qr_flutter: ^4.1.0
+  url_launcher: ^6.3.1
+  share_plus: ^10.1.4
+  
+  # Backup
+  archive: ^4.0.4
+  
+  # Onboarding
+  showcaseview: ^3.0.0
+  
+  # Utilities
+  intl: ^0.20.2
+  uuid: ^4.5.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  
+  # Code Generation
+  build_runner: ^2.4.14
+  riverpod_generator: ^2.6.3
+  freezed: ^2.5.7
+  json_serializable: ^6.9.4
+  drift_dev: ^2.23.1
+
+flutter:
+  uses-material-design: true
