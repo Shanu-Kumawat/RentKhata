@@ -10,6 +10,7 @@ import '../database/daos/billing_dao.dart';
 import '../database/daos/tenant_dao.dart';
 import '../database/daos/property_dao.dart';
 import '../database/tables/bill_table.dart' as db;
+import '../database/tables/payment_table.dart' as db;
 
 /// Implementation of [BillingRepository] using Drift database.
 class BillingRepositoryImpl implements BillingRepository {

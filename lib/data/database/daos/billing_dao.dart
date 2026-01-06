@@ -83,7 +83,7 @@ class BillingDao extends DatabaseAccessor<AppDatabase> with _$BillingDaoMixin {
   /// Get total paid amount for a bill
   Future<double> getTotalPaidForBill(int billId) async {
     final paymentList = await getPaymentsForBill(billId);
-    return paymentList.fold(0.0, (sum, p) => sum + p.amount);
+    return paymentList.fold<double>(0.0, (double sum, p) => sum + p.amount);
   }
 
   /// Get pending balance for a bill
