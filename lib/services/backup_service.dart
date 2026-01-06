@@ -27,7 +27,7 @@ class BackupService {
   /// Get database file path
   Future<String> get _databasePath async {
     final appDir = await getApplicationDocumentsDirectory();
-    return '${appDir.path}/${AppConstants.databaseName}';
+    return '${appDir.path}/${DbConstants.databaseName}';
   }
 
   /// Create a backup of the database
@@ -55,7 +55,7 @@ class BackupService {
       // Create archive
       final archive = Archive();
       archive.addFile(ArchiveFile(
-        AppConstants.databaseName,
+        DbConstants.databaseName,
         dbBytes.length,
         dbBytes,
       ));
@@ -95,7 +95,7 @@ class BackupService {
     
     // Find database file in archive
     final dbArchiveFile = archive.files.firstWhere(
-      (file) => file.name == AppConstants.databaseName,
+      (file) => file.name == DbConstants.databaseName,
       orElse: () => throw Exception('Invalid backup file'),
     );
     

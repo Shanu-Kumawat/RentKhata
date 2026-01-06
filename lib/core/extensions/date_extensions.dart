@@ -22,4 +22,7 @@ extension DateTimeExtensions on DateTime {
   /// Check if same month and year
   bool isSameMonthAs(DateTime other) =>
       year == other.year && month == other.month;
+
+  /// Format for display "15 Jan 2024"
+  String toDisplayDate() => DateFormat('dd MMM yyyy').format(this);
 }

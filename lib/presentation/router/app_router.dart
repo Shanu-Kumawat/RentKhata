@@ -12,9 +12,12 @@ import '../screens/dashboard/dashboard_screen.dart';
 import '../screens/properties/properties_screen.dart';
 import '../screens/properties/add_property_screen.dart';
 import '../screens/properties/property_detail_screen.dart';
+import '../screens/rooms/room_detail_screen.dart';
 import '../screens/tenants/tenants_screen.dart';
 import '../screens/tenants/add_tenant_screen.dart';
+import '../screens/tenants/tenant_detail_screen.dart';
 import '../screens/settings/settings_screen.dart';
+import '../screens/settings/backup_screen.dart';
 import '../screens/reports/reports_screen.dart';
 import '../widgets/main_shell.dart';
 
@@ -65,6 +68,15 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.addFirstProperty,
         builder: (context, state) => const AddFirstPropertyScreen(),
+      ),
+
+      // ========== Room Detail (outside shell for full-screen) ==========
+      GoRoute(
+        path: AppRoutes.roomDetail,
+        builder: (context, state) {
+          final id = int.parse(state.pathParameters['id']!);
+          return RoomDetailScreen(roomId: id);
+        },
       ),
 
       // ========== Main Shell with Bottom Navigation ==========
@@ -120,11 +132,8 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: ':id',
                     builder: (context, state) {
-                      // TODO: Implement tenant detail screen
-                      return Scaffold(
-                        appBar: AppBar(title: const Text('Tenant Details')),
-                        body: const Center(child: Text('Coming soon')),
-                      );
+                      final id = int.parse(state.pathParameters['id']!);
+                      return TenantDetailScreen(tenantId: id);
                     },
                   ),
                 ],
@@ -141,10 +150,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                 routes: [
                   GoRoute(
                     path: 'backup',
-                    builder: (context, state) => Scaffold(
-                      appBar: AppBar(title: const Text('Backup & Restore')),
-                      body: const Center(child: Text('Coming soon')),
-                    ),
+                    builder: (context, state) => const BackupScreen(),
                   ),
                 ],
               ),
