@@ -2,18 +2,20 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../application/providers/dashboard_providers.dart';
 import '../../../core/theme/app_colors.dart';
 
 /// Splash screen shown on app launch.
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
+class _SplashScreenState extends ConsumerState<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
@@ -49,8 +51,16 @@ class _SplashScreenState extends State<SplashScreen>
     await Future.delayed(const Duration(seconds: 2));
     if (!mounted) return;
 
-    // Navigate to dashboard (onboarding check will be added later)
-    context.go('/dashboard');
+    // Check if this is the first launch (no landlord profile)
+    final isFirstLaunch = await ref.read(isFirstLaunchProvider.future);
+    
+    if (!mounted) return;
+    
+    if (isFirstLaunch) {
+      context.go('/welcome');
+    } else {
+      context.go('/dashboard');
+    }
   }
 
   @override

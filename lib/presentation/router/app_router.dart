@@ -5,8 +5,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../screens/onboarding/splash_screen.dart';
+import '../screens/onboarding/welcome_screen.dart';
+import '../screens/onboarding/profile_setup_screen.dart';
+import '../screens/onboarding/add_first_property_screen.dart';
 import '../screens/dashboard/dashboard_screen.dart';
-import '../screens/placeholder_screens.dart';
+import '../screens/properties/properties_screen.dart';
+import '../screens/properties/add_property_screen.dart';
+import '../screens/properties/property_detail_screen.dart';
+import '../screens/tenants/tenants_screen.dart';
+import '../screens/tenants/add_tenant_screen.dart';
+import '../screens/settings/settings_screen.dart';
+import '../screens/reports/reports_screen.dart';
 import '../widgets/main_shell.dart';
 
 /// Route paths
@@ -14,6 +23,7 @@ class AppRoutes {
   static const String splash = '/';
   static const String welcome = '/welcome';
   static const String profileSetup = '/profile-setup';
+  static const String addFirstProperty = '/add-first-property';
   static const String dashboard = '/dashboard';
   static const String properties = '/properties';
   static const String propertyDetail = '/properties/:id';
@@ -32,7 +42,6 @@ class AppRoutes {
 
 // Navigation keys for shell routes
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
-final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
 /// Router provider
 final routerProvider = Provider<GoRouter>((ref) {
@@ -40,13 +49,25 @@ final routerProvider = Provider<GoRouter>((ref) {
     navigatorKey: _rootNavigatorKey,
     initialLocation: AppRoutes.splash,
     routes: [
-      // Splash screen (outside shell)
+      // ========== Onboarding Routes (outside shell) ==========
       GoRoute(
         path: AppRoutes.splash,
         builder: (context, state) => const SplashScreen(),
       ),
+      GoRoute(
+        path: AppRoutes.welcome,
+        builder: (context, state) => const WelcomeScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.profileSetup,
+        builder: (context, state) => const ProfileSetupScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.addFirstProperty,
+        builder: (context, state) => const AddFirstPropertyScreen(),
+      ),
 
-      // Main shell with bottom navigation
+      // ========== Main Shell with Bottom Navigation ==========
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return MainShell(navigationShell: navigationShell);
@@ -71,18 +92,13 @@ final routerProvider = Provider<GoRouter>((ref) {
                 routes: [
                   GoRoute(
                     path: 'add',
-                    builder: (context, state) => const PlaceholderScreen(
-                      title: 'Add Property',
-                      icon: Icons.add_home_work_outlined,
-                    ),
+                    builder: (context, state) => const AddPropertyScreen(),
                   ),
                   GoRoute(
                     path: ':id',
                     builder: (context, state) {
-                      return const PlaceholderScreen(
-                        title: 'Property Details',
-                        icon: Icons.home_work_outlined,
-                      );
+                      final id = int.parse(state.pathParameters['id']!);
+                      return PropertyDetailScreen(propertyId: id);
                     },
                   ),
                 ],
@@ -99,17 +115,15 @@ final routerProvider = Provider<GoRouter>((ref) {
                 routes: [
                   GoRoute(
                     path: 'add',
-                    builder: (context, state) => const PlaceholderScreen(
-                      title: 'Add Tenant',
-                      icon: Icons.person_add_outlined,
-                    ),
+                    builder: (context, state) => const AddTenantScreen(),
                   ),
                   GoRoute(
                     path: ':id',
                     builder: (context, state) {
-                      return const PlaceholderScreen(
-                        title: 'Tenant Details',
-                        icon: Icons.person_outline,
+                      // TODO: Implement tenant detail screen
+                      return Scaffold(
+                        appBar: AppBar(title: const Text('Tenant Details')),
+                        body: const Center(child: Text('Coming soon')),
                       );
                     },
                   ),
@@ -127,9 +141,9 @@ final routerProvider = Provider<GoRouter>((ref) {
                 routes: [
                   GoRoute(
                     path: 'backup',
-                    builder: (context, state) => const PlaceholderScreen(
-                      title: 'Backup & Restore',
-                      icon: Icons.backup_outlined,
+                    builder: (context, state) => Scaffold(
+                      appBar: AppBar(title: const Text('Backup & Restore')),
+                      body: const Center(child: Text('Coming soon')),
                     ),
                   ),
                 ],
@@ -139,7 +153,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         ],
       ),
 
-      // Reports (outside shell, modal-style)
+      // ========== Modal Routes (outside shell) ==========
       GoRoute(
         path: AppRoutes.reports,
         builder: (context, state) => const ReportsScreen(),
