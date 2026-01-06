@@ -1,0 +1,49 @@
+/// Repository providers.
+library;
+
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../../domain/repositories/landlord_repository.dart';
+import '../../domain/repositories/property_repository.dart';
+import '../../domain/repositories/tenant_repository.dart';
+import '../../domain/repositories/billing_repository.dart';
+import '../../data/repositories/landlord_repository_impl.dart';
+import '../../data/repositories/property_repository_impl.dart';
+import '../../data/repositories/tenant_repository_impl.dart';
+import '../../data/repositories/billing_repository_impl.dart';
+import 'database_provider.dart';
+
+part 'repository_providers.g.dart';
+
+/// Provides the LandlordRepository.
+@riverpod
+LandlordRepository landlordRepository(LandlordRepositoryRef ref) {
+  return LandlordRepositoryImpl(ref.watch(landlordDaoProvider));
+}
+
+/// Provides the PropertyRepository.
+@riverpod
+PropertyRepository propertyRepository(PropertyRepositoryRef ref) {
+  return PropertyRepositoryImpl(
+    ref.watch(propertyDaoProvider),
+    ref.watch(tenantDaoProvider),
+  );
+}
+
+/// Provides the TenantRepository.
+@riverpod
+TenantRepository tenantRepository(TenantRepositoryRef ref) {
+  return TenantRepositoryImpl(
+    ref.watch(tenantDaoProvider),
+    ref.watch(propertyDaoProvider),
+  );
+}
+
+/// Provides the BillingRepository.
+@riverpod
+BillingRepository billingRepository(BillingRepositoryRef ref) {
+  return BillingRepositoryImpl(
+    ref.watch(billingDaoProvider),
+    ref.watch(tenantDaoProvider),
+    ref.watch(propertyDaoProvider),
+  );
+}

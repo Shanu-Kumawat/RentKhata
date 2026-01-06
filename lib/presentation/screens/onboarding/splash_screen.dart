@@ -49,8 +49,7 @@ class _SplashScreenState extends State<SplashScreen>
     await Future.delayed(const Duration(seconds: 2));
     if (!mounted) return;
 
-    // TODO: Check if first launch and navigate accordingly
-    // For now, go to dashboard (will be updated when onboarding is complete)
+    // Navigate to dashboard (onboarding check will be added later)
     context.go('/dashboard');
   }
 
