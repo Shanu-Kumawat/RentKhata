@@ -8,6 +8,7 @@ import '../../../application/providers/dashboard_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/validators.dart';
 import '../../../domain/entities/landlord.dart';
+import '../../widgets/image_picker_widget.dart';
 
 /// Screen to edit landlord profile.
 class EditProfileScreen extends ConsumerStatefulWidget {
@@ -22,6 +23,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
   final _upiController = TextEditingController();
+  String? _photoPath;
   bool _isLoading = false;
   bool _initialized = false;
 
@@ -38,6 +40,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       _nameController.text = landlord.name;
       _phoneController.text = landlord.phone ?? '';
       _upiController.text = landlord.upiId ?? '';
+      _photoPath = landlord.photoPath;
       _initialized = true;
     }
   }
@@ -61,6 +64,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             upiId: _upiController.text.trim().isEmpty
                 ? null
                 : _upiController.text.trim(),
+            photoPath: _photoPath,
           ),
         );
       }
@@ -102,19 +106,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               children: [
                 // Avatar
                 Center(
-                  child: CircleAvatar(
-                    radius: 48,
-                    backgroundColor: AppColors.primary.withOpacity(0.1),
-                    child: Text(
-                      _nameController.text.isNotEmpty
-                          ? _nameController.text[0].toUpperCase()
-                          : '?',
-                      style: const TextStyle(
-                        fontSize: 36,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
-                      ),
-                    ),
+                  child: ImagePickerWidget(
+                    initialImagePath: _photoPath,
+                    placeholderIcon: Icons.person,
+                    size: 100,
+                    onImageSelected: (path) => setState(() => _photoPath = path),
                   ),
                 ),
                 const SizedBox(height: 32),

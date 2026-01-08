@@ -8,6 +8,7 @@ import '../../../application/providers/repository_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/validators.dart';
 import '../../../domain/entities/property.dart';
+import '../../widgets/image_picker_widget.dart';
 
 /// Screen to add or edit a property.
 class AddPropertyScreen extends ConsumerStatefulWidget {
@@ -23,6 +24,7 @@ class _AddPropertyScreenState extends ConsumerState<AddPropertyScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _addressController = TextEditingController();
+  String? _photoPath;
   bool _isLoading = false;
 
   bool get isEditing => widget.property != null;
@@ -33,6 +35,7 @@ class _AddPropertyScreenState extends ConsumerState<AddPropertyScreen> {
     if (widget.property != null) {
       _nameController.text = widget.property!.name;
       _addressController.text = widget.property!.address ?? '';
+      _photoPath = widget.property!.photoPath;
     }
   }
 
@@ -58,6 +61,7 @@ class _AddPropertyScreenState extends ConsumerState<AddPropertyScreen> {
             address: _addressController.text.trim().isEmpty
                 ? null
                 : _addressController.text.trim(),
+            photoPath: _photoPath,
           ),
         );
       } else {
@@ -66,6 +70,7 @@ class _AddPropertyScreenState extends ConsumerState<AddPropertyScreen> {
           address: _addressController.text.trim().isEmpty
               ? null
               : _addressController.text.trim(),
+          photoPath: _photoPath,
         );
       }
 
@@ -105,38 +110,10 @@ class _AddPropertyScreenState extends ConsumerState<AddPropertyScreen> {
             children: [
               // Property photo
               Center(
-                child: Stack(
-                  children: [
-                    Container(
-                      width: 120,
-                      height: 120,
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                      child: const Icon(
-                        Icons.apartment_rounded,
-                        size: 56,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: const BoxDecoration(
-                          color: AppColors.primary,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.camera_alt,
-                          size: 16,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
+                child: ImagePickerWidget(
+                  initialImagePath: _photoPath,
+                  placeholderIcon: Icons.apartment_rounded,
+                  onImageSelected: (path) => setState(() => _photoPath = path),
                 ),
               ),
               const SizedBox(height: 32),

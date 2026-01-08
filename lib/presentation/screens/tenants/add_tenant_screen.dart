@@ -8,6 +8,7 @@ import '../../../application/providers/repository_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/validators.dart';
 import '../../../domain/entities/tenant.dart';
+import '../../widgets/image_picker_widget.dart';
 
 /// Screen to add or edit a tenant.
 class AddTenantScreen extends ConsumerStatefulWidget {
@@ -25,6 +26,7 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
   final _phoneController = TextEditingController();
   final _aadharController = TextEditingController();
   bool _isPoliceVerified = false;
+  String? _photoPath;
   bool _isLoading = false;
 
   bool get isEditing => widget.tenant != null;
@@ -37,6 +39,7 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
       _phoneController.text = widget.tenant!.phone ?? '';
       _aadharController.text = widget.tenant!.aadharNumber ?? '';
       _isPoliceVerified = widget.tenant!.isPoliceVerified;
+      _photoPath = widget.tenant!.photoPath;
     }
   }
 
@@ -67,6 +70,7 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
                 ? null
                 : _aadharController.text.trim(),
             isPoliceVerified: _isPoliceVerified,
+            photoPath: _photoPath,
           ),
         );
       } else {
@@ -79,6 +83,7 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
               ? null
               : _aadharController.text.trim(),
           isPoliceVerified: _isPoliceVerified,
+          photoPath: _photoPath,
         );
       }
 
@@ -116,34 +121,11 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
             children: [
               // Profile photo
               Center(
-                child: Stack(
-                  children: [
-                    CircleAvatar(
-                      radius: 50,
-                      backgroundColor: AppColors.primary.withOpacity(0.1),
-                      child: const Icon(
-                        Icons.person,
-                        size: 50,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: const BoxDecoration(
-                          color: AppColors.primary,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.camera_alt,
-                          size: 16,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
+                child: ImagePickerWidget(
+                  initialImagePath: _photoPath,
+                  placeholderIcon: Icons.person,
+                  size: 100,
+                  onImageSelected: (path) => setState(() => _photoPath = path),
                 ),
               ),
               const SizedBox(height: 32),

@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../application/providers/repository_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/validators.dart';
+import '../../widgets/image_picker_widget.dart';
 
 /// Profile setup screen for landlord to enter their details.
 class ProfileSetupScreen extends ConsumerStatefulWidget {
@@ -21,6 +22,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
   final _nameController = TextEditingController();
   final _upiController = TextEditingController();
   final _phoneController = TextEditingController();
+  String? _photoPath;
   bool _isLoading = false;
 
   @override
@@ -46,6 +48,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
         phone: _phoneController.text.trim().isEmpty
             ? null
             : _phoneController.text.trim(),
+        photoPath: _photoPath,
       );
 
       if (mounted) {
@@ -94,34 +97,11 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
 
               // Profile photo placeholder
               Center(
-                child: Stack(
-                  children: [
-                    CircleAvatar(
-                      radius: 50,
-                      backgroundColor: AppColors.primary.withOpacity(0.1),
-                      child: const Icon(
-                        Icons.person,
-                        size: 50,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: const BoxDecoration(
-                          color: AppColors.primary,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.camera_alt,
-                          size: 16,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
+                child: ImagePickerWidget(
+                  initialImagePath: _photoPath,
+                  placeholderIcon: Icons.person,
+                  size: 100,
+                  onImageSelected: (path) => setState(() => _photoPath = path),
                 ),
               ),
               const SizedBox(height: 32),
