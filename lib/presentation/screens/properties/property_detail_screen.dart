@@ -11,6 +11,7 @@ import '../../../core/utils/currency_formatter.dart';
 import '../../../domain/entities/property.dart';
 import '../../../domain/entities/room.dart';
 import '../rooms/add_room_screen.dart';
+import 'add_property_screen.dart';
 
 /// Property detail screen showing rooms.
 class PropertyDetailScreen extends ConsumerWidget {
@@ -37,9 +38,7 @@ class PropertyDetailScreen extends ConsumerWidget {
             actions: [
               IconButton(
                 icon: const Icon(Icons.edit_outlined),
-                onPressed: () {
-                  // TODO: Navigate to edit property
-                },
+                onPressed: () => _showEditProperty(context, property),
               ),
               PopupMenuButton<String>(
                 onSelected: (value) {
@@ -145,6 +144,15 @@ class PropertyDetailScreen extends ConsumerWidget {
         final room = rooms[index];
         return _RoomCard(room: room);
       },
+    );
+  }
+
+  void _showEditProperty(BuildContext context, Property property) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddPropertyScreen(property: property),
+      ),
     );
   }
 
@@ -318,9 +326,7 @@ class _RoomCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
-        onTap: () {
-          // TODO: Navigate to room detail
-        },
+        onTap: () => context.push('/rooms/${room.id}'),
         borderRadius: BorderRadius.circular(16),
         child: Padding(
           padding: const EdgeInsets.all(16),

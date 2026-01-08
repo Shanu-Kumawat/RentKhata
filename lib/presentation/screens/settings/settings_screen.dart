@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../application/providers/dashboard_providers.dart';
 import '../../../core/theme/app_colors.dart';
+import 'edit_profile_screen.dart';
+import 'electricity_rates_screen.dart';
 
 /// Settings screen.
 class SettingsScreen extends ConsumerWidget {
@@ -23,12 +25,13 @@ class SettingsScreen extends ConsumerWidget {
         children: [
           // Profile section
           landlordAsync.when(
-            data: (landlord) => _ProfileTile(
+            data: (landlord) =>             _ProfileTile(
               name: landlord?.name ?? 'Set up profile',
               upiId: landlord?.upiId,
-              onTap: () {
-                // TODO: Navigate to edit profile
-              },
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const EditProfileScreen()),
+              ),
             ),
             loading: () => const ListTile(
               leading: CircleAvatar(child: CircularProgressIndicator()),
@@ -48,13 +51,14 @@ class SettingsScreen extends ConsumerWidget {
           _SettingsSection(
             title: 'Billing',
             children: [
-              _SettingsTile(
+                            _SettingsTile(
                 icon: Icons.bolt_outlined,
                 title: 'Electricity Rates',
                 subtitle: 'View and update electricity rates',
-                onTap: () {
-                  // TODO: Navigate to electricity rates
-                },
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ElectricityRatesScreen()),
+                ),
               ),
             ],
           ),

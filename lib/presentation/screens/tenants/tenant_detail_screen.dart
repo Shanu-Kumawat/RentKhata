@@ -3,11 +3,12 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../application/providers/tenant_providers.dart';
 import '../../../application/providers/repository_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/tenant.dart';
-import '../../../domain/entities/occupancy.dart';
+import 'add_tenant_screen.dart';
 
 /// Tenant detail screen showing profile, custom fields, and history.
 class TenantDetailScreen extends ConsumerWidget {
@@ -56,9 +57,7 @@ class _TenantDetailContent extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.edit_outlined),
-            onPressed: () {
-              // TODO: Navigate to edit tenant
-            },
+            onPressed: () => _showEditTenant(context),
           ),
           PopupMenuButton<String>(
             onSelected: (value) {
@@ -134,25 +133,34 @@ class _TenantDetailContent extends ConsumerWidget {
     );
   }
 
+  void _showEditTenant(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddTenantScreen(tenant: tenant),
+      ),
+    );
+  }
+
   void _confirmDelete(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (ctx) => AlertDialog(
         title: const Text('Delete Tenant?'),
         content: Text(
           'Are you sure you want to delete ${tenant.name}? This action cannot be undone.',
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(ctx),
             child: const Text('Cancel'),
           ),
           FilledButton(
             onPressed: () async {
-              Navigator.pop(context);
+              Navigator.pop(ctx); // Close dialog
               await ref.read(tenantRepositoryProvider).deleteTenant(tenant.id);
               if (context.mounted) {
-                Navigator.pop(context);
+                context.pop(); // Go back using GoRouter
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Tenant deleted')),
                 );
