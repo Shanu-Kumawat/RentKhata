@@ -62,9 +62,6 @@ class BackupService {
       
       // Write zip file
       final zipBytes = ZipEncoder().encode(archive);
-      if (zipBytes == null) {
-        throw Exception('Failed to create backup archive');
-      }
       
       final backupFile = File(backupPath);
       await backupFile.writeAsBytes(zipBytes);

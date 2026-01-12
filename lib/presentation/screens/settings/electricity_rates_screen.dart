@@ -7,8 +7,6 @@ import '../../../application/providers/repository_providers.dart';
 import '../../../application/providers/billing_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
-import '../../../core/utils/validators.dart';
-import '../../../core/extensions/date_extensions.dart';
 
 /// Screen to manage electricity rates.
 class ElectricityRatesScreen extends ConsumerStatefulWidget {

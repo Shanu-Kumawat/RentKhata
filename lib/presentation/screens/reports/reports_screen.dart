@@ -6,8 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../application/providers/billing_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
-import '../../../core/extensions/date_extensions.dart';
 import '../../../domain/entities/bill.dart';
+import '../billing/record_payment_sheet.dart';
 
 /// Reports screen showing bills and payment history.
 class ReportsScreen extends ConsumerStatefulWidget {
@@ -273,18 +273,14 @@ class _BillCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 TextButton.icon(
-                  onPressed: () {
-                    // TODO: Show bill details
-                  },
+                  onPressed: () => _showBillDetails(context, bill),
                   icon: const Icon(Icons.visibility_outlined, size: 18),
                   label: const Text('View'),
                 ),
                 if (!bill.isFullyPaid) ...[
                   const SizedBox(width: 8),
                   FilledButton.icon(
-                    onPressed: () {
-                      // TODO: Record payment
-                    },
+                    onPressed: () => _showRecordPayment(context, bill),
                     icon: const Icon(Icons.payment, size: 18),
                     label: const Text('Record Payment'),
                   ),
@@ -294,6 +290,48 @@ class _BillCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  void _showBillDetails(BuildContext context, Bill bill) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('${bill.billType.name.toUpperCase()} Bill'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Period: ${bill.billingPeriod}'),
+            if (bill.roomNumber != null)
+              Text('Room: ${bill.roomNumber}'),
+            const SizedBox(height: 8),
+            Text('Amount: ${formatCurrency(bill.amount)}'),
+            Text('Paid: ${formatCurrency(bill.paidAmount)}'),
+            Text('Pending: ${formatCurrency(bill.pendingAmount)}'),
+            if (bill.electricityPrevReading != null) ...[
+              const SizedBox(height: 8),
+              Text('Previous Reading: ${bill.electricityPrevReading}'),
+              Text('Current Reading: ${bill.electricityCurrReading}'),
+              Text('Units: ${(bill.electricityCurrReading ?? 0) - (bill.electricityPrevReading ?? 0)}'),
+            ],
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showRecordPayment(BuildContext context, Bill bill) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => RecordPaymentSheet(bill: bill),
     );
   }
 

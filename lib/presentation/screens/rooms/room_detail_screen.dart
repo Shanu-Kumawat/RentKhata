@@ -3,7 +3,6 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../../../application/providers/property_providers.dart';
 import '../../../application/providers/tenant_providers.dart';
 import '../../../application/providers/billing_providers.dart';
@@ -18,6 +17,7 @@ import '../billing/create_bill_sheet.dart';
 import '../billing/record_payment_sheet.dart';
 import '../../widgets/upi_qr_widget.dart';
 import 'move_in_sheet.dart';
+import 'add_room_screen.dart';
 
 /// Room detail screen showing occupancy, bills, and actions.
 class RoomDetailScreen extends ConsumerWidget {
@@ -67,9 +67,7 @@ class _RoomDetailContent extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.edit_outlined),
-            onPressed: () {
-              // TODO: Edit room
-            },
+            onPressed: () => _showEditRoom(context, room),
           ),
         ],
       ),
@@ -180,6 +178,18 @@ class _RoomDetailContent extends ConsumerWidget {
       upiId: upiId,
       amount: amount,
       transactionNote: 'Rent for Room ${room.roomNumber}',
+    );
+  }
+
+  void _showEditRoom(BuildContext context, Room room) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (context) => AddRoomSheet(
+        propertyId: room.propertyId,
+        existingRoom: room,
+      ),
     );
   }
 

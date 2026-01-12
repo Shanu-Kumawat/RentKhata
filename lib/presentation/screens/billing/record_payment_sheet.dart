@@ -4,6 +4,8 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../application/providers/repository_providers.dart';
+import '../../../application/providers/billing_providers.dart';
+import '../../../application/providers/dashboard_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/validators.dart';
@@ -83,6 +85,11 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
       );
 
       if (mounted) {
+        // Invalidate providers to refresh UI
+        ref.invalidate(billsForOccupancyProvider(widget.bill.occupancyId));
+        ref.invalidate(billsForOccupancyStreamProvider(widget.bill.occupancyId));
+        ref.invalidate(unpaidBillsProvider);
+        ref.invalidate(dashboardSummaryProvider);
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Payment recorded')),

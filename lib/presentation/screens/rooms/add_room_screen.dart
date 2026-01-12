@@ -1,18 +1,23 @@
-/// Add room bottom sheet.
+/// Add/Edit room bottom sheet.
 library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../application/providers/repository_providers.dart';
 import '../../../application/providers/billing_providers.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/validators.dart';
+import '../../../domain/entities/room.dart';
 
-/// Bottom sheet to add a new room.
+/// Bottom sheet to add or edit a room.
 class AddRoomSheet extends ConsumerStatefulWidget {
   final int propertyId;
+  final Room? existingRoom; // null for add, non-null for edit
 
-  const AddRoomSheet({super.key, required this.propertyId});
+  const AddRoomSheet({
+    super.key,
+    required this.propertyId,
+    this.existingRoom,
+  });
 
   @override
   ConsumerState<AddRoomSheet> createState() => _AddRoomSheetState();
@@ -26,10 +31,20 @@ class _AddRoomSheetState extends ConsumerState<AddRoomSheet> {
   bool _hasElectricityMeter = false;
   bool _isLoading = false;
 
+  bool get isEditing => widget.existingRoom != null;
+
   @override
   void initState() {
     super.initState();
-    _loadDefaultRate();
+    if (widget.existingRoom != null) {
+      final room = widget.existingRoom!;
+      _roomNumberController.text = room.roomNumber;
+      _rentController.text = room.baseRent.toString();
+      _hasElectricityMeter = room.hasElectricityMeter;
+      _electricityRateController.text = room.currentElectricityRate.toString();
+    } else {
+      _loadDefaultRate();
+    }
   }
 
   Future<void> _loadDefaultRate() async {
@@ -52,19 +67,32 @@ class _AddRoomSheetState extends ConsumerState<AddRoomSheet> {
 
     try {
       final repo = ref.read(propertyRepositoryProvider);
-      await repo.createRoom(
-        propertyId: widget.propertyId,
-        roomNumber: _roomNumberController.text.trim(),
-        baseRent: double.tryParse(_rentController.text) ?? 0,
-        hasElectricityMeter: _hasElectricityMeter,
-        currentElectricityRate:
-            double.tryParse(_electricityRateController.text) ?? 7.0,
-      );
+      
+      if (isEditing) {
+        await repo.updateRoom(
+          widget.existingRoom!.copyWith(
+            roomNumber: _roomNumberController.text.trim(),
+            baseRent: double.tryParse(_rentController.text) ?? 0,
+            hasElectricityMeter: _hasElectricityMeter,
+            currentElectricityRate:
+                double.tryParse(_electricityRateController.text) ?? 7.0,
+          ),
+        );
+      } else {
+        await repo.createRoom(
+          propertyId: widget.propertyId,
+          roomNumber: _roomNumberController.text.trim(),
+          baseRent: double.tryParse(_rentController.text) ?? 0,
+          hasElectricityMeter: _hasElectricityMeter,
+          currentElectricityRate:
+              double.tryParse(_electricityRateController.text) ?? 7.0,
+        );
+      }
 
       if (mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Room added')),
+          SnackBar(content: Text(isEditing ? 'Room updated' : 'Room added')),
         );
       }
     } catch (e) {
@@ -97,7 +125,7 @@ class _AddRoomSheetState extends ConsumerState<AddRoomSheet> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Add Room',
+                    isEditing ? 'Edit Room' : 'Add Room',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -173,7 +201,7 @@ class _AddRoomSheetState extends ConsumerState<AddRoomSheet> {
                             color: Colors.white,
                           ),
                         )
-                      : const Text('Add Room'),
+                      : Text(isEditing ? 'Save Changes' : 'Add Room'),
                 ),
               ),
             ],

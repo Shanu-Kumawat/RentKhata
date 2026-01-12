@@ -30,6 +30,7 @@ mixin _$Tenant {
   String? get policeVerificationDocPath => throw _privateConstructorUsedError;
   DateTime get createdAt =>
       throw _privateConstructorUsedError; // Denormalized fields
+  int? get currentRoomId => throw _privateConstructorUsedError;
   String? get currentRoomNumber => throw _privateConstructorUsedError;
   String? get currentPropertyName => throw _privateConstructorUsedError;
   bool get isCurrentlyOccupying => throw _privateConstructorUsedError;
@@ -57,6 +58,7 @@ abstract class $TenantCopyWith<$Res> {
     bool isPoliceVerified,
     String? policeVerificationDocPath,
     DateTime createdAt,
+    int? currentRoomId,
     String? currentRoomNumber,
     String? currentPropertyName,
     bool isCurrentlyOccupying,
@@ -86,6 +88,7 @@ class _$TenantCopyWithImpl<$Res, $Val extends Tenant>
     Object? isPoliceVerified = null,
     Object? policeVerificationDocPath = freezed,
     Object? createdAt = null,
+    Object? currentRoomId = freezed,
     Object? currentRoomNumber = freezed,
     Object? currentPropertyName = freezed,
     Object? isCurrentlyOccupying = null,
@@ -124,6 +127,10 @@ class _$TenantCopyWithImpl<$Res, $Val extends Tenant>
                 ? _value.createdAt
                 : createdAt // ignore: cast_nullable_to_non_nullable
                       as DateTime,
+            currentRoomId: freezed == currentRoomId
+                ? _value.currentRoomId
+                : currentRoomId // ignore: cast_nullable_to_non_nullable
+                      as int?,
             currentRoomNumber: freezed == currentRoomNumber
                 ? _value.currentRoomNumber
                 : currentRoomNumber // ignore: cast_nullable_to_non_nullable
@@ -159,6 +166,7 @@ abstract class _$$TenantImplCopyWith<$Res> implements $TenantCopyWith<$Res> {
     bool isPoliceVerified,
     String? policeVerificationDocPath,
     DateTime createdAt,
+    int? currentRoomId,
     String? currentRoomNumber,
     String? currentPropertyName,
     bool isCurrentlyOccupying,
@@ -187,6 +195,7 @@ class __$$TenantImplCopyWithImpl<$Res>
     Object? isPoliceVerified = null,
     Object? policeVerificationDocPath = freezed,
     Object? createdAt = null,
+    Object? currentRoomId = freezed,
     Object? currentRoomNumber = freezed,
     Object? currentPropertyName = freezed,
     Object? isCurrentlyOccupying = null,
@@ -225,6 +234,10 @@ class __$$TenantImplCopyWithImpl<$Res>
             ? _value.createdAt
             : createdAt // ignore: cast_nullable_to_non_nullable
                   as DateTime,
+        currentRoomId: freezed == currentRoomId
+            ? _value.currentRoomId
+            : currentRoomId // ignore: cast_nullable_to_non_nullable
+                  as int?,
         currentRoomNumber: freezed == currentRoomNumber
             ? _value.currentRoomNumber
             : currentRoomNumber // ignore: cast_nullable_to_non_nullable
@@ -254,6 +267,7 @@ class _$TenantImpl implements _Tenant {
     this.isPoliceVerified = false,
     this.policeVerificationDocPath,
     required this.createdAt,
+    this.currentRoomId,
     this.currentRoomNumber,
     this.currentPropertyName,
     this.isCurrentlyOccupying = false,
@@ -281,6 +295,8 @@ class _$TenantImpl implements _Tenant {
   final DateTime createdAt;
   // Denormalized fields
   @override
+  final int? currentRoomId;
+  @override
   final String? currentRoomNumber;
   @override
   final String? currentPropertyName;
@@ -290,7 +306,7 @@ class _$TenantImpl implements _Tenant {
 
   @override
   String toString() {
-    return 'Tenant(id: $id, name: $name, phone: $phone, aadharNumber: $aadharNumber, photoPath: $photoPath, isPoliceVerified: $isPoliceVerified, policeVerificationDocPath: $policeVerificationDocPath, createdAt: $createdAt, currentRoomNumber: $currentRoomNumber, currentPropertyName: $currentPropertyName, isCurrentlyOccupying: $isCurrentlyOccupying)';
+    return 'Tenant(id: $id, name: $name, phone: $phone, aadharNumber: $aadharNumber, photoPath: $photoPath, isPoliceVerified: $isPoliceVerified, policeVerificationDocPath: $policeVerificationDocPath, createdAt: $createdAt, currentRoomId: $currentRoomId, currentRoomNumber: $currentRoomNumber, currentPropertyName: $currentPropertyName, isCurrentlyOccupying: $isCurrentlyOccupying)';
   }
 
   @override
@@ -314,6 +330,8 @@ class _$TenantImpl implements _Tenant {
                 other.policeVerificationDocPath == policeVerificationDocPath) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
+            (identical(other.currentRoomId, currentRoomId) ||
+                other.currentRoomId == currentRoomId) &&
             (identical(other.currentRoomNumber, currentRoomNumber) ||
                 other.currentRoomNumber == currentRoomNumber) &&
             (identical(other.currentPropertyName, currentPropertyName) ||
@@ -334,6 +352,7 @@ class _$TenantImpl implements _Tenant {
     isPoliceVerified,
     policeVerificationDocPath,
     createdAt,
+    currentRoomId,
     currentRoomNumber,
     currentPropertyName,
     isCurrentlyOccupying,
@@ -363,6 +382,7 @@ abstract class _Tenant implements Tenant {
     final bool isPoliceVerified,
     final String? policeVerificationDocPath,
     required final DateTime createdAt,
+    final int? currentRoomId,
     final String? currentRoomNumber,
     final String? currentPropertyName,
     final bool isCurrentlyOccupying,
@@ -386,6 +406,8 @@ abstract class _Tenant implements Tenant {
   String? get policeVerificationDocPath;
   @override
   DateTime get createdAt; // Denormalized fields
+  @override
+  int? get currentRoomId;
   @override
   String? get currentRoomNumber;
   @override

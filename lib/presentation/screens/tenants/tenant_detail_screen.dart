@@ -8,6 +8,7 @@ import '../../../application/providers/tenant_providers.dart';
 import '../../../application/providers/repository_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/tenant.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'add_tenant_screen.dart';
 
 /// Tenant detail screen showing profile, custom fields, and history.
@@ -104,9 +105,7 @@ class _TenantDetailContent extends ConsumerWidget {
                     icon: Icons.phone_outlined,
                     label: 'Phone',
                     value: tenant.phone!,
-                    onTap: () {
-                      // TODO: Open phone dialer
-                    },
+                    onTap: () => _launchPhone(tenant.phone!),
                   ),
                 if (tenant.aadharNumber != null)
                   _InfoRow(
@@ -140,6 +139,13 @@ class _TenantDetailContent extends ConsumerWidget {
         builder: (context) => AddTenantScreen(tenant: tenant),
       ),
     );
+  }
+
+  void _launchPhone(String phone) async {
+    final uri = Uri.parse('tel:$phone');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
   }
 
   void _confirmDelete(BuildContext context, WidgetRef ref) {
@@ -271,7 +277,9 @@ class _CurrentOccupancyCard extends StatelessWidget {
         subtitle: const Text('Current Location'),
         trailing: const Icon(Icons.chevron_right),
         onTap: () {
-          // TODO: Navigate to room detail
+          if (tenant.currentRoomId != null) {
+            context.push('/rooms/${tenant.currentRoomId}');
+          }
         },
       ),
     );

@@ -8,7 +8,7 @@ part of 'property_providers.dart';
 
 String _$propertiesStreamHash() => r'2d0b96e1177326589e8363f6f437585739f92d26';
 
-/// Watch all properties.
+/// Watch all properties (auto-updates when data changes).
 ///
 /// Copied from [propertiesStream].
 @ProviderFor(propertiesStream)
@@ -45,7 +45,7 @@ final propertiesProvider = AutoDisposeFutureProvider<List<Property>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef PropertiesRef = AutoDisposeFutureProviderRef<List<Property>>;
-String _$propertyHash() => r'2dfdde5a4bd311e705c7bdc4fceedd75334a628c';
+String _$propertyHash() => r'b73b1cd83f3015a8ad56f1b5b50338dad52a90a3';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -69,21 +69,25 @@ class _SystemHash {
 }
 
 /// Get a single property by ID.
+/// This provider auto-refreshes when propertiesStream emits new data.
 ///
 /// Copied from [property].
 @ProviderFor(property)
 const propertyProvider = PropertyFamily();
 
 /// Get a single property by ID.
+/// This provider auto-refreshes when propertiesStream emits new data.
 ///
 /// Copied from [property].
 class PropertyFamily extends Family<AsyncValue<Property?>> {
   /// Get a single property by ID.
+  /// This provider auto-refreshes when propertiesStream emits new data.
   ///
   /// Copied from [property].
   const PropertyFamily();
 
   /// Get a single property by ID.
+  /// This provider auto-refreshes when propertiesStream emits new data.
   ///
   /// Copied from [property].
   PropertyProvider call(int id) {
@@ -111,10 +115,12 @@ class PropertyFamily extends Family<AsyncValue<Property?>> {
 }
 
 /// Get a single property by ID.
+/// This provider auto-refreshes when propertiesStream emits new data.
 ///
 /// Copied from [property].
 class PropertyProvider extends AutoDisposeFutureProvider<Property?> {
   /// Get a single property by ID.
+  /// This provider auto-refreshes when propertiesStream emits new data.
   ///
   /// Copied from [property].
   PropertyProvider(int id)
@@ -198,22 +204,22 @@ class _PropertyProviderElement
 String _$roomsForPropertyStreamHash() =>
     r'a77d085a5e3366e4958f07fb241d7c76a7b8c01e';
 
-/// Watch rooms for a property.
+/// Watch rooms for a property (auto-updates when data changes).
 ///
 /// Copied from [roomsForPropertyStream].
 @ProviderFor(roomsForPropertyStream)
 const roomsForPropertyStreamProvider = RoomsForPropertyStreamFamily();
 
-/// Watch rooms for a property.
+/// Watch rooms for a property (auto-updates when data changes).
 ///
 /// Copied from [roomsForPropertyStream].
 class RoomsForPropertyStreamFamily extends Family<AsyncValue<List<Room>>> {
-  /// Watch rooms for a property.
+  /// Watch rooms for a property (auto-updates when data changes).
   ///
   /// Copied from [roomsForPropertyStream].
   const RoomsForPropertyStreamFamily();
 
-  /// Watch rooms for a property.
+  /// Watch rooms for a property (auto-updates when data changes).
   ///
   /// Copied from [roomsForPropertyStream].
   RoomsForPropertyStreamProvider call(int propertyId) {
@@ -242,12 +248,12 @@ class RoomsForPropertyStreamFamily extends Family<AsyncValue<List<Room>>> {
   String? get name => r'roomsForPropertyStreamProvider';
 }
 
-/// Watch rooms for a property.
+/// Watch rooms for a property (auto-updates when data changes).
 ///
 /// Copied from [roomsForPropertyStream].
 class RoomsForPropertyStreamProvider
     extends AutoDisposeStreamProvider<List<Room>> {
-  /// Watch rooms for a property.
+  /// Watch rooms for a property (auto-updates when data changes).
   ///
   /// Copied from [roomsForPropertyStream].
   RoomsForPropertyStreamProvider(int propertyId)
@@ -465,24 +471,28 @@ class _RoomsForPropertyProviderElement
   int get propertyId => (origin as RoomsForPropertyProvider).propertyId;
 }
 
-String _$roomHash() => r'bcb338e94a1134e1b3ad49619cd46107313edb06';
+String _$roomHash() => r'4a4b1b319cfcb0e50e68ae23c26246abaa3833cf';
 
 /// Get a single room by ID.
+/// This provider auto-refreshes when room data changes.
 ///
 /// Copied from [room].
 @ProviderFor(room)
 const roomProvider = RoomFamily();
 
 /// Get a single room by ID.
+/// This provider auto-refreshes when room data changes.
 ///
 /// Copied from [room].
 class RoomFamily extends Family<AsyncValue<Room?>> {
   /// Get a single room by ID.
+  /// This provider auto-refreshes when room data changes.
   ///
   /// Copied from [room].
   const RoomFamily();
 
   /// Get a single room by ID.
+  /// This provider auto-refreshes when room data changes.
   ///
   /// Copied from [room].
   RoomProvider call(int id) {
@@ -510,10 +520,12 @@ class RoomFamily extends Family<AsyncValue<Room?>> {
 }
 
 /// Get a single room by ID.
+/// This provider auto-refreshes when room data changes.
 ///
 /// Copied from [room].
 class RoomProvider extends AutoDisposeFutureProvider<Room?> {
   /// Get a single room by ID.
+  /// This provider auto-refreshes when room data changes.
   ///
   /// Copied from [room].
   RoomProvider(int id)

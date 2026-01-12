@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../application/providers/repository_providers.dart';
 import '../../../application/providers/billing_providers.dart';
+import '../../../application/providers/dashboard_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/validators.dart';
@@ -123,6 +124,10 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
       );
 
       if (mounted) {
+        // Invalidate providers to refresh UI
+        ref.invalidate(billsForOccupancyProvider(widget.occupancyId));
+        ref.invalidate(unpaidBillsProvider);
+        ref.invalidate(dashboardSummaryProvider);
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Bill created')),
@@ -234,8 +239,9 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                           onChanged: (v) => setState(() => _billingMonth = v!),
                         ),
                       ),
-                      const SizedBox(width: 16),
+                      const SizedBox(width: 12),
                       Expanded(
+                        flex: 1,
                         child: DropdownButtonFormField<int>(
                           value: _billingYear,
                           decoration: const InputDecoration(

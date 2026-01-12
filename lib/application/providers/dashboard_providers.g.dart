@@ -6,9 +6,10 @@ part of 'dashboard_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$dashboardSummaryHash() => r'4c979ad5ad79e502d8cbebd3d30952abff457f80';
+String _$dashboardSummaryHash() => r'e5b3a10093de29c90581f14f9addc23d89174062';
 
 /// Provides dashboard summary.
+/// Watches stream providers to auto-refresh when data changes.
 ///
 /// Copied from [dashboardSummary].
 @ProviderFor(dashboardSummary)

@@ -19,6 +19,7 @@ class Tenant with _$Tenant {
     String? policeVerificationDocPath,
     required DateTime createdAt,
     // Denormalized fields
+    int? currentRoomId,
     String? currentRoomNumber,
     String? currentPropertyName,
     @Default(false) bool isCurrentlyOccupying,

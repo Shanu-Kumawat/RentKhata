@@ -42,6 +42,7 @@ class TenantRepositoryImpl implements TenantRepository {
       isPoliceVerified: entity.isPoliceVerified,
       policeVerificationDocPath: entity.policeVerificationDocPath,
       createdAt: entity.createdAt,
+      currentRoomId: activeOccupancy?.roomId,
       currentRoomNumber: roomNumber,
       currentPropertyName: propertyName,
       isCurrentlyOccupying: activeOccupancy != null,

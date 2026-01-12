@@ -12,6 +12,10 @@ import '../../../core/utils/currency_formatter.dart';
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
 
+  void _refresh(WidgetRef ref) {
+    ref.invalidate(dashboardSummaryProvider);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final summaryAsync = ref.watch(dashboardSummaryProvider);
@@ -27,7 +31,7 @@ class DashboardScreen extends ConsumerWidget {
         ],
       ),
       body: summaryAsync.when(
-        data: (summary) => _buildDashboard(context, summary),
+        data: (summary) => _buildDashboard(context, summary, ref),
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => Center(child: Text('Error: $error')),
       ),
@@ -39,10 +43,12 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildDashboard(BuildContext context, DashboardSummary summary) {
+  Widget _buildDashboard(BuildContext context, DashboardSummary summary, WidgetRef ref) {
     return RefreshIndicator(
       onRefresh: () async {
-        // Refresh will be handled by invalidating providers
+        _refresh(ref);
+        // Wait a bit for the provider to refetch
+        await Future.delayed(const Duration(milliseconds: 500));
       },
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),

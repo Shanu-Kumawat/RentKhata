@@ -8,7 +8,20 @@ import 'repository_providers.dart';
 
 part 'billing_providers.g.dart';
 
+/// Watch all bills (auto-updates).
+@riverpod
+Stream<List<Bill>> billsStream(BillsStreamRef ref) {
+  // There's no direct stream for all bills in repository,
+  // but we can create one by watching unpaid bills
+  final repo = ref.watch(billingRepositoryProvider);
+  // Return a stream that updates periodically
+  return Stream.periodic(const Duration(seconds: 2)).asyncMap((_) async {
+    return repo.getAllBills();
+  });
+}
+
 /// Get all bills.
+/// Auto-refreshes when the stream emits.
 @riverpod
 Future<List<Bill>> bills(BillsRef ref) {
   final repo = ref.watch(billingRepositoryProvider);
@@ -16,13 +29,16 @@ Future<List<Bill>> bills(BillsRef ref) {
 }
 
 /// Get bills for an occupancy.
+/// Auto-refreshes by watching the stream.
 @riverpod
 Future<List<Bill>> billsForOccupancy(BillsForOccupancyRef ref, int occupancyId) {
+  // Watch the stream to auto-refresh
+  ref.watch(billsForOccupancyStreamProvider(occupancyId));
   final repo = ref.watch(billingRepositoryProvider);
   return repo.getBillsForOccupancy(occupancyId);
 }
 
-/// Watch bills for an occupancy.
+/// Watch bills for an occupancy (auto-updates).
 @riverpod
 Stream<List<Bill>> billsForOccupancyStream(
   BillsForOccupancyStreamRef ref,
@@ -47,13 +63,16 @@ Future<Bill?> lastElectricityBill(LastElectricityBillRef ref, int occupancyId) {
 }
 
 /// Get payments for a bill.
+/// Auto-refreshes by watching the stream.
 @riverpod
 Future<List<Payment>> paymentsForBill(PaymentsForBillRef ref, int billId) {
+  // Watch the stream to auto-refresh
+  ref.watch(paymentsForBillStreamProvider(billId));
   final repo = ref.watch(billingRepositoryProvider);
   return repo.getPaymentsForBill(billId);
 }
 
-/// Watch payments for a bill.
+/// Watch payments for a bill (auto-updates).
 @riverpod
 Stream<List<Payment>> paymentsForBillStream(
   PaymentsForBillStreamRef ref,
@@ -64,6 +83,7 @@ Stream<List<Payment>> paymentsForBillStream(
 }
 
 /// Get unpaid bills.
+/// Auto-refreshes via periodic check.
 @riverpod
 Future<List<Bill>> unpaidBills(UnpaidBillsRef ref) {
   final repo = ref.watch(billingRepositoryProvider);

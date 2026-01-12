@@ -8,7 +8,7 @@ part of 'tenant_providers.dart';
 
 String _$tenantsStreamHash() => r'8909a6ffc0554c19e1916d1a45c021c31de742e1';
 
-/// Watch all tenants.
+/// Watch all tenants (auto-updates when data changes).
 ///
 /// Copied from [tenantsStream].
 @ProviderFor(tenantsStream)
@@ -44,7 +44,7 @@ final tenantsProvider = AutoDisposeFutureProvider<List<Tenant>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef TenantsRef = AutoDisposeFutureProviderRef<List<Tenant>>;
-String _$tenantHash() => r'd3270c318fddc76811bb7c30903087ef7af4abd5';
+String _$tenantHash() => r'6c05e46b245f343a6e52d9e92231a12e037fa58c';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -68,21 +68,25 @@ class _SystemHash {
 }
 
 /// Get a single tenant by ID.
+/// This provider auto-refreshes when tenantsStream emits new data.
 ///
 /// Copied from [tenant].
 @ProviderFor(tenant)
 const tenantProvider = TenantFamily();
 
 /// Get a single tenant by ID.
+/// This provider auto-refreshes when tenantsStream emits new data.
 ///
 /// Copied from [tenant].
 class TenantFamily extends Family<AsyncValue<Tenant?>> {
   /// Get a single tenant by ID.
+  /// This provider auto-refreshes when tenantsStream emits new data.
   ///
   /// Copied from [tenant].
   const TenantFamily();
 
   /// Get a single tenant by ID.
+  /// This provider auto-refreshes when tenantsStream emits new data.
   ///
   /// Copied from [tenant].
   TenantProvider call(int id) {
@@ -110,10 +114,12 @@ class TenantFamily extends Family<AsyncValue<Tenant?>> {
 }
 
 /// Get a single tenant by ID.
+/// This provider auto-refreshes when tenantsStream emits new data.
 ///
 /// Copied from [tenant].
 class TenantProvider extends AutoDisposeFutureProvider<Tenant?> {
   /// Get a single tenant by ID.
+  /// This provider auto-refreshes when tenantsStream emits new data.
   ///
   /// Copied from [tenant].
   TenantProvider(int id)
@@ -324,25 +330,29 @@ class _SearchTenantsProviderElement
 }
 
 String _$customFieldsForTenantHash() =>
-    r'ef024bd2aa476cc849526f3fc01c759b8b43e639';
+    r'5af741e50127031f6b56d3fe236c8d2cd6720a25';
 
 /// Get custom fields for a tenant.
+/// This auto-refreshes when tenants change.
 ///
 /// Copied from [customFieldsForTenant].
 @ProviderFor(customFieldsForTenant)
 const customFieldsForTenantProvider = CustomFieldsForTenantFamily();
 
 /// Get custom fields for a tenant.
+/// This auto-refreshes when tenants change.
 ///
 /// Copied from [customFieldsForTenant].
 class CustomFieldsForTenantFamily
     extends Family<AsyncValue<List<CustomField>>> {
   /// Get custom fields for a tenant.
+  /// This auto-refreshes when tenants change.
   ///
   /// Copied from [customFieldsForTenant].
   const CustomFieldsForTenantFamily();
 
   /// Get custom fields for a tenant.
+  /// This auto-refreshes when tenants change.
   ///
   /// Copied from [customFieldsForTenant].
   CustomFieldsForTenantProvider call(int tenantId) {
@@ -372,11 +382,13 @@ class CustomFieldsForTenantFamily
 }
 
 /// Get custom fields for a tenant.
+/// This auto-refreshes when tenants change.
 ///
 /// Copied from [customFieldsForTenant].
 class CustomFieldsForTenantProvider
     extends AutoDisposeFutureProvider<List<CustomField>> {
   /// Get custom fields for a tenant.
+  /// This auto-refreshes when tenants change.
   ///
   /// Copied from [customFieldsForTenant].
   CustomFieldsForTenantProvider(int tenantId)
@@ -464,7 +476,7 @@ class _CustomFieldsForTenantProviderElement
 String _$activeOccupanciesStreamHash() =>
     r'c9d10a3bdd9d1e024de1da337739db48d7f6a7f4';
 
-/// Watch active occupancies.
+/// Watch active occupancies (auto-updates when data changes).
 ///
 /// Copied from [activeOccupanciesStream].
 @ProviderFor(activeOccupanciesStream)
@@ -503,24 +515,28 @@ final activeOccupanciesProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef ActiveOccupanciesRef = AutoDisposeFutureProviderRef<List<Occupancy>>;
-String _$occupancyForRoomHash() => r'e964f2f2a385f45e569b6de281731d9448f05787';
+String _$occupancyForRoomHash() => r'2cb945d0a067595eaa5f8e8386567bb5284c9079';
 
 /// Get active occupancy for a room.
+/// This provider auto-refreshes when occupancy data changes.
 ///
 /// Copied from [occupancyForRoom].
 @ProviderFor(occupancyForRoom)
 const occupancyForRoomProvider = OccupancyForRoomFamily();
 
 /// Get active occupancy for a room.
+/// This provider auto-refreshes when occupancy data changes.
 ///
 /// Copied from [occupancyForRoom].
 class OccupancyForRoomFamily extends Family<AsyncValue<Occupancy?>> {
   /// Get active occupancy for a room.
+  /// This provider auto-refreshes when occupancy data changes.
   ///
   /// Copied from [occupancyForRoom].
   const OccupancyForRoomFamily();
 
   /// Get active occupancy for a room.
+  /// This provider auto-refreshes when occupancy data changes.
   ///
   /// Copied from [occupancyForRoom].
   OccupancyForRoomProvider call(int roomId) {
@@ -550,10 +566,12 @@ class OccupancyForRoomFamily extends Family<AsyncValue<Occupancy?>> {
 }
 
 /// Get active occupancy for a room.
+/// This provider auto-refreshes when occupancy data changes.
 ///
 /// Copied from [occupancyForRoom].
 class OccupancyForRoomProvider extends AutoDisposeFutureProvider<Occupancy?> {
   /// Get active occupancy for a room.
+  /// This provider auto-refreshes when occupancy data changes.
   ///
   /// Copied from [occupancyForRoom].
   OccupancyForRoomProvider(int roomId)
@@ -635,24 +653,28 @@ class _OccupancyForRoomProviderElement
   int get roomId => (origin as OccupancyForRoomProvider).roomId;
 }
 
-String _$tenantForRoomHash() => r'c0f46828529b3c5eea3b8b2359b9690e3c29a63d';
+String _$tenantForRoomHash() => r'80cae7b32b9d06b518373181aabd7541134120dc';
 
 /// Get tenant for a room.
+/// This provider auto-refreshes when tenant data changes.
 ///
 /// Copied from [tenantForRoom].
 @ProviderFor(tenantForRoom)
 const tenantForRoomProvider = TenantForRoomFamily();
 
 /// Get tenant for a room.
+/// This provider auto-refreshes when tenant data changes.
 ///
 /// Copied from [tenantForRoom].
 class TenantForRoomFamily extends Family<AsyncValue<Tenant?>> {
   /// Get tenant for a room.
+  /// This provider auto-refreshes when tenant data changes.
   ///
   /// Copied from [tenantForRoom].
   const TenantForRoomFamily();
 
   /// Get tenant for a room.
+  /// This provider auto-refreshes when tenant data changes.
   ///
   /// Copied from [tenantForRoom].
   TenantForRoomProvider call(int roomId) {
@@ -682,10 +704,12 @@ class TenantForRoomFamily extends Family<AsyncValue<Tenant?>> {
 }
 
 /// Get tenant for a room.
+/// This provider auto-refreshes when tenant data changes.
 ///
 /// Copied from [tenantForRoom].
 class TenantForRoomProvider extends AutoDisposeFutureProvider<Tenant?> {
   /// Get tenant for a room.
+  /// This provider auto-refreshes when tenant data changes.
   ///
   /// Copied from [tenantForRoom].
   TenantForRoomProvider(int roomId)

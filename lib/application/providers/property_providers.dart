@@ -8,7 +8,7 @@ import 'repository_providers.dart';
 
 part 'property_providers.g.dart';
 
-/// Watch all properties.
+/// Watch all properties (auto-updates when data changes).
 @riverpod
 Stream<List<Property>> propertiesStream(PropertiesStreamRef ref) {
   final repo = ref.watch(propertyRepositoryProvider);
@@ -23,13 +23,16 @@ Future<List<Property>> properties(PropertiesRef ref) {
 }
 
 /// Get a single property by ID.
+/// This provider auto-refreshes when propertiesStream emits new data.
 @riverpod
-Future<Property?> property(PropertyRef ref, int id) {
+Future<Property?> property(PropertyRef ref, int id) async {
+  // Watch the stream to trigger refresh when properties change
+  ref.watch(propertiesStreamProvider);
   final repo = ref.watch(propertyRepositoryProvider);
   return repo.getPropertyById(id);
 }
 
-/// Watch rooms for a property.
+/// Watch rooms for a property (auto-updates when data changes).
 @riverpod
 Stream<List<Room>> roomsForPropertyStream(
   RoomsForPropertyStreamRef ref,
@@ -47,8 +50,11 @@ Future<List<Room>> roomsForProperty(RoomsForPropertyRef ref, int propertyId) {
 }
 
 /// Get a single room by ID.
+/// This provider auto-refreshes when room data changes.
 @riverpod
-Future<Room?> room(RoomRef ref, int id) {
+Future<Room?> room(RoomRef ref, int id) async {
+  // Watch the all rooms stream indirectly through property stream
+  ref.watch(propertiesStreamProvider);
   final repo = ref.watch(propertyRepositoryProvider);
   return repo.getRoomById(id);
 }

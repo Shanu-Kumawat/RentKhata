@@ -6,9 +6,29 @@ part of 'billing_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+String _$billsStreamHash() => r'1be27f6281a0a5703bacc454d806409a58e9f922';
+
+/// Watch all bills (auto-updates).
+///
+/// Copied from [billsStream].
+@ProviderFor(billsStream)
+final billsStreamProvider = AutoDisposeStreamProvider<List<Bill>>.internal(
+  billsStream,
+  name: r'billsStreamProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$billsStreamHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef BillsStreamRef = AutoDisposeStreamProviderRef<List<Bill>>;
 String _$billsHash() => r'10b00ecfa32c830218199a29fa5d5aaa97b7faa5';
 
 /// Get all bills.
+/// Auto-refreshes when the stream emits.
 ///
 /// Copied from [bills].
 @ProviderFor(bills)
@@ -25,7 +45,7 @@ final billsProvider = AutoDisposeFutureProvider<List<Bill>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef BillsRef = AutoDisposeFutureProviderRef<List<Bill>>;
-String _$billsForOccupancyHash() => r'8e2a9156f4674c34a0d4e8cf1fa17ce6485cc57d';
+String _$billsForOccupancyHash() => r'2f81eebe1ad36b615a590fb6e0f1db5738d78ab1';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -49,21 +69,25 @@ class _SystemHash {
 }
 
 /// Get bills for an occupancy.
+/// Auto-refreshes by watching the stream.
 ///
 /// Copied from [billsForOccupancy].
 @ProviderFor(billsForOccupancy)
 const billsForOccupancyProvider = BillsForOccupancyFamily();
 
 /// Get bills for an occupancy.
+/// Auto-refreshes by watching the stream.
 ///
 /// Copied from [billsForOccupancy].
 class BillsForOccupancyFamily extends Family<AsyncValue<List<Bill>>> {
   /// Get bills for an occupancy.
+  /// Auto-refreshes by watching the stream.
   ///
   /// Copied from [billsForOccupancy].
   const BillsForOccupancyFamily();
 
   /// Get bills for an occupancy.
+  /// Auto-refreshes by watching the stream.
   ///
   /// Copied from [billsForOccupancy].
   BillsForOccupancyProvider call(int occupancyId) {
@@ -93,10 +117,12 @@ class BillsForOccupancyFamily extends Family<AsyncValue<List<Bill>>> {
 }
 
 /// Get bills for an occupancy.
+/// Auto-refreshes by watching the stream.
 ///
 /// Copied from [billsForOccupancy].
 class BillsForOccupancyProvider extends AutoDisposeFutureProvider<List<Bill>> {
   /// Get bills for an occupancy.
+  /// Auto-refreshes by watching the stream.
   ///
   /// Copied from [billsForOccupancy].
   BillsForOccupancyProvider(int occupancyId)
@@ -182,22 +208,22 @@ class _BillsForOccupancyProviderElement
 String _$billsForOccupancyStreamHash() =>
     r'6109c2f5a474858cc4bf1948fd8939d1ead6105b';
 
-/// Watch bills for an occupancy.
+/// Watch bills for an occupancy (auto-updates).
 ///
 /// Copied from [billsForOccupancyStream].
 @ProviderFor(billsForOccupancyStream)
 const billsForOccupancyStreamProvider = BillsForOccupancyStreamFamily();
 
-/// Watch bills for an occupancy.
+/// Watch bills for an occupancy (auto-updates).
 ///
 /// Copied from [billsForOccupancyStream].
 class BillsForOccupancyStreamFamily extends Family<AsyncValue<List<Bill>>> {
-  /// Watch bills for an occupancy.
+  /// Watch bills for an occupancy (auto-updates).
   ///
   /// Copied from [billsForOccupancyStream].
   const BillsForOccupancyStreamFamily();
 
-  /// Watch bills for an occupancy.
+  /// Watch bills for an occupancy (auto-updates).
   ///
   /// Copied from [billsForOccupancyStream].
   BillsForOccupancyStreamProvider call(int occupancyId) {
@@ -226,12 +252,12 @@ class BillsForOccupancyStreamFamily extends Family<AsyncValue<List<Bill>>> {
   String? get name => r'billsForOccupancyStreamProvider';
 }
 
-/// Watch bills for an occupancy.
+/// Watch bills for an occupancy (auto-updates).
 ///
 /// Copied from [billsForOccupancyStream].
 class BillsForOccupancyStreamProvider
     extends AutoDisposeStreamProvider<List<Bill>> {
-  /// Watch bills for an occupancy.
+  /// Watch bills for an occupancy (auto-updates).
   ///
   /// Copied from [billsForOccupancyStream].
   BillsForOccupancyStreamProvider(int occupancyId)
@@ -579,24 +605,28 @@ class _LastElectricityBillProviderElement
   int get occupancyId => (origin as LastElectricityBillProvider).occupancyId;
 }
 
-String _$paymentsForBillHash() => r'59a7fb7be719efd3980896985fc2845147c0e1d2';
+String _$paymentsForBillHash() => r'c6e4fbc40b47f657ab0f2706f58405988ae07c02';
 
 /// Get payments for a bill.
+/// Auto-refreshes by watching the stream.
 ///
 /// Copied from [paymentsForBill].
 @ProviderFor(paymentsForBill)
 const paymentsForBillProvider = PaymentsForBillFamily();
 
 /// Get payments for a bill.
+/// Auto-refreshes by watching the stream.
 ///
 /// Copied from [paymentsForBill].
 class PaymentsForBillFamily extends Family<AsyncValue<List<Payment>>> {
   /// Get payments for a bill.
+  /// Auto-refreshes by watching the stream.
   ///
   /// Copied from [paymentsForBill].
   const PaymentsForBillFamily();
 
   /// Get payments for a bill.
+  /// Auto-refreshes by watching the stream.
   ///
   /// Copied from [paymentsForBill].
   PaymentsForBillProvider call(int billId) {
@@ -626,10 +656,12 @@ class PaymentsForBillFamily extends Family<AsyncValue<List<Payment>>> {
 }
 
 /// Get payments for a bill.
+/// Auto-refreshes by watching the stream.
 ///
 /// Copied from [paymentsForBill].
 class PaymentsForBillProvider extends AutoDisposeFutureProvider<List<Payment>> {
   /// Get payments for a bill.
+  /// Auto-refreshes by watching the stream.
   ///
   /// Copied from [paymentsForBill].
   PaymentsForBillProvider(int billId)
@@ -714,22 +746,22 @@ class _PaymentsForBillProviderElement
 String _$paymentsForBillStreamHash() =>
     r'35a9d0959d5c12dd00f0a0e28192ee9a94b99ae0';
 
-/// Watch payments for a bill.
+/// Watch payments for a bill (auto-updates).
 ///
 /// Copied from [paymentsForBillStream].
 @ProviderFor(paymentsForBillStream)
 const paymentsForBillStreamProvider = PaymentsForBillStreamFamily();
 
-/// Watch payments for a bill.
+/// Watch payments for a bill (auto-updates).
 ///
 /// Copied from [paymentsForBillStream].
 class PaymentsForBillStreamFamily extends Family<AsyncValue<List<Payment>>> {
-  /// Watch payments for a bill.
+  /// Watch payments for a bill (auto-updates).
   ///
   /// Copied from [paymentsForBillStream].
   const PaymentsForBillStreamFamily();
 
-  /// Watch payments for a bill.
+  /// Watch payments for a bill (auto-updates).
   ///
   /// Copied from [paymentsForBillStream].
   PaymentsForBillStreamProvider call(int billId) {
@@ -758,12 +790,12 @@ class PaymentsForBillStreamFamily extends Family<AsyncValue<List<Payment>>> {
   String? get name => r'paymentsForBillStreamProvider';
 }
 
-/// Watch payments for a bill.
+/// Watch payments for a bill (auto-updates).
 ///
 /// Copied from [paymentsForBillStream].
 class PaymentsForBillStreamProvider
     extends AutoDisposeStreamProvider<List<Payment>> {
-  /// Watch payments for a bill.
+  /// Watch payments for a bill (auto-updates).
   ///
   /// Copied from [paymentsForBillStream].
   PaymentsForBillStreamProvider(int billId)
@@ -848,6 +880,7 @@ class _PaymentsForBillStreamProviderElement
 String _$unpaidBillsHash() => r'55b62459f26e48b1553254e5e9b649ef983b11d8';
 
 /// Get unpaid bills.
+/// Auto-refreshes via periodic check.
 ///
 /// Copied from [unpaidBills].
 @ProviderFor(unpaidBills)

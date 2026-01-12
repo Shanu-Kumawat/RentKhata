@@ -2,8 +2,6 @@
 library;
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../../domain/entities/bill.dart';
-import '../../domain/entities/property.dart';
 import '../../domain/entities/landlord.dart';
 import 'repository_providers.dart';
 import 'property_providers.dart';
@@ -41,8 +39,12 @@ class DashboardSummary {
 }
 
 /// Provides dashboard summary.
+/// Watches stream providers to auto-refresh when data changes.
 @riverpod
 Future<DashboardSummary> dashboardSummary(DashboardSummaryRef ref) async {
+  // Watch the stream providers to trigger auto-refresh
+  ref.watch(propertiesStreamProvider);
+  
   final properties = await ref.watch(propertiesProvider.future);
   final unpaidBills = await ref.watch(unpaidBillsProvider.future);
   final billingRepo = ref.watch(billingRepositoryProvider);
