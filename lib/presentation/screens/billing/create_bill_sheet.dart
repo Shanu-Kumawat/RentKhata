@@ -56,12 +56,13 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
 
   Future<void> _loadLastReading() async {
     if (!widget.hasElectricityMeter) return;
-    
+
     final lastBill = await ref.read(
       lastElectricityBillProvider(widget.occupancyId).future,
     );
     if (lastBill != null && lastBill.electricityCurrReading != null) {
-      _prevReadingController.text = lastBill.electricityCurrReading!.toStringAsFixed(0);
+      _prevReadingController.text = lastBill.electricityCurrReading!
+          .toStringAsFixed(0);
     }
   }
 
@@ -86,7 +87,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
     final prev = double.tryParse(_prevReadingController.text) ?? 0;
     final curr = double.tryParse(_currReadingController.text) ?? 0;
     final units = curr - prev;
-    
+
     if (units > 0) {
       _electricityCharges = units * widget.electricityRate;
       _amountController.text = _electricityCharges.toStringAsFixed(0);
@@ -101,7 +102,14 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
 
     try {
       final repo = ref.read(billingRepositoryProvider);
-      
+
+      // Calculate period dates from month/year
+      final periodStart = DateTime(_billingYear, _billingMonth, 1);
+      // End of month: next month's 1st minus 1 day
+      final periodEnd = DateTime(_billingYear, _billingMonth + 1, 0);
+      // Due date: 10 days after period start
+      final calculatedDueDate = periodStart.add(const Duration(days: 10));
+
       await repo.createBill(
         occupancyId: widget.occupancyId,
         billType: _selectedBillType,
@@ -121,6 +129,9 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
             ? _electricityCharges
             : null,
         notes: _notesController.text.isEmpty ? null : _notesController.text,
+        periodStartDate: periodStart,
+        periodEndDate: periodEnd,
+        dueDate: calculatedDueDate,
       );
 
       if (mounted) {
@@ -129,15 +140,15 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
         ref.invalidate(unpaidBillsProvider);
         ref.invalidate(dashboardSummaryProvider);
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Bill created')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Bill created')));
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -147,8 +158,18 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
   @override
   Widget build(BuildContext context) {
     final months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
     ];
 
     return Padding(
@@ -177,16 +198,14 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                         children: [
                           Text(
                             'Create Bill',
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            style: Theme.of(context).textTheme.titleLarge
+                                ?.copyWith(fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             'Room ${widget.roomNumber}',
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: AppColors.onSurfaceVariant,
-                                ),
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(color: AppColors.onSurfaceVariant),
                           ),
                         ],
                       ),
@@ -227,9 +246,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                         flex: 2,
                         child: DropdownButtonFormField<int>(
                           value: _billingMonth,
-                          decoration: const InputDecoration(
-                            labelText: 'Month',
-                          ),
+                          decoration: const InputDecoration(labelText: 'Month'),
                           items: List.generate(12, (i) {
                             return DropdownMenuItem(
                               value: i + 1,
@@ -244,9 +261,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                         flex: 1,
                         child: DropdownButtonFormField<int>(
                           value: _billingYear,
-                          decoration: const InputDecoration(
-                            labelText: 'Year',
-                          ),
+                          decoration: const InputDecoration(labelText: 'Year'),
                           items: List.generate(5, (i) {
                             final year = DateTime.now().year - 2 + i;
                             return DropdownMenuItem(
@@ -262,7 +277,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                   const SizedBox(height: 24),
 
                   // Electricity readings (if applicable)
-                  if (_selectedBillType == BillType.electricity && 
+                  if (_selectedBillType == BillType.electricity &&
                       widget.hasElectricityMeter) ...[
                     Text(
                       'Meter Readings',
@@ -291,7 +306,8 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                               prefixIcon: Icon(Icons.arrow_forward),
                             ),
                             keyboardType: TextInputType.number,
-                            validator: (v) => validatePositiveNumber(v, 'Current reading'),
+                            validator: (v) =>
+                                validatePositiveNumber(v, 'Current reading'),
                             onChanged: (_) => _calculateElectricityCharges(),
                           ),
                         ),
@@ -314,7 +330,8 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                             ),
                             Text(
                               formatCurrency(_electricityCharges),
-                              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                              style: Theme.of(context).textTheme.titleSmall
+                                  ?.copyWith(
                                     fontWeight: FontWeight.bold,
                                     color: AppColors.primary,
                                   ),

@@ -128,6 +128,8 @@ class BillingRepositoryImpl implements BillingRepository {
       notes: entity.notes,
       createdAt: entity.createdAt,
       dueDate: entity.dueDate,
+      periodStartDate: entity.periodStartDate,
+      periodEndDate: entity.periodEndDate,
       paidAmount: paidAmount,
       pendingAmount: pendingAmount,
       roomNumber: roomNumber,
@@ -201,6 +203,8 @@ class BillingRepositoryImpl implements BillingRepository {
     String? meterPhotoPath,
     String? notes,
     DateTime? dueDate,
+    DateTime? periodStartDate,
+    DateTime? periodEndDate,
   }) async {
     final bill = BillsCompanion(
       occupancyId: Value(occupancyId),
@@ -215,6 +219,8 @@ class BillingRepositoryImpl implements BillingRepository {
       meterPhotoPath: Value(meterPhotoPath),
       notes: Value(notes),
       dueDate: Value(dueDate),
+      periodStartDate: Value(periodStartDate),
+      periodEndDate: Value(periodEndDate),
     );
     return _billingDao.insertBill(bill);
   }
