@@ -23,7 +23,7 @@ class WelcomeScreen extends StatelessWidget {
                 width: 200,
                 height: 200,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
+                  color: AppColors.primary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -107,7 +107,7 @@ class _FeatureItem extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: AppColors.secondary.withOpacity(0.1),
+            color: AppColors.secondary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(icon, color: AppColors.secondary, size: 24),

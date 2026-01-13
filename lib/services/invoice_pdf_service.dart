@@ -127,7 +127,7 @@ class InvoicePdfService {
                         _tableCell('  Previous Reading'),
                         _tableCell(''),
                         _tableCell(
-                          '${bill.electricityPrevReading!.toStringAsFixed(0)}',
+                          bill.electricityPrevReading!.toStringAsFixed(0),
                         ),
                       ],
                     ),
@@ -136,7 +136,7 @@ class InvoicePdfService {
                         _tableCell('  Current Reading'),
                         _tableCell(''),
                         _tableCell(
-                          '${bill.electricityCurrReading!.toStringAsFixed(0)}',
+                          bill.electricityCurrReading!.toStringAsFixed(0),
                         ),
                       ],
                     ),

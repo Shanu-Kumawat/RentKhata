@@ -98,7 +98,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
             width: widget.size,
             height: widget.size,
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(widget.size / 4), // Rounded square
               image: _currentImagePath != null
                   ? DecorationImage(

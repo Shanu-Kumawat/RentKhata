@@ -107,7 +107,7 @@ class PropertyDetailScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: AppColors.secondary.withOpacity(0.1),
+                color: AppColors.secondary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -217,7 +217,7 @@ class _PropertyHeader extends StatelessWidget {
             width: 64,
             height: 64,
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(16),
             ),
             child: const Icon(
@@ -295,7 +295,7 @@ class _InfoChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: chipColor.withOpacity(0.1),
+        color: chipColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
@@ -338,7 +338,7 @@ class _RoomCard extends StatelessWidget {
                 height: 48,
                 decoration: BoxDecoration(
                   color: room.isOccupied
-                      ? AppColors.success.withOpacity(0.1)
+                      ? AppColors.success.withValues(alpha: 0.1)
                       : AppColors.surfaceVariant,
                   borderRadius: BorderRadius.circular(12),
                 ),

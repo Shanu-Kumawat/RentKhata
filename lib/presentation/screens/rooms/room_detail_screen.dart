@@ -254,7 +254,7 @@ class _RoomInfoCard extends StatelessWidget {
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: room.isOccupied
-                        ? AppColors.success.withOpacity(0.1)
+                        ? AppColors.success.withValues(alpha: 0.1)
                         : AppColors.surfaceVariant,
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -359,7 +359,7 @@ class _OccupancyCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 24,
-                  backgroundColor: AppColors.primary.withOpacity(0.1),
+                  backgroundColor: AppColors.primary.withValues(alpha: 0.1),
                   child: Text(
                     (occupancy.tenantName ?? 'T')[0].toUpperCase(),
                     style: const TextStyle(
@@ -573,7 +573,7 @@ class _BillTile extends StatelessWidget {
         leading: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: statusColor.withOpacity(0.1),
+            color: statusColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(

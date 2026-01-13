@@ -166,7 +166,9 @@ class _BillCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: _getBillTypeColor(bill.billType).withOpacity(0.1),
+                    color: _getBillTypeColor(
+                      bill.billType,
+                    ).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
@@ -197,8 +199,8 @@ class _BillCard extends StatelessWidget {
                           '${bill.propertyName ?? ''} - Room ${bill.roomNumber}',
                           style: Theme.of(context).textTheme.labelSmall
                               ?.copyWith(
-                                color: AppColors.onSurfaceVariant.withOpacity(
-                                  0.7,
+                                color: AppColors.onSurfaceVariant.withValues(
+                                  alpha: 0.7,
                                 ),
                               ),
                         ),
@@ -212,7 +214,7 @@ class _BillCard extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.1),
+                    color: statusColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(

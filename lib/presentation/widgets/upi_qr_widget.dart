@@ -62,7 +62,7 @@ Pay using UPI: $_upiUri
       return Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: AppColors.warning.withOpacity(0.1),
+          color: AppColors.warning.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
@@ -95,7 +95,7 @@ Pay using UPI: $_upiUri
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),

@@ -195,7 +195,7 @@ class _ProfileCard extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 36,
-              backgroundColor: AppColors.primary.withOpacity(0.1),
+              backgroundColor: AppColors.primary.withValues(alpha: 0.1),
               child: Text(
                 tenant.name[0].toUpperCase(),
                 style: const TextStyle(
@@ -260,12 +260,12 @@ class _CurrentOccupancyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: AppColors.success.withOpacity(0.05),
+      color: AppColors.success.withValues(alpha: 0.05),
       child: ListTile(
         leading: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: AppColors.success.withOpacity(0.1),
+            color: AppColors.success.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: const Icon(Icons.home_outlined, color: AppColors.success),
@@ -375,7 +375,7 @@ class _VerificationCard extends StatelessWidget {
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
             color: tenant.isPoliceVerified
-                ? AppColors.success.withOpacity(0.1)
+                ? AppColors.success.withValues(alpha: 0.1)
                 : AppColors.surfaceVariant,
             borderRadius: BorderRadius.circular(8),
           ),

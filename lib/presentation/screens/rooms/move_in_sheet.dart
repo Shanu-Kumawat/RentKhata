@@ -228,7 +228,7 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
                           return Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: AppColors.warning.withOpacity(0.1),
+                              color: AppColors.warning.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Row(
@@ -395,11 +395,11 @@ class _TenantRadioTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
-      color: isSelected ? AppColors.primary.withOpacity(0.1) : null,
+      color: isSelected ? AppColors.primary.withValues(alpha: 0.1) : null,
       child: ListTile(
         onTap: onTap,
         leading: CircleAvatar(
-          backgroundColor: AppColors.secondary.withOpacity(0.1),
+          backgroundColor: AppColors.secondary.withValues(alpha: 0.1),
           child: Text(
             tenant.name[0].toUpperCase(),
             style: const TextStyle(

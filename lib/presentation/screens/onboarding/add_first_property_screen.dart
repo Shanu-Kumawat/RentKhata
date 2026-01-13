@@ -105,7 +105,7 @@ class _AddFirstPropertyScreenState
                   width: 120,
                   height: 120,
                   decoration: BoxDecoration(
-                    color: AppColors.secondary.withOpacity(0.1),
+                    color: AppColors.secondary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(24),
                   ),
                   child: const Icon(
@@ -147,7 +147,7 @@ class _AddFirstPropertyScreenState
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.secondary.withOpacity(0.1),
+                  color: AppColors.secondary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(

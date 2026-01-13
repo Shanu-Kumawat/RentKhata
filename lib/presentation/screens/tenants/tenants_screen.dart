@@ -84,7 +84,7 @@ class _TenantsScreenState extends ConsumerState<TenantsScreen> {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppColors.secondary.withOpacity(0.1),
+                color: AppColors.secondary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -147,7 +147,7 @@ class _TenantCard extends StatelessWidget {
               // Avatar
               CircleAvatar(
                 radius: 28,
-                backgroundColor: AppColors.primary.withOpacity(0.1),
+                backgroundColor: AppColors.primary.withValues(alpha: 0.1),
                 backgroundImage: tenant.photoPath != null
                     ? AssetImage(tenant.photoPath!)
                     : null,
@@ -186,7 +186,7 @@ class _TenantCard extends StatelessWidget {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.success.withOpacity(0.1),
+                              color: AppColors.success.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Row(
@@ -258,7 +258,7 @@ class _TenantCard extends StatelessWidget {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.onSurfaceVariant.withOpacity(0.1),
+                          color: AppColors.onSurfaceVariant.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
