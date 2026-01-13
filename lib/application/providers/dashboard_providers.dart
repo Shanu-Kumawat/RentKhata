@@ -1,6 +1,7 @@
 /// Dashboard-related providers.
 library;
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../domain/entities/landlord.dart';
 import 'repository_providers.dart';
@@ -41,7 +42,7 @@ class DashboardSummary {
 /// Provides dashboard summary.
 /// Watches stream providers to auto-refresh when data changes.
 @riverpod
-Future<DashboardSummary> dashboardSummary(DashboardSummaryRef ref) async {
+Future<DashboardSummary> dashboardSummary(Ref ref) async {
   // Watch the stream providers to trigger auto-refresh
   ref.watch(propertiesStreamProvider);
   
@@ -86,21 +87,21 @@ Future<DashboardSummary> dashboardSummary(DashboardSummaryRef ref) async {
 
 /// Watch landlord profile.
 @riverpod
-Stream<Landlord?> landlordStream(LandlordStreamRef ref) {
+Stream<Landlord?> landlordStream(Ref ref) {
   final repo = ref.watch(landlordRepositoryProvider);
   return repo.watchLandlord();
 }
 
 /// Check if is first launch (no landlord profile).
 @riverpod
-Future<bool> isFirstLaunch(IsFirstLaunchRef ref) async {
+Future<bool> isFirstLaunch(Ref ref) async {
   final repo = ref.watch(landlordRepositoryProvider);
   return !(await repo.hasLandlordProfile());
 }
 
 /// Get landlord profile.
 @riverpod
-Future<Landlord?> landlord(LandlordRef ref) {
+Future<Landlord?> landlord(Ref ref) {
   final repo = ref.watch(landlordRepositoryProvider);
   return repo.getLandlord();
 }

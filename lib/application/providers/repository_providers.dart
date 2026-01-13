@@ -1,6 +1,7 @@
 /// Repository providers.
 library;
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../domain/repositories/landlord_repository.dart';
 import '../../domain/repositories/property_repository.dart';
@@ -16,13 +17,13 @@ part 'repository_providers.g.dart';
 
 /// Provides the LandlordRepository.
 @riverpod
-LandlordRepository landlordRepository(LandlordRepositoryRef ref) {
+LandlordRepository landlordRepository(Ref ref) {
   return LandlordRepositoryImpl(ref.watch(landlordDaoProvider));
 }
 
 /// Provides the PropertyRepository.
 @riverpod
-PropertyRepository propertyRepository(PropertyRepositoryRef ref) {
+PropertyRepository propertyRepository(Ref ref) {
   return PropertyRepositoryImpl(
     ref.watch(propertyDaoProvider),
     ref.watch(tenantDaoProvider),
@@ -31,7 +32,7 @@ PropertyRepository propertyRepository(PropertyRepositoryRef ref) {
 
 /// Provides the TenantRepository.
 @riverpod
-TenantRepository tenantRepository(TenantRepositoryRef ref) {
+TenantRepository tenantRepository(Ref ref) {
   return TenantRepositoryImpl(
     ref.watch(tenantDaoProvider),
     ref.watch(propertyDaoProvider),
@@ -40,7 +41,7 @@ TenantRepository tenantRepository(TenantRepositoryRef ref) {
 
 /// Provides the BillingRepository.
 @riverpod
-BillingRepository billingRepository(BillingRepositoryRef ref) {
+BillingRepository billingRepository(Ref ref) {
   return BillingRepositoryImpl(
     ref.watch(billingDaoProvider),
     ref.watch(tenantDaoProvider),

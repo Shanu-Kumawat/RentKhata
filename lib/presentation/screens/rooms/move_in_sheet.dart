@@ -16,11 +16,7 @@ class MoveInSheet extends ConsumerStatefulWidget {
   final int roomId;
   final Room room;
 
-  const MoveInSheet({
-    super.key,
-    required this.roomId,
-    required this.room,
-  });
+  const MoveInSheet({super.key, required this.roomId, required this.room});
 
   @override
   ConsumerState<MoveInSheet> createState() => _MoveInSheetState();
@@ -31,12 +27,12 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
   final _rentController = TextEditingController();
   final _depositController = TextEditingController();
   final _searchController = TextEditingController();
-  
+
   DateTime _moveInDate = DateTime.now();
   Tenant? _selectedTenant;
   bool _isLoading = false;
   bool _createNewTenant = false;
-  
+
   // New tenant fields
   final _newNameController = TextEditingController();
   final _newPhoneController = TextEditingController();
@@ -71,11 +67,11 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
 
   Future<void> _saveOccupancy() async {
     if (!_formKey.currentState!.validate()) return;
-    
+
     if (!_createNewTenant && _selectedTenant == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a tenant')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please select a tenant')));
       return;
     }
 
@@ -84,25 +80,26 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
     try {
       final tenantRepo = ref.read(tenantRepositoryProvider);
       int tenantId;
-      
+
       if (_createNewTenant) {
         // Create new tenant first
         tenantId = await tenantRepo.createTenant(
           name: _newNameController.text.trim(),
-          phone: _newPhoneController.text.trim().isEmpty 
-              ? null 
+          phone: _newPhoneController.text.trim().isEmpty
+              ? null
               : _newPhoneController.text.trim(),
         );
       } else {
         tenantId = _selectedTenant!.id;
       }
-      
+
       // Create occupancy
       await tenantRepo.createOccupancy(
         roomId: widget.roomId,
         tenantId: tenantId,
         moveInDate: _moveInDate,
-        agreedRent: double.tryParse(_rentController.text) ?? widget.room.baseRent,
+        agreedRent:
+            double.tryParse(_rentController.text) ?? widget.room.baseRent,
         securityDeposit: double.tryParse(_depositController.text) ?? 0,
       );
 
@@ -114,9 +111,9 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -153,16 +150,14 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
                         children: [
                           Text(
                             'Move In Tenant',
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            style: Theme.of(context).textTheme.titleLarge
+                                ?.copyWith(fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             'Room ${widget.room.roomNumber}',
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: AppColors.onSurfaceVariant,
-                                ),
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(color: AppColors.onSurfaceVariant),
                           ),
                         ],
                       ),
@@ -223,7 +218,7 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
                         final availableTenants = tenants
                             .where((t) => !t.isCurrentlyOccupying)
                             .toList();
-                        
+
                         if (availableTenants.isEmpty) {
                           return Container(
                             padding: const EdgeInsets.all(16),
@@ -233,19 +228,24 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
                             ),
                             child: Row(
                               children: [
-                                const Icon(Icons.info_outline, color: AppColors.warning),
+                                const Icon(
+                                  Icons.info_outline,
+                                  color: AppColors.warning,
+                                ),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Text(
                                     'No available tenants. Create a new tenant or add tenants who are not currently occupying any room.',
-                                    style: Theme.of(context).textTheme.bodySmall,
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.bodySmall,
                                   ),
                                 ),
                               ],
                             ),
                           );
                         }
-                        
+
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -254,15 +254,19 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
                               style: Theme.of(context).textTheme.titleSmall,
                             ),
                             const SizedBox(height: 8),
-                            ...availableTenants.map((tenant) => _TenantRadioTile(
-                              tenant: tenant,
-                              isSelected: _selectedTenant?.id == tenant.id,
-                              onTap: () => setState(() => _selectedTenant = tenant),
-                            )),
+                            ...availableTenants.map(
+                              (tenant) => _TenantRadioTile(
+                                tenant: tenant,
+                                isSelected: _selectedTenant?.id == tenant.id,
+                                onTap: () =>
+                                    setState(() => _selectedTenant = tenant),
+                              ),
+                            ),
                           ],
                         );
                       },
-                      loading: () => const Center(child: CircularProgressIndicator()),
+                      loading: () =>
+                          const Center(child: CircularProgressIndicator()),
                       error: (e, s) => Text('Error: $e'),
                     ),
                   ],
@@ -298,7 +302,8 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
                     decoration: InputDecoration(
                       labelText: 'Agreed Monthly Rent (₹)',
                       prefixIcon: const Icon(Icons.currency_rupee),
-                      helperText: 'Base rent: ${formatCurrency(widget.room.baseRent)}',
+                      helperText:
+                          'Base rent: ${formatCurrency(widget.room.baseRent)}',
                     ),
                     keyboardType: TextInputType.number,
                     validator: (v) => validatePositiveNumber(v, 'Rent'),
@@ -410,10 +415,11 @@ class _TenantRadioTile extends StatelessWidget {
         ),
         title: Text(tenant.name),
         subtitle: tenant.phone != null ? Text(tenant.phone!) : null,
-        trailing: Radio<bool>(
-          value: true,
-          groupValue: isSelected,
-          onChanged: (_) => onTap(),
+        trailing: Icon(
+          isSelected
+              ? Icons.radio_button_checked
+              : Icons.radio_button_unchecked,
+          color: isSelected ? AppColors.primary : AppColors.onSurfaceVariant,
         ),
       ),
     );

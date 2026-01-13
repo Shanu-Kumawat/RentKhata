@@ -1,6 +1,7 @@
 /// Tenant-related providers.
 library;
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../domain/entities/tenant.dart';
 import '../../domain/entities/occupancy.dart';
@@ -10,14 +11,14 @@ part 'tenant_providers.g.dart';
 
 /// Watch all tenants (auto-updates when data changes).
 @riverpod
-Stream<List<Tenant>> tenantsStream(TenantsStreamRef ref) {
+Stream<List<Tenant>> tenantsStream(Ref ref) {
   final repo = ref.watch(tenantRepositoryProvider);
   return repo.watchAllTenants();
 }
 
 /// Get all tenants (future).
 @riverpod
-Future<List<Tenant>> tenants(TenantsRef ref) {
+Future<List<Tenant>> tenants(Ref ref) {
   final repo = ref.watch(tenantRepositoryProvider);
   return repo.getAllTenants();
 }
@@ -25,7 +26,7 @@ Future<List<Tenant>> tenants(TenantsRef ref) {
 /// Get a single tenant by ID.
 /// This provider auto-refreshes when tenantsStream emits new data.
 @riverpod
-Future<Tenant?> tenant(TenantRef ref, int id) async {
+Future<Tenant?> tenant(Ref ref, int id) async {
   // Watch the stream to trigger refresh when tenants change
   ref.watch(tenantsStreamProvider);
   final repo = ref.watch(tenantRepositoryProvider);
@@ -34,7 +35,7 @@ Future<Tenant?> tenant(TenantRef ref, int id) async {
 
 /// Search tenants.
 @riverpod
-Future<List<Tenant>> searchTenants(SearchTenantsRef ref, String query) {
+Future<List<Tenant>> searchTenants(Ref ref, String query) {
   if (query.isEmpty) return ref.watch(tenantsProvider.future);
   final repo = ref.watch(tenantRepositoryProvider);
   return repo.searchTenants(query);
@@ -43,10 +44,7 @@ Future<List<Tenant>> searchTenants(SearchTenantsRef ref, String query) {
 /// Get custom fields for a tenant.
 /// This auto-refreshes when tenants change.
 @riverpod
-Future<List<CustomField>> customFieldsForTenant(
-  CustomFieldsForTenantRef ref,
-  int tenantId,
-) {
+Future<List<CustomField>> customFieldsForTenant(Ref ref, int tenantId) {
   // Watch tenants stream to refresh custom fields when tenant updates
   ref.watch(tenantsStreamProvider);
   final repo = ref.watch(tenantRepositoryProvider);
@@ -55,14 +53,14 @@ Future<List<CustomField>> customFieldsForTenant(
 
 /// Watch active occupancies (auto-updates when data changes).
 @riverpod
-Stream<List<Occupancy>> activeOccupanciesStream(ActiveOccupanciesStreamRef ref) {
+Stream<List<Occupancy>> activeOccupanciesStream(Ref ref) {
   final repo = ref.watch(tenantRepositoryProvider);
   return repo.watchActiveOccupancies();
 }
 
 /// Get active occupancies.
 @riverpod
-Future<List<Occupancy>> activeOccupancies(ActiveOccupanciesRef ref) {
+Future<List<Occupancy>> activeOccupancies(Ref ref) {
   final repo = ref.watch(tenantRepositoryProvider);
   return repo.getActiveOccupancies();
 }
@@ -70,7 +68,7 @@ Future<List<Occupancy>> activeOccupancies(ActiveOccupanciesRef ref) {
 /// Get active occupancy for a room.
 /// This provider auto-refreshes when occupancy data changes.
 @riverpod
-Future<Occupancy?> occupancyForRoom(OccupancyForRoomRef ref, int roomId) {
+Future<Occupancy?> occupancyForRoom(Ref ref, int roomId) {
   // Watch active occupancies stream to trigger refresh
   ref.watch(activeOccupanciesStreamProvider);
   final repo = ref.watch(tenantRepositoryProvider);
@@ -80,7 +78,7 @@ Future<Occupancy?> occupancyForRoom(OccupancyForRoomRef ref, int roomId) {
 /// Get tenant for a room.
 /// This provider auto-refreshes when tenant data changes.
 @riverpod
-Future<Tenant?> tenantForRoom(TenantForRoomRef ref, int roomId) {
+Future<Tenant?> tenantForRoom(Ref ref, int roomId) {
   // Watch tenants and occupancies to trigger refresh
   ref.watch(tenantsStreamProvider);
   ref.watch(activeOccupanciesStreamProvider);

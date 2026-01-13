@@ -262,7 +262,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                       Expanded(
                         flex: 2,
                         child: DropdownButtonFormField<int>(
-                          value: _billingMonth,
+                          initialValue: _billingMonth,
                           decoration: const InputDecoration(labelText: 'Month'),
                           items: List.generate(12, (i) {
                             return DropdownMenuItem(
@@ -277,7 +277,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                       Expanded(
                         flex: 1,
                         child: DropdownButtonFormField<int>(
-                          value: _billingYear,
+                          initialValue: _billingYear,
                           decoration: const InputDecoration(labelText: 'Year'),
                           items: List.generate(5, (i) {
                             final year = DateTime.now().year - 2 + i;
