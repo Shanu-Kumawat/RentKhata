@@ -28,7 +28,11 @@ mixin _$Occupancy {
   DateTime? get moveOutDate => throw _privateConstructorUsedError;
   double get agreedRent => throw _privateConstructorUsedError;
   double get securityDeposit => throw _privateConstructorUsedError;
-  bool get isActive =>
+  bool get isActive => throw _privateConstructorUsedError; // Deposit tracking
+  DepositStatus get depositStatus => throw _privateConstructorUsedError;
+  DateTime? get depositReceivedDate => throw _privateConstructorUsedError;
+  DateTime? get depositReturnedDate => throw _privateConstructorUsedError;
+  double? get depositReturnedAmount =>
       throw _privateConstructorUsedError; // Denormalized fields
   String? get roomNumber => throw _privateConstructorUsedError;
   String? get tenantName => throw _privateConstructorUsedError;
@@ -58,6 +62,10 @@ abstract class $OccupancyCopyWith<$Res> {
     double agreedRent,
     double securityDeposit,
     bool isActive,
+    DepositStatus depositStatus,
+    DateTime? depositReceivedDate,
+    DateTime? depositReturnedDate,
+    double? depositReturnedAmount,
     String? roomNumber,
     String? tenantName,
     String? propertyName,
@@ -87,6 +95,10 @@ class _$OccupancyCopyWithImpl<$Res, $Val extends Occupancy>
     Object? agreedRent = null,
     Object? securityDeposit = null,
     Object? isActive = null,
+    Object? depositStatus = null,
+    Object? depositReceivedDate = freezed,
+    Object? depositReturnedDate = freezed,
+    Object? depositReturnedAmount = freezed,
     Object? roomNumber = freezed,
     Object? tenantName = freezed,
     Object? propertyName = freezed,
@@ -125,6 +137,22 @@ class _$OccupancyCopyWithImpl<$Res, $Val extends Occupancy>
                 ? _value.isActive
                 : isActive // ignore: cast_nullable_to_non_nullable
                       as bool,
+            depositStatus: null == depositStatus
+                ? _value.depositStatus
+                : depositStatus // ignore: cast_nullable_to_non_nullable
+                      as DepositStatus,
+            depositReceivedDate: freezed == depositReceivedDate
+                ? _value.depositReceivedDate
+                : depositReceivedDate // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
+            depositReturnedDate: freezed == depositReturnedDate
+                ? _value.depositReturnedDate
+                : depositReturnedDate // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
+            depositReturnedAmount: freezed == depositReturnedAmount
+                ? _value.depositReturnedAmount
+                : depositReturnedAmount // ignore: cast_nullable_to_non_nullable
+                      as double?,
             roomNumber: freezed == roomNumber
                 ? _value.roomNumber
                 : roomNumber // ignore: cast_nullable_to_non_nullable
@@ -161,6 +189,10 @@ abstract class _$$OccupancyImplCopyWith<$Res>
     double agreedRent,
     double securityDeposit,
     bool isActive,
+    DepositStatus depositStatus,
+    DateTime? depositReceivedDate,
+    DateTime? depositReturnedDate,
+    double? depositReturnedAmount,
     String? roomNumber,
     String? tenantName,
     String? propertyName,
@@ -189,6 +221,10 @@ class __$$OccupancyImplCopyWithImpl<$Res>
     Object? agreedRent = null,
     Object? securityDeposit = null,
     Object? isActive = null,
+    Object? depositStatus = null,
+    Object? depositReceivedDate = freezed,
+    Object? depositReturnedDate = freezed,
+    Object? depositReturnedAmount = freezed,
     Object? roomNumber = freezed,
     Object? tenantName = freezed,
     Object? propertyName = freezed,
@@ -227,6 +263,22 @@ class __$$OccupancyImplCopyWithImpl<$Res>
             ? _value.isActive
             : isActive // ignore: cast_nullable_to_non_nullable
                   as bool,
+        depositStatus: null == depositStatus
+            ? _value.depositStatus
+            : depositStatus // ignore: cast_nullable_to_non_nullable
+                  as DepositStatus,
+        depositReceivedDate: freezed == depositReceivedDate
+            ? _value.depositReceivedDate
+            : depositReceivedDate // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
+        depositReturnedDate: freezed == depositReturnedDate
+            ? _value.depositReturnedDate
+            : depositReturnedDate // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
+        depositReturnedAmount: freezed == depositReturnedAmount
+            ? _value.depositReturnedAmount
+            : depositReturnedAmount // ignore: cast_nullable_to_non_nullable
+                  as double?,
         roomNumber: freezed == roomNumber
             ? _value.roomNumber
             : roomNumber // ignore: cast_nullable_to_non_nullable
@@ -256,6 +308,10 @@ class _$OccupancyImpl implements _Occupancy {
     required this.agreedRent,
     this.securityDeposit = 0.0,
     this.isActive = true,
+    this.depositStatus = DepositStatus.pending,
+    this.depositReceivedDate,
+    this.depositReturnedDate,
+    this.depositReturnedAmount,
     this.roomNumber,
     this.tenantName,
     this.propertyName,
@@ -282,6 +338,16 @@ class _$OccupancyImpl implements _Occupancy {
   @override
   @JsonKey()
   final bool isActive;
+  // Deposit tracking
+  @override
+  @JsonKey()
+  final DepositStatus depositStatus;
+  @override
+  final DateTime? depositReceivedDate;
+  @override
+  final DateTime? depositReturnedDate;
+  @override
+  final double? depositReturnedAmount;
   // Denormalized fields
   @override
   final String? roomNumber;
@@ -292,7 +358,7 @@ class _$OccupancyImpl implements _Occupancy {
 
   @override
   String toString() {
-    return 'Occupancy(id: $id, roomId: $roomId, tenantId: $tenantId, moveInDate: $moveInDate, moveOutDate: $moveOutDate, agreedRent: $agreedRent, securityDeposit: $securityDeposit, isActive: $isActive, roomNumber: $roomNumber, tenantName: $tenantName, propertyName: $propertyName)';
+    return 'Occupancy(id: $id, roomId: $roomId, tenantId: $tenantId, moveInDate: $moveInDate, moveOutDate: $moveOutDate, agreedRent: $agreedRent, securityDeposit: $securityDeposit, isActive: $isActive, depositStatus: $depositStatus, depositReceivedDate: $depositReceivedDate, depositReturnedDate: $depositReturnedDate, depositReturnedAmount: $depositReturnedAmount, roomNumber: $roomNumber, tenantName: $tenantName, propertyName: $propertyName)';
   }
 
   @override
@@ -314,6 +380,14 @@ class _$OccupancyImpl implements _Occupancy {
                 other.securityDeposit == securityDeposit) &&
             (identical(other.isActive, isActive) ||
                 other.isActive == isActive) &&
+            (identical(other.depositStatus, depositStatus) ||
+                other.depositStatus == depositStatus) &&
+            (identical(other.depositReceivedDate, depositReceivedDate) ||
+                other.depositReceivedDate == depositReceivedDate) &&
+            (identical(other.depositReturnedDate, depositReturnedDate) ||
+                other.depositReturnedDate == depositReturnedDate) &&
+            (identical(other.depositReturnedAmount, depositReturnedAmount) ||
+                other.depositReturnedAmount == depositReturnedAmount) &&
             (identical(other.roomNumber, roomNumber) ||
                 other.roomNumber == roomNumber) &&
             (identical(other.tenantName, tenantName) ||
@@ -334,6 +408,10 @@ class _$OccupancyImpl implements _Occupancy {
     agreedRent,
     securityDeposit,
     isActive,
+    depositStatus,
+    depositReceivedDate,
+    depositReturnedDate,
+    depositReturnedAmount,
     roomNumber,
     tenantName,
     propertyName,
@@ -363,6 +441,10 @@ abstract class _Occupancy implements Occupancy {
     required final double agreedRent,
     final double securityDeposit,
     final bool isActive,
+    final DepositStatus depositStatus,
+    final DateTime? depositReceivedDate,
+    final DateTime? depositReturnedDate,
+    final double? depositReturnedAmount,
     final String? roomNumber,
     final String? tenantName,
     final String? propertyName,
@@ -386,7 +468,15 @@ abstract class _Occupancy implements Occupancy {
   @override
   double get securityDeposit;
   @override
-  bool get isActive; // Denormalized fields
+  bool get isActive; // Deposit tracking
+  @override
+  DepositStatus get depositStatus;
+  @override
+  DateTime? get depositReceivedDate;
+  @override
+  DateTime? get depositReturnedDate;
+  @override
+  double? get depositReturnedAmount; // Denormalized fields
   @override
   String? get roomNumber;
   @override

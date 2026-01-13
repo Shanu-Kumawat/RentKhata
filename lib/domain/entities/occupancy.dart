@@ -6,6 +6,9 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'occupancy.freezed.dart';
 part 'occupancy.g.dart';
 
+/// Deposit status enumeration.
+enum DepositStatus { pending, received, partiallyReturned, returned }
+
 /// Represents a tenant's occupancy of a room.
 @freezed
 class Occupancy with _$Occupancy {
@@ -18,6 +21,11 @@ class Occupancy with _$Occupancy {
     required double agreedRent,
     @Default(0.0) double securityDeposit,
     @Default(true) bool isActive,
+    // Deposit tracking
+    @Default(DepositStatus.pending) DepositStatus depositStatus,
+    DateTime? depositReceivedDate,
+    DateTime? depositReturnedDate,
+    double? depositReturnedAmount,
     // Denormalized fields
     String? roomNumber,
     String? tenantName,

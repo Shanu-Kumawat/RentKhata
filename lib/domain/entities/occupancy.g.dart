@@ -18,6 +18,17 @@ _$OccupancyImpl _$$OccupancyImplFromJson(Map<String, dynamic> json) =>
       agreedRent: (json['agreedRent'] as num).toDouble(),
       securityDeposit: (json['securityDeposit'] as num?)?.toDouble() ?? 0.0,
       isActive: json['isActive'] as bool? ?? true,
+      depositStatus:
+          $enumDecodeNullable(_$DepositStatusEnumMap, json['depositStatus']) ??
+          DepositStatus.pending,
+      depositReceivedDate: json['depositReceivedDate'] == null
+          ? null
+          : DateTime.parse(json['depositReceivedDate'] as String),
+      depositReturnedDate: json['depositReturnedDate'] == null
+          ? null
+          : DateTime.parse(json['depositReturnedDate'] as String),
+      depositReturnedAmount: (json['depositReturnedAmount'] as num?)
+          ?.toDouble(),
       roomNumber: json['roomNumber'] as String?,
       tenantName: json['tenantName'] as String?,
       propertyName: json['propertyName'] as String?,
@@ -33,7 +44,18 @@ Map<String, dynamic> _$$OccupancyImplToJson(_$OccupancyImpl instance) =>
       'agreedRent': instance.agreedRent,
       'securityDeposit': instance.securityDeposit,
       'isActive': instance.isActive,
+      'depositStatus': _$DepositStatusEnumMap[instance.depositStatus]!,
+      'depositReceivedDate': instance.depositReceivedDate?.toIso8601String(),
+      'depositReturnedDate': instance.depositReturnedDate?.toIso8601String(),
+      'depositReturnedAmount': instance.depositReturnedAmount,
       'roomNumber': instance.roomNumber,
       'tenantName': instance.tenantName,
       'propertyName': instance.propertyName,
     };
+
+const _$DepositStatusEnumMap = {
+  DepositStatus.pending: 'pending',
+  DepositStatus.received: 'received',
+  DepositStatus.partiallyReturned: 'partiallyReturned',
+  DepositStatus.returned: 'returned',
+};
