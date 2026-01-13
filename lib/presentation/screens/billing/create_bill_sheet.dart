@@ -80,6 +80,8 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
       _amountController.text = widget.agreedRent.toStringAsFixed(0);
     } else if (_selectedBillType == BillType.electricity) {
       _calculateElectricityCharges();
+    } else if (_selectedBillType == BillType.rentPlusElectricity) {
+      _calculateCombinedBill();
     }
   }
 
@@ -92,6 +94,21 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
       _electricityCharges = units * widget.electricityRate;
       _amountController.text = _electricityCharges.toStringAsFixed(0);
     }
+    setState(() {});
+  }
+
+  void _calculateCombinedBill() {
+    final prev = double.tryParse(_prevReadingController.text) ?? 0;
+    final curr = double.tryParse(_currReadingController.text) ?? 0;
+    final units = curr - prev;
+
+    if (units > 0) {
+      _electricityCharges = units * widget.electricityRate;
+    } else {
+      _electricityCharges = 0;
+    }
+    final total = widget.agreedRent + _electricityCharges;
+    _amountController.text = total.toStringAsFixed(0);
     setState(() {});
   }
 
@@ -277,7 +294,8 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                   const SizedBox(height: 24),
 
                   // Electricity readings (if applicable)
-                  if (_selectedBillType == BillType.electricity &&
+                  if ((_selectedBillType == BillType.electricity ||
+                          _selectedBillType == BillType.rentPlusElectricity) &&
                       widget.hasElectricityMeter) ...[
                     Text(
                       'Meter Readings',
