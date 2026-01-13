@@ -17,6 +17,11 @@ import 'tables/occupancy_table.dart';
 import 'tables/bill_table.dart';
 import 'tables/payment_table.dart';
 import 'tables/electricity_rate_table.dart';
+import 'tables/family_member_table.dart';
+import 'tables/deposit_transaction_table.dart';
+import 'tables/meter_photo_table.dart';
+import 'tables/auto_bill_setting_table.dart';
+import 'tables/notification_setting_table.dart';
 
 // DAOs
 import 'daos/landlord_dao.dart';
@@ -38,13 +43,13 @@ part 'app_database.g.dart';
     Bills,
     Payments,
     ElectricityRates,
+    FamilyMembers,
+    DepositTransactions,
+    MeterPhotos,
+    AutoBillSettings,
+    NotificationSettings,
   ],
-  daos: [
-    LandlordDao,
-    PropertyDao,
-    TenantDao,
-    BillingDao,
-  ],
+  daos: [LandlordDao, PropertyDao, TenantDao, BillingDao],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
@@ -53,7 +58,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration {
@@ -69,7 +74,24 @@ class AppDatabase extends _$AppDatabase {
         );
       },
       onUpgrade: (Migrator m, int from, int to) async {
-        // Handle migrations here as schema evolves
+        if (from < 2) {
+          // Add new tables
+          await m.createTable(familyMembers);
+          await m.createTable(depositTransactions);
+          await m.createTable(meterPhotos);
+          await m.createTable(autoBillSettings);
+          await m.createTable(notificationSettings);
+
+          // Add new columns to bills
+          await m.addColumn(bills, bills.periodStartDate);
+          await m.addColumn(bills, bills.periodEndDate);
+
+          // Add new columns to occupancies
+          await m.addColumn(occupancies, occupancies.depositStatus);
+          await m.addColumn(occupancies, occupancies.depositReceivedDate);
+          await m.addColumn(occupancies, occupancies.depositReturnedDate);
+          await m.addColumn(occupancies, occupancies.depositReturnedAmount);
+        }
       },
     );
   }

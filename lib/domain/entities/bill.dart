@@ -12,6 +12,7 @@ enum BillType {
   electricity,
   water,
   maintenance,
+  rentPlusElectricity,
   other,
 }
 
@@ -35,6 +36,8 @@ class Bill with _$Bill {
     String? notes,
     required DateTime createdAt,
     DateTime? dueDate,
+    DateTime? periodStartDate,
+    DateTime? periodEndDate,
     // Calculated fields
     @Default(0.0) double paidAmount,
     @Default(0.0) double pendingAmount,
@@ -56,8 +59,18 @@ class Bill with _$Bill {
   /// Get billing period as readable string
   String get billingPeriod {
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     return '${months[billingMonth - 1]} $billingYear';
   }

@@ -2287,6 +2287,49 @@ class $OccupanciesTable extends Occupancies
     defaultValue: const Constant(true),
   );
   @override
+  late final GeneratedColumnWithTypeConverter<DepositStatus, String>
+  depositStatus = GeneratedColumn<String>(
+    'deposit_status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: Constant(DepositStatus.pending.name),
+  ).withConverter<DepositStatus>($OccupanciesTable.$converterdepositStatus);
+  static const VerificationMeta _depositReceivedDateMeta =
+      const VerificationMeta('depositReceivedDate');
+  @override
+  late final GeneratedColumn<DateTime> depositReceivedDate =
+      GeneratedColumn<DateTime>(
+        'deposit_received_date',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _depositReturnedDateMeta =
+      const VerificationMeta('depositReturnedDate');
+  @override
+  late final GeneratedColumn<DateTime> depositReturnedDate =
+      GeneratedColumn<DateTime>(
+        'deposit_returned_date',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _depositReturnedAmountMeta =
+      const VerificationMeta('depositReturnedAmount');
+  @override
+  late final GeneratedColumn<double> depositReturnedAmount =
+      GeneratedColumn<double>(
+        'deposit_returned_amount',
+        aliasedName,
+        true,
+        type: DriftSqlType.double,
+        requiredDuringInsert: false,
+      );
+  @override
   List<GeneratedColumn> get $columns => [
     id,
     roomId,
@@ -2296,6 +2339,10 @@ class $OccupanciesTable extends Occupancies
     agreedRent,
     securityDeposit,
     isActive,
+    depositStatus,
+    depositReceivedDate,
+    depositReturnedDate,
+    depositReturnedAmount,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -2371,6 +2418,33 @@ class $OccupanciesTable extends Occupancies
         isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta),
       );
     }
+    if (data.containsKey('deposit_received_date')) {
+      context.handle(
+        _depositReceivedDateMeta,
+        depositReceivedDate.isAcceptableOrUnknown(
+          data['deposit_received_date']!,
+          _depositReceivedDateMeta,
+        ),
+      );
+    }
+    if (data.containsKey('deposit_returned_date')) {
+      context.handle(
+        _depositReturnedDateMeta,
+        depositReturnedDate.isAcceptableOrUnknown(
+          data['deposit_returned_date']!,
+          _depositReturnedDateMeta,
+        ),
+      );
+    }
+    if (data.containsKey('deposit_returned_amount')) {
+      context.handle(
+        _depositReturnedAmountMeta,
+        depositReturnedAmount.isAcceptableOrUnknown(
+          data['deposit_returned_amount']!,
+          _depositReturnedAmountMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -2412,6 +2486,24 @@ class $OccupanciesTable extends Occupancies
         DriftSqlType.bool,
         data['${effectivePrefix}is_active'],
       )!,
+      depositStatus: $OccupanciesTable.$converterdepositStatus.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}deposit_status'],
+        )!,
+      ),
+      depositReceivedDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deposit_received_date'],
+      ),
+      depositReturnedDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deposit_returned_date'],
+      ),
+      depositReturnedAmount: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}deposit_returned_amount'],
+      ),
     );
   }
 
@@ -2419,6 +2511,11 @@ class $OccupanciesTable extends Occupancies
   $OccupanciesTable createAlias(String alias) {
     return $OccupanciesTable(attachedDatabase, alias);
   }
+
+  static JsonTypeConverter2<DepositStatus, String, String>
+  $converterdepositStatus = const EnumNameConverter<DepositStatus>(
+    DepositStatus.values,
+  );
 }
 
 class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
@@ -2445,6 +2542,18 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
 
   /// Whether this is the current active occupancy
   final bool isActive;
+
+  /// Deposit status
+  final DepositStatus depositStatus;
+
+  /// Date deposit was received
+  final DateTime? depositReceivedDate;
+
+  /// Date deposit was returned
+  final DateTime? depositReturnedDate;
+
+  /// Amount returned (may differ from original if deductions)
+  final double? depositReturnedAmount;
   const OccupancyEntity({
     required this.id,
     required this.roomId,
@@ -2454,6 +2563,10 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
     required this.agreedRent,
     required this.securityDeposit,
     required this.isActive,
+    required this.depositStatus,
+    this.depositReceivedDate,
+    this.depositReturnedDate,
+    this.depositReturnedAmount,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -2468,6 +2581,20 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
     map['agreed_rent'] = Variable<double>(agreedRent);
     map['security_deposit'] = Variable<double>(securityDeposit);
     map['is_active'] = Variable<bool>(isActive);
+    {
+      map['deposit_status'] = Variable<String>(
+        $OccupanciesTable.$converterdepositStatus.toSql(depositStatus),
+      );
+    }
+    if (!nullToAbsent || depositReceivedDate != null) {
+      map['deposit_received_date'] = Variable<DateTime>(depositReceivedDate);
+    }
+    if (!nullToAbsent || depositReturnedDate != null) {
+      map['deposit_returned_date'] = Variable<DateTime>(depositReturnedDate);
+    }
+    if (!nullToAbsent || depositReturnedAmount != null) {
+      map['deposit_returned_amount'] = Variable<double>(depositReturnedAmount);
+    }
     return map;
   }
 
@@ -2483,6 +2610,16 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
       agreedRent: Value(agreedRent),
       securityDeposit: Value(securityDeposit),
       isActive: Value(isActive),
+      depositStatus: Value(depositStatus),
+      depositReceivedDate: depositReceivedDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(depositReceivedDate),
+      depositReturnedDate: depositReturnedDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(depositReturnedDate),
+      depositReturnedAmount: depositReturnedAmount == null && nullToAbsent
+          ? const Value.absent()
+          : Value(depositReturnedAmount),
     );
   }
 
@@ -2500,6 +2637,18 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
       agreedRent: serializer.fromJson<double>(json['agreedRent']),
       securityDeposit: serializer.fromJson<double>(json['securityDeposit']),
       isActive: serializer.fromJson<bool>(json['isActive']),
+      depositStatus: $OccupanciesTable.$converterdepositStatus.fromJson(
+        serializer.fromJson<String>(json['depositStatus']),
+      ),
+      depositReceivedDate: serializer.fromJson<DateTime?>(
+        json['depositReceivedDate'],
+      ),
+      depositReturnedDate: serializer.fromJson<DateTime?>(
+        json['depositReturnedDate'],
+      ),
+      depositReturnedAmount: serializer.fromJson<double?>(
+        json['depositReturnedAmount'],
+      ),
     );
   }
   @override
@@ -2514,6 +2663,14 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
       'agreedRent': serializer.toJson<double>(agreedRent),
       'securityDeposit': serializer.toJson<double>(securityDeposit),
       'isActive': serializer.toJson<bool>(isActive),
+      'depositStatus': serializer.toJson<String>(
+        $OccupanciesTable.$converterdepositStatus.toJson(depositStatus),
+      ),
+      'depositReceivedDate': serializer.toJson<DateTime?>(depositReceivedDate),
+      'depositReturnedDate': serializer.toJson<DateTime?>(depositReturnedDate),
+      'depositReturnedAmount': serializer.toJson<double?>(
+        depositReturnedAmount,
+      ),
     };
   }
 
@@ -2526,6 +2683,10 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
     double? agreedRent,
     double? securityDeposit,
     bool? isActive,
+    DepositStatus? depositStatus,
+    Value<DateTime?> depositReceivedDate = const Value.absent(),
+    Value<DateTime?> depositReturnedDate = const Value.absent(),
+    Value<double?> depositReturnedAmount = const Value.absent(),
   }) => OccupancyEntity(
     id: id ?? this.id,
     roomId: roomId ?? this.roomId,
@@ -2535,6 +2696,16 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
     agreedRent: agreedRent ?? this.agreedRent,
     securityDeposit: securityDeposit ?? this.securityDeposit,
     isActive: isActive ?? this.isActive,
+    depositStatus: depositStatus ?? this.depositStatus,
+    depositReceivedDate: depositReceivedDate.present
+        ? depositReceivedDate.value
+        : this.depositReceivedDate,
+    depositReturnedDate: depositReturnedDate.present
+        ? depositReturnedDate.value
+        : this.depositReturnedDate,
+    depositReturnedAmount: depositReturnedAmount.present
+        ? depositReturnedAmount.value
+        : this.depositReturnedAmount,
   );
   OccupancyEntity copyWithCompanion(OccupanciesCompanion data) {
     return OccupancyEntity(
@@ -2554,6 +2725,18 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
           ? data.securityDeposit.value
           : this.securityDeposit,
       isActive: data.isActive.present ? data.isActive.value : this.isActive,
+      depositStatus: data.depositStatus.present
+          ? data.depositStatus.value
+          : this.depositStatus,
+      depositReceivedDate: data.depositReceivedDate.present
+          ? data.depositReceivedDate.value
+          : this.depositReceivedDate,
+      depositReturnedDate: data.depositReturnedDate.present
+          ? data.depositReturnedDate.value
+          : this.depositReturnedDate,
+      depositReturnedAmount: data.depositReturnedAmount.present
+          ? data.depositReturnedAmount.value
+          : this.depositReturnedAmount,
     );
   }
 
@@ -2567,7 +2750,11 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
           ..write('moveOutDate: $moveOutDate, ')
           ..write('agreedRent: $agreedRent, ')
           ..write('securityDeposit: $securityDeposit, ')
-          ..write('isActive: $isActive')
+          ..write('isActive: $isActive, ')
+          ..write('depositStatus: $depositStatus, ')
+          ..write('depositReceivedDate: $depositReceivedDate, ')
+          ..write('depositReturnedDate: $depositReturnedDate, ')
+          ..write('depositReturnedAmount: $depositReturnedAmount')
           ..write(')'))
         .toString();
   }
@@ -2582,6 +2769,10 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
     agreedRent,
     securityDeposit,
     isActive,
+    depositStatus,
+    depositReceivedDate,
+    depositReturnedDate,
+    depositReturnedAmount,
   );
   @override
   bool operator ==(Object other) =>
@@ -2594,7 +2785,11 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
           other.moveOutDate == this.moveOutDate &&
           other.agreedRent == this.agreedRent &&
           other.securityDeposit == this.securityDeposit &&
-          other.isActive == this.isActive);
+          other.isActive == this.isActive &&
+          other.depositStatus == this.depositStatus &&
+          other.depositReceivedDate == this.depositReceivedDate &&
+          other.depositReturnedDate == this.depositReturnedDate &&
+          other.depositReturnedAmount == this.depositReturnedAmount);
 }
 
 class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
@@ -2606,6 +2801,10 @@ class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
   final Value<double> agreedRent;
   final Value<double> securityDeposit;
   final Value<bool> isActive;
+  final Value<DepositStatus> depositStatus;
+  final Value<DateTime?> depositReceivedDate;
+  final Value<DateTime?> depositReturnedDate;
+  final Value<double?> depositReturnedAmount;
   const OccupanciesCompanion({
     this.id = const Value.absent(),
     this.roomId = const Value.absent(),
@@ -2615,6 +2814,10 @@ class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
     this.agreedRent = const Value.absent(),
     this.securityDeposit = const Value.absent(),
     this.isActive = const Value.absent(),
+    this.depositStatus = const Value.absent(),
+    this.depositReceivedDate = const Value.absent(),
+    this.depositReturnedDate = const Value.absent(),
+    this.depositReturnedAmount = const Value.absent(),
   });
   OccupanciesCompanion.insert({
     this.id = const Value.absent(),
@@ -2625,6 +2828,10 @@ class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
     required double agreedRent,
     this.securityDeposit = const Value.absent(),
     this.isActive = const Value.absent(),
+    this.depositStatus = const Value.absent(),
+    this.depositReceivedDate = const Value.absent(),
+    this.depositReturnedDate = const Value.absent(),
+    this.depositReturnedAmount = const Value.absent(),
   }) : roomId = Value(roomId),
        tenantId = Value(tenantId),
        moveInDate = Value(moveInDate),
@@ -2638,6 +2845,10 @@ class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
     Expression<double>? agreedRent,
     Expression<double>? securityDeposit,
     Expression<bool>? isActive,
+    Expression<String>? depositStatus,
+    Expression<DateTime>? depositReceivedDate,
+    Expression<DateTime>? depositReturnedDate,
+    Expression<double>? depositReturnedAmount,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -2648,6 +2859,13 @@ class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
       if (agreedRent != null) 'agreed_rent': agreedRent,
       if (securityDeposit != null) 'security_deposit': securityDeposit,
       if (isActive != null) 'is_active': isActive,
+      if (depositStatus != null) 'deposit_status': depositStatus,
+      if (depositReceivedDate != null)
+        'deposit_received_date': depositReceivedDate,
+      if (depositReturnedDate != null)
+        'deposit_returned_date': depositReturnedDate,
+      if (depositReturnedAmount != null)
+        'deposit_returned_amount': depositReturnedAmount,
     });
   }
 
@@ -2660,6 +2878,10 @@ class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
     Value<double>? agreedRent,
     Value<double>? securityDeposit,
     Value<bool>? isActive,
+    Value<DepositStatus>? depositStatus,
+    Value<DateTime?>? depositReceivedDate,
+    Value<DateTime?>? depositReturnedDate,
+    Value<double?>? depositReturnedAmount,
   }) {
     return OccupanciesCompanion(
       id: id ?? this.id,
@@ -2670,6 +2892,11 @@ class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
       agreedRent: agreedRent ?? this.agreedRent,
       securityDeposit: securityDeposit ?? this.securityDeposit,
       isActive: isActive ?? this.isActive,
+      depositStatus: depositStatus ?? this.depositStatus,
+      depositReceivedDate: depositReceivedDate ?? this.depositReceivedDate,
+      depositReturnedDate: depositReturnedDate ?? this.depositReturnedDate,
+      depositReturnedAmount:
+          depositReturnedAmount ?? this.depositReturnedAmount,
     );
   }
 
@@ -2700,6 +2927,26 @@ class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
     if (isActive.present) {
       map['is_active'] = Variable<bool>(isActive.value);
     }
+    if (depositStatus.present) {
+      map['deposit_status'] = Variable<String>(
+        $OccupanciesTable.$converterdepositStatus.toSql(depositStatus.value),
+      );
+    }
+    if (depositReceivedDate.present) {
+      map['deposit_received_date'] = Variable<DateTime>(
+        depositReceivedDate.value,
+      );
+    }
+    if (depositReturnedDate.present) {
+      map['deposit_returned_date'] = Variable<DateTime>(
+        depositReturnedDate.value,
+      );
+    }
+    if (depositReturnedAmount.present) {
+      map['deposit_returned_amount'] = Variable<double>(
+        depositReturnedAmount.value,
+      );
+    }
     return map;
   }
 
@@ -2713,7 +2960,11 @@ class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
           ..write('moveOutDate: $moveOutDate, ')
           ..write('agreedRent: $agreedRent, ')
           ..write('securityDeposit: $securityDeposit, ')
-          ..write('isActive: $isActive')
+          ..write('isActive: $isActive, ')
+          ..write('depositStatus: $depositStatus, ')
+          ..write('depositReceivedDate: $depositReceivedDate, ')
+          ..write('depositReturnedDate: $depositReturnedDate, ')
+          ..write('depositReturnedAmount: $depositReturnedAmount')
           ..write(')'))
         .toString();
   }
@@ -2782,6 +3033,30 @@ class $BillsTable extends Bills with TableInfo<$BillsTable, BillEntity> {
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _periodStartDateMeta = const VerificationMeta(
+    'periodStartDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> periodStartDate =
+      GeneratedColumn<DateTime>(
+        'period_start_date',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _periodEndDateMeta = const VerificationMeta(
+    'periodEndDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> periodEndDate =
+      GeneratedColumn<DateTime>(
+        'period_end_date',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
   static const VerificationMeta _amountMeta = const VerificationMeta('amount');
   @override
   late final GeneratedColumn<double> amount = GeneratedColumn<double>(
@@ -2885,6 +3160,8 @@ class $BillsTable extends Bills with TableInfo<$BillsTable, BillEntity> {
     billType,
     billingMonth,
     billingYear,
+    periodStartDate,
+    periodEndDate,
     amount,
     electricityPrevReading,
     electricityCurrReading,
@@ -2942,6 +3219,24 @@ class $BillsTable extends Bills with TableInfo<$BillsTable, BillEntity> {
       );
     } else if (isInserting) {
       context.missing(_billingYearMeta);
+    }
+    if (data.containsKey('period_start_date')) {
+      context.handle(
+        _periodStartDateMeta,
+        periodStartDate.isAcceptableOrUnknown(
+          data['period_start_date']!,
+          _periodStartDateMeta,
+        ),
+      );
+    }
+    if (data.containsKey('period_end_date')) {
+      context.handle(
+        _periodEndDateMeta,
+        periodEndDate.isAcceptableOrUnknown(
+          data['period_end_date']!,
+          _periodEndDateMeta,
+        ),
+      );
     }
     if (data.containsKey('amount')) {
       context.handle(
@@ -3045,6 +3340,14 @@ class $BillsTable extends Bills with TableInfo<$BillsTable, BillEntity> {
         DriftSqlType.int,
         data['${effectivePrefix}billing_year'],
       )!,
+      periodStartDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}period_start_date'],
+      ),
+      periodEndDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}period_end_date'],
+      ),
       amount: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
         data['${effectivePrefix}amount'],
@@ -3109,6 +3412,12 @@ class BillEntity extends DataClass implements Insertable<BillEntity> {
   /// Billing year
   final int billingYear;
 
+  /// Period start date (for pro-rating)
+  final DateTime? periodStartDate;
+
+  /// Period end date (for pro-rating)
+  final DateTime? periodEndDate;
+
   /// Total bill amount
   final double amount;
 
@@ -3141,6 +3450,8 @@ class BillEntity extends DataClass implements Insertable<BillEntity> {
     required this.billType,
     required this.billingMonth,
     required this.billingYear,
+    this.periodStartDate,
+    this.periodEndDate,
     required this.amount,
     this.electricityPrevReading,
     this.electricityCurrReading,
@@ -3163,6 +3474,12 @@ class BillEntity extends DataClass implements Insertable<BillEntity> {
     }
     map['billing_month'] = Variable<int>(billingMonth);
     map['billing_year'] = Variable<int>(billingYear);
+    if (!nullToAbsent || periodStartDate != null) {
+      map['period_start_date'] = Variable<DateTime>(periodStartDate);
+    }
+    if (!nullToAbsent || periodEndDate != null) {
+      map['period_end_date'] = Variable<DateTime>(periodEndDate);
+    }
     map['amount'] = Variable<double>(amount);
     if (!nullToAbsent || electricityPrevReading != null) {
       map['electricity_prev_reading'] = Variable<double>(
@@ -3202,6 +3519,12 @@ class BillEntity extends DataClass implements Insertable<BillEntity> {
       billType: Value(billType),
       billingMonth: Value(billingMonth),
       billingYear: Value(billingYear),
+      periodStartDate: periodStartDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(periodStartDate),
+      periodEndDate: periodEndDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(periodEndDate),
       amount: Value(amount),
       electricityPrevReading: electricityPrevReading == null && nullToAbsent
           ? const Value.absent()
@@ -3241,6 +3564,8 @@ class BillEntity extends DataClass implements Insertable<BillEntity> {
       ),
       billingMonth: serializer.fromJson<int>(json['billingMonth']),
       billingYear: serializer.fromJson<int>(json['billingYear']),
+      periodStartDate: serializer.fromJson<DateTime?>(json['periodStartDate']),
+      periodEndDate: serializer.fromJson<DateTime?>(json['periodEndDate']),
       amount: serializer.fromJson<double>(json['amount']),
       electricityPrevReading: serializer.fromJson<double?>(
         json['electricityPrevReading'],
@@ -3271,6 +3596,8 @@ class BillEntity extends DataClass implements Insertable<BillEntity> {
       ),
       'billingMonth': serializer.toJson<int>(billingMonth),
       'billingYear': serializer.toJson<int>(billingYear),
+      'periodStartDate': serializer.toJson<DateTime?>(periodStartDate),
+      'periodEndDate': serializer.toJson<DateTime?>(periodEndDate),
       'amount': serializer.toJson<double>(amount),
       'electricityPrevReading': serializer.toJson<double?>(
         electricityPrevReading,
@@ -3295,6 +3622,8 @@ class BillEntity extends DataClass implements Insertable<BillEntity> {
     BillType? billType,
     int? billingMonth,
     int? billingYear,
+    Value<DateTime?> periodStartDate = const Value.absent(),
+    Value<DateTime?> periodEndDate = const Value.absent(),
     double? amount,
     Value<double?> electricityPrevReading = const Value.absent(),
     Value<double?> electricityCurrReading = const Value.absent(),
@@ -3310,6 +3639,12 @@ class BillEntity extends DataClass implements Insertable<BillEntity> {
     billType: billType ?? this.billType,
     billingMonth: billingMonth ?? this.billingMonth,
     billingYear: billingYear ?? this.billingYear,
+    periodStartDate: periodStartDate.present
+        ? periodStartDate.value
+        : this.periodStartDate,
+    periodEndDate: periodEndDate.present
+        ? periodEndDate.value
+        : this.periodEndDate,
     amount: amount ?? this.amount,
     electricityPrevReading: electricityPrevReading.present
         ? electricityPrevReading.value
@@ -3343,6 +3678,12 @@ class BillEntity extends DataClass implements Insertable<BillEntity> {
       billingYear: data.billingYear.present
           ? data.billingYear.value
           : this.billingYear,
+      periodStartDate: data.periodStartDate.present
+          ? data.periodStartDate.value
+          : this.periodStartDate,
+      periodEndDate: data.periodEndDate.present
+          ? data.periodEndDate.value
+          : this.periodEndDate,
       amount: data.amount.present ? data.amount.value : this.amount,
       electricityPrevReading: data.electricityPrevReading.present
           ? data.electricityPrevReading.value
@@ -3373,6 +3714,8 @@ class BillEntity extends DataClass implements Insertable<BillEntity> {
           ..write('billType: $billType, ')
           ..write('billingMonth: $billingMonth, ')
           ..write('billingYear: $billingYear, ')
+          ..write('periodStartDate: $periodStartDate, ')
+          ..write('periodEndDate: $periodEndDate, ')
           ..write('amount: $amount, ')
           ..write('electricityPrevReading: $electricityPrevReading, ')
           ..write('electricityCurrReading: $electricityCurrReading, ')
@@ -3393,6 +3736,8 @@ class BillEntity extends DataClass implements Insertable<BillEntity> {
     billType,
     billingMonth,
     billingYear,
+    periodStartDate,
+    periodEndDate,
     amount,
     electricityPrevReading,
     electricityCurrReading,
@@ -3412,6 +3757,8 @@ class BillEntity extends DataClass implements Insertable<BillEntity> {
           other.billType == this.billType &&
           other.billingMonth == this.billingMonth &&
           other.billingYear == this.billingYear &&
+          other.periodStartDate == this.periodStartDate &&
+          other.periodEndDate == this.periodEndDate &&
           other.amount == this.amount &&
           other.electricityPrevReading == this.electricityPrevReading &&
           other.electricityCurrReading == this.electricityCurrReading &&
@@ -3429,6 +3776,8 @@ class BillsCompanion extends UpdateCompanion<BillEntity> {
   final Value<BillType> billType;
   final Value<int> billingMonth;
   final Value<int> billingYear;
+  final Value<DateTime?> periodStartDate;
+  final Value<DateTime?> periodEndDate;
   final Value<double> amount;
   final Value<double?> electricityPrevReading;
   final Value<double?> electricityCurrReading;
@@ -3444,6 +3793,8 @@ class BillsCompanion extends UpdateCompanion<BillEntity> {
     this.billType = const Value.absent(),
     this.billingMonth = const Value.absent(),
     this.billingYear = const Value.absent(),
+    this.periodStartDate = const Value.absent(),
+    this.periodEndDate = const Value.absent(),
     this.amount = const Value.absent(),
     this.electricityPrevReading = const Value.absent(),
     this.electricityCurrReading = const Value.absent(),
@@ -3460,6 +3811,8 @@ class BillsCompanion extends UpdateCompanion<BillEntity> {
     required BillType billType,
     required int billingMonth,
     required int billingYear,
+    this.periodStartDate = const Value.absent(),
+    this.periodEndDate = const Value.absent(),
     required double amount,
     this.electricityPrevReading = const Value.absent(),
     this.electricityCurrReading = const Value.absent(),
@@ -3480,6 +3833,8 @@ class BillsCompanion extends UpdateCompanion<BillEntity> {
     Expression<String>? billType,
     Expression<int>? billingMonth,
     Expression<int>? billingYear,
+    Expression<DateTime>? periodStartDate,
+    Expression<DateTime>? periodEndDate,
     Expression<double>? amount,
     Expression<double>? electricityPrevReading,
     Expression<double>? electricityCurrReading,
@@ -3496,6 +3851,8 @@ class BillsCompanion extends UpdateCompanion<BillEntity> {
       if (billType != null) 'bill_type': billType,
       if (billingMonth != null) 'billing_month': billingMonth,
       if (billingYear != null) 'billing_year': billingYear,
+      if (periodStartDate != null) 'period_start_date': periodStartDate,
+      if (periodEndDate != null) 'period_end_date': periodEndDate,
       if (amount != null) 'amount': amount,
       if (electricityPrevReading != null)
         'electricity_prev_reading': electricityPrevReading,
@@ -3517,6 +3874,8 @@ class BillsCompanion extends UpdateCompanion<BillEntity> {
     Value<BillType>? billType,
     Value<int>? billingMonth,
     Value<int>? billingYear,
+    Value<DateTime?>? periodStartDate,
+    Value<DateTime?>? periodEndDate,
     Value<double>? amount,
     Value<double?>? electricityPrevReading,
     Value<double?>? electricityCurrReading,
@@ -3533,6 +3892,8 @@ class BillsCompanion extends UpdateCompanion<BillEntity> {
       billType: billType ?? this.billType,
       billingMonth: billingMonth ?? this.billingMonth,
       billingYear: billingYear ?? this.billingYear,
+      periodStartDate: periodStartDate ?? this.periodStartDate,
+      periodEndDate: periodEndDate ?? this.periodEndDate,
       amount: amount ?? this.amount,
       electricityPrevReading:
           electricityPrevReading ?? this.electricityPrevReading,
@@ -3567,6 +3928,12 @@ class BillsCompanion extends UpdateCompanion<BillEntity> {
     }
     if (billingYear.present) {
       map['billing_year'] = Variable<int>(billingYear.value);
+    }
+    if (periodStartDate.present) {
+      map['period_start_date'] = Variable<DateTime>(periodStartDate.value);
+    }
+    if (periodEndDate.present) {
+      map['period_end_date'] = Variable<DateTime>(periodEndDate.value);
     }
     if (amount.present) {
       map['amount'] = Variable<double>(amount.value);
@@ -3612,6 +3979,8 @@ class BillsCompanion extends UpdateCompanion<BillEntity> {
           ..write('billType: $billType, ')
           ..write('billingMonth: $billingMonth, ')
           ..write('billingYear: $billingYear, ')
+          ..write('periodStartDate: $periodStartDate, ')
+          ..write('periodEndDate: $periodEndDate, ')
           ..write('amount: $amount, ')
           ..write('electricityPrevReading: $electricityPrevReading, ')
           ..write('electricityCurrReading: $electricityCurrReading, ')
@@ -4316,6 +4685,2364 @@ class ElectricityRatesCompanion extends UpdateCompanion<ElectricityRateEntity> {
   }
 }
 
+class $FamilyMembersTable extends FamilyMembers
+    with TableInfo<$FamilyMembersTable, FamilyMemberEntity> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FamilyMembersTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _tenantIdMeta = const VerificationMeta(
+    'tenantId',
+  );
+  @override
+  late final GeneratedColumn<int> tenantId = GeneratedColumn<int>(
+    'tenant_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES tenants (id)',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 100,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<FamilyRelationship, String>
+  relationship =
+      GeneratedColumn<String>(
+        'relationship',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<FamilyRelationship>(
+        $FamilyMembersTable.$converterrelationship,
+      );
+  static const VerificationMeta _phoneMeta = const VerificationMeta('phone');
+  @override
+  late final GeneratedColumn<String> phone = GeneratedColumn<String>(
+    'phone',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _aadharNumberMeta = const VerificationMeta(
+    'aadharNumber',
+  );
+  @override
+  late final GeneratedColumn<String> aadharNumber = GeneratedColumn<String>(
+    'aadhar_number',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    tenantId,
+    name,
+    relationship,
+    phone,
+    aadharNumber,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'family_members';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<FamilyMemberEntity> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('tenant_id')) {
+      context.handle(
+        _tenantIdMeta,
+        tenantId.isAcceptableOrUnknown(data['tenant_id']!, _tenantIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_tenantIdMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('phone')) {
+      context.handle(
+        _phoneMeta,
+        phone.isAcceptableOrUnknown(data['phone']!, _phoneMeta),
+      );
+    }
+    if (data.containsKey('aadhar_number')) {
+      context.handle(
+        _aadharNumberMeta,
+        aadharNumber.isAcceptableOrUnknown(
+          data['aadhar_number']!,
+          _aadharNumberMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  FamilyMemberEntity map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return FamilyMemberEntity(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      tenantId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}tenant_id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      relationship: $FamilyMembersTable.$converterrelationship.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}relationship'],
+        )!,
+      ),
+      phone: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}phone'],
+      ),
+      aadharNumber: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}aadhar_number'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $FamilyMembersTable createAlias(String alias) {
+    return $FamilyMembersTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<FamilyRelationship, String, String>
+  $converterrelationship = const EnumNameConverter<FamilyRelationship>(
+    FamilyRelationship.values,
+  );
+}
+
+class FamilyMemberEntity extends DataClass
+    implements Insertable<FamilyMemberEntity> {
+  /// Primary key
+  final int id;
+
+  /// Foreign key to tenant
+  final int tenantId;
+
+  /// Family member's name
+  final String name;
+
+  /// Relationship to tenant
+  final FamilyRelationship relationship;
+
+  /// Phone number (optional)
+  final String? phone;
+
+  /// Aadhar number (optional)
+  final String? aadharNumber;
+
+  /// Created timestamp
+  final DateTime createdAt;
+  const FamilyMemberEntity({
+    required this.id,
+    required this.tenantId,
+    required this.name,
+    required this.relationship,
+    this.phone,
+    this.aadharNumber,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['tenant_id'] = Variable<int>(tenantId);
+    map['name'] = Variable<String>(name);
+    {
+      map['relationship'] = Variable<String>(
+        $FamilyMembersTable.$converterrelationship.toSql(relationship),
+      );
+    }
+    if (!nullToAbsent || phone != null) {
+      map['phone'] = Variable<String>(phone);
+    }
+    if (!nullToAbsent || aadharNumber != null) {
+      map['aadhar_number'] = Variable<String>(aadharNumber);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  FamilyMembersCompanion toCompanion(bool nullToAbsent) {
+    return FamilyMembersCompanion(
+      id: Value(id),
+      tenantId: Value(tenantId),
+      name: Value(name),
+      relationship: Value(relationship),
+      phone: phone == null && nullToAbsent
+          ? const Value.absent()
+          : Value(phone),
+      aadharNumber: aadharNumber == null && nullToAbsent
+          ? const Value.absent()
+          : Value(aadharNumber),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory FamilyMemberEntity.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return FamilyMemberEntity(
+      id: serializer.fromJson<int>(json['id']),
+      tenantId: serializer.fromJson<int>(json['tenantId']),
+      name: serializer.fromJson<String>(json['name']),
+      relationship: $FamilyMembersTable.$converterrelationship.fromJson(
+        serializer.fromJson<String>(json['relationship']),
+      ),
+      phone: serializer.fromJson<String?>(json['phone']),
+      aadharNumber: serializer.fromJson<String?>(json['aadharNumber']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'tenantId': serializer.toJson<int>(tenantId),
+      'name': serializer.toJson<String>(name),
+      'relationship': serializer.toJson<String>(
+        $FamilyMembersTable.$converterrelationship.toJson(relationship),
+      ),
+      'phone': serializer.toJson<String?>(phone),
+      'aadharNumber': serializer.toJson<String?>(aadharNumber),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  FamilyMemberEntity copyWith({
+    int? id,
+    int? tenantId,
+    String? name,
+    FamilyRelationship? relationship,
+    Value<String?> phone = const Value.absent(),
+    Value<String?> aadharNumber = const Value.absent(),
+    DateTime? createdAt,
+  }) => FamilyMemberEntity(
+    id: id ?? this.id,
+    tenantId: tenantId ?? this.tenantId,
+    name: name ?? this.name,
+    relationship: relationship ?? this.relationship,
+    phone: phone.present ? phone.value : this.phone,
+    aadharNumber: aadharNumber.present ? aadharNumber.value : this.aadharNumber,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  FamilyMemberEntity copyWithCompanion(FamilyMembersCompanion data) {
+    return FamilyMemberEntity(
+      id: data.id.present ? data.id.value : this.id,
+      tenantId: data.tenantId.present ? data.tenantId.value : this.tenantId,
+      name: data.name.present ? data.name.value : this.name,
+      relationship: data.relationship.present
+          ? data.relationship.value
+          : this.relationship,
+      phone: data.phone.present ? data.phone.value : this.phone,
+      aadharNumber: data.aadharNumber.present
+          ? data.aadharNumber.value
+          : this.aadharNumber,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FamilyMemberEntity(')
+          ..write('id: $id, ')
+          ..write('tenantId: $tenantId, ')
+          ..write('name: $name, ')
+          ..write('relationship: $relationship, ')
+          ..write('phone: $phone, ')
+          ..write('aadharNumber: $aadharNumber, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    tenantId,
+    name,
+    relationship,
+    phone,
+    aadharNumber,
+    createdAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FamilyMemberEntity &&
+          other.id == this.id &&
+          other.tenantId == this.tenantId &&
+          other.name == this.name &&
+          other.relationship == this.relationship &&
+          other.phone == this.phone &&
+          other.aadharNumber == this.aadharNumber &&
+          other.createdAt == this.createdAt);
+}
+
+class FamilyMembersCompanion extends UpdateCompanion<FamilyMemberEntity> {
+  final Value<int> id;
+  final Value<int> tenantId;
+  final Value<String> name;
+  final Value<FamilyRelationship> relationship;
+  final Value<String?> phone;
+  final Value<String?> aadharNumber;
+  final Value<DateTime> createdAt;
+  const FamilyMembersCompanion({
+    this.id = const Value.absent(),
+    this.tenantId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.relationship = const Value.absent(),
+    this.phone = const Value.absent(),
+    this.aadharNumber = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  FamilyMembersCompanion.insert({
+    this.id = const Value.absent(),
+    required int tenantId,
+    required String name,
+    required FamilyRelationship relationship,
+    this.phone = const Value.absent(),
+    this.aadharNumber = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  }) : tenantId = Value(tenantId),
+       name = Value(name),
+       relationship = Value(relationship);
+  static Insertable<FamilyMemberEntity> custom({
+    Expression<int>? id,
+    Expression<int>? tenantId,
+    Expression<String>? name,
+    Expression<String>? relationship,
+    Expression<String>? phone,
+    Expression<String>? aadharNumber,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (tenantId != null) 'tenant_id': tenantId,
+      if (name != null) 'name': name,
+      if (relationship != null) 'relationship': relationship,
+      if (phone != null) 'phone': phone,
+      if (aadharNumber != null) 'aadhar_number': aadharNumber,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  FamilyMembersCompanion copyWith({
+    Value<int>? id,
+    Value<int>? tenantId,
+    Value<String>? name,
+    Value<FamilyRelationship>? relationship,
+    Value<String?>? phone,
+    Value<String?>? aadharNumber,
+    Value<DateTime>? createdAt,
+  }) {
+    return FamilyMembersCompanion(
+      id: id ?? this.id,
+      tenantId: tenantId ?? this.tenantId,
+      name: name ?? this.name,
+      relationship: relationship ?? this.relationship,
+      phone: phone ?? this.phone,
+      aadharNumber: aadharNumber ?? this.aadharNumber,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (tenantId.present) {
+      map['tenant_id'] = Variable<int>(tenantId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (relationship.present) {
+      map['relationship'] = Variable<String>(
+        $FamilyMembersTable.$converterrelationship.toSql(relationship.value),
+      );
+    }
+    if (phone.present) {
+      map['phone'] = Variable<String>(phone.value);
+    }
+    if (aadharNumber.present) {
+      map['aadhar_number'] = Variable<String>(aadharNumber.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FamilyMembersCompanion(')
+          ..write('id: $id, ')
+          ..write('tenantId: $tenantId, ')
+          ..write('name: $name, ')
+          ..write('relationship: $relationship, ')
+          ..write('phone: $phone, ')
+          ..write('aadharNumber: $aadharNumber, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $DepositTransactionsTable extends DepositTransactions
+    with TableInfo<$DepositTransactionsTable, DepositTransactionEntity> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DepositTransactionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _occupancyIdMeta = const VerificationMeta(
+    'occupancyId',
+  );
+  @override
+  late final GeneratedColumn<int> occupancyId = GeneratedColumn<int>(
+    'occupancy_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES occupancies (id)',
+    ),
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<DepositTransactionType, String>
+  transactionType =
+      GeneratedColumn<String>(
+        'transaction_type',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<DepositTransactionType>(
+        $DepositTransactionsTable.$convertertransactionType,
+      );
+  static const VerificationMeta _amountMeta = const VerificationMeta('amount');
+  @override
+  late final GeneratedColumn<double> amount = GeneratedColumn<double>(
+    'amount',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _transactionDateMeta = const VerificationMeta(
+    'transactionDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> transactionDate =
+      GeneratedColumn<DateTime>(
+        'transaction_date',
+        aliasedName,
+        false,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+    'notes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    occupancyId,
+    transactionType,
+    amount,
+    transactionDate,
+    notes,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'deposit_transactions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DepositTransactionEntity> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('occupancy_id')) {
+      context.handle(
+        _occupancyIdMeta,
+        occupancyId.isAcceptableOrUnknown(
+          data['occupancy_id']!,
+          _occupancyIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_occupancyIdMeta);
+    }
+    if (data.containsKey('amount')) {
+      context.handle(
+        _amountMeta,
+        amount.isAcceptableOrUnknown(data['amount']!, _amountMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_amountMeta);
+    }
+    if (data.containsKey('transaction_date')) {
+      context.handle(
+        _transactionDateMeta,
+        transactionDate.isAcceptableOrUnknown(
+          data['transaction_date']!,
+          _transactionDateMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_transactionDateMeta);
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+        _notesMeta,
+        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  DepositTransactionEntity map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DepositTransactionEntity(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      occupancyId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}occupancy_id'],
+      )!,
+      transactionType: $DepositTransactionsTable.$convertertransactionType
+          .fromSql(
+            attachedDatabase.typeMapping.read(
+              DriftSqlType.string,
+              data['${effectivePrefix}transaction_type'],
+            )!,
+          ),
+      amount: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}amount'],
+      )!,
+      transactionDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}transaction_date'],
+      )!,
+      notes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notes'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $DepositTransactionsTable createAlias(String alias) {
+    return $DepositTransactionsTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<DepositTransactionType, String, String>
+  $convertertransactionType = const EnumNameConverter<DepositTransactionType>(
+    DepositTransactionType.values,
+  );
+}
+
+class DepositTransactionEntity extends DataClass
+    implements Insertable<DepositTransactionEntity> {
+  /// Primary key
+  final int id;
+
+  /// Foreign key to occupancy
+  final int occupancyId;
+
+  /// Type of transaction
+  final DepositTransactionType transactionType;
+
+  /// Transaction amount
+  final double amount;
+
+  /// Transaction date
+  final DateTime transactionDate;
+
+  /// Notes/reason for transaction
+  final String? notes;
+
+  /// Created timestamp
+  final DateTime createdAt;
+  const DepositTransactionEntity({
+    required this.id,
+    required this.occupancyId,
+    required this.transactionType,
+    required this.amount,
+    required this.transactionDate,
+    this.notes,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['occupancy_id'] = Variable<int>(occupancyId);
+    {
+      map['transaction_type'] = Variable<String>(
+        $DepositTransactionsTable.$convertertransactionType.toSql(
+          transactionType,
+        ),
+      );
+    }
+    map['amount'] = Variable<double>(amount);
+    map['transaction_date'] = Variable<DateTime>(transactionDate);
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  DepositTransactionsCompanion toCompanion(bool nullToAbsent) {
+    return DepositTransactionsCompanion(
+      id: Value(id),
+      occupancyId: Value(occupancyId),
+      transactionType: Value(transactionType),
+      amount: Value(amount),
+      transactionDate: Value(transactionDate),
+      notes: notes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notes),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory DepositTransactionEntity.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DepositTransactionEntity(
+      id: serializer.fromJson<int>(json['id']),
+      occupancyId: serializer.fromJson<int>(json['occupancyId']),
+      transactionType: $DepositTransactionsTable.$convertertransactionType
+          .fromJson(serializer.fromJson<String>(json['transactionType'])),
+      amount: serializer.fromJson<double>(json['amount']),
+      transactionDate: serializer.fromJson<DateTime>(json['transactionDate']),
+      notes: serializer.fromJson<String?>(json['notes']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'occupancyId': serializer.toJson<int>(occupancyId),
+      'transactionType': serializer.toJson<String>(
+        $DepositTransactionsTable.$convertertransactionType.toJson(
+          transactionType,
+        ),
+      ),
+      'amount': serializer.toJson<double>(amount),
+      'transactionDate': serializer.toJson<DateTime>(transactionDate),
+      'notes': serializer.toJson<String?>(notes),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  DepositTransactionEntity copyWith({
+    int? id,
+    int? occupancyId,
+    DepositTransactionType? transactionType,
+    double? amount,
+    DateTime? transactionDate,
+    Value<String?> notes = const Value.absent(),
+    DateTime? createdAt,
+  }) => DepositTransactionEntity(
+    id: id ?? this.id,
+    occupancyId: occupancyId ?? this.occupancyId,
+    transactionType: transactionType ?? this.transactionType,
+    amount: amount ?? this.amount,
+    transactionDate: transactionDate ?? this.transactionDate,
+    notes: notes.present ? notes.value : this.notes,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  DepositTransactionEntity copyWithCompanion(
+    DepositTransactionsCompanion data,
+  ) {
+    return DepositTransactionEntity(
+      id: data.id.present ? data.id.value : this.id,
+      occupancyId: data.occupancyId.present
+          ? data.occupancyId.value
+          : this.occupancyId,
+      transactionType: data.transactionType.present
+          ? data.transactionType.value
+          : this.transactionType,
+      amount: data.amount.present ? data.amount.value : this.amount,
+      transactionDate: data.transactionDate.present
+          ? data.transactionDate.value
+          : this.transactionDate,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DepositTransactionEntity(')
+          ..write('id: $id, ')
+          ..write('occupancyId: $occupancyId, ')
+          ..write('transactionType: $transactionType, ')
+          ..write('amount: $amount, ')
+          ..write('transactionDate: $transactionDate, ')
+          ..write('notes: $notes, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    occupancyId,
+    transactionType,
+    amount,
+    transactionDate,
+    notes,
+    createdAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DepositTransactionEntity &&
+          other.id == this.id &&
+          other.occupancyId == this.occupancyId &&
+          other.transactionType == this.transactionType &&
+          other.amount == this.amount &&
+          other.transactionDate == this.transactionDate &&
+          other.notes == this.notes &&
+          other.createdAt == this.createdAt);
+}
+
+class DepositTransactionsCompanion
+    extends UpdateCompanion<DepositTransactionEntity> {
+  final Value<int> id;
+  final Value<int> occupancyId;
+  final Value<DepositTransactionType> transactionType;
+  final Value<double> amount;
+  final Value<DateTime> transactionDate;
+  final Value<String?> notes;
+  final Value<DateTime> createdAt;
+  const DepositTransactionsCompanion({
+    this.id = const Value.absent(),
+    this.occupancyId = const Value.absent(),
+    this.transactionType = const Value.absent(),
+    this.amount = const Value.absent(),
+    this.transactionDate = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  DepositTransactionsCompanion.insert({
+    this.id = const Value.absent(),
+    required int occupancyId,
+    required DepositTransactionType transactionType,
+    required double amount,
+    required DateTime transactionDate,
+    this.notes = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  }) : occupancyId = Value(occupancyId),
+       transactionType = Value(transactionType),
+       amount = Value(amount),
+       transactionDate = Value(transactionDate);
+  static Insertable<DepositTransactionEntity> custom({
+    Expression<int>? id,
+    Expression<int>? occupancyId,
+    Expression<String>? transactionType,
+    Expression<double>? amount,
+    Expression<DateTime>? transactionDate,
+    Expression<String>? notes,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (occupancyId != null) 'occupancy_id': occupancyId,
+      if (transactionType != null) 'transaction_type': transactionType,
+      if (amount != null) 'amount': amount,
+      if (transactionDate != null) 'transaction_date': transactionDate,
+      if (notes != null) 'notes': notes,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  DepositTransactionsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? occupancyId,
+    Value<DepositTransactionType>? transactionType,
+    Value<double>? amount,
+    Value<DateTime>? transactionDate,
+    Value<String?>? notes,
+    Value<DateTime>? createdAt,
+  }) {
+    return DepositTransactionsCompanion(
+      id: id ?? this.id,
+      occupancyId: occupancyId ?? this.occupancyId,
+      transactionType: transactionType ?? this.transactionType,
+      amount: amount ?? this.amount,
+      transactionDate: transactionDate ?? this.transactionDate,
+      notes: notes ?? this.notes,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (occupancyId.present) {
+      map['occupancy_id'] = Variable<int>(occupancyId.value);
+    }
+    if (transactionType.present) {
+      map['transaction_type'] = Variable<String>(
+        $DepositTransactionsTable.$convertertransactionType.toSql(
+          transactionType.value,
+        ),
+      );
+    }
+    if (amount.present) {
+      map['amount'] = Variable<double>(amount.value);
+    }
+    if (transactionDate.present) {
+      map['transaction_date'] = Variable<DateTime>(transactionDate.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DepositTransactionsCompanion(')
+          ..write('id: $id, ')
+          ..write('occupancyId: $occupancyId, ')
+          ..write('transactionType: $transactionType, ')
+          ..write('amount: $amount, ')
+          ..write('transactionDate: $transactionDate, ')
+          ..write('notes: $notes, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $MeterPhotosTable extends MeterPhotos
+    with TableInfo<$MeterPhotosTable, MeterPhotoEntity> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MeterPhotosTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _billIdMeta = const VerificationMeta('billId');
+  @override
+  late final GeneratedColumn<int> billId = GeneratedColumn<int>(
+    'bill_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES bills (id)',
+    ),
+  );
+  static const VerificationMeta _photoPathMeta = const VerificationMeta(
+    'photoPath',
+  );
+  @override
+  late final GeneratedColumn<String> photoPath = GeneratedColumn<String>(
+    'photo_path',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _photoOrderMeta = const VerificationMeta(
+    'photoOrder',
+  );
+  @override
+  late final GeneratedColumn<int> photoOrder = GeneratedColumn<int>(
+    'photo_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    billId,
+    photoPath,
+    photoOrder,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'meter_photos';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<MeterPhotoEntity> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('bill_id')) {
+      context.handle(
+        _billIdMeta,
+        billId.isAcceptableOrUnknown(data['bill_id']!, _billIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_billIdMeta);
+    }
+    if (data.containsKey('photo_path')) {
+      context.handle(
+        _photoPathMeta,
+        photoPath.isAcceptableOrUnknown(data['photo_path']!, _photoPathMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_photoPathMeta);
+    }
+    if (data.containsKey('photo_order')) {
+      context.handle(
+        _photoOrderMeta,
+        photoOrder.isAcceptableOrUnknown(data['photo_order']!, _photoOrderMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  MeterPhotoEntity map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MeterPhotoEntity(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      billId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}bill_id'],
+      )!,
+      photoPath: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}photo_path'],
+      )!,
+      photoOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}photo_order'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $MeterPhotosTable createAlias(String alias) {
+    return $MeterPhotosTable(attachedDatabase, alias);
+  }
+}
+
+class MeterPhotoEntity extends DataClass
+    implements Insertable<MeterPhotoEntity> {
+  /// Primary key
+  final int id;
+
+  /// Foreign key to bill
+  final int billId;
+
+  /// Local file path to photo
+  final String photoPath;
+
+  /// Photo order (1 or 2)
+  final int photoOrder;
+
+  /// Created timestamp
+  final DateTime createdAt;
+  const MeterPhotoEntity({
+    required this.id,
+    required this.billId,
+    required this.photoPath,
+    required this.photoOrder,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['bill_id'] = Variable<int>(billId);
+    map['photo_path'] = Variable<String>(photoPath);
+    map['photo_order'] = Variable<int>(photoOrder);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  MeterPhotosCompanion toCompanion(bool nullToAbsent) {
+    return MeterPhotosCompanion(
+      id: Value(id),
+      billId: Value(billId),
+      photoPath: Value(photoPath),
+      photoOrder: Value(photoOrder),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory MeterPhotoEntity.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MeterPhotoEntity(
+      id: serializer.fromJson<int>(json['id']),
+      billId: serializer.fromJson<int>(json['billId']),
+      photoPath: serializer.fromJson<String>(json['photoPath']),
+      photoOrder: serializer.fromJson<int>(json['photoOrder']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'billId': serializer.toJson<int>(billId),
+      'photoPath': serializer.toJson<String>(photoPath),
+      'photoOrder': serializer.toJson<int>(photoOrder),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  MeterPhotoEntity copyWith({
+    int? id,
+    int? billId,
+    String? photoPath,
+    int? photoOrder,
+    DateTime? createdAt,
+  }) => MeterPhotoEntity(
+    id: id ?? this.id,
+    billId: billId ?? this.billId,
+    photoPath: photoPath ?? this.photoPath,
+    photoOrder: photoOrder ?? this.photoOrder,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  MeterPhotoEntity copyWithCompanion(MeterPhotosCompanion data) {
+    return MeterPhotoEntity(
+      id: data.id.present ? data.id.value : this.id,
+      billId: data.billId.present ? data.billId.value : this.billId,
+      photoPath: data.photoPath.present ? data.photoPath.value : this.photoPath,
+      photoOrder: data.photoOrder.present
+          ? data.photoOrder.value
+          : this.photoOrder,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MeterPhotoEntity(')
+          ..write('id: $id, ')
+          ..write('billId: $billId, ')
+          ..write('photoPath: $photoPath, ')
+          ..write('photoOrder: $photoOrder, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, billId, photoPath, photoOrder, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MeterPhotoEntity &&
+          other.id == this.id &&
+          other.billId == this.billId &&
+          other.photoPath == this.photoPath &&
+          other.photoOrder == this.photoOrder &&
+          other.createdAt == this.createdAt);
+}
+
+class MeterPhotosCompanion extends UpdateCompanion<MeterPhotoEntity> {
+  final Value<int> id;
+  final Value<int> billId;
+  final Value<String> photoPath;
+  final Value<int> photoOrder;
+  final Value<DateTime> createdAt;
+  const MeterPhotosCompanion({
+    this.id = const Value.absent(),
+    this.billId = const Value.absent(),
+    this.photoPath = const Value.absent(),
+    this.photoOrder = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  MeterPhotosCompanion.insert({
+    this.id = const Value.absent(),
+    required int billId,
+    required String photoPath,
+    this.photoOrder = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  }) : billId = Value(billId),
+       photoPath = Value(photoPath);
+  static Insertable<MeterPhotoEntity> custom({
+    Expression<int>? id,
+    Expression<int>? billId,
+    Expression<String>? photoPath,
+    Expression<int>? photoOrder,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (billId != null) 'bill_id': billId,
+      if (photoPath != null) 'photo_path': photoPath,
+      if (photoOrder != null) 'photo_order': photoOrder,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  MeterPhotosCompanion copyWith({
+    Value<int>? id,
+    Value<int>? billId,
+    Value<String>? photoPath,
+    Value<int>? photoOrder,
+    Value<DateTime>? createdAt,
+  }) {
+    return MeterPhotosCompanion(
+      id: id ?? this.id,
+      billId: billId ?? this.billId,
+      photoPath: photoPath ?? this.photoPath,
+      photoOrder: photoOrder ?? this.photoOrder,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (billId.present) {
+      map['bill_id'] = Variable<int>(billId.value);
+    }
+    if (photoPath.present) {
+      map['photo_path'] = Variable<String>(photoPath.value);
+    }
+    if (photoOrder.present) {
+      map['photo_order'] = Variable<int>(photoOrder.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MeterPhotosCompanion(')
+          ..write('id: $id, ')
+          ..write('billId: $billId, ')
+          ..write('photoPath: $photoPath, ')
+          ..write('photoOrder: $photoOrder, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $AutoBillSettingsTable extends AutoBillSettings
+    with TableInfo<$AutoBillSettingsTable, AutoBillSettingEntity> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AutoBillSettingsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _roomIdMeta = const VerificationMeta('roomId');
+  @override
+  late final GeneratedColumn<int> roomId = GeneratedColumn<int>(
+    'room_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES rooms (id)',
+    ),
+  );
+  static const VerificationMeta _enabledMeta = const VerificationMeta(
+    'enabled',
+  );
+  @override
+  late final GeneratedColumn<bool> enabled = GeneratedColumn<bool>(
+    'enabled',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("enabled" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _generateRentMeta = const VerificationMeta(
+    'generateRent',
+  );
+  @override
+  late final GeneratedColumn<bool> generateRent = GeneratedColumn<bool>(
+    'generate_rent',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("generate_rent" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _generateElectricityMeta =
+      const VerificationMeta('generateElectricity');
+  @override
+  late final GeneratedColumn<bool> generateElectricity = GeneratedColumn<bool>(
+    'generate_electricity',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("generate_electricity" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _generationDayMeta = const VerificationMeta(
+    'generationDay',
+  );
+  @override
+  late final GeneratedColumn<int> generationDay = GeneratedColumn<int>(
+    'generation_day',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  static const VerificationMeta _dueDayOffsetMeta = const VerificationMeta(
+    'dueDayOffset',
+  );
+  @override
+  late final GeneratedColumn<int> dueDayOffset = GeneratedColumn<int>(
+    'due_day_offset',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(10),
+  );
+  static const VerificationMeta _lastGeneratedAtMeta = const VerificationMeta(
+    'lastGeneratedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lastGeneratedAt =
+      GeneratedColumn<DateTime>(
+        'last_generated_at',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    roomId,
+    enabled,
+    generateRent,
+    generateElectricity,
+    generationDay,
+    dueDayOffset,
+    lastGeneratedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'auto_bill_settings';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AutoBillSettingEntity> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('room_id')) {
+      context.handle(
+        _roomIdMeta,
+        roomId.isAcceptableOrUnknown(data['room_id']!, _roomIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_roomIdMeta);
+    }
+    if (data.containsKey('enabled')) {
+      context.handle(
+        _enabledMeta,
+        enabled.isAcceptableOrUnknown(data['enabled']!, _enabledMeta),
+      );
+    }
+    if (data.containsKey('generate_rent')) {
+      context.handle(
+        _generateRentMeta,
+        generateRent.isAcceptableOrUnknown(
+          data['generate_rent']!,
+          _generateRentMeta,
+        ),
+      );
+    }
+    if (data.containsKey('generate_electricity')) {
+      context.handle(
+        _generateElectricityMeta,
+        generateElectricity.isAcceptableOrUnknown(
+          data['generate_electricity']!,
+          _generateElectricityMeta,
+        ),
+      );
+    }
+    if (data.containsKey('generation_day')) {
+      context.handle(
+        _generationDayMeta,
+        generationDay.isAcceptableOrUnknown(
+          data['generation_day']!,
+          _generationDayMeta,
+        ),
+      );
+    }
+    if (data.containsKey('due_day_offset')) {
+      context.handle(
+        _dueDayOffsetMeta,
+        dueDayOffset.isAcceptableOrUnknown(
+          data['due_day_offset']!,
+          _dueDayOffsetMeta,
+        ),
+      );
+    }
+    if (data.containsKey('last_generated_at')) {
+      context.handle(
+        _lastGeneratedAtMeta,
+        lastGeneratedAt.isAcceptableOrUnknown(
+          data['last_generated_at']!,
+          _lastGeneratedAtMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AutoBillSettingEntity map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AutoBillSettingEntity(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      roomId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}room_id'],
+      )!,
+      enabled: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}enabled'],
+      )!,
+      generateRent: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}generate_rent'],
+      )!,
+      generateElectricity: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}generate_electricity'],
+      )!,
+      generationDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}generation_day'],
+      )!,
+      dueDayOffset: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}due_day_offset'],
+      )!,
+      lastGeneratedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_generated_at'],
+      ),
+    );
+  }
+
+  @override
+  $AutoBillSettingsTable createAlias(String alias) {
+    return $AutoBillSettingsTable(attachedDatabase, alias);
+  }
+}
+
+class AutoBillSettingEntity extends DataClass
+    implements Insertable<AutoBillSettingEntity> {
+  /// Primary key
+  final int id;
+
+  /// Foreign key to room
+  final int roomId;
+
+  /// Whether auto-billing is enabled
+  final bool enabled;
+
+  /// Generate rent bills automatically
+  final bool generateRent;
+
+  /// Generate electricity bills automatically
+  final bool generateElectricity;
+
+  /// Day of month to generate bills (1-28)
+  final int generationDay;
+
+  /// Number of days after generation for due date
+  final int dueDayOffset;
+
+  /// Last date bills were generated
+  final DateTime? lastGeneratedAt;
+  const AutoBillSettingEntity({
+    required this.id,
+    required this.roomId,
+    required this.enabled,
+    required this.generateRent,
+    required this.generateElectricity,
+    required this.generationDay,
+    required this.dueDayOffset,
+    this.lastGeneratedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['room_id'] = Variable<int>(roomId);
+    map['enabled'] = Variable<bool>(enabled);
+    map['generate_rent'] = Variable<bool>(generateRent);
+    map['generate_electricity'] = Variable<bool>(generateElectricity);
+    map['generation_day'] = Variable<int>(generationDay);
+    map['due_day_offset'] = Variable<int>(dueDayOffset);
+    if (!nullToAbsent || lastGeneratedAt != null) {
+      map['last_generated_at'] = Variable<DateTime>(lastGeneratedAt);
+    }
+    return map;
+  }
+
+  AutoBillSettingsCompanion toCompanion(bool nullToAbsent) {
+    return AutoBillSettingsCompanion(
+      id: Value(id),
+      roomId: Value(roomId),
+      enabled: Value(enabled),
+      generateRent: Value(generateRent),
+      generateElectricity: Value(generateElectricity),
+      generationDay: Value(generationDay),
+      dueDayOffset: Value(dueDayOffset),
+      lastGeneratedAt: lastGeneratedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastGeneratedAt),
+    );
+  }
+
+  factory AutoBillSettingEntity.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AutoBillSettingEntity(
+      id: serializer.fromJson<int>(json['id']),
+      roomId: serializer.fromJson<int>(json['roomId']),
+      enabled: serializer.fromJson<bool>(json['enabled']),
+      generateRent: serializer.fromJson<bool>(json['generateRent']),
+      generateElectricity: serializer.fromJson<bool>(
+        json['generateElectricity'],
+      ),
+      generationDay: serializer.fromJson<int>(json['generationDay']),
+      dueDayOffset: serializer.fromJson<int>(json['dueDayOffset']),
+      lastGeneratedAt: serializer.fromJson<DateTime?>(json['lastGeneratedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'roomId': serializer.toJson<int>(roomId),
+      'enabled': serializer.toJson<bool>(enabled),
+      'generateRent': serializer.toJson<bool>(generateRent),
+      'generateElectricity': serializer.toJson<bool>(generateElectricity),
+      'generationDay': serializer.toJson<int>(generationDay),
+      'dueDayOffset': serializer.toJson<int>(dueDayOffset),
+      'lastGeneratedAt': serializer.toJson<DateTime?>(lastGeneratedAt),
+    };
+  }
+
+  AutoBillSettingEntity copyWith({
+    int? id,
+    int? roomId,
+    bool? enabled,
+    bool? generateRent,
+    bool? generateElectricity,
+    int? generationDay,
+    int? dueDayOffset,
+    Value<DateTime?> lastGeneratedAt = const Value.absent(),
+  }) => AutoBillSettingEntity(
+    id: id ?? this.id,
+    roomId: roomId ?? this.roomId,
+    enabled: enabled ?? this.enabled,
+    generateRent: generateRent ?? this.generateRent,
+    generateElectricity: generateElectricity ?? this.generateElectricity,
+    generationDay: generationDay ?? this.generationDay,
+    dueDayOffset: dueDayOffset ?? this.dueDayOffset,
+    lastGeneratedAt: lastGeneratedAt.present
+        ? lastGeneratedAt.value
+        : this.lastGeneratedAt,
+  );
+  AutoBillSettingEntity copyWithCompanion(AutoBillSettingsCompanion data) {
+    return AutoBillSettingEntity(
+      id: data.id.present ? data.id.value : this.id,
+      roomId: data.roomId.present ? data.roomId.value : this.roomId,
+      enabled: data.enabled.present ? data.enabled.value : this.enabled,
+      generateRent: data.generateRent.present
+          ? data.generateRent.value
+          : this.generateRent,
+      generateElectricity: data.generateElectricity.present
+          ? data.generateElectricity.value
+          : this.generateElectricity,
+      generationDay: data.generationDay.present
+          ? data.generationDay.value
+          : this.generationDay,
+      dueDayOffset: data.dueDayOffset.present
+          ? data.dueDayOffset.value
+          : this.dueDayOffset,
+      lastGeneratedAt: data.lastGeneratedAt.present
+          ? data.lastGeneratedAt.value
+          : this.lastGeneratedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AutoBillSettingEntity(')
+          ..write('id: $id, ')
+          ..write('roomId: $roomId, ')
+          ..write('enabled: $enabled, ')
+          ..write('generateRent: $generateRent, ')
+          ..write('generateElectricity: $generateElectricity, ')
+          ..write('generationDay: $generationDay, ')
+          ..write('dueDayOffset: $dueDayOffset, ')
+          ..write('lastGeneratedAt: $lastGeneratedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    roomId,
+    enabled,
+    generateRent,
+    generateElectricity,
+    generationDay,
+    dueDayOffset,
+    lastGeneratedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AutoBillSettingEntity &&
+          other.id == this.id &&
+          other.roomId == this.roomId &&
+          other.enabled == this.enabled &&
+          other.generateRent == this.generateRent &&
+          other.generateElectricity == this.generateElectricity &&
+          other.generationDay == this.generationDay &&
+          other.dueDayOffset == this.dueDayOffset &&
+          other.lastGeneratedAt == this.lastGeneratedAt);
+}
+
+class AutoBillSettingsCompanion extends UpdateCompanion<AutoBillSettingEntity> {
+  final Value<int> id;
+  final Value<int> roomId;
+  final Value<bool> enabled;
+  final Value<bool> generateRent;
+  final Value<bool> generateElectricity;
+  final Value<int> generationDay;
+  final Value<int> dueDayOffset;
+  final Value<DateTime?> lastGeneratedAt;
+  const AutoBillSettingsCompanion({
+    this.id = const Value.absent(),
+    this.roomId = const Value.absent(),
+    this.enabled = const Value.absent(),
+    this.generateRent = const Value.absent(),
+    this.generateElectricity = const Value.absent(),
+    this.generationDay = const Value.absent(),
+    this.dueDayOffset = const Value.absent(),
+    this.lastGeneratedAt = const Value.absent(),
+  });
+  AutoBillSettingsCompanion.insert({
+    this.id = const Value.absent(),
+    required int roomId,
+    this.enabled = const Value.absent(),
+    this.generateRent = const Value.absent(),
+    this.generateElectricity = const Value.absent(),
+    this.generationDay = const Value.absent(),
+    this.dueDayOffset = const Value.absent(),
+    this.lastGeneratedAt = const Value.absent(),
+  }) : roomId = Value(roomId);
+  static Insertable<AutoBillSettingEntity> custom({
+    Expression<int>? id,
+    Expression<int>? roomId,
+    Expression<bool>? enabled,
+    Expression<bool>? generateRent,
+    Expression<bool>? generateElectricity,
+    Expression<int>? generationDay,
+    Expression<int>? dueDayOffset,
+    Expression<DateTime>? lastGeneratedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (roomId != null) 'room_id': roomId,
+      if (enabled != null) 'enabled': enabled,
+      if (generateRent != null) 'generate_rent': generateRent,
+      if (generateElectricity != null)
+        'generate_electricity': generateElectricity,
+      if (generationDay != null) 'generation_day': generationDay,
+      if (dueDayOffset != null) 'due_day_offset': dueDayOffset,
+      if (lastGeneratedAt != null) 'last_generated_at': lastGeneratedAt,
+    });
+  }
+
+  AutoBillSettingsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? roomId,
+    Value<bool>? enabled,
+    Value<bool>? generateRent,
+    Value<bool>? generateElectricity,
+    Value<int>? generationDay,
+    Value<int>? dueDayOffset,
+    Value<DateTime?>? lastGeneratedAt,
+  }) {
+    return AutoBillSettingsCompanion(
+      id: id ?? this.id,
+      roomId: roomId ?? this.roomId,
+      enabled: enabled ?? this.enabled,
+      generateRent: generateRent ?? this.generateRent,
+      generateElectricity: generateElectricity ?? this.generateElectricity,
+      generationDay: generationDay ?? this.generationDay,
+      dueDayOffset: dueDayOffset ?? this.dueDayOffset,
+      lastGeneratedAt: lastGeneratedAt ?? this.lastGeneratedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (roomId.present) {
+      map['room_id'] = Variable<int>(roomId.value);
+    }
+    if (enabled.present) {
+      map['enabled'] = Variable<bool>(enabled.value);
+    }
+    if (generateRent.present) {
+      map['generate_rent'] = Variable<bool>(generateRent.value);
+    }
+    if (generateElectricity.present) {
+      map['generate_electricity'] = Variable<bool>(generateElectricity.value);
+    }
+    if (generationDay.present) {
+      map['generation_day'] = Variable<int>(generationDay.value);
+    }
+    if (dueDayOffset.present) {
+      map['due_day_offset'] = Variable<int>(dueDayOffset.value);
+    }
+    if (lastGeneratedAt.present) {
+      map['last_generated_at'] = Variable<DateTime>(lastGeneratedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AutoBillSettingsCompanion(')
+          ..write('id: $id, ')
+          ..write('roomId: $roomId, ')
+          ..write('enabled: $enabled, ')
+          ..write('generateRent: $generateRent, ')
+          ..write('generateElectricity: $generateElectricity, ')
+          ..write('generationDay: $generationDay, ')
+          ..write('dueDayOffset: $dueDayOffset, ')
+          ..write('lastGeneratedAt: $lastGeneratedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $NotificationSettingsTable extends NotificationSettings
+    with TableInfo<$NotificationSettingsTable, NotificationSettingEntity> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $NotificationSettingsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<NotificationType, String>
+  notificationType =
+      GeneratedColumn<String>(
+        'notification_type',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<NotificationType>(
+        $NotificationSettingsTable.$converternotificationType,
+      );
+  static const VerificationMeta _enabledMeta = const VerificationMeta(
+    'enabled',
+  );
+  @override
+  late final GeneratedColumn<bool> enabled = GeneratedColumn<bool>(
+    'enabled',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("enabled" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _daysBeforeMeta = const VerificationMeta(
+    'daysBefore',
+  );
+  @override
+  late final GeneratedColumn<int> daysBefore = GeneratedColumn<int>(
+    'days_before',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(3),
+  );
+  static const VerificationMeta _quietHoursStartMeta = const VerificationMeta(
+    'quietHoursStart',
+  );
+  @override
+  late final GeneratedColumn<int> quietHoursStart = GeneratedColumn<int>(
+    'quiet_hours_start',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _quietHoursEndMeta = const VerificationMeta(
+    'quietHoursEnd',
+  );
+  @override
+  late final GeneratedColumn<int> quietHoursEnd = GeneratedColumn<int>(
+    'quiet_hours_end',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    notificationType,
+    enabled,
+    daysBefore,
+    quietHoursStart,
+    quietHoursEnd,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'notification_settings';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<NotificationSettingEntity> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('enabled')) {
+      context.handle(
+        _enabledMeta,
+        enabled.isAcceptableOrUnknown(data['enabled']!, _enabledMeta),
+      );
+    }
+    if (data.containsKey('days_before')) {
+      context.handle(
+        _daysBeforeMeta,
+        daysBefore.isAcceptableOrUnknown(data['days_before']!, _daysBeforeMeta),
+      );
+    }
+    if (data.containsKey('quiet_hours_start')) {
+      context.handle(
+        _quietHoursStartMeta,
+        quietHoursStart.isAcceptableOrUnknown(
+          data['quiet_hours_start']!,
+          _quietHoursStartMeta,
+        ),
+      );
+    }
+    if (data.containsKey('quiet_hours_end')) {
+      context.handle(
+        _quietHoursEndMeta,
+        quietHoursEnd.isAcceptableOrUnknown(
+          data['quiet_hours_end']!,
+          _quietHoursEndMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  NotificationSettingEntity map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return NotificationSettingEntity(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      notificationType: $NotificationSettingsTable.$converternotificationType
+          .fromSql(
+            attachedDatabase.typeMapping.read(
+              DriftSqlType.string,
+              data['${effectivePrefix}notification_type'],
+            )!,
+          ),
+      enabled: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}enabled'],
+      )!,
+      daysBefore: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}days_before'],
+      )!,
+      quietHoursStart: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}quiet_hours_start'],
+      ),
+      quietHoursEnd: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}quiet_hours_end'],
+      ),
+    );
+  }
+
+  @override
+  $NotificationSettingsTable createAlias(String alias) {
+    return $NotificationSettingsTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<NotificationType, String, String>
+  $converternotificationType = const EnumNameConverter<NotificationType>(
+    NotificationType.values,
+  );
+}
+
+class NotificationSettingEntity extends DataClass
+    implements Insertable<NotificationSettingEntity> {
+  /// Primary key
+  final int id;
+
+  /// Type of notification
+  final NotificationType notificationType;
+
+  /// Whether this notification is enabled
+  final bool enabled;
+
+  /// Days before/after to trigger (positive = before due, negative = after)
+  final int daysBefore;
+
+  /// Quiet hours start (0-23)
+  final int? quietHoursStart;
+
+  /// Quiet hours end (0-23)
+  final int? quietHoursEnd;
+  const NotificationSettingEntity({
+    required this.id,
+    required this.notificationType,
+    required this.enabled,
+    required this.daysBefore,
+    this.quietHoursStart,
+    this.quietHoursEnd,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    {
+      map['notification_type'] = Variable<String>(
+        $NotificationSettingsTable.$converternotificationType.toSql(
+          notificationType,
+        ),
+      );
+    }
+    map['enabled'] = Variable<bool>(enabled);
+    map['days_before'] = Variable<int>(daysBefore);
+    if (!nullToAbsent || quietHoursStart != null) {
+      map['quiet_hours_start'] = Variable<int>(quietHoursStart);
+    }
+    if (!nullToAbsent || quietHoursEnd != null) {
+      map['quiet_hours_end'] = Variable<int>(quietHoursEnd);
+    }
+    return map;
+  }
+
+  NotificationSettingsCompanion toCompanion(bool nullToAbsent) {
+    return NotificationSettingsCompanion(
+      id: Value(id),
+      notificationType: Value(notificationType),
+      enabled: Value(enabled),
+      daysBefore: Value(daysBefore),
+      quietHoursStart: quietHoursStart == null && nullToAbsent
+          ? const Value.absent()
+          : Value(quietHoursStart),
+      quietHoursEnd: quietHoursEnd == null && nullToAbsent
+          ? const Value.absent()
+          : Value(quietHoursEnd),
+    );
+  }
+
+  factory NotificationSettingEntity.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return NotificationSettingEntity(
+      id: serializer.fromJson<int>(json['id']),
+      notificationType: $NotificationSettingsTable.$converternotificationType
+          .fromJson(serializer.fromJson<String>(json['notificationType'])),
+      enabled: serializer.fromJson<bool>(json['enabled']),
+      daysBefore: serializer.fromJson<int>(json['daysBefore']),
+      quietHoursStart: serializer.fromJson<int?>(json['quietHoursStart']),
+      quietHoursEnd: serializer.fromJson<int?>(json['quietHoursEnd']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'notificationType': serializer.toJson<String>(
+        $NotificationSettingsTable.$converternotificationType.toJson(
+          notificationType,
+        ),
+      ),
+      'enabled': serializer.toJson<bool>(enabled),
+      'daysBefore': serializer.toJson<int>(daysBefore),
+      'quietHoursStart': serializer.toJson<int?>(quietHoursStart),
+      'quietHoursEnd': serializer.toJson<int?>(quietHoursEnd),
+    };
+  }
+
+  NotificationSettingEntity copyWith({
+    int? id,
+    NotificationType? notificationType,
+    bool? enabled,
+    int? daysBefore,
+    Value<int?> quietHoursStart = const Value.absent(),
+    Value<int?> quietHoursEnd = const Value.absent(),
+  }) => NotificationSettingEntity(
+    id: id ?? this.id,
+    notificationType: notificationType ?? this.notificationType,
+    enabled: enabled ?? this.enabled,
+    daysBefore: daysBefore ?? this.daysBefore,
+    quietHoursStart: quietHoursStart.present
+        ? quietHoursStart.value
+        : this.quietHoursStart,
+    quietHoursEnd: quietHoursEnd.present
+        ? quietHoursEnd.value
+        : this.quietHoursEnd,
+  );
+  NotificationSettingEntity copyWithCompanion(
+    NotificationSettingsCompanion data,
+  ) {
+    return NotificationSettingEntity(
+      id: data.id.present ? data.id.value : this.id,
+      notificationType: data.notificationType.present
+          ? data.notificationType.value
+          : this.notificationType,
+      enabled: data.enabled.present ? data.enabled.value : this.enabled,
+      daysBefore: data.daysBefore.present
+          ? data.daysBefore.value
+          : this.daysBefore,
+      quietHoursStart: data.quietHoursStart.present
+          ? data.quietHoursStart.value
+          : this.quietHoursStart,
+      quietHoursEnd: data.quietHoursEnd.present
+          ? data.quietHoursEnd.value
+          : this.quietHoursEnd,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('NotificationSettingEntity(')
+          ..write('id: $id, ')
+          ..write('notificationType: $notificationType, ')
+          ..write('enabled: $enabled, ')
+          ..write('daysBefore: $daysBefore, ')
+          ..write('quietHoursStart: $quietHoursStart, ')
+          ..write('quietHoursEnd: $quietHoursEnd')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    notificationType,
+    enabled,
+    daysBefore,
+    quietHoursStart,
+    quietHoursEnd,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is NotificationSettingEntity &&
+          other.id == this.id &&
+          other.notificationType == this.notificationType &&
+          other.enabled == this.enabled &&
+          other.daysBefore == this.daysBefore &&
+          other.quietHoursStart == this.quietHoursStart &&
+          other.quietHoursEnd == this.quietHoursEnd);
+}
+
+class NotificationSettingsCompanion
+    extends UpdateCompanion<NotificationSettingEntity> {
+  final Value<int> id;
+  final Value<NotificationType> notificationType;
+  final Value<bool> enabled;
+  final Value<int> daysBefore;
+  final Value<int?> quietHoursStart;
+  final Value<int?> quietHoursEnd;
+  const NotificationSettingsCompanion({
+    this.id = const Value.absent(),
+    this.notificationType = const Value.absent(),
+    this.enabled = const Value.absent(),
+    this.daysBefore = const Value.absent(),
+    this.quietHoursStart = const Value.absent(),
+    this.quietHoursEnd = const Value.absent(),
+  });
+  NotificationSettingsCompanion.insert({
+    this.id = const Value.absent(),
+    required NotificationType notificationType,
+    this.enabled = const Value.absent(),
+    this.daysBefore = const Value.absent(),
+    this.quietHoursStart = const Value.absent(),
+    this.quietHoursEnd = const Value.absent(),
+  }) : notificationType = Value(notificationType);
+  static Insertable<NotificationSettingEntity> custom({
+    Expression<int>? id,
+    Expression<String>? notificationType,
+    Expression<bool>? enabled,
+    Expression<int>? daysBefore,
+    Expression<int>? quietHoursStart,
+    Expression<int>? quietHoursEnd,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (notificationType != null) 'notification_type': notificationType,
+      if (enabled != null) 'enabled': enabled,
+      if (daysBefore != null) 'days_before': daysBefore,
+      if (quietHoursStart != null) 'quiet_hours_start': quietHoursStart,
+      if (quietHoursEnd != null) 'quiet_hours_end': quietHoursEnd,
+    });
+  }
+
+  NotificationSettingsCompanion copyWith({
+    Value<int>? id,
+    Value<NotificationType>? notificationType,
+    Value<bool>? enabled,
+    Value<int>? daysBefore,
+    Value<int?>? quietHoursStart,
+    Value<int?>? quietHoursEnd,
+  }) {
+    return NotificationSettingsCompanion(
+      id: id ?? this.id,
+      notificationType: notificationType ?? this.notificationType,
+      enabled: enabled ?? this.enabled,
+      daysBefore: daysBefore ?? this.daysBefore,
+      quietHoursStart: quietHoursStart ?? this.quietHoursStart,
+      quietHoursEnd: quietHoursEnd ?? this.quietHoursEnd,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (notificationType.present) {
+      map['notification_type'] = Variable<String>(
+        $NotificationSettingsTable.$converternotificationType.toSql(
+          notificationType.value,
+        ),
+      );
+    }
+    if (enabled.present) {
+      map['enabled'] = Variable<bool>(enabled.value);
+    }
+    if (daysBefore.present) {
+      map['days_before'] = Variable<int>(daysBefore.value);
+    }
+    if (quietHoursStart.present) {
+      map['quiet_hours_start'] = Variable<int>(quietHoursStart.value);
+    }
+    if (quietHoursEnd.present) {
+      map['quiet_hours_end'] = Variable<int>(quietHoursEnd.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('NotificationSettingsCompanion(')
+          ..write('id: $id, ')
+          ..write('notificationType: $notificationType, ')
+          ..write('enabled: $enabled, ')
+          ..write('daysBefore: $daysBefore, ')
+          ..write('quietHoursStart: $quietHoursStart, ')
+          ..write('quietHoursEnd: $quietHoursEnd')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -4330,6 +7057,15 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $ElectricityRatesTable electricityRates = $ElectricityRatesTable(
     this,
   );
+  late final $FamilyMembersTable familyMembers = $FamilyMembersTable(this);
+  late final $DepositTransactionsTable depositTransactions =
+      $DepositTransactionsTable(this);
+  late final $MeterPhotosTable meterPhotos = $MeterPhotosTable(this);
+  late final $AutoBillSettingsTable autoBillSettings = $AutoBillSettingsTable(
+    this,
+  );
+  late final $NotificationSettingsTable notificationSettings =
+      $NotificationSettingsTable(this);
   late final LandlordDao landlordDao = LandlordDao(this as AppDatabase);
   late final PropertyDao propertyDao = PropertyDao(this as AppDatabase);
   late final TenantDao tenantDao = TenantDao(this as AppDatabase);
@@ -4348,6 +7084,11 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     bills,
     payments,
     electricityRates,
+    familyMembers,
+    depositTransactions,
+    meterPhotos,
+    autoBillSettings,
+    notificationSettings,
   ];
 }
 
@@ -4934,6 +7675,29 @@ final class $$RoomsTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<
+    $AutoBillSettingsTable,
+    List<AutoBillSettingEntity>
+  >
+  _autoBillSettingsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.autoBillSettings,
+    aliasName: $_aliasNameGenerator(db.rooms.id, db.autoBillSettings.roomId),
+  );
+
+  $$AutoBillSettingsTableProcessedTableManager get autoBillSettingsRefs {
+    final manager = $$AutoBillSettingsTableTableManager(
+      $_db,
+      $_db.autoBillSettings,
+    ).filter((f) => f.roomId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _autoBillSettingsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$RoomsTableFilterComposer extends Composer<_$AppDatabase, $RoomsTable> {
@@ -5013,6 +7777,31 @@ class $$RoomsTableFilterComposer extends Composer<_$AppDatabase, $RoomsTable> {
           }) => $$OccupanciesTableFilterComposer(
             $db: $db,
             $table: $db.occupancies,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> autoBillSettingsRefs(
+    Expression<bool> Function($$AutoBillSettingsTableFilterComposer f) f,
+  ) {
+    final $$AutoBillSettingsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.autoBillSettings,
+      getReferencedColumn: (t) => t.roomId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AutoBillSettingsTableFilterComposer(
+            $db: $db,
+            $table: $db.autoBillSettings,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -5166,6 +7955,31 @@ class $$RoomsTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> autoBillSettingsRefs<T extends Object>(
+    Expression<T> Function($$AutoBillSettingsTableAnnotationComposer a) f,
+  ) {
+    final $$AutoBillSettingsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.autoBillSettings,
+      getReferencedColumn: (t) => t.roomId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AutoBillSettingsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.autoBillSettings,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$RoomsTableTableManager
@@ -5181,7 +7995,11 @@ class $$RoomsTableTableManager
           $$RoomsTableUpdateCompanionBuilder,
           (RoomEntity, $$RoomsTableReferences),
           RoomEntity,
-          PrefetchHooks Function({bool propertyId, bool occupanciesRefs})
+          PrefetchHooks Function({
+            bool propertyId,
+            bool occupanciesRefs,
+            bool autoBillSettingsRefs,
+          })
         > {
   $$RoomsTableTableManager(_$AppDatabase db, $RoomsTable table)
     : super(
@@ -5237,11 +8055,16 @@ class $$RoomsTableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({propertyId = false, occupanciesRefs = false}) {
+              ({
+                propertyId = false,
+                occupanciesRefs = false,
+                autoBillSettingsRefs = false,
+              }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (occupanciesRefs) db.occupancies,
+                    if (autoBillSettingsRefs) db.autoBillSettings,
                   ],
                   addJoins:
                       <
@@ -5298,6 +8121,27 @@ class $$RoomsTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (autoBillSettingsRefs)
+                        await $_getPrefetchedData<
+                          RoomEntity,
+                          $RoomsTable,
+                          AutoBillSettingEntity
+                        >(
+                          currentTable: table,
+                          referencedTable: $$RoomsTableReferences
+                              ._autoBillSettingsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$RoomsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).autoBillSettingsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.roomId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -5318,7 +8162,11 @@ typedef $$RoomsTableProcessedTableManager =
       $$RoomsTableUpdateCompanionBuilder,
       (RoomEntity, $$RoomsTableReferences),
       RoomEntity,
-      PrefetchHooks Function({bool propertyId, bool occupanciesRefs})
+      PrefetchHooks Function({
+        bool propertyId,
+        bool occupanciesRefs,
+        bool autoBillSettingsRefs,
+      })
     >;
 typedef $$TenantsTableCreateCompanionBuilder =
     TenantsCompanion Function({
@@ -5378,6 +8226,24 @@ final class $$TenantsTableReferences
     ).filter((f) => f.tenantId.id.sqlEquals($_itemColumn<int>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_occupanciesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$FamilyMembersTable, List<FamilyMemberEntity>>
+  _familyMembersRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.familyMembers,
+    aliasName: $_aliasNameGenerator(db.tenants.id, db.familyMembers.tenantId),
+  );
+
+  $$FamilyMembersTableProcessedTableManager get familyMembersRefs {
+    final manager = $$FamilyMembersTableTableManager(
+      $_db,
+      $_db.familyMembers,
+    ).filter((f) => f.tenantId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_familyMembersRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -5474,6 +8340,31 @@ class $$TenantsTableFilterComposer
           }) => $$OccupanciesTableFilterComposer(
             $db: $db,
             $table: $db.occupancies,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> familyMembersRefs(
+    Expression<bool> Function($$FamilyMembersTableFilterComposer f) f,
+  ) {
+    final $$FamilyMembersTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.familyMembers,
+      getReferencedColumn: (t) => t.tenantId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FamilyMembersTableFilterComposer(
+            $db: $db,
+            $table: $db.familyMembers,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -5622,6 +8513,31 @@ class $$TenantsTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> familyMembersRefs<T extends Object>(
+    Expression<T> Function($$FamilyMembersTableAnnotationComposer a) f,
+  ) {
+    final $$FamilyMembersTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.familyMembers,
+      getReferencedColumn: (t) => t.tenantId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FamilyMembersTableAnnotationComposer(
+            $db: $db,
+            $table: $db.familyMembers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$TenantsTableTableManager
@@ -5637,7 +8553,11 @@ class $$TenantsTableTableManager
           $$TenantsTableUpdateCompanionBuilder,
           (TenantEntity, $$TenantsTableReferences),
           TenantEntity,
-          PrefetchHooks Function({bool customFieldsRefs, bool occupanciesRefs})
+          PrefetchHooks Function({
+            bool customFieldsRefs,
+            bool occupanciesRefs,
+            bool familyMembersRefs,
+          })
         > {
   $$TenantsTableTableManager(_$AppDatabase db, $TenantsTable table)
     : super(
@@ -5699,12 +8619,17 @@ class $$TenantsTableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({customFieldsRefs = false, occupanciesRefs = false}) {
+              ({
+                customFieldsRefs = false,
+                occupanciesRefs = false,
+                familyMembersRefs = false,
+              }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (customFieldsRefs) db.customFields,
                     if (occupanciesRefs) db.occupancies,
+                    if (familyMembersRefs) db.familyMembers,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -5751,6 +8676,27 @@ class $$TenantsTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (familyMembersRefs)
+                        await $_getPrefetchedData<
+                          TenantEntity,
+                          $TenantsTable,
+                          FamilyMemberEntity
+                        >(
+                          currentTable: table,
+                          referencedTable: $$TenantsTableReferences
+                              ._familyMembersRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$TenantsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).familyMembersRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.tenantId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -5771,7 +8717,11 @@ typedef $$TenantsTableProcessedTableManager =
       $$TenantsTableUpdateCompanionBuilder,
       (TenantEntity, $$TenantsTableReferences),
       TenantEntity,
-      PrefetchHooks Function({bool customFieldsRefs, bool occupanciesRefs})
+      PrefetchHooks Function({
+        bool customFieldsRefs,
+        bool occupanciesRefs,
+        bool familyMembersRefs,
+      })
     >;
 typedef $$CustomFieldsTableCreateCompanionBuilder =
     CustomFieldsCompanion Function({
@@ -6080,6 +9030,10 @@ typedef $$OccupanciesTableCreateCompanionBuilder =
       required double agreedRent,
       Value<double> securityDeposit,
       Value<bool> isActive,
+      Value<DepositStatus> depositStatus,
+      Value<DateTime?> depositReceivedDate,
+      Value<DateTime?> depositReturnedDate,
+      Value<double?> depositReturnedAmount,
     });
 typedef $$OccupanciesTableUpdateCompanionBuilder =
     OccupanciesCompanion Function({
@@ -6091,6 +9045,10 @@ typedef $$OccupanciesTableUpdateCompanionBuilder =
       Value<double> agreedRent,
       Value<double> securityDeposit,
       Value<bool> isActive,
+      Value<DepositStatus> depositStatus,
+      Value<DateTime?> depositReceivedDate,
+      Value<DateTime?> depositReturnedDate,
+      Value<double?> depositReturnedAmount,
     });
 
 final class $$OccupanciesTableReferences
@@ -6152,6 +9110,33 @@ final class $$OccupanciesTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<
+    $DepositTransactionsTable,
+    List<DepositTransactionEntity>
+  >
+  _depositTransactionsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.depositTransactions,
+        aliasName: $_aliasNameGenerator(
+          db.occupancies.id,
+          db.depositTransactions.occupancyId,
+        ),
+      );
+
+  $$DepositTransactionsTableProcessedTableManager get depositTransactionsRefs {
+    final manager = $$DepositTransactionsTableTableManager(
+      $_db,
+      $_db.depositTransactions,
+    ).filter((f) => f.occupancyId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _depositTransactionsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$OccupanciesTableFilterComposer
@@ -6190,6 +9175,27 @@ class $$OccupanciesTableFilterComposer
 
   ColumnFilters<bool> get isActive => $composableBuilder(
     column: $table.isActive,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<DepositStatus, DepositStatus, String>
+  get depositStatus => $composableBuilder(
+    column: $table.depositStatus,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<DateTime> get depositReceivedDate => $composableBuilder(
+    column: $table.depositReceivedDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get depositReturnedDate => $composableBuilder(
+    column: $table.depositReturnedDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get depositReturnedAmount => $composableBuilder(
+    column: $table.depositReturnedAmount,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -6263,6 +9269,31 @@ class $$OccupanciesTableFilterComposer
     );
     return f(composer);
   }
+
+  Expression<bool> depositTransactionsRefs(
+    Expression<bool> Function($$DepositTransactionsTableFilterComposer f) f,
+  ) {
+    final $$DepositTransactionsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.depositTransactions,
+      getReferencedColumn: (t) => t.occupancyId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$DepositTransactionsTableFilterComposer(
+            $db: $db,
+            $table: $db.depositTransactions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$OccupanciesTableOrderingComposer
@@ -6301,6 +9332,26 @@ class $$OccupanciesTableOrderingComposer
 
   ColumnOrderings<bool> get isActive => $composableBuilder(
     column: $table.isActive,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get depositStatus => $composableBuilder(
+    column: $table.depositStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get depositReceivedDate => $composableBuilder(
+    column: $table.depositReceivedDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get depositReturnedDate => $composableBuilder(
+    column: $table.depositReturnedDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get depositReturnedAmount => $composableBuilder(
+    column: $table.depositReturnedAmount,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -6386,6 +9437,27 @@ class $$OccupanciesTableAnnotationComposer
   GeneratedColumn<bool> get isActive =>
       $composableBuilder(column: $table.isActive, builder: (column) => column);
 
+  GeneratedColumnWithTypeConverter<DepositStatus, String> get depositStatus =>
+      $composableBuilder(
+        column: $table.depositStatus,
+        builder: (column) => column,
+      );
+
+  GeneratedColumn<DateTime> get depositReceivedDate => $composableBuilder(
+    column: $table.depositReceivedDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get depositReturnedDate => $composableBuilder(
+    column: $table.depositReturnedDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get depositReturnedAmount => $composableBuilder(
+    column: $table.depositReturnedAmount,
+    builder: (column) => column,
+  );
+
   $$RoomsTableAnnotationComposer get roomId {
     final $$RoomsTableAnnotationComposer composer = $composerBuilder(
       composer: this,
@@ -6456,6 +9528,32 @@ class $$OccupanciesTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> depositTransactionsRefs<T extends Object>(
+    Expression<T> Function($$DepositTransactionsTableAnnotationComposer a) f,
+  ) {
+    final $$DepositTransactionsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.depositTransactions,
+          getReferencedColumn: (t) => t.occupancyId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$DepositTransactionsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.depositTransactions,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$OccupanciesTableTableManager
@@ -6471,7 +9569,12 @@ class $$OccupanciesTableTableManager
           $$OccupanciesTableUpdateCompanionBuilder,
           (OccupancyEntity, $$OccupanciesTableReferences),
           OccupancyEntity,
-          PrefetchHooks Function({bool roomId, bool tenantId, bool billsRefs})
+          PrefetchHooks Function({
+            bool roomId,
+            bool tenantId,
+            bool billsRefs,
+            bool depositTransactionsRefs,
+          })
         > {
   $$OccupanciesTableTableManager(_$AppDatabase db, $OccupanciesTable table)
     : super(
@@ -6494,6 +9597,10 @@ class $$OccupanciesTableTableManager
                 Value<double> agreedRent = const Value.absent(),
                 Value<double> securityDeposit = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
+                Value<DepositStatus> depositStatus = const Value.absent(),
+                Value<DateTime?> depositReceivedDate = const Value.absent(),
+                Value<DateTime?> depositReturnedDate = const Value.absent(),
+                Value<double?> depositReturnedAmount = const Value.absent(),
               }) => OccupanciesCompanion(
                 id: id,
                 roomId: roomId,
@@ -6503,6 +9610,10 @@ class $$OccupanciesTableTableManager
                 agreedRent: agreedRent,
                 securityDeposit: securityDeposit,
                 isActive: isActive,
+                depositStatus: depositStatus,
+                depositReceivedDate: depositReceivedDate,
+                depositReturnedDate: depositReturnedDate,
+                depositReturnedAmount: depositReturnedAmount,
               ),
           createCompanionCallback:
               ({
@@ -6514,6 +9625,10 @@ class $$OccupanciesTableTableManager
                 required double agreedRent,
                 Value<double> securityDeposit = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
+                Value<DepositStatus> depositStatus = const Value.absent(),
+                Value<DateTime?> depositReceivedDate = const Value.absent(),
+                Value<DateTime?> depositReturnedDate = const Value.absent(),
+                Value<double?> depositReturnedAmount = const Value.absent(),
               }) => OccupanciesCompanion.insert(
                 id: id,
                 roomId: roomId,
@@ -6523,6 +9638,10 @@ class $$OccupanciesTableTableManager
                 agreedRent: agreedRent,
                 securityDeposit: securityDeposit,
                 isActive: isActive,
+                depositStatus: depositStatus,
+                depositReceivedDate: depositReceivedDate,
+                depositReturnedDate: depositReturnedDate,
+                depositReturnedAmount: depositReturnedAmount,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -6533,10 +9652,18 @@ class $$OccupanciesTableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({roomId = false, tenantId = false, billsRefs = false}) {
+              ({
+                roomId = false,
+                tenantId = false,
+                billsRefs = false,
+                depositTransactionsRefs = false,
+              }) {
                 return PrefetchHooks(
                   db: db,
-                  explicitlyWatchedTables: [if (billsRefs) db.bills],
+                  explicitlyWatchedTables: [
+                    if (billsRefs) db.bills,
+                    if (depositTransactionsRefs) db.depositTransactions,
+                  ],
                   addJoins:
                       <
                         T extends TableManagerState<
@@ -6609,6 +9736,27 @@ class $$OccupanciesTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (depositTransactionsRefs)
+                        await $_getPrefetchedData<
+                          OccupancyEntity,
+                          $OccupanciesTable,
+                          DepositTransactionEntity
+                        >(
+                          currentTable: table,
+                          referencedTable: $$OccupanciesTableReferences
+                              ._depositTransactionsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$OccupanciesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).depositTransactionsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.occupancyId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -6629,7 +9777,12 @@ typedef $$OccupanciesTableProcessedTableManager =
       $$OccupanciesTableUpdateCompanionBuilder,
       (OccupancyEntity, $$OccupanciesTableReferences),
       OccupancyEntity,
-      PrefetchHooks Function({bool roomId, bool tenantId, bool billsRefs})
+      PrefetchHooks Function({
+        bool roomId,
+        bool tenantId,
+        bool billsRefs,
+        bool depositTransactionsRefs,
+      })
     >;
 typedef $$BillsTableCreateCompanionBuilder =
     BillsCompanion Function({
@@ -6638,6 +9791,8 @@ typedef $$BillsTableCreateCompanionBuilder =
       required BillType billType,
       required int billingMonth,
       required int billingYear,
+      Value<DateTime?> periodStartDate,
+      Value<DateTime?> periodEndDate,
       required double amount,
       Value<double?> electricityPrevReading,
       Value<double?> electricityCurrReading,
@@ -6655,6 +9810,8 @@ typedef $$BillsTableUpdateCompanionBuilder =
       Value<BillType> billType,
       Value<int> billingMonth,
       Value<int> billingYear,
+      Value<DateTime?> periodStartDate,
+      Value<DateTime?> periodEndDate,
       Value<double> amount,
       Value<double?> electricityPrevReading,
       Value<double?> electricityCurrReading,
@@ -6706,6 +9863,24 @@ final class $$BillsTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$MeterPhotosTable, List<MeterPhotoEntity>>
+  _meterPhotosRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.meterPhotos,
+    aliasName: $_aliasNameGenerator(db.bills.id, db.meterPhotos.billId),
+  );
+
+  $$MeterPhotosTableProcessedTableManager get meterPhotosRefs {
+    final manager = $$MeterPhotosTableTableManager(
+      $_db,
+      $_db.meterPhotos,
+    ).filter((f) => f.billId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_meterPhotosRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$BillsTableFilterComposer extends Composer<_$AppDatabase, $BillsTable> {
@@ -6734,6 +9909,16 @@ class $$BillsTableFilterComposer extends Composer<_$AppDatabase, $BillsTable> {
 
   ColumnFilters<int> get billingYear => $composableBuilder(
     column: $table.billingYear,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get periodStartDate => $composableBuilder(
+    column: $table.periodStartDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get periodEndDate => $composableBuilder(
+    column: $table.periodEndDate,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -6829,6 +10014,31 @@ class $$BillsTableFilterComposer extends Composer<_$AppDatabase, $BillsTable> {
     );
     return f(composer);
   }
+
+  Expression<bool> meterPhotosRefs(
+    Expression<bool> Function($$MeterPhotosTableFilterComposer f) f,
+  ) {
+    final $$MeterPhotosTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.meterPhotos,
+      getReferencedColumn: (t) => t.billId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MeterPhotosTableFilterComposer(
+            $db: $db,
+            $table: $db.meterPhotos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$BillsTableOrderingComposer
@@ -6857,6 +10067,16 @@ class $$BillsTableOrderingComposer
 
   ColumnOrderings<int> get billingYear => $composableBuilder(
     column: $table.billingYear,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get periodStartDate => $composableBuilder(
+    column: $table.periodStartDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get periodEndDate => $composableBuilder(
+    column: $table.periodEndDate,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -6954,6 +10174,16 @@ class $$BillsTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<DateTime> get periodStartDate => $composableBuilder(
+    column: $table.periodStartDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get periodEndDate => $composableBuilder(
+    column: $table.periodEndDate,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<double> get amount =>
       $composableBuilder(column: $table.amount, builder: (column) => column);
 
@@ -7038,6 +10268,31 @@ class $$BillsTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> meterPhotosRefs<T extends Object>(
+    Expression<T> Function($$MeterPhotosTableAnnotationComposer a) f,
+  ) {
+    final $$MeterPhotosTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.meterPhotos,
+      getReferencedColumn: (t) => t.billId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MeterPhotosTableAnnotationComposer(
+            $db: $db,
+            $table: $db.meterPhotos,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$BillsTableTableManager
@@ -7053,7 +10308,11 @@ class $$BillsTableTableManager
           $$BillsTableUpdateCompanionBuilder,
           (BillEntity, $$BillsTableReferences),
           BillEntity,
-          PrefetchHooks Function({bool occupancyId, bool paymentsRefs})
+          PrefetchHooks Function({
+            bool occupancyId,
+            bool paymentsRefs,
+            bool meterPhotosRefs,
+          })
         > {
   $$BillsTableTableManager(_$AppDatabase db, $BillsTable table)
     : super(
@@ -7073,6 +10332,8 @@ class $$BillsTableTableManager
                 Value<BillType> billType = const Value.absent(),
                 Value<int> billingMonth = const Value.absent(),
                 Value<int> billingYear = const Value.absent(),
+                Value<DateTime?> periodStartDate = const Value.absent(),
+                Value<DateTime?> periodEndDate = const Value.absent(),
                 Value<double> amount = const Value.absent(),
                 Value<double?> electricityPrevReading = const Value.absent(),
                 Value<double?> electricityCurrReading = const Value.absent(),
@@ -7088,6 +10349,8 @@ class $$BillsTableTableManager
                 billType: billType,
                 billingMonth: billingMonth,
                 billingYear: billingYear,
+                periodStartDate: periodStartDate,
+                periodEndDate: periodEndDate,
                 amount: amount,
                 electricityPrevReading: electricityPrevReading,
                 electricityCurrReading: electricityCurrReading,
@@ -7105,6 +10368,8 @@ class $$BillsTableTableManager
                 required BillType billType,
                 required int billingMonth,
                 required int billingYear,
+                Value<DateTime?> periodStartDate = const Value.absent(),
+                Value<DateTime?> periodEndDate = const Value.absent(),
                 required double amount,
                 Value<double?> electricityPrevReading = const Value.absent(),
                 Value<double?> electricityCurrReading = const Value.absent(),
@@ -7120,6 +10385,8 @@ class $$BillsTableTableManager
                 billType: billType,
                 billingMonth: billingMonth,
                 billingYear: billingYear,
+                periodStartDate: periodStartDate,
+                periodEndDate: periodEndDate,
                 amount: amount,
                 electricityPrevReading: electricityPrevReading,
                 electricityCurrReading: electricityCurrReading,
@@ -7136,63 +10403,98 @@ class $$BillsTableTableManager
                     (e.readTable(table), $$BillsTableReferences(db, table, e)),
               )
               .toList(),
-          prefetchHooksCallback: ({occupancyId = false, paymentsRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [if (paymentsRefs) db.payments],
-              addJoins:
-                  <
-                    T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic
-                    >
-                  >(state) {
-                    if (occupancyId) {
-                      state =
-                          state.withJoin(
-                                currentTable: table,
-                                currentColumn: table.occupancyId,
-                                referencedTable: $$BillsTableReferences
-                                    ._occupancyIdTable(db),
-                                referencedColumn: $$BillsTableReferences
-                                    ._occupancyIdTable(db)
-                                    .id,
-                              )
-                              as T;
-                    }
+          prefetchHooksCallback:
+              ({
+                occupancyId = false,
+                paymentsRefs = false,
+                meterPhotosRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (paymentsRefs) db.payments,
+                    if (meterPhotosRefs) db.meterPhotos,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (occupancyId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.occupancyId,
+                                    referencedTable: $$BillsTableReferences
+                                        ._occupancyIdTable(db),
+                                    referencedColumn: $$BillsTableReferences
+                                        ._occupancyIdTable(db)
+                                        .id,
+                                  )
+                                  as T;
+                        }
 
-                    return state;
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (paymentsRefs)
+                        await $_getPrefetchedData<
+                          BillEntity,
+                          $BillsTable,
+                          PaymentEntity
+                        >(
+                          currentTable: table,
+                          referencedTable: $$BillsTableReferences
+                              ._paymentsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$BillsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).paymentsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.billId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (meterPhotosRefs)
+                        await $_getPrefetchedData<
+                          BillEntity,
+                          $BillsTable,
+                          MeterPhotoEntity
+                        >(
+                          currentTable: table,
+                          referencedTable: $$BillsTableReferences
+                              ._meterPhotosRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$BillsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).meterPhotosRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.billId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
                   },
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (paymentsRefs)
-                    await $_getPrefetchedData<
-                      BillEntity,
-                      $BillsTable,
-                      PaymentEntity
-                    >(
-                      currentTable: table,
-                      referencedTable: $$BillsTableReferences
-                          ._paymentsRefsTable(db),
-                      managerFromTypedResult: (p0) =>
-                          $$BillsTableReferences(db, table, p0).paymentsRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.billId == item.id),
-                      typedResults: items,
-                    ),
-                ];
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -7209,7 +10511,11 @@ typedef $$BillsTableProcessedTableManager =
       $$BillsTableUpdateCompanionBuilder,
       (BillEntity, $$BillsTableReferences),
       BillEntity,
-      PrefetchHooks Function({bool occupancyId, bool paymentsRefs})
+      PrefetchHooks Function({
+        bool occupancyId,
+        bool paymentsRefs,
+        bool meterPhotosRefs,
+      })
     >;
 typedef $$PaymentsTableCreateCompanionBuilder =
     PaymentsCompanion Function({
@@ -7718,6 +11024,1697 @@ typedef $$ElectricityRatesTableProcessedTableManager =
       ElectricityRateEntity,
       PrefetchHooks Function()
     >;
+typedef $$FamilyMembersTableCreateCompanionBuilder =
+    FamilyMembersCompanion Function({
+      Value<int> id,
+      required int tenantId,
+      required String name,
+      required FamilyRelationship relationship,
+      Value<String?> phone,
+      Value<String?> aadharNumber,
+      Value<DateTime> createdAt,
+    });
+typedef $$FamilyMembersTableUpdateCompanionBuilder =
+    FamilyMembersCompanion Function({
+      Value<int> id,
+      Value<int> tenantId,
+      Value<String> name,
+      Value<FamilyRelationship> relationship,
+      Value<String?> phone,
+      Value<String?> aadharNumber,
+      Value<DateTime> createdAt,
+    });
+
+final class $$FamilyMembersTableReferences
+    extends
+        BaseReferences<_$AppDatabase, $FamilyMembersTable, FamilyMemberEntity> {
+  $$FamilyMembersTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $TenantsTable _tenantIdTable(_$AppDatabase db) =>
+      db.tenants.createAlias(
+        $_aliasNameGenerator(db.familyMembers.tenantId, db.tenants.id),
+      );
+
+  $$TenantsTableProcessedTableManager get tenantId {
+    final $_column = $_itemColumn<int>('tenant_id')!;
+
+    final manager = $$TenantsTableTableManager(
+      $_db,
+      $_db.tenants,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_tenantIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$FamilyMembersTableFilterComposer
+    extends Composer<_$AppDatabase, $FamilyMembersTable> {
+  $$FamilyMembersTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<FamilyRelationship, FamilyRelationship, String>
+  get relationship => $composableBuilder(
+    column: $table.relationship,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<String> get phone => $composableBuilder(
+    column: $table.phone,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get aadharNumber => $composableBuilder(
+    column: $table.aadharNumber,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$TenantsTableFilterComposer get tenantId {
+    final $$TenantsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.tenantId,
+      referencedTable: $db.tenants,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TenantsTableFilterComposer(
+            $db: $db,
+            $table: $db.tenants,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FamilyMembersTableOrderingComposer
+    extends Composer<_$AppDatabase, $FamilyMembersTable> {
+  $$FamilyMembersTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get relationship => $composableBuilder(
+    column: $table.relationship,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get phone => $composableBuilder(
+    column: $table.phone,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get aadharNumber => $composableBuilder(
+    column: $table.aadharNumber,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$TenantsTableOrderingComposer get tenantId {
+    final $$TenantsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.tenantId,
+      referencedTable: $db.tenants,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TenantsTableOrderingComposer(
+            $db: $db,
+            $table: $db.tenants,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FamilyMembersTableAnnotationComposer
+    extends Composer<_$AppDatabase, $FamilyMembersTable> {
+  $$FamilyMembersTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<FamilyRelationship, String>
+  get relationship => $composableBuilder(
+    column: $table.relationship,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get phone =>
+      $composableBuilder(column: $table.phone, builder: (column) => column);
+
+  GeneratedColumn<String> get aadharNumber => $composableBuilder(
+    column: $table.aadharNumber,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  $$TenantsTableAnnotationComposer get tenantId {
+    final $$TenantsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.tenantId,
+      referencedTable: $db.tenants,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TenantsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.tenants,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FamilyMembersTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $FamilyMembersTable,
+          FamilyMemberEntity,
+          $$FamilyMembersTableFilterComposer,
+          $$FamilyMembersTableOrderingComposer,
+          $$FamilyMembersTableAnnotationComposer,
+          $$FamilyMembersTableCreateCompanionBuilder,
+          $$FamilyMembersTableUpdateCompanionBuilder,
+          (FamilyMemberEntity, $$FamilyMembersTableReferences),
+          FamilyMemberEntity,
+          PrefetchHooks Function({bool tenantId})
+        > {
+  $$FamilyMembersTableTableManager(_$AppDatabase db, $FamilyMembersTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$FamilyMembersTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$FamilyMembersTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$FamilyMembersTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> tenantId = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<FamilyRelationship> relationship = const Value.absent(),
+                Value<String?> phone = const Value.absent(),
+                Value<String?> aadharNumber = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => FamilyMembersCompanion(
+                id: id,
+                tenantId: tenantId,
+                name: name,
+                relationship: relationship,
+                phone: phone,
+                aadharNumber: aadharNumber,
+                createdAt: createdAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int tenantId,
+                required String name,
+                required FamilyRelationship relationship,
+                Value<String?> phone = const Value.absent(),
+                Value<String?> aadharNumber = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => FamilyMembersCompanion.insert(
+                id: id,
+                tenantId: tenantId,
+                name: name,
+                relationship: relationship,
+                phone: phone,
+                aadharNumber: aadharNumber,
+                createdAt: createdAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$FamilyMembersTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({tenantId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (tenantId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.tenantId,
+                                referencedTable: $$FamilyMembersTableReferences
+                                    ._tenantIdTable(db),
+                                referencedColumn: $$FamilyMembersTableReferences
+                                    ._tenantIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$FamilyMembersTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $FamilyMembersTable,
+      FamilyMemberEntity,
+      $$FamilyMembersTableFilterComposer,
+      $$FamilyMembersTableOrderingComposer,
+      $$FamilyMembersTableAnnotationComposer,
+      $$FamilyMembersTableCreateCompanionBuilder,
+      $$FamilyMembersTableUpdateCompanionBuilder,
+      (FamilyMemberEntity, $$FamilyMembersTableReferences),
+      FamilyMemberEntity,
+      PrefetchHooks Function({bool tenantId})
+    >;
+typedef $$DepositTransactionsTableCreateCompanionBuilder =
+    DepositTransactionsCompanion Function({
+      Value<int> id,
+      required int occupancyId,
+      required DepositTransactionType transactionType,
+      required double amount,
+      required DateTime transactionDate,
+      Value<String?> notes,
+      Value<DateTime> createdAt,
+    });
+typedef $$DepositTransactionsTableUpdateCompanionBuilder =
+    DepositTransactionsCompanion Function({
+      Value<int> id,
+      Value<int> occupancyId,
+      Value<DepositTransactionType> transactionType,
+      Value<double> amount,
+      Value<DateTime> transactionDate,
+      Value<String?> notes,
+      Value<DateTime> createdAt,
+    });
+
+final class $$DepositTransactionsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $DepositTransactionsTable,
+          DepositTransactionEntity
+        > {
+  $$DepositTransactionsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $OccupanciesTable _occupancyIdTable(_$AppDatabase db) =>
+      db.occupancies.createAlias(
+        $_aliasNameGenerator(
+          db.depositTransactions.occupancyId,
+          db.occupancies.id,
+        ),
+      );
+
+  $$OccupanciesTableProcessedTableManager get occupancyId {
+    final $_column = $_itemColumn<int>('occupancy_id')!;
+
+    final manager = $$OccupanciesTableTableManager(
+      $_db,
+      $_db.occupancies,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_occupancyIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$DepositTransactionsTableFilterComposer
+    extends Composer<_$AppDatabase, $DepositTransactionsTable> {
+  $$DepositTransactionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<
+    DepositTransactionType,
+    DepositTransactionType,
+    String
+  >
+  get transactionType => $composableBuilder(
+    column: $table.transactionType,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<double> get amount => $composableBuilder(
+    column: $table.amount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get transactionDate => $composableBuilder(
+    column: $table.transactionDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$OccupanciesTableFilterComposer get occupancyId {
+    final $$OccupanciesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.occupancyId,
+      referencedTable: $db.occupancies,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$OccupanciesTableFilterComposer(
+            $db: $db,
+            $table: $db.occupancies,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$DepositTransactionsTableOrderingComposer
+    extends Composer<_$AppDatabase, $DepositTransactionsTable> {
+  $$DepositTransactionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get transactionType => $composableBuilder(
+    column: $table.transactionType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get amount => $composableBuilder(
+    column: $table.amount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get transactionDate => $composableBuilder(
+    column: $table.transactionDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$OccupanciesTableOrderingComposer get occupancyId {
+    final $$OccupanciesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.occupancyId,
+      referencedTable: $db.occupancies,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$OccupanciesTableOrderingComposer(
+            $db: $db,
+            $table: $db.occupancies,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$DepositTransactionsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DepositTransactionsTable> {
+  $$DepositTransactionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<DepositTransactionType, String>
+  get transactionType => $composableBuilder(
+    column: $table.transactionType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get amount =>
+      $composableBuilder(column: $table.amount, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get transactionDate => $composableBuilder(
+    column: $table.transactionDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  $$OccupanciesTableAnnotationComposer get occupancyId {
+    final $$OccupanciesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.occupancyId,
+      referencedTable: $db.occupancies,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$OccupanciesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.occupancies,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$DepositTransactionsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $DepositTransactionsTable,
+          DepositTransactionEntity,
+          $$DepositTransactionsTableFilterComposer,
+          $$DepositTransactionsTableOrderingComposer,
+          $$DepositTransactionsTableAnnotationComposer,
+          $$DepositTransactionsTableCreateCompanionBuilder,
+          $$DepositTransactionsTableUpdateCompanionBuilder,
+          (DepositTransactionEntity, $$DepositTransactionsTableReferences),
+          DepositTransactionEntity,
+          PrefetchHooks Function({bool occupancyId})
+        > {
+  $$DepositTransactionsTableTableManager(
+    _$AppDatabase db,
+    $DepositTransactionsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DepositTransactionsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DepositTransactionsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$DepositTransactionsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> occupancyId = const Value.absent(),
+                Value<DepositTransactionType> transactionType =
+                    const Value.absent(),
+                Value<double> amount = const Value.absent(),
+                Value<DateTime> transactionDate = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => DepositTransactionsCompanion(
+                id: id,
+                occupancyId: occupancyId,
+                transactionType: transactionType,
+                amount: amount,
+                transactionDate: transactionDate,
+                notes: notes,
+                createdAt: createdAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int occupancyId,
+                required DepositTransactionType transactionType,
+                required double amount,
+                required DateTime transactionDate,
+                Value<String?> notes = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => DepositTransactionsCompanion.insert(
+                id: id,
+                occupancyId: occupancyId,
+                transactionType: transactionType,
+                amount: amount,
+                transactionDate: transactionDate,
+                notes: notes,
+                createdAt: createdAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$DepositTransactionsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({occupancyId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (occupancyId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.occupancyId,
+                                referencedTable:
+                                    $$DepositTransactionsTableReferences
+                                        ._occupancyIdTable(db),
+                                referencedColumn:
+                                    $$DepositTransactionsTableReferences
+                                        ._occupancyIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$DepositTransactionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $DepositTransactionsTable,
+      DepositTransactionEntity,
+      $$DepositTransactionsTableFilterComposer,
+      $$DepositTransactionsTableOrderingComposer,
+      $$DepositTransactionsTableAnnotationComposer,
+      $$DepositTransactionsTableCreateCompanionBuilder,
+      $$DepositTransactionsTableUpdateCompanionBuilder,
+      (DepositTransactionEntity, $$DepositTransactionsTableReferences),
+      DepositTransactionEntity,
+      PrefetchHooks Function({bool occupancyId})
+    >;
+typedef $$MeterPhotosTableCreateCompanionBuilder =
+    MeterPhotosCompanion Function({
+      Value<int> id,
+      required int billId,
+      required String photoPath,
+      Value<int> photoOrder,
+      Value<DateTime> createdAt,
+    });
+typedef $$MeterPhotosTableUpdateCompanionBuilder =
+    MeterPhotosCompanion Function({
+      Value<int> id,
+      Value<int> billId,
+      Value<String> photoPath,
+      Value<int> photoOrder,
+      Value<DateTime> createdAt,
+    });
+
+final class $$MeterPhotosTableReferences
+    extends BaseReferences<_$AppDatabase, $MeterPhotosTable, MeterPhotoEntity> {
+  $$MeterPhotosTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $BillsTable _billIdTable(_$AppDatabase db) => db.bills.createAlias(
+    $_aliasNameGenerator(db.meterPhotos.billId, db.bills.id),
+  );
+
+  $$BillsTableProcessedTableManager get billId {
+    final $_column = $_itemColumn<int>('bill_id')!;
+
+    final manager = $$BillsTableTableManager(
+      $_db,
+      $_db.bills,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_billIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$MeterPhotosTableFilterComposer
+    extends Composer<_$AppDatabase, $MeterPhotosTable> {
+  $$MeterPhotosTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get photoPath => $composableBuilder(
+    column: $table.photoPath,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get photoOrder => $composableBuilder(
+    column: $table.photoOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$BillsTableFilterComposer get billId {
+    final $$BillsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.billId,
+      referencedTable: $db.bills,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BillsTableFilterComposer(
+            $db: $db,
+            $table: $db.bills,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$MeterPhotosTableOrderingComposer
+    extends Composer<_$AppDatabase, $MeterPhotosTable> {
+  $$MeterPhotosTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get photoPath => $composableBuilder(
+    column: $table.photoPath,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get photoOrder => $composableBuilder(
+    column: $table.photoOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$BillsTableOrderingComposer get billId {
+    final $$BillsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.billId,
+      referencedTable: $db.bills,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BillsTableOrderingComposer(
+            $db: $db,
+            $table: $db.bills,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$MeterPhotosTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MeterPhotosTable> {
+  $$MeterPhotosTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get photoPath =>
+      $composableBuilder(column: $table.photoPath, builder: (column) => column);
+
+  GeneratedColumn<int> get photoOrder => $composableBuilder(
+    column: $table.photoOrder,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  $$BillsTableAnnotationComposer get billId {
+    final $$BillsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.billId,
+      referencedTable: $db.bills,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BillsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.bills,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$MeterPhotosTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $MeterPhotosTable,
+          MeterPhotoEntity,
+          $$MeterPhotosTableFilterComposer,
+          $$MeterPhotosTableOrderingComposer,
+          $$MeterPhotosTableAnnotationComposer,
+          $$MeterPhotosTableCreateCompanionBuilder,
+          $$MeterPhotosTableUpdateCompanionBuilder,
+          (MeterPhotoEntity, $$MeterPhotosTableReferences),
+          MeterPhotoEntity,
+          PrefetchHooks Function({bool billId})
+        > {
+  $$MeterPhotosTableTableManager(_$AppDatabase db, $MeterPhotosTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MeterPhotosTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$MeterPhotosTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$MeterPhotosTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> billId = const Value.absent(),
+                Value<String> photoPath = const Value.absent(),
+                Value<int> photoOrder = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => MeterPhotosCompanion(
+                id: id,
+                billId: billId,
+                photoPath: photoPath,
+                photoOrder: photoOrder,
+                createdAt: createdAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int billId,
+                required String photoPath,
+                Value<int> photoOrder = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => MeterPhotosCompanion.insert(
+                id: id,
+                billId: billId,
+                photoPath: photoPath,
+                photoOrder: photoOrder,
+                createdAt: createdAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$MeterPhotosTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({billId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (billId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.billId,
+                                referencedTable: $$MeterPhotosTableReferences
+                                    ._billIdTable(db),
+                                referencedColumn: $$MeterPhotosTableReferences
+                                    ._billIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$MeterPhotosTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $MeterPhotosTable,
+      MeterPhotoEntity,
+      $$MeterPhotosTableFilterComposer,
+      $$MeterPhotosTableOrderingComposer,
+      $$MeterPhotosTableAnnotationComposer,
+      $$MeterPhotosTableCreateCompanionBuilder,
+      $$MeterPhotosTableUpdateCompanionBuilder,
+      (MeterPhotoEntity, $$MeterPhotosTableReferences),
+      MeterPhotoEntity,
+      PrefetchHooks Function({bool billId})
+    >;
+typedef $$AutoBillSettingsTableCreateCompanionBuilder =
+    AutoBillSettingsCompanion Function({
+      Value<int> id,
+      required int roomId,
+      Value<bool> enabled,
+      Value<bool> generateRent,
+      Value<bool> generateElectricity,
+      Value<int> generationDay,
+      Value<int> dueDayOffset,
+      Value<DateTime?> lastGeneratedAt,
+    });
+typedef $$AutoBillSettingsTableUpdateCompanionBuilder =
+    AutoBillSettingsCompanion Function({
+      Value<int> id,
+      Value<int> roomId,
+      Value<bool> enabled,
+      Value<bool> generateRent,
+      Value<bool> generateElectricity,
+      Value<int> generationDay,
+      Value<int> dueDayOffset,
+      Value<DateTime?> lastGeneratedAt,
+    });
+
+final class $$AutoBillSettingsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $AutoBillSettingsTable,
+          AutoBillSettingEntity
+        > {
+  $$AutoBillSettingsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $RoomsTable _roomIdTable(_$AppDatabase db) => db.rooms.createAlias(
+    $_aliasNameGenerator(db.autoBillSettings.roomId, db.rooms.id),
+  );
+
+  $$RoomsTableProcessedTableManager get roomId {
+    final $_column = $_itemColumn<int>('room_id')!;
+
+    final manager = $$RoomsTableTableManager(
+      $_db,
+      $_db.rooms,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_roomIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$AutoBillSettingsTableFilterComposer
+    extends Composer<_$AppDatabase, $AutoBillSettingsTable> {
+  $$AutoBillSettingsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get enabled => $composableBuilder(
+    column: $table.enabled,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get generateRent => $composableBuilder(
+    column: $table.generateRent,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get generateElectricity => $composableBuilder(
+    column: $table.generateElectricity,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get generationDay => $composableBuilder(
+    column: $table.generationDay,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get dueDayOffset => $composableBuilder(
+    column: $table.dueDayOffset,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lastGeneratedAt => $composableBuilder(
+    column: $table.lastGeneratedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$RoomsTableFilterComposer get roomId {
+    final $$RoomsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.roomId,
+      referencedTable: $db.rooms,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RoomsTableFilterComposer(
+            $db: $db,
+            $table: $db.rooms,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AutoBillSettingsTableOrderingComposer
+    extends Composer<_$AppDatabase, $AutoBillSettingsTable> {
+  $$AutoBillSettingsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get enabled => $composableBuilder(
+    column: $table.enabled,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get generateRent => $composableBuilder(
+    column: $table.generateRent,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get generateElectricity => $composableBuilder(
+    column: $table.generateElectricity,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get generationDay => $composableBuilder(
+    column: $table.generationDay,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get dueDayOffset => $composableBuilder(
+    column: $table.dueDayOffset,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get lastGeneratedAt => $composableBuilder(
+    column: $table.lastGeneratedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$RoomsTableOrderingComposer get roomId {
+    final $$RoomsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.roomId,
+      referencedTable: $db.rooms,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RoomsTableOrderingComposer(
+            $db: $db,
+            $table: $db.rooms,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AutoBillSettingsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AutoBillSettingsTable> {
+  $$AutoBillSettingsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<bool> get enabled =>
+      $composableBuilder(column: $table.enabled, builder: (column) => column);
+
+  GeneratedColumn<bool> get generateRent => $composableBuilder(
+    column: $table.generateRent,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get generateElectricity => $composableBuilder(
+    column: $table.generateElectricity,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get generationDay => $composableBuilder(
+    column: $table.generationDay,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get dueDayOffset => $composableBuilder(
+    column: $table.dueDayOffset,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get lastGeneratedAt => $composableBuilder(
+    column: $table.lastGeneratedAt,
+    builder: (column) => column,
+  );
+
+  $$RoomsTableAnnotationComposer get roomId {
+    final $$RoomsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.roomId,
+      referencedTable: $db.rooms,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RoomsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.rooms,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AutoBillSettingsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AutoBillSettingsTable,
+          AutoBillSettingEntity,
+          $$AutoBillSettingsTableFilterComposer,
+          $$AutoBillSettingsTableOrderingComposer,
+          $$AutoBillSettingsTableAnnotationComposer,
+          $$AutoBillSettingsTableCreateCompanionBuilder,
+          $$AutoBillSettingsTableUpdateCompanionBuilder,
+          (AutoBillSettingEntity, $$AutoBillSettingsTableReferences),
+          AutoBillSettingEntity,
+          PrefetchHooks Function({bool roomId})
+        > {
+  $$AutoBillSettingsTableTableManager(
+    _$AppDatabase db,
+    $AutoBillSettingsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AutoBillSettingsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AutoBillSettingsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AutoBillSettingsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> roomId = const Value.absent(),
+                Value<bool> enabled = const Value.absent(),
+                Value<bool> generateRent = const Value.absent(),
+                Value<bool> generateElectricity = const Value.absent(),
+                Value<int> generationDay = const Value.absent(),
+                Value<int> dueDayOffset = const Value.absent(),
+                Value<DateTime?> lastGeneratedAt = const Value.absent(),
+              }) => AutoBillSettingsCompanion(
+                id: id,
+                roomId: roomId,
+                enabled: enabled,
+                generateRent: generateRent,
+                generateElectricity: generateElectricity,
+                generationDay: generationDay,
+                dueDayOffset: dueDayOffset,
+                lastGeneratedAt: lastGeneratedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int roomId,
+                Value<bool> enabled = const Value.absent(),
+                Value<bool> generateRent = const Value.absent(),
+                Value<bool> generateElectricity = const Value.absent(),
+                Value<int> generationDay = const Value.absent(),
+                Value<int> dueDayOffset = const Value.absent(),
+                Value<DateTime?> lastGeneratedAt = const Value.absent(),
+              }) => AutoBillSettingsCompanion.insert(
+                id: id,
+                roomId: roomId,
+                enabled: enabled,
+                generateRent: generateRent,
+                generateElectricity: generateElectricity,
+                generationDay: generationDay,
+                dueDayOffset: dueDayOffset,
+                lastGeneratedAt: lastGeneratedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$AutoBillSettingsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({roomId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (roomId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.roomId,
+                                referencedTable:
+                                    $$AutoBillSettingsTableReferences
+                                        ._roomIdTable(db),
+                                referencedColumn:
+                                    $$AutoBillSettingsTableReferences
+                                        ._roomIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$AutoBillSettingsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AutoBillSettingsTable,
+      AutoBillSettingEntity,
+      $$AutoBillSettingsTableFilterComposer,
+      $$AutoBillSettingsTableOrderingComposer,
+      $$AutoBillSettingsTableAnnotationComposer,
+      $$AutoBillSettingsTableCreateCompanionBuilder,
+      $$AutoBillSettingsTableUpdateCompanionBuilder,
+      (AutoBillSettingEntity, $$AutoBillSettingsTableReferences),
+      AutoBillSettingEntity,
+      PrefetchHooks Function({bool roomId})
+    >;
+typedef $$NotificationSettingsTableCreateCompanionBuilder =
+    NotificationSettingsCompanion Function({
+      Value<int> id,
+      required NotificationType notificationType,
+      Value<bool> enabled,
+      Value<int> daysBefore,
+      Value<int?> quietHoursStart,
+      Value<int?> quietHoursEnd,
+    });
+typedef $$NotificationSettingsTableUpdateCompanionBuilder =
+    NotificationSettingsCompanion Function({
+      Value<int> id,
+      Value<NotificationType> notificationType,
+      Value<bool> enabled,
+      Value<int> daysBefore,
+      Value<int?> quietHoursStart,
+      Value<int?> quietHoursEnd,
+    });
+
+class $$NotificationSettingsTableFilterComposer
+    extends Composer<_$AppDatabase, $NotificationSettingsTable> {
+  $$NotificationSettingsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<NotificationType, NotificationType, String>
+  get notificationType => $composableBuilder(
+    column: $table.notificationType,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<bool> get enabled => $composableBuilder(
+    column: $table.enabled,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get daysBefore => $composableBuilder(
+    column: $table.daysBefore,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get quietHoursStart => $composableBuilder(
+    column: $table.quietHoursStart,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get quietHoursEnd => $composableBuilder(
+    column: $table.quietHoursEnd,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$NotificationSettingsTableOrderingComposer
+    extends Composer<_$AppDatabase, $NotificationSettingsTable> {
+  $$NotificationSettingsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get notificationType => $composableBuilder(
+    column: $table.notificationType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get enabled => $composableBuilder(
+    column: $table.enabled,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get daysBefore => $composableBuilder(
+    column: $table.daysBefore,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get quietHoursStart => $composableBuilder(
+    column: $table.quietHoursStart,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get quietHoursEnd => $composableBuilder(
+    column: $table.quietHoursEnd,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$NotificationSettingsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $NotificationSettingsTable> {
+  $$NotificationSettingsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<NotificationType, String>
+  get notificationType => $composableBuilder(
+    column: $table.notificationType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get enabled =>
+      $composableBuilder(column: $table.enabled, builder: (column) => column);
+
+  GeneratedColumn<int> get daysBefore => $composableBuilder(
+    column: $table.daysBefore,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get quietHoursStart => $composableBuilder(
+    column: $table.quietHoursStart,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get quietHoursEnd => $composableBuilder(
+    column: $table.quietHoursEnd,
+    builder: (column) => column,
+  );
+}
+
+class $$NotificationSettingsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $NotificationSettingsTable,
+          NotificationSettingEntity,
+          $$NotificationSettingsTableFilterComposer,
+          $$NotificationSettingsTableOrderingComposer,
+          $$NotificationSettingsTableAnnotationComposer,
+          $$NotificationSettingsTableCreateCompanionBuilder,
+          $$NotificationSettingsTableUpdateCompanionBuilder,
+          (
+            NotificationSettingEntity,
+            BaseReferences<
+              _$AppDatabase,
+              $NotificationSettingsTable,
+              NotificationSettingEntity
+            >,
+          ),
+          NotificationSettingEntity,
+          PrefetchHooks Function()
+        > {
+  $$NotificationSettingsTableTableManager(
+    _$AppDatabase db,
+    $NotificationSettingsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$NotificationSettingsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$NotificationSettingsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$NotificationSettingsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<NotificationType> notificationType = const Value.absent(),
+                Value<bool> enabled = const Value.absent(),
+                Value<int> daysBefore = const Value.absent(),
+                Value<int?> quietHoursStart = const Value.absent(),
+                Value<int?> quietHoursEnd = const Value.absent(),
+              }) => NotificationSettingsCompanion(
+                id: id,
+                notificationType: notificationType,
+                enabled: enabled,
+                daysBefore: daysBefore,
+                quietHoursStart: quietHoursStart,
+                quietHoursEnd: quietHoursEnd,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required NotificationType notificationType,
+                Value<bool> enabled = const Value.absent(),
+                Value<int> daysBefore = const Value.absent(),
+                Value<int?> quietHoursStart = const Value.absent(),
+                Value<int?> quietHoursEnd = const Value.absent(),
+              }) => NotificationSettingsCompanion.insert(
+                id: id,
+                notificationType: notificationType,
+                enabled: enabled,
+                daysBefore: daysBefore,
+                quietHoursStart: quietHoursStart,
+                quietHoursEnd: quietHoursEnd,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$NotificationSettingsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $NotificationSettingsTable,
+      NotificationSettingEntity,
+      $$NotificationSettingsTableFilterComposer,
+      $$NotificationSettingsTableOrderingComposer,
+      $$NotificationSettingsTableAnnotationComposer,
+      $$NotificationSettingsTableCreateCompanionBuilder,
+      $$NotificationSettingsTableUpdateCompanionBuilder,
+      (
+        NotificationSettingEntity,
+        BaseReferences<
+          _$AppDatabase,
+          $NotificationSettingsTable,
+          NotificationSettingEntity
+        >,
+      ),
+      NotificationSettingEntity,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -7740,4 +12737,14 @@ class $AppDatabaseManager {
       $$PaymentsTableTableManager(_db, _db.payments);
   $$ElectricityRatesTableTableManager get electricityRates =>
       $$ElectricityRatesTableTableManager(_db, _db.electricityRates);
+  $$FamilyMembersTableTableManager get familyMembers =>
+      $$FamilyMembersTableTableManager(_db, _db.familyMembers);
+  $$DepositTransactionsTableTableManager get depositTransactions =>
+      $$DepositTransactionsTableTableManager(_db, _db.depositTransactions);
+  $$MeterPhotosTableTableManager get meterPhotos =>
+      $$MeterPhotosTableTableManager(_db, _db.meterPhotos);
+  $$AutoBillSettingsTableTableManager get autoBillSettings =>
+      $$AutoBillSettingsTableTableManager(_db, _db.autoBillSettings);
+  $$NotificationSettingsTableTableManager get notificationSettings =>
+      $$NotificationSettingsTableTableManager(_db, _db.notificationSettings);
 }

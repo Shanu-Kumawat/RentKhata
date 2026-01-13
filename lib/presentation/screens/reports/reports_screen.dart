@@ -48,10 +48,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
       ),
       body: TabBarView(
         controller: _tabController,
-        children: [
-          _UnpaidBillsTab(),
-          _AllBillsTab(),
-        ],
+        children: [_UnpaidBillsTab(), _AllBillsTab()],
       ),
     );
   }
@@ -64,7 +61,11 @@ class _UnpaidBillsTab extends ConsumerWidget {
 
     return unpaidAsync.when(
       data: (bills) => bills.isEmpty
-          ? _buildEmptyState(context, 'No unpaid bills', Icons.check_circle_outline)
+          ? _buildEmptyState(
+              context,
+              'No unpaid bills',
+              Icons.check_circle_outline,
+            )
           : _buildBillsList(context, bills),
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, s) => Center(child: Text('Error: $e')),
@@ -78,10 +79,7 @@ class _UnpaidBillsTab extends ConsumerWidget {
         children: [
           Icon(icon, size: 64, color: AppColors.success),
           const SizedBox(height: 16),
-          Text(
-            message,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
+          Text(message, style: Theme.of(context).textTheme.titleMedium),
         ],
       ),
     );
@@ -106,7 +104,11 @@ class _AllBillsTab extends ConsumerWidget {
 
     return billsAsync.when(
       data: (bills) => bills.isEmpty
-          ? _buildEmptyState(context, 'No bills yet', Icons.receipt_long_outlined)
+          ? _buildEmptyState(
+              context,
+              'No bills yet',
+              Icons.receipt_long_outlined,
+            )
           : _buildBillsList(context, bills),
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, s) => Center(child: Text('Error: $e')),
@@ -120,10 +122,7 @@ class _AllBillsTab extends ConsumerWidget {
         children: [
           Icon(icon, size: 64, color: AppColors.onSurfaceVariant),
           const SizedBox(height: 16),
-          Text(
-            message,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
+          Text(message, style: Theme.of(context).textTheme.titleMedium),
         ],
       ),
     );
@@ -151,8 +150,8 @@ class _BillCard extends StatelessWidget {
     final statusColor = bill.isFullyPaid
         ? AppColors.success
         : bill.isOverdue
-            ? AppColors.error
-            : AppColors.warning;
+        ? AppColors.error
+        : AppColors.warning;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -183,26 +182,25 @@ class _BillCard extends StatelessWidget {
                     children: [
                       Text(
                         '${bill.billType.name.toUpperCase()} - ${bill.billingPeriod}',
-                        style:
-                            Theme.of(context).textTheme.titleSmall?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                ),
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                       if (bill.roomNumber != null)
                         Text(
                           '${bill.propertyName ?? ''} - Room ${bill.roomNumber}',
-                          style:
-                              Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: AppColors.onSurfaceVariant,
-                                  ),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: AppColors.onSurfaceVariant),
                         ),
                     ],
                   ),
                 ),
                 // Status badge
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: statusColor.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
@@ -211,12 +209,12 @@ class _BillCard extends StatelessWidget {
                     bill.isFullyPaid
                         ? 'Paid'
                         : bill.isOverdue
-                            ? 'Overdue'
-                            : 'Pending',
+                        ? 'Overdue'
+                        : 'Pending',
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: statusColor,
-                          fontWeight: FontWeight.w600,
-                        ),
+                      color: statusColor,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
@@ -234,14 +232,14 @@ class _BillCard extends StatelessWidget {
                     Text(
                       'Total',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.onSurfaceVariant,
-                          ),
+                        color: AppColors.onSurfaceVariant,
+                      ),
                     ),
                     Text(
                       formatCurrency(bill.amount),
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ],
                 ),
@@ -252,16 +250,16 @@ class _BillCard extends StatelessWidget {
                       Text(
                         'Pending',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: AppColors.onSurfaceVariant,
-                            ),
+                          color: AppColors.onSurfaceVariant,
+                        ),
                       ),
                       Text(
                         formatCurrency(bill.pendingAmount),
-                        style:
-                            Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: statusColor,
-                                ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: statusColor,
+                            ),
                       ),
                     ],
                   ),
@@ -303,8 +301,7 @@ class _BillCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Period: ${bill.billingPeriod}'),
-            if (bill.roomNumber != null)
-              Text('Room: ${bill.roomNumber}'),
+            if (bill.roomNumber != null) Text('Room: ${bill.roomNumber}'),
             const SizedBox(height: 8),
             Text('Amount: ${formatCurrency(bill.amount)}'),
             Text('Paid: ${formatCurrency(bill.paidAmount)}'),
@@ -313,7 +310,9 @@ class _BillCard extends StatelessWidget {
               const SizedBox(height: 8),
               Text('Previous Reading: ${bill.electricityPrevReading}'),
               Text('Current Reading: ${bill.electricityCurrReading}'),
-              Text('Units: ${(bill.electricityCurrReading ?? 0) - (bill.electricityPrevReading ?? 0)}'),
+              Text(
+                'Units: ${(bill.electricityCurrReading ?? 0) - (bill.electricityPrevReading ?? 0)}',
+              ),
             ],
           ],
         ),
@@ -345,6 +344,8 @@ class _BillCard extends StatelessWidget {
         return Icons.water_drop_outlined;
       case BillType.maintenance:
         return Icons.build_outlined;
+      case BillType.rentPlusElectricity:
+        return Icons.home_work_outlined;
       case BillType.other:
         return Icons.receipt_long_outlined;
     }
@@ -360,6 +361,8 @@ class _BillCard extends StatelessWidget {
         return Colors.blue;
       case BillType.maintenance:
         return Colors.orange;
+      case BillType.rentPlusElectricity:
+        return Colors.purple;
       case BillType.other:
         return AppColors.secondary;
     }

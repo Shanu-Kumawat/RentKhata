@@ -24,6 +24,12 @@ _$BillImpl _$$BillImplFromJson(Map<String, dynamic> json) => _$BillImpl(
   dueDate: json['dueDate'] == null
       ? null
       : DateTime.parse(json['dueDate'] as String),
+  periodStartDate: json['periodStartDate'] == null
+      ? null
+      : DateTime.parse(json['periodStartDate'] as String),
+  periodEndDate: json['periodEndDate'] == null
+      ? null
+      : DateTime.parse(json['periodEndDate'] as String),
   paidAmount: (json['paidAmount'] as num?)?.toDouble() ?? 0.0,
   pendingAmount: (json['pendingAmount'] as num?)?.toDouble() ?? 0.0,
   roomNumber: json['roomNumber'] as String?,
@@ -47,6 +53,8 @@ Map<String, dynamic> _$$BillImplToJson(_$BillImpl instance) =>
       'notes': instance.notes,
       'createdAt': instance.createdAt.toIso8601String(),
       'dueDate': instance.dueDate?.toIso8601String(),
+      'periodStartDate': instance.periodStartDate?.toIso8601String(),
+      'periodEndDate': instance.periodEndDate?.toIso8601String(),
       'paidAmount': instance.paidAmount,
       'pendingAmount': instance.pendingAmount,
       'roomNumber': instance.roomNumber,
@@ -59,5 +67,6 @@ const _$BillTypeEnumMap = {
   BillType.electricity: 'electricity',
   BillType.water: 'water',
   BillType.maintenance: 'maintenance',
+  BillType.rentPlusElectricity: 'rentPlusElectricity',
   BillType.other: 'other',
 };

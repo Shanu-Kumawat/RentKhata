@@ -31,6 +31,8 @@ class BillingRepositoryImpl implements BillingRepository {
         return BillType.water;
       case db.BillType.maintenance:
         return BillType.maintenance;
+      case db.BillType.rentPlusElectricity:
+        return BillType.rentPlusElectricity;
       case db.BillType.other:
         return BillType.other;
     }
@@ -47,6 +49,8 @@ class BillingRepositoryImpl implements BillingRepository {
         return db.BillType.water;
       case BillType.maintenance:
         return db.BillType.maintenance;
+      case BillType.rentPlusElectricity:
+        return db.BillType.rentPlusElectricity;
       case BillType.other:
         return db.BillType.other;
     }
@@ -91,8 +95,8 @@ class BillingRepositoryImpl implements BillingRepository {
 
     // Get occupancy info for denormalized fields
     final occupancy = await _tenantDao.getActiveOccupancies().then(
-          (list) => list.where((o) => o.id == entity.occupancyId).firstOrNull,
-        );
+      (list) => list.where((o) => o.id == entity.occupancyId).firstOrNull,
+    );
 
     String? roomNumber;
     String? tenantName;
@@ -160,9 +164,9 @@ class BillingRepositoryImpl implements BillingRepository {
 
   @override
   Stream<List<Bill>> watchBillsForOccupancy(int occupancyId) {
-    return _billingDao.watchBillsForOccupancy(occupancyId).asyncMap(
-          (entities) => Future.wait(entities.map(_billToDomain)),
-        );
+    return _billingDao
+        .watchBillsForOccupancy(occupancyId)
+        .asyncMap((entities) => Future.wait(entities.map(_billToDomain)));
   }
 
   @override
@@ -252,9 +256,9 @@ class BillingRepositoryImpl implements BillingRepository {
 
   @override
   Stream<List<Payment>> watchPaymentsForBill(int billId) {
-    return _billingDao.watchPaymentsForBill(billId).map(
-          (entities) => entities.map(_paymentToDomain).toList(),
-        );
+    return _billingDao
+        .watchPaymentsForBill(billId)
+        .map((entities) => entities.map(_paymentToDomain).toList());
   }
 
   @override
@@ -296,9 +300,7 @@ class BillingRepositoryImpl implements BillingRepository {
   @override
   Future<List<Bill>> getUnpaidBills() async {
     final unpaidData = await _billingDao.getUnpaidBills();
-    return Future.wait(
-      unpaidData.map((data) => _billToDomain(data.bill)),
-    );
+    return Future.wait(unpaidData.map((data) => _billToDomain(data.bill)));
   }
 
   @override
@@ -309,7 +311,9 @@ class BillingRepositoryImpl implements BillingRepository {
 
   @override
   Future<List<Payment>> getPaymentsInDateRange(
-      DateTime start, DateTime end) async {
+    DateTime start,
+    DateTime end,
+  ) async {
     final entities = await _billingDao.getPaymentsInDateRange(start, end);
     return entities.map(_paymentToDomain).toList();
   }

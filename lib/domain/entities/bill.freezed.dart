@@ -34,7 +34,9 @@ mixin _$Bill {
   String? get meterPhotoPath => throw _privateConstructorUsedError;
   String? get notes => throw _privateConstructorUsedError;
   DateTime get createdAt => throw _privateConstructorUsedError;
-  DateTime? get dueDate =>
+  DateTime? get dueDate => throw _privateConstructorUsedError;
+  DateTime? get periodStartDate => throw _privateConstructorUsedError;
+  DateTime? get periodEndDate =>
       throw _privateConstructorUsedError; // Calculated fields
   double get paidAmount => throw _privateConstructorUsedError;
   double get pendingAmount =>
@@ -72,6 +74,8 @@ abstract class $BillCopyWith<$Res> {
     String? notes,
     DateTime createdAt,
     DateTime? dueDate,
+    DateTime? periodStartDate,
+    DateTime? periodEndDate,
     double paidAmount,
     double pendingAmount,
     String? roomNumber,
@@ -109,6 +113,8 @@ class _$BillCopyWithImpl<$Res, $Val extends Bill>
     Object? notes = freezed,
     Object? createdAt = null,
     Object? dueDate = freezed,
+    Object? periodStartDate = freezed,
+    Object? periodEndDate = freezed,
     Object? paidAmount = null,
     Object? pendingAmount = null,
     Object? roomNumber = freezed,
@@ -173,6 +179,14 @@ class _$BillCopyWithImpl<$Res, $Val extends Bill>
                 ? _value.dueDate
                 : dueDate // ignore: cast_nullable_to_non_nullable
                       as DateTime?,
+            periodStartDate: freezed == periodStartDate
+                ? _value.periodStartDate
+                : periodStartDate // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
+            periodEndDate: freezed == periodEndDate
+                ? _value.periodEndDate
+                : periodEndDate // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
             paidAmount: null == paidAmount
                 ? _value.paidAmount
                 : paidAmount // ignore: cast_nullable_to_non_nullable
@@ -222,6 +236,8 @@ abstract class _$$BillImplCopyWith<$Res> implements $BillCopyWith<$Res> {
     String? notes,
     DateTime createdAt,
     DateTime? dueDate,
+    DateTime? periodStartDate,
+    DateTime? periodEndDate,
     double paidAmount,
     double pendingAmount,
     String? roomNumber,
@@ -256,6 +272,8 @@ class __$$BillImplCopyWithImpl<$Res>
     Object? notes = freezed,
     Object? createdAt = null,
     Object? dueDate = freezed,
+    Object? periodStartDate = freezed,
+    Object? periodEndDate = freezed,
     Object? paidAmount = null,
     Object? pendingAmount = null,
     Object? roomNumber = freezed,
@@ -320,6 +338,14 @@ class __$$BillImplCopyWithImpl<$Res>
             ? _value.dueDate
             : dueDate // ignore: cast_nullable_to_non_nullable
                   as DateTime?,
+        periodStartDate: freezed == periodStartDate
+            ? _value.periodStartDate
+            : periodStartDate // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
+        periodEndDate: freezed == periodEndDate
+            ? _value.periodEndDate
+            : periodEndDate // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
         paidAmount: null == paidAmount
             ? _value.paidAmount
             : paidAmount // ignore: cast_nullable_to_non_nullable
@@ -363,6 +389,8 @@ class _$BillImpl extends _Bill {
     this.notes,
     required this.createdAt,
     this.dueDate,
+    this.periodStartDate,
+    this.periodEndDate,
     this.paidAmount = 0.0,
     this.pendingAmount = 0.0,
     this.roomNumber,
@@ -401,6 +429,10 @@ class _$BillImpl extends _Bill {
   final DateTime createdAt;
   @override
   final DateTime? dueDate;
+  @override
+  final DateTime? periodStartDate;
+  @override
+  final DateTime? periodEndDate;
   // Calculated fields
   @override
   @JsonKey()
@@ -418,7 +450,7 @@ class _$BillImpl extends _Bill {
 
   @override
   String toString() {
-    return 'Bill(id: $id, occupancyId: $occupancyId, billType: $billType, billingMonth: $billingMonth, billingYear: $billingYear, amount: $amount, electricityPrevReading: $electricityPrevReading, electricityCurrReading: $electricityCurrReading, electricityRateAtBilling: $electricityRateAtBilling, electricityCharges: $electricityCharges, meterPhotoPath: $meterPhotoPath, notes: $notes, createdAt: $createdAt, dueDate: $dueDate, paidAmount: $paidAmount, pendingAmount: $pendingAmount, roomNumber: $roomNumber, tenantName: $tenantName, propertyName: $propertyName)';
+    return 'Bill(id: $id, occupancyId: $occupancyId, billType: $billType, billingMonth: $billingMonth, billingYear: $billingYear, amount: $amount, electricityPrevReading: $electricityPrevReading, electricityCurrReading: $electricityCurrReading, electricityRateAtBilling: $electricityRateAtBilling, electricityCharges: $electricityCharges, meterPhotoPath: $meterPhotoPath, notes: $notes, createdAt: $createdAt, dueDate: $dueDate, periodStartDate: $periodStartDate, periodEndDate: $periodEndDate, paidAmount: $paidAmount, pendingAmount: $pendingAmount, roomNumber: $roomNumber, tenantName: $tenantName, propertyName: $propertyName)';
   }
 
   @override
@@ -453,6 +485,10 @@ class _$BillImpl extends _Bill {
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.dueDate, dueDate) || other.dueDate == dueDate) &&
+            (identical(other.periodStartDate, periodStartDate) ||
+                other.periodStartDate == periodStartDate) &&
+            (identical(other.periodEndDate, periodEndDate) ||
+                other.periodEndDate == periodEndDate) &&
             (identical(other.paidAmount, paidAmount) ||
                 other.paidAmount == paidAmount) &&
             (identical(other.pendingAmount, pendingAmount) ||
@@ -483,6 +519,8 @@ class _$BillImpl extends _Bill {
     notes,
     createdAt,
     dueDate,
+    periodStartDate,
+    periodEndDate,
     paidAmount,
     pendingAmount,
     roomNumber,
@@ -520,6 +558,8 @@ abstract class _Bill extends Bill {
     final String? notes,
     required final DateTime createdAt,
     final DateTime? dueDate,
+    final DateTime? periodStartDate,
+    final DateTime? periodEndDate,
     final double paidAmount,
     final double pendingAmount,
     final String? roomNumber,
@@ -557,7 +597,11 @@ abstract class _Bill extends Bill {
   @override
   DateTime get createdAt;
   @override
-  DateTime? get dueDate; // Calculated fields
+  DateTime? get dueDate;
+  @override
+  DateTime? get periodStartDate;
+  @override
+  DateTime? get periodEndDate; // Calculated fields
   @override
   double get paidAmount;
   @override

@@ -10,6 +10,7 @@ enum BillType {
   electricity,
   water,
   maintenance,
+  rentPlusElectricity,
   other,
 }
 
@@ -30,6 +31,12 @@ class Bills extends Table {
 
   /// Billing year
   IntColumn get billingYear => integer()();
+
+  /// Period start date (for pro-rating)
+  DateTimeColumn get periodStartDate => dateTime().nullable()();
+
+  /// Period end date (for pro-rating)
+  DateTimeColumn get periodEndDate => dateTime().nullable()();
 
   /// Total bill amount
   RealColumn get amount => real()();
