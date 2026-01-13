@@ -186,11 +186,21 @@ class _BillCard extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
+                      if (bill.tenantName != null)
+                        Text(
+                          bill.tenantName!,
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: AppColors.onSurfaceVariant),
+                        ),
                       if (bill.roomNumber != null)
                         Text(
                           '${bill.propertyName ?? ''} - Room ${bill.roomNumber}',
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(color: AppColors.onSurfaceVariant),
+                          style: Theme.of(context).textTheme.labelSmall
+                              ?.copyWith(
+                                color: AppColors.onSurfaceVariant.withOpacity(
+                                  0.7,
+                                ),
+                              ),
                         ),
                     ],
                   ),
