@@ -73,6 +73,15 @@ abstract class BillingRepository {
     DateTime? paymentDate,
   });
 
+  /// Update an existing payment
+  Future<bool> updatePayment({
+    required int paymentId,
+    required double amount,
+    required PaymentMode paymentMode,
+    String? notes,
+    DateTime? paymentDate,
+  });
+
   /// Delete a payment
   Future<bool> deletePayment(int id);
 

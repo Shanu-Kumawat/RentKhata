@@ -296,6 +296,24 @@ class BillingRepositoryImpl implements BillingRepository {
   }
 
   @override
+  Future<bool> updatePayment({
+    required int paymentId,
+    required double amount,
+    required PaymentMode paymentMode,
+    String? notes,
+    DateTime? paymentDate,
+  }) async {
+    final payment = PaymentsCompanion(
+      id: Value(paymentId),
+      amount: Value(amount),
+      paymentMode: Value(_paymentModeToDb(paymentMode)),
+      notes: Value(notes),
+      paymentDate: Value(paymentDate ?? DateTime.now()),
+    );
+    return _billingDao.updatePayment(payment);
+  }
+
+  @override
   Future<bool> deletePayment(int id) async {
     final result = await _billingDao.deletePayment(id);
     return result > 0;

@@ -39,17 +39,19 @@ class BillingDao extends DatabaseAccessor<AppDatabase> with _$BillingDaoMixin {
 
   /// Get bills for a month/year
   Future<List<BillEntity>> getBillsForMonth(int month, int year) =>
-      (select(bills)
-            ..where(
-                (b) => b.billingMonth.equals(month) & b.billingYear.equals(year)))
+      (select(bills)..where(
+            (b) => b.billingMonth.equals(month) & b.billingYear.equals(year),
+          ))
           .get();
 
   /// Get last electricity bill for an occupancy (for fetching previous reading)
   Future<BillEntity?> getLastElectricityBill(int occupancyId) =>
       (select(bills)
-            ..where((b) =>
-                b.occupancyId.equals(occupancyId) &
-                b.billType.equals(BillType.electricity.name))
+            ..where(
+              (b) =>
+                  b.occupancyId.equals(occupancyId) &
+                  b.billType.equals(BillType.electricity.name),
+            )
             ..orderBy([(b) => OrderingTerm.desc(b.createdAt)])
             ..limit(1))
           .getSingleOrNull();
@@ -98,6 +100,14 @@ class BillingDao extends DatabaseAccessor<AppDatabase> with _$BillingDaoMixin {
   Future<int> insertPayment(PaymentsCompanion payment) =>
       into(payments).insert(payment);
 
+  /// Update a payment
+  Future<bool> updatePayment(PaymentsCompanion payment) async {
+    return await (update(
+          payments,
+        )..where((p) => p.id.equals(payment.id.value))).write(payment) >
+        0;
+  }
+
   /// Delete a payment
   Future<int> deletePayment(int id) =>
       (delete(payments)..where((p) => p.id.equals(id))).go();
@@ -112,10 +122,9 @@ class BillingDao extends DatabaseAccessor<AppDatabase> with _$BillingDaoMixin {
           .getSingleOrNull();
 
   /// Get all electricity rates
-  Future<List<ElectricityRateEntity>> getAllElectricityRates() =>
-      (select(electricityRates)
-            ..orderBy([(r) => OrderingTerm.desc(r.effectiveFrom)]))
-          .get();
+  Future<List<ElectricityRateEntity>> getAllElectricityRates() => (select(
+    electricityRates,
+  )..orderBy([(r) => OrderingTerm.desc(r.effectiveFrom)])).get();
 
   /// Insert a new electricity rate
   Future<int> insertElectricityRate(ElectricityRatesCompanion rate) =>
@@ -125,7 +134,7 @@ class BillingDao extends DatabaseAccessor<AppDatabase> with _$BillingDaoMixin {
 
   /// Get all unpaid bills (bills with pending balance)
   Future<List<({BillEntity bill, double pendingAmount})>>
-      getUnpaidBills() async {
+  getUnpaidBills() async {
     final allBills = await getAllBills();
     final unpaid = <({BillEntity bill, double pendingAmount})>[];
 
@@ -141,22 +150,30 @@ class BillingDao extends DatabaseAccessor<AppDatabase> with _$BillingDaoMixin {
 
   /// Get bills for a date range
   Future<List<BillEntity>> getBillsInDateRange(
-      DateTime start, DateTime end) async {
+    DateTime start,
+    DateTime end,
+  ) async {
     return (select(bills)
-          ..where((b) =>
-              b.createdAt.isBiggerOrEqualValue(start) &
-              b.createdAt.isSmallerOrEqualValue(end))
+          ..where(
+            (b) =>
+                b.createdAt.isBiggerOrEqualValue(start) &
+                b.createdAt.isSmallerOrEqualValue(end),
+          )
           ..orderBy([(b) => OrderingTerm.desc(b.createdAt)]))
         .get();
   }
 
   /// Get payments for a date range
   Future<List<PaymentEntity>> getPaymentsInDateRange(
-      DateTime start, DateTime end) async {
+    DateTime start,
+    DateTime end,
+  ) async {
     return (select(payments)
-          ..where((p) =>
-              p.paymentDate.isBiggerOrEqualValue(start) &
-              p.paymentDate.isSmallerOrEqualValue(end))
+          ..where(
+            (p) =>
+                p.paymentDate.isBiggerOrEqualValue(start) &
+                p.paymentDate.isSmallerOrEqualValue(end),
+          )
           ..orderBy([(p) => OrderingTerm.desc(p.paymentDate)]))
         .get();
   }
