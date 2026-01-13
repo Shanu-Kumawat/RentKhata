@@ -33,9 +33,7 @@ class _TenantsScreenState extends ConsumerState<TenantsScreen> {
         : ref.watch(searchTenantsProvider(_searchQuery));
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Tenants'),
-      ),
+      appBar: AppBar(title: const Text('Tenants')),
       body: Column(
         children: [
           // Search bar
@@ -73,11 +71,6 @@ class _TenantsScreenState extends ConsumerState<TenantsScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/tenants/add'),
-        icon: const Icon(Icons.person_add),
-        label: const Text('Add Tenant'),
-      ),
     );
   }
 
@@ -103,18 +96,19 @@ class _TenantsScreenState extends ConsumerState<TenantsScreen> {
             const SizedBox(height: 24),
             Text(
               _searchQuery.isEmpty ? 'No tenants yet' : 'No tenants found',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
               _searchQuery.isEmpty
-                  ? 'Add tenants to assign them to rooms'
+                  ? 'Tenants will appear here after you move them into a room'
                   : 'Try a different search term',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.onSurfaceVariant,
-                  ),
+                color: AppColors.onSurfaceVariant,
+              ),
+              textAlign: TextAlign.center,
             ),
           ],
         ),
@@ -181,9 +175,7 @@ class _TenantCard extends StatelessWidget {
                         Expanded(
                           child: Text(
                             tenant.name,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium
+                            style: Theme.of(context).textTheme.titleMedium
                                 ?.copyWith(fontWeight: FontWeight.w600),
                           ),
                         ),
@@ -208,9 +200,7 @@ class _TenantCard extends StatelessWidget {
                                 const SizedBox(width: 4),
                                 Text(
                                   'Verified',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .labelSmall
+                                  style: Theme.of(context).textTheme.labelSmall
                                       ?.copyWith(color: AppColors.success),
                                 ),
                               ],
@@ -230,10 +220,8 @@ class _TenantCard extends StatelessWidget {
                           const SizedBox(width: 4),
                           Text(
                             tenant.phone!,
-                            style:
-                                Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: AppColors.onSurfaceVariant,
-                                    ),
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(color: AppColors.onSurfaceVariant),
                           ),
                         ],
                       ),
@@ -255,9 +243,7 @@ class _TenantCard extends StatelessWidget {
                           Expanded(
                             child: Text(
                               '${tenant.currentPropertyName ?? ''} - Room ${tenant.currentRoomNumber}',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
+                              style: Theme.of(context).textTheme.bodySmall
                                   ?.copyWith(color: AppColors.success),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -266,30 +252,28 @@ class _TenantCard extends StatelessWidget {
                         ],
                       )
                     else
-                      Row(
-                        children: [
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color: AppColors.onSurfaceVariant.withOpacity(0.5),
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Not assigned to any room',
-                            style:
-                                Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: AppColors.onSurfaceVariant,
-                                    ),
-                          ),
-                        ],
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.onSurfaceVariant.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          'Past Tenant',
+                          style: Theme.of(context).textTheme.labelSmall
+                              ?.copyWith(color: AppColors.onSurfaceVariant),
+                        ),
                       ),
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right, color: AppColors.onSurfaceVariant),
+              const Icon(
+                Icons.chevron_right,
+                color: AppColors.onSurfaceVariant,
+              ),
             ],
           ),
         ),
