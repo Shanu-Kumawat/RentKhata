@@ -8,6 +8,7 @@ import '../../../application/providers/billing_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../domain/entities/bill.dart';
+import '../../../services/share_service.dart';
 import '../billing/record_payment_sheet.dart';
 
 /// Reports screen showing bills and payment history.
@@ -388,10 +389,11 @@ class _BillCard extends StatelessWidget {
     );
   }
 
-  void _handleShare(BuildContext context, Bill bill, String action) {
+  void _handleShare(BuildContext context, Bill bill, String action) async {
     final tenantName = bill.tenantName ?? 'Tenant';
     final amount = formatCurrency(bill.pendingAmount);
     final period = bill.billingPeriod;
+    final shareService = ShareService();
 
     if (action == 'whatsapp') {
       // Build WhatsApp message
@@ -399,32 +401,35 @@ class _BillCard extends StatelessWidget {
           ? 'Payment received! Receipt for $period - ${formatCurrency(bill.paidAmount)}. Thank you!'
           : 'Rent Due: $amount for $period. Room ${bill.roomNumber ?? ""}. Please pay at your earliest convenience.';
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Opening WhatsApp for $tenantName...'),
-          action: SnackBarAction(
-            label: 'Copy',
-            onPressed: () {
-              // Copy message to clipboard
-              Clipboard.setData(ClipboardData(text: message));
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Message copied to clipboard')),
-              );
-            },
+      // Try WhatsApp first, fall back to clipboard
+      final success = await shareService.shareToWhatsApp(message: message);
+      if (!success && context.mounted) {
+        Clipboard.setData(ClipboardData(text: message));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'WhatsApp not available. Message copied to clipboard!',
+            ),
           ),
-        ),
-      );
-      // TODO: Integrate with ShareService.shareToWhatsApp when tenant phone is available
+        );
+      } else if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Opening WhatsApp for $tenantName...')),
+        );
+      }
     } else if (action == 'pdf') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Generating PDF for ${bill.billType.name.toUpperCase()} - $period...',
-          ),
-          duration: const Duration(seconds: 2),
-        ),
-      );
-      // TODO: Integrate with InvoicePdfService when landlord info is available
+      // Share as text for now (PDF generation requires landlord setup)
+      final message =
+          '''INVOICE
+$tenantName
+Room: ${bill.roomNumber ?? 'N/A'}
+Type: ${bill.billType.name.toUpperCase()}
+Period: $period
+Amount: ${formatCurrency(bill.amount)}
+Paid: ${formatCurrency(bill.paidAmount)}
+Pending: $amount''';
+
+      await shareService.shareText(text: message, subject: 'Invoice - $period');
     }
   }
 
