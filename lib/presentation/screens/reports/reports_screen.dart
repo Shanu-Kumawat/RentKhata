@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../application/providers/billing_providers.dart';
 import '../../../core/theme/app_colors.dart';
@@ -280,17 +281,58 @@ class _BillCard extends StatelessWidget {
             const SizedBox(height: 12),
             // Action buttons
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
               children: [
+                // Share menu
+                PopupMenuButton<String>(
+                  icon: const Icon(Icons.share_outlined, size: 20),
+                  tooltip: 'Share',
+                  onSelected: (value) {
+                    HapticFeedback.lightImpact();
+                    _handleShare(context, bill, value);
+                  },
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      value: 'whatsapp',
+                      child: Row(
+                        children: [
+                          Icon(Icons.chat, color: Colors.green, size: 20),
+                          SizedBox(width: 8),
+                          Text('Send via WhatsApp'),
+                        ],
+                      ),
+                    ),
+                    const PopupMenuItem(
+                      value: 'pdf',
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.picture_as_pdf,
+                            color: Colors.red,
+                            size: 20,
+                          ),
+                          SizedBox(width: 8),
+                          Text('Generate PDF'),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const Spacer(),
                 TextButton.icon(
-                  onPressed: () => _showBillDetails(context, bill),
+                  onPressed: () {
+                    HapticFeedback.lightImpact();
+                    _showBillDetails(context, bill);
+                  },
                   icon: const Icon(Icons.visibility_outlined, size: 18),
                   label: const Text('View'),
                 ),
                 if (!bill.isFullyPaid) ...[
                   const SizedBox(width: 8),
                   FilledButton.icon(
-                    onPressed: () => _showRecordPayment(context, bill),
+                    onPressed: () {
+                      HapticFeedback.mediumImpact();
+                      _showRecordPayment(context, bill);
+                    },
                     icon: const Icon(Icons.payment, size: 18),
                     label: const Text('Record Payment'),
                   ),
@@ -344,6 +386,46 @@ class _BillCard extends StatelessWidget {
       isScrollControlled: true,
       builder: (context) => RecordPaymentSheet(bill: bill),
     );
+  }
+
+  void _handleShare(BuildContext context, Bill bill, String action) {
+    final tenantName = bill.tenantName ?? 'Tenant';
+    final amount = formatCurrency(bill.pendingAmount);
+    final period = bill.billingPeriod;
+
+    if (action == 'whatsapp') {
+      // Build WhatsApp message
+      final message = bill.isFullyPaid
+          ? 'Payment received! Receipt for $period - ${formatCurrency(bill.paidAmount)}. Thank you!'
+          : 'Rent Due: $amount for $period. Room ${bill.roomNumber ?? ""}. Please pay at your earliest convenience.';
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Opening WhatsApp for $tenantName...'),
+          action: SnackBarAction(
+            label: 'Copy',
+            onPressed: () {
+              // Copy message to clipboard
+              Clipboard.setData(ClipboardData(text: message));
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Message copied to clipboard')),
+              );
+            },
+          ),
+        ),
+      );
+      // TODO: Integrate with ShareService.shareToWhatsApp when tenant phone is available
+    } else if (action == 'pdf') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Generating PDF for ${bill.billType.name.toUpperCase()} - $period...',
+          ),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+      // TODO: Integrate with InvoicePdfService when landlord info is available
+    }
   }
 
   IconData _getBillTypeIcon(BillType type) {
