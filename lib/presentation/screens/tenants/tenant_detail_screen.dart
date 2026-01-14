@@ -50,7 +50,9 @@ class _TenantDetailContent extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final customFieldsAsync = ref.watch(customFieldsForTenantProvider(tenant.id));
+    final customFieldsAsync = ref.watch(
+      customFieldsForTenantProvider(tenant.id),
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -121,6 +123,10 @@ class _TenantDetailContent extends ConsumerWidget {
             _VerificationCard(tenant: tenant),
             const SizedBox(height: 16),
 
+            // Family Members placeholder section
+            _FamilyMembersSection(tenantId: tenant.id),
+            const SizedBox(height: 16),
+
             // Custom fields
             _CustomFieldsSection(
               customFieldsAsync: customFieldsAsync,
@@ -135,9 +141,7 @@ class _TenantDetailContent extends ConsumerWidget {
   void _showEditTenant(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => AddTenantScreen(tenant: tenant),
-      ),
+      MaterialPageRoute(builder: (context) => AddTenantScreen(tenant: tenant)),
     );
   }
 
@@ -167,9 +171,9 @@ class _TenantDetailContent extends ConsumerWidget {
               await ref.read(tenantRepositoryProvider).deleteTenant(tenant.id);
               if (context.mounted) {
                 context.pop(); // Go back using GoRouter
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Tenant deleted')),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(const SnackBar(content: Text('Tenant deleted')));
               }
             },
             style: FilledButton.styleFrom(backgroundColor: AppColors.error),
@@ -213,8 +217,8 @@ class _ProfileCard extends StatelessWidget {
                   Text(
                     tenant.name,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Row(
@@ -235,10 +239,10 @@ class _ProfileCard extends StatelessWidget {
                             ? 'Currently Occupying'
                             : 'Not Assigned',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: tenant.isCurrentlyOccupying
-                                  ? AppColors.success
-                                  : AppColors.onSurfaceVariant,
-                            ),
+                          color: tenant.isCurrentlyOccupying
+                              ? AppColors.success
+                              : AppColors.onSurfaceVariant,
+                        ),
                       ),
                     ],
                   ),
@@ -295,7 +299,7 @@ class _InfoSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (children.isEmpty) return const SizedBox();
-    
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -304,9 +308,9 @@ class _InfoSection extends StatelessWidget {
           children: [
             Text(
               title,
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
             ...children,
@@ -346,13 +350,10 @@ class _InfoRow extends StatelessWidget {
                 Text(
                   label,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.onSurfaceVariant,
-                      ),
+                    color: AppColors.onSurfaceVariant,
+                  ),
                 ),
-                Text(
-                  value,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
+                Text(value, style: Theme.of(context).textTheme.bodyMedium),
               ],
             ),
           ],
@@ -402,6 +403,147 @@ class _VerificationCard extends StatelessWidget {
   }
 }
 
+class _FamilyMembersSection extends StatelessWidget {
+  final int tenantId;
+
+  const _FamilyMembersSection({required this.tenantId});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: ExpansionTile(
+        leading: const Icon(
+          Icons.family_restroom_outlined,
+          color: AppColors.primary,
+        ),
+        title: const Text('Family Members'),
+        subtitle: const Text('Manage tenant\'s family'),
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                // Empty state
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.people_outline,
+                        size: 48,
+                        color: AppColors.onSurfaceVariant.withValues(
+                          alpha: 0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'No family members added',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppColors.onSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      OutlinedButton.icon(
+                        onPressed: () => _showAddFamilyMember(context),
+                        icon: const Icon(Icons.add),
+                        label: const Text('Add Family Member'),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAddFamilyMember(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+          left: 24,
+          right: 24,
+          top: 24,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Add Family Member',
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 24),
+            TextFormField(
+              decoration: const InputDecoration(
+                labelText: 'Name *',
+                prefixIcon: Icon(Icons.person_outline),
+              ),
+              autofocus: true,
+            ),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<String>(
+              decoration: const InputDecoration(
+                labelText: 'Relationship *',
+                prefixIcon: Icon(Icons.family_restroom_outlined),
+              ),
+              items: const [
+                DropdownMenuItem(value: 'spouse', child: Text('Spouse')),
+                DropdownMenuItem(value: 'child', child: Text('Child')),
+                DropdownMenuItem(value: 'parent', child: Text('Parent')),
+                DropdownMenuItem(value: 'sibling', child: Text('Sibling')),
+                DropdownMenuItem(value: 'other', child: Text('Other')),
+              ],
+              onChanged: (_) {},
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              decoration: const InputDecoration(
+                labelText: 'Phone (Optional)',
+                prefixIcon: Icon(Icons.phone_outlined),
+              ),
+              keyboardType: TextInputType.phone,
+            ),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Cancel'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: FilledButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Family member feature coming soon!'),
+                        ),
+                      );
+                    },
+                    child: const Text('Add'),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _CustomFieldsSection extends ConsumerStatefulWidget {
   final AsyncValue<List<CustomField>> customFieldsAsync;
   final int tenantId;
@@ -429,11 +571,14 @@ class _CustomFieldsSectionState extends ConsumerState<_CustomFieldsSection> {
   }
 
   Future<void> _addField() async {
-    if (_fieldNameController.text.isEmpty || _fieldValueController.text.isEmpty) {
+    if (_fieldNameController.text.isEmpty ||
+        _fieldValueController.text.isEmpty) {
       return;
     }
 
-    await ref.read(tenantRepositoryProvider).addCustomField(
+    await ref
+        .read(tenantRepositoryProvider)
+        .addCustomField(
           tenantId: widget.tenantId,
           fieldName: _fieldNameController.text.trim(),
           fieldValue: _fieldValueController.text.trim(),
@@ -458,12 +603,13 @@ class _CustomFieldsSectionState extends ConsumerState<_CustomFieldsSection> {
               children: [
                 Text(
                   'Custom Fields',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 TextButton.icon(
-                  onPressed: () => setState(() => _isAddingField = !_isAddingField),
+                  onPressed: () =>
+                      setState(() => _isAddingField = !_isAddingField),
                   icon: Icon(_isAddingField ? Icons.close : Icons.add),
                   label: Text(_isAddingField ? 'Cancel' : 'Add Field'),
                 ),
@@ -505,21 +651,26 @@ class _CustomFieldsSectionState extends ConsumerState<_CustomFieldsSection> {
                   ? Text(
                       'No custom fields',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.onSurfaceVariant,
-                          ),
+                        color: AppColors.onSurfaceVariant,
+                      ),
                     )
                   : Column(
                       children: fields
-                          .map((f) => _CustomFieldTile(
-                                field: f,
-                                onDelete: () async {
-                                  await ref
-                                      .read(tenantRepositoryProvider)
-                                      .deleteCustomField(f.id);
-                                  ref.invalidate(
-                                      customFieldsForTenantProvider(widget.tenantId));
-                                },
-                              ))
+                          .map(
+                            (f) => _CustomFieldTile(
+                              field: f,
+                              onDelete: () async {
+                                await ref
+                                    .read(tenantRepositoryProvider)
+                                    .deleteCustomField(f.id);
+                                ref.invalidate(
+                                  customFieldsForTenantProvider(
+                                    widget.tenantId,
+                                  ),
+                                );
+                              },
+                            ),
+                          )
                           .toList(),
                     ),
               loading: () => const Center(child: CircularProgressIndicator()),
@@ -551,8 +702,8 @@ class _CustomFieldTile extends StatelessWidget {
                 Text(
                   field.fieldName,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.onSurfaceVariant,
-                      ),
+                    color: AppColors.onSurfaceVariant,
+                  ),
                 ),
                 Text(
                   field.fieldValue,
