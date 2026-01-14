@@ -320,6 +320,32 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
                     ),
                     keyboardType: TextInputType.number,
                   ),
+                  const SizedBox(height: 16),
+
+                  // Deposit Collection Status (simplified - uses same date as move-in)
+                  Card(
+                    color: AppColors.surfaceVariant.withValues(alpha: 0.3),
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.info_outline,
+                            color: AppColors.primary,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'Security deposit will be marked as collected on move-in date',
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(color: AppColors.onSurfaceVariant),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 32),
 
                   // Save button
