@@ -6,7 +6,7 @@ part of 'billing_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$billsStreamHash() => r'1be27f6281a0a5703bacc454d806409a58e9f922';
+String _$billsStreamHash() => r'ff0b76a409f8781ea546384d9cda27bac2e1528a';
 
 /// Watch all bills (auto-updates).
 ///
@@ -25,7 +25,7 @@ final billsStreamProvider = AutoDisposeStreamProvider<List<Bill>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef BillsStreamRef = AutoDisposeStreamProviderRef<List<Bill>>;
-String _$billsHash() => r'10b00ecfa32c830218199a29fa5d5aaa97b7faa5';
+String _$billsHash() => r'5d30177a5827db81d9fb2da8f8f6c0908cb253fb';
 
 /// Get all bills.
 /// Auto-refreshes when the stream emits.
@@ -45,7 +45,7 @@ final billsProvider = AutoDisposeFutureProvider<List<Bill>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef BillsRef = AutoDisposeFutureProviderRef<List<Bill>>;
-String _$billsForOccupancyHash() => r'2f81eebe1ad36b615a590fb6e0f1db5738d78ab1';
+String _$billsForOccupancyHash() => r'bebfef601f937e7cb63a09d64ae58278b675f4cd';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -206,7 +206,7 @@ class _BillsForOccupancyProviderElement
 }
 
 String _$billsForOccupancyStreamHash() =>
-    r'6109c2f5a474858cc4bf1948fd8939d1ead6105b';
+    r'0a332992635714e05b5ab38ac93159786d97e979';
 
 /// Watch bills for an occupancy (auto-updates).
 ///
@@ -344,7 +344,7 @@ class _BillsForOccupancyStreamProviderElement
       (origin as BillsForOccupancyStreamProvider).occupancyId;
 }
 
-String _$billHash() => r'8ae456dfd51632354ddf35c05ca7107bc833865d';
+String _$billHash() => r'caf09a637268c302013bff4644d257bef3900532';
 
 /// Get a single bill by ID.
 ///
@@ -471,7 +471,7 @@ class _BillProviderElement extends AutoDisposeFutureProviderElement<Bill?>
 }
 
 String _$lastElectricityBillHash() =>
-    r'0ac034121c904e40309bde904f4f3b173ff71008';
+    r'81a83d5b42a33e02548d0ba95f9a8fc38fb5a574';
 
 /// Get last electricity bill for auto-fill.
 ///
@@ -605,7 +605,7 @@ class _LastElectricityBillProviderElement
   int get occupancyId => (origin as LastElectricityBillProvider).occupancyId;
 }
 
-String _$paymentsForBillHash() => r'c6e4fbc40b47f657ab0f2706f58405988ae07c02';
+String _$paymentsForBillHash() => r'3dcbfa79842c9146e70de3c02acd05b753bfd716';
 
 /// Get payments for a bill.
 /// Auto-refreshes by watching the stream.
@@ -744,7 +744,7 @@ class _PaymentsForBillProviderElement
 }
 
 String _$paymentsForBillStreamHash() =>
-    r'35a9d0959d5c12dd00f0a0e28192ee9a94b99ae0';
+    r'3ff0d790f488571eafff1f5b3d6527197220445a';
 
 /// Watch payments for a bill (auto-updates).
 ///
@@ -877,7 +877,7 @@ class _PaymentsForBillStreamProviderElement
   int get billId => (origin as PaymentsForBillStreamProvider).billId;
 }
 
-String _$unpaidBillsHash() => r'55b62459f26e48b1553254e5e9b649ef983b11d8';
+String _$unpaidBillsHash() => r'f4f09294bfc8c7e275a7deb918838a883069e465';
 
 /// Get unpaid bills.
 /// Auto-refreshes via periodic check.
@@ -898,7 +898,7 @@ final unpaidBillsProvider = AutoDisposeFutureProvider<List<Bill>>.internal(
 // ignore: unused_element
 typedef UnpaidBillsRef = AutoDisposeFutureProviderRef<List<Bill>>;
 String _$currentElectricityRateHash() =>
-    r'6dff93d283469f7712f205091374139047ef441a';
+    r'bcd8591826e7088a003ccda1e9b36a0819ca6b05';
 
 /// Get current electricity rate.
 ///

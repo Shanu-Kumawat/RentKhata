@@ -6,7 +6,7 @@ part of 'dashboard_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$dashboardSummaryHash() => r'e5b3a10093de29c90581f14f9addc23d89174062';
+String _$dashboardSummaryHash() => r'8327fb279e4f5525413c4e424730148cf6319ac3';
 
 /// Provides dashboard summary.
 /// Watches stream providers to auto-refresh when data changes.
@@ -27,7 +27,7 @@ final dashboardSummaryProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef DashboardSummaryRef = AutoDisposeFutureProviderRef<DashboardSummary>;
-String _$landlordStreamHash() => r'2eecc0c5e82c6c3995aa436277ae6ce3d5d98e70';
+String _$landlordStreamHash() => r'7b20d250d031f30108867ec96f3bbcd0907735a7';
 
 /// Watch landlord profile.
 ///
@@ -46,7 +46,7 @@ final landlordStreamProvider = AutoDisposeStreamProvider<Landlord?>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef LandlordStreamRef = AutoDisposeStreamProviderRef<Landlord?>;
-String _$isFirstLaunchHash() => r'ae2587fd86ae25aa73e5741462ed467ca99c35c9';
+String _$isFirstLaunchHash() => r'6af86bc237555f753eb2df364dc3273420052b72';
 
 /// Check if is first launch (no landlord profile).
 ///
@@ -65,7 +65,7 @@ final isFirstLaunchProvider = AutoDisposeFutureProvider<bool>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef IsFirstLaunchRef = AutoDisposeFutureProviderRef<bool>;
-String _$landlordHash() => r'3efedf9fd79937645fe96dd05e026a77c1923183';
+String _$landlordHash() => r'5421deb575717001fd10e677d400fddf307b1c33';
 
 /// Get landlord profile.
 ///

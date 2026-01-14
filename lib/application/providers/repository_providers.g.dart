@@ -7,7 +7,7 @@ part of 'repository_providers.dart';
 // **************************************************************************
 
 String _$landlordRepositoryHash() =>
-    r'6e8fdf525f8e2d53bc2a39c95e7fdd964706f794';
+    r'c6d7548e4710a361b878547c34e3bf53ffa4cfc1';
 
 /// Provides the LandlordRepository.
 ///
@@ -28,7 +28,7 @@ final landlordRepositoryProvider =
 // ignore: unused_element
 typedef LandlordRepositoryRef = AutoDisposeProviderRef<LandlordRepository>;
 String _$propertyRepositoryHash() =>
-    r'001842f38fcc94199c19cb62ca8183103cfe7a65';
+    r'2bbf77900108e78442ffd46a0735df10dcb99072';
 
 /// Provides the PropertyRepository.
 ///
@@ -48,7 +48,7 @@ final propertyRepositoryProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef PropertyRepositoryRef = AutoDisposeProviderRef<PropertyRepository>;
-String _$tenantRepositoryHash() => r'a8fdc297160ffa7916d9b5fbbfb1d1942fa4a378';
+String _$tenantRepositoryHash() => r'b535c0ef962a17004d9163a156636b72b46ad4c3';
 
 /// Provides the TenantRepository.
 ///
@@ -67,7 +67,7 @@ final tenantRepositoryProvider = AutoDisposeProvider<TenantRepository>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef TenantRepositoryRef = AutoDisposeProviderRef<TenantRepository>;
-String _$billingRepositoryHash() => r'470610c647e8426dbfbc0dba45e157cbeea17b1f';
+String _$billingRepositoryHash() => r'f2d2d121d960eaee7cfa7061aa60b230618549ae';
 
 /// Provides the BillingRepository.
 ///

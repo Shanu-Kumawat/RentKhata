@@ -12,4 +12,5 @@ mixin _$BillingDaoMixin on DatabaseAccessor<AppDatabase> {
   $PaymentsTable get payments => attachedDatabase.payments;
   $ElectricityRatesTable get electricityRates =>
       attachedDatabase.electricityRates;
+  $MeterPhotosTable get meterPhotos => attachedDatabase.meterPhotos;
 }

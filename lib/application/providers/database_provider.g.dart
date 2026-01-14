@@ -6,7 +6,7 @@ part of 'database_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$appDatabaseHash() => r'105bd8a8ef41e172ff5db2d8e451479a0697fd42';
+String _$appDatabaseHash() => r'448adad5717e7b1c0b3ca3ca7e03d0b2116237af';
 
 /// Provides the main database instance.
 ///
@@ -25,7 +25,7 @@ final appDatabaseProvider = Provider<AppDatabase>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef AppDatabaseRef = ProviderRef<AppDatabase>;
-String _$landlordDaoHash() => r'e6cbf07337ceef9e66214d944230e411e312f6f4';
+String _$landlordDaoHash() => r'3d1729b11c13863deec9217dfd8cd6b50e247b2a';
 
 /// Provides the LandlordDao.
 ///
@@ -44,7 +44,7 @@ final landlordDaoProvider = AutoDisposeProvider<LandlordDao>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef LandlordDaoRef = AutoDisposeProviderRef<LandlordDao>;
-String _$propertyDaoHash() => r'd4701d5039b6aa5d9378c7923091be6bf10d90a2';
+String _$propertyDaoHash() => r'1976185007e00a0f2edcde80b645ed1c4bf99088';
 
 /// Provides the PropertyDao.
 ///
@@ -63,7 +63,7 @@ final propertyDaoProvider = AutoDisposeProvider<PropertyDao>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef PropertyDaoRef = AutoDisposeProviderRef<PropertyDao>;
-String _$tenantDaoHash() => r'16bc96a6d4f033a7ba93233c522c16079859cc9c';
+String _$tenantDaoHash() => r'fa0ab84eed8b51c512f327f4a1b46c6606b1a095';
 
 /// Provides the TenantDao.
 ///
@@ -82,7 +82,7 @@ final tenantDaoProvider = AutoDisposeProvider<TenantDao>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef TenantDaoRef = AutoDisposeProviderRef<TenantDao>;
-String _$billingDaoHash() => r'95acd8ad7243f3f37281a3b27bbf268a44ef8bb3';
+String _$billingDaoHash() => r'53982fde99705ece7045d883adf84695da9fb858';
 
 /// Provides the BillingDao.
 ///

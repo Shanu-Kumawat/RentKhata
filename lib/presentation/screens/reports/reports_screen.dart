@@ -5,10 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../application/providers/billing_providers.dart';
+import '../../../application/providers/dashboard_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../domain/entities/bill.dart';
 import '../../../services/share_service.dart';
+import '../../../services/invoice_pdf_service.dart';
 import '../billing/record_payment_sheet.dart';
 
 /// Reports screen showing bills and payment history.
@@ -142,13 +144,13 @@ class _AllBillsTab extends ConsumerWidget {
   }
 }
 
-class _BillCard extends StatelessWidget {
+class _BillCard extends ConsumerWidget {
   final Bill bill;
 
   const _BillCard({required this.bill});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final statusColor = bill.isFullyPaid
         ? AppColors.success
         : bill.isOverdue
@@ -289,7 +291,7 @@ class _BillCard extends StatelessWidget {
                   tooltip: 'Share',
                   onSelected: (value) {
                     HapticFeedback.lightImpact();
-                    _handleShare(context, bill, value);
+                    _handleShare(context, ref, bill, value);
                   },
                   itemBuilder: (context) => [
                     const PopupMenuItem(
@@ -389,7 +391,12 @@ class _BillCard extends StatelessWidget {
     );
   }
 
-  void _handleShare(BuildContext context, Bill bill, String action) async {
+  void _handleShare(
+    BuildContext context,
+    WidgetRef ref,
+    Bill bill,
+    String action,
+  ) async {
     final tenantName = bill.tenantName ?? 'Tenant';
     final amount = formatCurrency(bill.pendingAmount);
     final period = bill.billingPeriod;
@@ -418,18 +425,37 @@ class _BillCard extends StatelessWidget {
         );
       }
     } else if (action == 'pdf') {
-      // Share as text for now (PDF generation requires landlord setup)
-      final message =
-          '''INVOICE
-$tenantName
-Room: ${bill.roomNumber ?? 'N/A'}
-Type: ${bill.billType.name.toUpperCase()}
-Period: $period
-Amount: ${formatCurrency(bill.amount)}
-Paid: ${formatCurrency(bill.paidAmount)}
-Pending: $amount''';
+      // Show loading indicator
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Generating PDF...')));
+      }
 
-      await shareService.shareText(text: message, subject: 'Invoice - $period');
+      try {
+        // Get landlord info
+        final landlord = await ref.read(landlordProvider.future);
+        final pdfService = InvoicePdfService();
+
+        // Generate PDF
+        final pdfFile = await pdfService.generateInvoice(
+          bill: bill,
+          landlordName: landlord?.name ?? 'Landlord',
+          landlordPhone: landlord?.phone ?? '',
+          landlordUpiId: landlord?.upiId,
+        );
+
+        // Share the PDF
+        if (context.mounted) {
+          await pdfService.sharePdf(pdfFile, 'Invoice - $period');
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Error generating PDF: $e')));
+        }
+      }
     }
   }
 

@@ -1,8 +1,10 @@
 /// Create bill screen.
 library;
 
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../application/providers/repository_providers.dart';
 import '../../../application/providers/billing_providers.dart';
 import '../../../application/providers/dashboard_providers.dart';
@@ -10,6 +12,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/validators.dart';
 import '../../../domain/entities/bill.dart';
+import '../../../services/image_service.dart';
 
 /// Bottom sheet to create a new bill.
 class CreateBillSheet extends ConsumerStatefulWidget {
@@ -46,6 +49,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
   int _billingYear = DateTime.now().year;
   bool _isLoading = false;
   double _electricityCharges = 0;
+  File? _meterPhoto;
 
   @override
   void initState() {
@@ -95,6 +99,37 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
       _amountController.text = _electricityCharges.toStringAsFixed(0);
     }
     setState(() {});
+  }
+
+  Future<void> _pickMeterPhoto() async {
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Take Photo'),
+              onTap: () => Navigator.pop(context, ImageSource.camera),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Choose from Gallery'),
+              onTap: () => Navigator.pop(context, ImageSource.gallery),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (source != null) {
+      final imageService = ImageService();
+      final photo = await imageService.pickImage(source: source);
+      if (photo != null) {
+        setState(() => _meterPhoto = photo);
+      }
+    }
   }
 
   void _calculateCombinedBill() {
@@ -365,17 +400,30 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                         padding: const EdgeInsets.all(12),
                         child: Row(
                           children: [
-                            Container(
-                              width: 60,
-                              height: 60,
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade200,
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: Colors.grey.shade300),
-                              ),
-                              child: const Icon(
-                                Icons.add_a_photo_outlined,
-                                color: Colors.grey,
+                            GestureDetector(
+                              onTap: _pickMeterPhoto,
+                              child: Container(
+                                width: 60,
+                                height: 60,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade200,
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: Colors.grey.shade300,
+                                  ),
+                                  image: _meterPhoto != null
+                                      ? DecorationImage(
+                                          image: FileImage(_meterPhoto!),
+                                          fit: BoxFit.cover,
+                                        )
+                                      : null,
+                                ),
+                                child: _meterPhoto == null
+                                    ? const Icon(
+                                        Icons.add_a_photo_outlined,
+                                        color: Colors.grey,
+                                      )
+                                    : null,
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -384,31 +432,37 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Meter Photo (Optional)',
+                                    _meterPhoto != null
+                                        ? 'Meter Photo Added'
+                                        : 'Meter Photo (Optional)',
                                     style: Theme.of(
                                       context,
                                     ).textTheme.titleSmall,
                                   ),
                                   Text(
-                                    'Tap to add photo of meter reading',
+                                    _meterPhoto != null
+                                        ? 'Tap to change or remove'
+                                        : 'Tap to add photo of meter reading',
                                     style: Theme.of(context).textTheme.bodySmall
                                         ?.copyWith(color: Colors.grey),
                                   ),
                                 ],
                               ),
                             ),
-                            IconButton(
-                              onPressed: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                      'Meter photo feature coming soon!',
-                                    ),
-                                  ),
-                                );
-                              },
-                              icon: const Icon(Icons.camera_alt_outlined),
-                            ),
+                            if (_meterPhoto != null)
+                              IconButton(
+                                onPressed: () =>
+                                    setState(() => _meterPhoto = null),
+                                icon: const Icon(
+                                  Icons.close,
+                                  color: Colors.grey,
+                                ),
+                              )
+                            else
+                              IconButton(
+                                onPressed: _pickMeterPhoto,
+                                icon: const Icon(Icons.camera_alt_outlined),
+                              ),
                           ],
                         ),
                       ),

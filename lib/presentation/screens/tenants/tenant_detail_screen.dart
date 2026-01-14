@@ -1,13 +1,17 @@
 /// Tenant detail screen with custom fields and occupancy history.
 library;
 
+import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../application/providers/tenant_providers.dart';
 import '../../../application/providers/repository_providers.dart';
+import '../../../application/providers/database_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/tenant.dart';
+import '../../../data/database/app_database.dart';
+import '../../../data/database/tables/family_member_table.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'add_tenant_screen.dart';
 
@@ -403,13 +407,17 @@ class _VerificationCard extends StatelessWidget {
   }
 }
 
-class _FamilyMembersSection extends StatelessWidget {
+class _FamilyMembersSection extends ConsumerWidget {
   final int tenantId;
 
   const _FamilyMembersSection({required this.tenantId});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final familyMembersAsync = ref.watch(
+      familyMembersForTenantProvider(tenantId),
+    );
+
     return Card(
       child: ExpansionTile(
         leading: const Icon(
@@ -417,41 +425,72 @@ class _FamilyMembersSection extends StatelessWidget {
           color: AppColors.primary,
         ),
         title: const Text('Family Members'),
-        subtitle: const Text('Manage tenant\'s family'),
+        subtitle: familyMembersAsync.when(
+          data: (members) => Text('${members.length} member(s)'),
+          loading: () => const Text('Loading...'),
+          error: (_, __) => const Text('Error'),
+        ),
         children: [
           Padding(
             padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                // Empty state
-                Container(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.people_outline,
-                        size: 48,
-                        color: AppColors.onSurfaceVariant.withValues(
-                          alpha: 0.5,
+            child: familyMembersAsync.when(
+              data: (members) => Column(
+                children: [
+                  if (members.isEmpty)
+                    Container(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.people_outline,
+                            size: 48,
+                            color: AppColors.onSurfaceVariant.withValues(
+                              alpha: 0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'No family members added',
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(color: AppColors.onSurfaceVariant),
+                          ),
+                        ],
+                      ),
+                    )
+                  else
+                    ...members.map(
+                      (member) => ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: AppColors.primary.withValues(
+                            alpha: 0.1,
+                          ),
+                          child: Text(
+                            member.name[0].toUpperCase(),
+                            style: const TextStyle(color: AppColors.primary),
+                          ),
+                        ),
+                        title: Text(member.name),
+                        subtitle: Text(member.relationship.name),
+                        trailing: IconButton(
+                          icon: const Icon(
+                            Icons.delete_outline,
+                            color: AppColors.error,
+                          ),
+                          onPressed: () =>
+                              _deleteFamilyMember(context, ref, member.id),
                         ),
                       ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'No family members added',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.onSurfaceVariant,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      OutlinedButton.icon(
-                        onPressed: () => _showAddFamilyMember(context),
-                        icon: const Icon(Icons.add),
-                        label: const Text('Add Family Member'),
-                      ),
-                    ],
+                    ),
+                  const SizedBox(height: 16),
+                  OutlinedButton.icon(
+                    onPressed: () => _showAddFamilyMember(context, ref),
+                    icon: const Icon(Icons.add),
+                    label: const Text('Add Family Member'),
                   ),
-                ),
-              ],
+                ],
+              ),
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, _) => Center(child: Text('Error: $e')),
             ),
           ),
         ],
@@ -459,88 +498,177 @@ class _FamilyMembersSection extends StatelessWidget {
     );
   }
 
-  void _showAddFamilyMember(BuildContext context) {
+  void _deleteFamilyMember(
+    BuildContext context,
+    WidgetRef ref,
+    int memberId,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Family Member?'),
+        content: const Text('This action cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      final db = ref.read(appDatabaseProvider);
+      await db.tenantDao.deleteFamilyMember(memberId);
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Family member deleted')));
+      }
+    }
+  }
+
+  void _showAddFamilyMember(BuildContext context, WidgetRef ref) {
+    final nameController = TextEditingController();
+    final phoneController = TextEditingController();
+    String? selectedRelationship;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (context) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-          left: 24,
-          right: 24,
-          top: 24,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Add Family Member',
-              style: Theme.of(
-                context,
-              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 24),
-            TextFormField(
-              decoration: const InputDecoration(
-                labelText: 'Name *',
-                prefixIcon: Icon(Icons.person_outline),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            left: 24,
+            right: 24,
+            top: 24,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Add Family Member',
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
               ),
-              autofocus: true,
-            ),
-            const SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              decoration: const InputDecoration(
-                labelText: 'Relationship *',
-                prefixIcon: Icon(Icons.family_restroom_outlined),
-              ),
-              items: const [
-                DropdownMenuItem(value: 'spouse', child: Text('Spouse')),
-                DropdownMenuItem(value: 'child', child: Text('Child')),
-                DropdownMenuItem(value: 'parent', child: Text('Parent')),
-                DropdownMenuItem(value: 'sibling', child: Text('Sibling')),
-                DropdownMenuItem(value: 'other', child: Text('Other')),
-              ],
-              onChanged: (_) {},
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              decoration: const InputDecoration(
-                labelText: 'Phone (Optional)',
-                prefixIcon: Icon(Icons.phone_outlined),
-              ),
-              keyboardType: TextInputType.phone,
-            ),
-            const SizedBox(height: 24),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text('Cancel'),
-                  ),
+              const SizedBox(height: 24),
+              TextFormField(
+                controller: nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Name *',
+                  prefixIcon: Icon(Icons.person_outline),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: FilledButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Family member feature coming soon!'),
-                        ),
-                      );
-                    },
-                    child: const Text('Add'),
-                  ),
+                autofocus: true,
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                decoration: const InputDecoration(
+                  labelText: 'Relationship *',
+                  prefixIcon: Icon(Icons.family_restroom_outlined),
                 ),
-              ],
-            ),
-            const SizedBox(height: 24),
-          ],
+                value: selectedRelationship,
+                items: const [
+                  DropdownMenuItem(value: 'spouse', child: Text('Spouse')),
+                  DropdownMenuItem(value: 'child', child: Text('Child')),
+                  DropdownMenuItem(value: 'parent', child: Text('Parent')),
+                  DropdownMenuItem(value: 'sibling', child: Text('Sibling')),
+                  DropdownMenuItem(value: 'other', child: Text('Other')),
+                ],
+                onChanged: (value) =>
+                    setState(() => selectedRelationship = value),
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: phoneController,
+                decoration: const InputDecoration(
+                  labelText: 'Phone (Optional)',
+                  prefixIcon: Icon(Icons.phone_outlined),
+                ),
+                keyboardType: TextInputType.phone,
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Cancel'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: () async {
+                        if (nameController.text.isEmpty ||
+                            selectedRelationship == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Name and relationship are required',
+                              ),
+                            ),
+                          );
+                          return;
+                        }
+
+                        final db = ref.read(appDatabaseProvider);
+                        await db.tenantDao.insertFamilyMember(
+                          FamilyMembersCompanion.insert(
+                            tenantId: tenantId,
+                            name: nameController.text,
+                            relationship: _stringToRelationship(
+                              selectedRelationship!,
+                            ),
+                            phone: Value(
+                              phoneController.text.isEmpty
+                                  ? null
+                                  : phoneController.text,
+                            ),
+                          ),
+                        );
+
+                        if (context.mounted) {
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Family member added!'),
+                            ),
+                          );
+                        }
+                      },
+                      child: const Text('Add'),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  FamilyRelationship _stringToRelationship(String value) {
+    switch (value) {
+      case 'spouse':
+        return FamilyRelationship.spouse;
+      case 'child':
+        return FamilyRelationship.child;
+      case 'parent':
+        return FamilyRelationship.parent;
+      case 'sibling':
+        return FamilyRelationship.sibling;
+      default:
+        return FamilyRelationship.other;
+    }
   }
 }
 

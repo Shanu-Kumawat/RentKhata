@@ -6,11 +6,12 @@ import '../app_database.dart';
 import '../tables/bill_table.dart';
 import '../tables/payment_table.dart';
 import '../tables/electricity_rate_table.dart';
+import '../tables/meter_photo_table.dart';
 
 part 'billing_dao.g.dart';
 
 /// DAO for billing and payment operations.
-@DriftAccessor(tables: [Bills, Payments, ElectricityRates])
+@DriftAccessor(tables: [Bills, Payments, ElectricityRates, MeterPhotos])
 class BillingDao extends DatabaseAccessor<AppDatabase> with _$BillingDaoMixin {
   BillingDao(super.db);
 
@@ -176,5 +177,29 @@ class BillingDao extends DatabaseAccessor<AppDatabase> with _$BillingDaoMixin {
           )
           ..orderBy([(p) => OrderingTerm.desc(p.paymentDate)]))
         .get();
+  }
+
+  // ========== Meter Photo Operations ==========
+
+  /// Get meter photos for a bill
+  Future<List<MeterPhotoEntity>> getMeterPhotosForBill(int billId) =>
+      (select(meterPhotos)..where((m) => m.billId.equals(billId))).get();
+
+  /// Insert a meter photo
+  Future<int> insertMeterPhoto(MeterPhotosCompanion photo) =>
+      into(meterPhotos).insert(photo);
+
+  /// Delete a meter photo
+  Future<int> deleteMeterPhoto(int id) =>
+      (delete(meterPhotos)..where((m) => m.id.equals(id))).go();
+
+  /// Delete all photos for a bill
+  Future<int> deleteMeterPhotosForBill(int billId) =>
+      (delete(meterPhotos)..where((m) => m.billId.equals(billId))).go();
+
+  /// Count photos for a bill
+  Future<int> countMeterPhotosForBill(int billId) async {
+    final photos = await getMeterPhotosForBill(billId);
+    return photos.length;
   }
 }

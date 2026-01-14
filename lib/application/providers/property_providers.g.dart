@@ -6,7 +6,7 @@ part of 'property_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$propertiesStreamHash() => r'2d0b96e1177326589e8363f6f437585739f92d26';
+String _$propertiesStreamHash() => r'194b2650a01845bf6d18c30969dc6cd087d35f5a';
 
 /// Watch all properties (auto-updates when data changes).
 ///
@@ -26,7 +26,7 @@ final propertiesStreamProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef PropertiesStreamRef = AutoDisposeStreamProviderRef<List<Property>>;
-String _$propertiesHash() => r'3741022e37ab498363ebf5545096969bfd07f1c0';
+String _$propertiesHash() => r'6c0be876712e61a8cd6e2b4dd77403fe6fc07c84';
 
 /// Get all properties (future).
 ///
@@ -45,7 +45,7 @@ final propertiesProvider = AutoDisposeFutureProvider<List<Property>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef PropertiesRef = AutoDisposeFutureProviderRef<List<Property>>;
-String _$propertyHash() => r'b73b1cd83f3015a8ad56f1b5b50338dad52a90a3';
+String _$propertyHash() => r'99b0313e500b30aa7c85467463c46ad76a402939';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -202,7 +202,7 @@ class _PropertyProviderElement
 }
 
 String _$roomsForPropertyStreamHash() =>
-    r'a77d085a5e3366e4958f07fb241d7c76a7b8c01e';
+    r'ec174991dcf9e30c1c37319223ab9c5949d992d6';
 
 /// Watch rooms for a property (auto-updates when data changes).
 ///
@@ -339,7 +339,7 @@ class _RoomsForPropertyStreamProviderElement
   int get propertyId => (origin as RoomsForPropertyStreamProvider).propertyId;
 }
 
-String _$roomsForPropertyHash() => r'7beffe1ed3f30deb97f2e830112b3d2fcac7351d';
+String _$roomsForPropertyHash() => r'162287f60d48bfdb5516a8d338e46e92e32c8b5f';
 
 /// Get rooms for a property.
 ///
@@ -471,7 +471,7 @@ class _RoomsForPropertyProviderElement
   int get propertyId => (origin as RoomsForPropertyProvider).propertyId;
 }
 
-String _$roomHash() => r'4a4b1b319cfcb0e50e68ae23c26246abaa3833cf';
+String _$roomHash() => r'b1f13c8bc207dbffa8ba998915e0bcc51e71ba46';
 
 /// Get a single room by ID.
 /// This provider auto-refreshes when room data changes.
@@ -603,7 +603,7 @@ class _RoomProviderElement extends AutoDisposeFutureProviderElement<Room?>
   int get id => (origin as RoomProvider).id;
 }
 
-String _$allRoomsHash() => r'4c5a118733d48f697a39b9f72cc81d0e955afb03';
+String _$allRoomsHash() => r'9775cec47f5205245bb65cb81f1e95c8f7d91727';
 
 /// Get all rooms.
 ///

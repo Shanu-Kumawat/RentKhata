@@ -6,7 +6,7 @@ part of 'tenant_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$tenantsStreamHash() => r'8909a6ffc0554c19e1916d1a45c021c31de742e1';
+String _$tenantsStreamHash() => r'18a4fb419c8bc4984f9b3856bb77f2b53a474283';
 
 /// Watch all tenants (auto-updates when data changes).
 ///
@@ -25,7 +25,7 @@ final tenantsStreamProvider = AutoDisposeStreamProvider<List<Tenant>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef TenantsStreamRef = AutoDisposeStreamProviderRef<List<Tenant>>;
-String _$tenantsHash() => r'd50d1f7b33c0a6cb3aabc8826a2625982742f921';
+String _$tenantsHash() => r'f996f116e03f8649e5617715f76dfb6a0136541b';
 
 /// Get all tenants (future).
 ///
@@ -44,7 +44,7 @@ final tenantsProvider = AutoDisposeFutureProvider<List<Tenant>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef TenantsRef = AutoDisposeFutureProviderRef<List<Tenant>>;
-String _$tenantHash() => r'6c05e46b245f343a6e52d9e92231a12e037fa58c';
+String _$tenantHash() => r'f9720b1f62257995bdd0633fee46cef003acac52';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -197,7 +197,7 @@ class _TenantProviderElement extends AutoDisposeFutureProviderElement<Tenant?>
   int get id => (origin as TenantProvider).id;
 }
 
-String _$searchTenantsHash() => r'fbeb7fdd18a473aa72e1ca6c7e3fd3282f96df57';
+String _$searchTenantsHash() => r'e97fd7d47f44992282b1e11be0a047cde08eb307';
 
 /// Search tenants.
 ///
@@ -330,7 +330,7 @@ class _SearchTenantsProviderElement
 }
 
 String _$customFieldsForTenantHash() =>
-    r'5af741e50127031f6b56d3fe236c8d2cd6720a25';
+    r'e5b07e3da553b91742556c860c0bdbb001e6191c';
 
 /// Get custom fields for a tenant.
 /// This auto-refreshes when tenants change.
@@ -474,7 +474,7 @@ class _CustomFieldsForTenantProviderElement
 }
 
 String _$activeOccupanciesStreamHash() =>
-    r'c9d10a3bdd9d1e024de1da337739db48d7f6a7f4';
+    r'fef19a0f82cc6dc455463c3a9e93266603fa4b82';
 
 /// Watch active occupancies (auto-updates when data changes).
 ///
@@ -495,7 +495,7 @@ final activeOccupanciesStreamProvider =
 // ignore: unused_element
 typedef ActiveOccupanciesStreamRef =
     AutoDisposeStreamProviderRef<List<Occupancy>>;
-String _$activeOccupanciesHash() => r'59248b69da430ac024a3baa9278bd64013ac50a2';
+String _$activeOccupanciesHash() => r'3b207c06e9645f041894acd667422224984a86da';
 
 /// Get active occupancies.
 ///
@@ -515,7 +515,7 @@ final activeOccupanciesProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef ActiveOccupanciesRef = AutoDisposeFutureProviderRef<List<Occupancy>>;
-String _$occupancyForRoomHash() => r'2cb945d0a067595eaa5f8e8386567bb5284c9079';
+String _$occupancyForRoomHash() => r'a1f004987a9967048321fc7a173f7310a4d62ea8';
 
 /// Get active occupancy for a room.
 /// This provider auto-refreshes when occupancy data changes.
@@ -653,7 +653,7 @@ class _OccupancyForRoomProviderElement
   int get roomId => (origin as OccupancyForRoomProvider).roomId;
 }
 
-String _$tenantForRoomHash() => r'80cae7b32b9d06b518373181aabd7541134120dc';
+String _$tenantForRoomHash() => r'b778d52bae27778a34748146eb19073eb001ef4d';
 
 /// Get tenant for a room.
 /// This provider auto-refreshes when tenant data changes.
@@ -789,6 +789,147 @@ class _TenantForRoomProviderElement
 
   @override
   int get roomId => (origin as TenantForRoomProvider).roomId;
+}
+
+String _$familyMembersForTenantHash() =>
+    r'6bbff3cfcfccbef793adafd3faa575b0da0404e1';
+
+/// Stream of family members for a tenant.
+///
+/// Copied from [familyMembersForTenant].
+@ProviderFor(familyMembersForTenant)
+const familyMembersForTenantProvider = FamilyMembersForTenantFamily();
+
+/// Stream of family members for a tenant.
+///
+/// Copied from [familyMembersForTenant].
+class FamilyMembersForTenantFamily
+    extends Family<AsyncValue<List<FamilyMemberEntity>>> {
+  /// Stream of family members for a tenant.
+  ///
+  /// Copied from [familyMembersForTenant].
+  const FamilyMembersForTenantFamily();
+
+  /// Stream of family members for a tenant.
+  ///
+  /// Copied from [familyMembersForTenant].
+  FamilyMembersForTenantProvider call(int tenantId) {
+    return FamilyMembersForTenantProvider(tenantId);
+  }
+
+  @override
+  FamilyMembersForTenantProvider getProviderOverride(
+    covariant FamilyMembersForTenantProvider provider,
+  ) {
+    return call(provider.tenantId);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'familyMembersForTenantProvider';
+}
+
+/// Stream of family members for a tenant.
+///
+/// Copied from [familyMembersForTenant].
+class FamilyMembersForTenantProvider
+    extends AutoDisposeStreamProvider<List<FamilyMemberEntity>> {
+  /// Stream of family members for a tenant.
+  ///
+  /// Copied from [familyMembersForTenant].
+  FamilyMembersForTenantProvider(int tenantId)
+    : this._internal(
+        (ref) =>
+            familyMembersForTenant(ref as FamilyMembersForTenantRef, tenantId),
+        from: familyMembersForTenantProvider,
+        name: r'familyMembersForTenantProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$familyMembersForTenantHash,
+        dependencies: FamilyMembersForTenantFamily._dependencies,
+        allTransitiveDependencies:
+            FamilyMembersForTenantFamily._allTransitiveDependencies,
+        tenantId: tenantId,
+      );
+
+  FamilyMembersForTenantProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.tenantId,
+  }) : super.internal();
+
+  final int tenantId;
+
+  @override
+  Override overrideWith(
+    Stream<List<FamilyMemberEntity>> Function(
+      FamilyMembersForTenantRef provider,
+    )
+    create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: FamilyMembersForTenantProvider._internal(
+        (ref) => create(ref as FamilyMembersForTenantRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        tenantId: tenantId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeStreamProviderElement<List<FamilyMemberEntity>> createElement() {
+    return _FamilyMembersForTenantProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is FamilyMembersForTenantProvider &&
+        other.tenantId == tenantId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, tenantId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin FamilyMembersForTenantRef
+    on AutoDisposeStreamProviderRef<List<FamilyMemberEntity>> {
+  /// The parameter `tenantId` of this provider.
+  int get tenantId;
+}
+
+class _FamilyMembersForTenantProviderElement
+    extends AutoDisposeStreamProviderElement<List<FamilyMemberEntity>>
+    with FamilyMembersForTenantRef {
+  _FamilyMembersForTenantProviderElement(super.provider);
+
+  @override
+  int get tenantId => (origin as FamilyMembersForTenantProvider).tenantId;
 }
 
 // ignore_for_file: type=lint

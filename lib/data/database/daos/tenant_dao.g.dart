@@ -9,4 +9,5 @@ mixin _$TenantDaoMixin on DatabaseAccessor<AppDatabase> {
   $PropertiesTable get properties => attachedDatabase.properties;
   $RoomsTable get rooms => attachedDatabase.rooms;
   $OccupanciesTable get occupancies => attachedDatabase.occupancies;
+  $FamilyMembersTable get familyMembers => attachedDatabase.familyMembers;
 }

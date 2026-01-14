@@ -5,7 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../domain/entities/tenant.dart';
 import '../../domain/entities/occupancy.dart';
+import '../../data/database/app_database.dart';
 import 'repository_providers.dart';
+import 'database_provider.dart';
 
 part 'tenant_providers.g.dart';
 
@@ -84,4 +86,11 @@ Future<Tenant?> tenantForRoom(Ref ref, int roomId) {
   ref.watch(activeOccupanciesStreamProvider);
   final repo = ref.watch(tenantRepositoryProvider);
   return repo.getTenantByRoom(roomId);
+}
+
+/// Stream of family members for a tenant.
+@riverpod
+Stream<List<FamilyMemberEntity>> familyMembersForTenant(Ref ref, int tenantId) {
+  final db = ref.watch(appDatabaseProvider);
+  return db.tenantDao.watchFamilyMembersForTenant(tenantId);
 }

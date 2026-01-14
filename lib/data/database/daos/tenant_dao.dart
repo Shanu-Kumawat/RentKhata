@@ -6,11 +6,12 @@ import '../app_database.dart';
 import '../tables/tenant_table.dart';
 import '../tables/custom_field_table.dart';
 import '../tables/occupancy_table.dart';
+import '../tables/family_member_table.dart';
 
 part 'tenant_dao.g.dart';
 
 /// DAO for tenant and occupancy operations.
-@DriftAccessor(tables: [Tenants, CustomFields, Occupancies])
+@DriftAccessor(tables: [Tenants, CustomFields, Occupancies, FamilyMembers])
 class TenantDao extends DatabaseAccessor<AppDatabase> with _$TenantDaoMixin {
   TenantDao(super.db);
 
@@ -29,9 +30,9 @@ class TenantDao extends DatabaseAccessor<AppDatabase> with _$TenantDaoMixin {
   /// Search tenants by name or phone
   Future<List<TenantEntity>> searchTenants(String query) {
     final lowerQuery = '%${query.toLowerCase()}%';
-    return (select(tenants)
-          ..where((t) =>
-              t.name.lower().like(lowerQuery) | t.phone.like('%$query%')))
+    return (select(tenants)..where(
+          (t) => t.name.lower().like(lowerQuery) | t.phone.like('%$query%'),
+        ))
         .get();
   }
 
@@ -99,17 +100,14 @@ class TenantDao extends DatabaseAccessor<AppDatabase> with _$TenantDaoMixin {
 
   /// End an occupancy (set move-out date and inactive)
   Future<bool> endOccupancy(int occupancyId, DateTime moveOutDate) async {
-    final occupancy = await (select(occupancies)
-          ..where((o) => o.id.equals(occupancyId)))
-        .getSingleOrNull();
+    final occupancy = await (select(
+      occupancies,
+    )..where((o) => o.id.equals(occupancyId))).getSingleOrNull();
 
     if (occupancy == null) return false;
 
     return update(occupancies).replace(
-      occupancy.copyWith(
-        moveOutDate: Value(moveOutDate),
-        isActive: false,
-      ),
+      occupancy.copyWith(moveOutDate: Value(moveOutDate), isActive: false),
     );
   }
 
@@ -118,5 +116,39 @@ class TenantDao extends DatabaseAccessor<AppDatabase> with _$TenantDaoMixin {
     final occupancy = await getActiveOccupancyForRoom(roomId);
     if (occupancy == null) return null;
     return getTenantById(occupancy.tenantId);
+  }
+
+  // ========== Family Member Operations ==========
+
+  /// Get family members for a tenant
+  Future<List<FamilyMemberEntity>> getFamilyMembersForTenant(int tenantId) =>
+      (select(familyMembers)..where((f) => f.tenantId.equals(tenantId))).get();
+
+  /// Watch family members for a tenant
+  Stream<List<FamilyMemberEntity>> watchFamilyMembersForTenant(int tenantId) =>
+      (select(
+        familyMembers,
+      )..where((f) => f.tenantId.equals(tenantId))).watch();
+
+  /// Insert a family member
+  Future<int> insertFamilyMember(FamilyMembersCompanion member) =>
+      into(familyMembers).insert(member);
+
+  /// Update a family member
+  Future<bool> updateFamilyMember(FamilyMemberEntity member) =>
+      update(familyMembers).replace(member);
+
+  /// Delete a family member
+  Future<int> deleteFamilyMember(int id) =>
+      (delete(familyMembers)..where((f) => f.id.equals(id))).go();
+
+  /// Delete all family members for a tenant
+  Future<int> deleteFamilyMembersForTenant(int tenantId) =>
+      (delete(familyMembers)..where((f) => f.tenantId.equals(tenantId))).go();
+
+  /// Count family members for a tenant
+  Future<int> countFamilyMembersForTenant(int tenantId) async {
+    final members = await getFamilyMembersForTenant(tenantId);
+    return members.length;
   }
 }

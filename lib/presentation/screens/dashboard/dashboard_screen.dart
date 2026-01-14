@@ -257,9 +257,19 @@ class DashboardScreen extends ConsumerWidget {
             ListTile(
               leading: const Icon(Icons.receipt_long_outlined),
               title: const Text('Create Bill'),
+              subtitle: const Text('Go to a room to create bills'),
               onTap: () {
                 Navigator.pop(context);
                 context.push('/properties');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.assessment_outlined),
+              title: const Text('View Reports'),
+              subtitle: const Text('See all bills and payments'),
+              onTap: () {
+                Navigator.pop(context);
+                context.push('/reports');
               },
             ),
           ],
