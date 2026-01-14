@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 /// Shell widget with persistent bottom navigation bar.
@@ -17,6 +18,7 @@ class MainShell extends StatelessWidget {
       bottomNavigationBar: NavigationBar(
         selectedIndex: navigationShell.currentIndex,
         onDestinationSelected: (index) {
+          HapticFeedback.selectionClick();
           navigationShell.goBranch(
             index,
             initialLocation: index == navigationShell.currentIndex,
