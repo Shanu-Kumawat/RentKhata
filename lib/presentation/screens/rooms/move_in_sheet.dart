@@ -228,10 +228,12 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
       if (mounted) {
         // Invalidate providers to refresh state across all screens
         ref.invalidate(tenantsProvider);
+        ref.invalidate(tenantsStreamProvider);
         ref.invalidate(tenantProvider(tenantId));
         ref.invalidate(roomProvider(widget.roomId));
         ref.invalidate(allRoomsProvider);
         ref.invalidate(propertiesStreamProvider);
+        ref.invalidate(roomsForPropertyStreamProvider(widget.room.propertyId));
         ref.invalidate(dashboardSummaryProvider);
 
         Navigator.pop(context);

@@ -200,7 +200,7 @@ class _RoomDetailContent extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      builder: (context) => _MoveOutSheet(occupancy: occupancy),
+      builder: (context) => _MoveOutSheet(occupancy: occupancy, room: room),
     );
   }
 }
@@ -587,8 +587,9 @@ class _BillTile extends StatelessWidget {
 /// Move out bottom sheet with deposit settlement
 class _MoveOutSheet extends ConsumerStatefulWidget {
   final Occupancy occupancy;
+  final Room room;
 
-  const _MoveOutSheet({required this.occupancy});
+  const _MoveOutSheet({required this.occupancy, required this.room});
 
   @override
   ConsumerState<_MoveOutSheet> createState() => _MoveOutSheetState();
@@ -680,11 +681,12 @@ class _MoveOutSheetState extends ConsumerState<_MoveOutSheet> {
                       ),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () async {
-                        // Allow dates from move-in date to 5 years in future
-                        final earliestDate = widget.occupancy.moveInDate;
+                        // Allow dates from 2000 to 5 years in future (flexible for corrections)
+                        final earliestDate = DateTime(2000);
                         final latestDate = DateTime.now().add(
                           const Duration(days: 365 * 5),
                         );
+
                         // Ensure initial date is within valid range
                         var initial = _moveOutDate;
                         if (initial.isBefore(earliestDate))
@@ -852,9 +854,13 @@ class _MoveOutSheetState extends ConsumerState<_MoveOutSheet> {
         ref.invalidate(roomProvider(widget.occupancy.roomId));
         ref.invalidate(allRoomsProvider);
         ref.invalidate(propertiesStreamProvider);
+        ref.invalidate(roomsForPropertyStreamProvider(widget.room.propertyId));
         ref.invalidate(tenantsProvider);
+        ref.invalidate(tenantsStreamProvider);
         ref.invalidate(tenantProvider(widget.occupancy.tenantId));
         ref.invalidate(dashboardSummaryProvider);
+
+        Navigator.pop(context);
 
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
