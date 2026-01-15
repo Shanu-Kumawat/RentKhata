@@ -50,11 +50,19 @@ class LocalNotificationService {
     );
 
     // Create notification channel
-    await _plugin
+    final androidPlugin = _plugin
         .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin
-        >()
-        ?.createNotificationChannel(_billChannel);
+        >();
+
+    await androidPlugin?.createNotificationChannel(_billChannel);
+
+    // Auto-request notification permission on Android 13+
+    final granted = await androidPlugin?.requestNotificationsPermission();
+    debugPrint('Notification permission granted: $granted');
+
+    // Also request exact alarm permission for scheduled notifications
+    await androidPlugin?.requestExactAlarmsPermission();
 
     _isInitialized = true;
     debugPrint('LocalNotificationService initialized');

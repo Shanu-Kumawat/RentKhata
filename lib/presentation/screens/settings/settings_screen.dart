@@ -1,6 +1,7 @@
 /// Settings screen.
 library;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -75,6 +76,8 @@ class SettingsScreen extends ConsumerWidget {
                 onTap: () {
                   showModalBottomSheet(
                     context: context,
+                    isScrollControlled: true,
+                    useSafeArea: true,
                     builder: (context) => const _NotificationSettingsSheet(),
                   );
                 },
@@ -250,7 +253,7 @@ class _NotificationSettingsSheetState
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -288,6 +291,18 @@ class _NotificationSettingsSheetState
             onChanged: (v) => setState(() => _overdue = v),
           ),
           const SizedBox(height: 24),
+          if (kDebugMode)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  icon: const Icon(Icons.notifications_active),
+                  label: const Text('Send Test Notification'),
+                  onPressed: _isLoading ? null : _sendTestNotification,
+                ),
+              ),
+            ),
           SizedBox(
             width: double.infinity,
             child: FilledButton(
@@ -356,6 +371,57 @@ class _NotificationSettingsSheetState
               scheduledCount > 0
                   ? 'Scheduled reminders for $scheduledCount bill(s)!'
                   : 'Settings saved. No pending bills to schedule.',
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _sendTestNotification() async {
+    setState(() => _isLoading = true);
+
+    try {
+      final notificationService = LocalNotificationService();
+      await notificationService.initialize();
+
+      // Request permission first
+      final granted = await notificationService.requestPermission();
+      if (!granted) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Notification permission denied. Please enable in Settings.',
+              ),
+            ),
+          );
+        }
+        setState(() => _isLoading = false);
+        return;
+      }
+
+      // Show immediate test notification
+      await notificationService.showNotification(
+        id: 12345,
+        title: '🔔 Test Notification',
+        body: 'Notifications are working! You will receive bill reminders.',
+        payload: 'test',
+      );
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Test notification sent! Check your notification tray.',
             ),
           ),
         );
