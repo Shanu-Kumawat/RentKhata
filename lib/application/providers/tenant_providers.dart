@@ -88,11 +88,22 @@ Future<Tenant?> tenantForRoom(Ref ref, int roomId) {
   return repo.getTenantByRoom(roomId);
 }
 
-/// Stream of family members for a tenant.
+/// Stream of family members for a tenant's current active occupancy.
 @riverpod
 Stream<List<FamilyMemberEntity>> familyMembersForTenant(Ref ref, int tenantId) {
   final db = ref.watch(appDatabaseProvider);
   return db.tenantDao.watchFamilyMembersForTenant(tenantId);
+}
+
+/// Stream of family members for a specific occupancy.
+/// This is the primary way to get family members in the occupancy-centric architecture.
+@riverpod
+Stream<List<FamilyMemberEntity>> familyMembersForOccupancy(
+  Ref ref,
+  int occupancyId,
+) {
+  final db = ref.watch(appDatabaseProvider);
+  return db.tenantDao.watchFamilyMembersForOccupancy(occupancyId);
 }
 
 /// Get all occupancies (history) for a tenant.

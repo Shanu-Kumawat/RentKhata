@@ -5568,18 +5568,18 @@ class $FamilyMembersTable extends FamilyMembers
       'PRIMARY KEY AUTOINCREMENT',
     ),
   );
-  static const VerificationMeta _tenantIdMeta = const VerificationMeta(
-    'tenantId',
+  static const VerificationMeta _occupancyIdMeta = const VerificationMeta(
+    'occupancyId',
   );
   @override
-  late final GeneratedColumn<int> tenantId = GeneratedColumn<int>(
-    'tenant_id',
+  late final GeneratedColumn<int> occupancyId = GeneratedColumn<int>(
+    'occupancy_id',
     aliasedName,
     false,
     type: DriftSqlType.int,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES tenants (id)',
+      'REFERENCES occupancies (id)',
     ),
   );
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
@@ -5660,7 +5660,7 @@ class $FamilyMembersTable extends FamilyMembers
   @override
   List<GeneratedColumn> get $columns => [
     id,
-    tenantId,
+    occupancyId,
     name,
     relationship,
     phone,
@@ -5684,13 +5684,16 @@ class $FamilyMembersTable extends FamilyMembers
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
-    if (data.containsKey('tenant_id')) {
+    if (data.containsKey('occupancy_id')) {
       context.handle(
-        _tenantIdMeta,
-        tenantId.isAcceptableOrUnknown(data['tenant_id']!, _tenantIdMeta),
+        _occupancyIdMeta,
+        occupancyId.isAcceptableOrUnknown(
+          data['occupancy_id']!,
+          _occupancyIdMeta,
+        ),
       );
     } else if (isInserting) {
-      context.missing(_tenantIdMeta);
+      context.missing(_occupancyIdMeta);
     }
     if (data.containsKey('name')) {
       context.handle(
@@ -5746,9 +5749,9 @@ class $FamilyMembersTable extends FamilyMembers
         DriftSqlType.int,
         data['${effectivePrefix}id'],
       )!,
-      tenantId: attachedDatabase.typeMapping.read(
+      occupancyId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
-        data['${effectivePrefix}tenant_id'],
+        data['${effectivePrefix}occupancy_id'],
       )!,
       name: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
@@ -5799,8 +5802,8 @@ class FamilyMemberEntity extends DataClass
   /// Primary key
   final int id;
 
-  /// Foreign key to tenant
-  final int tenantId;
+  /// Foreign key to occupancy (links family to a specific stay period)
+  final int occupancyId;
 
   /// Family member's name
   final String name;
@@ -5824,7 +5827,7 @@ class FamilyMemberEntity extends DataClass
   final DateTime createdAt;
   const FamilyMemberEntity({
     required this.id,
-    required this.tenantId,
+    required this.occupancyId,
     required this.name,
     required this.relationship,
     this.phone,
@@ -5837,7 +5840,7 @@ class FamilyMemberEntity extends DataClass
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
-    map['tenant_id'] = Variable<int>(tenantId);
+    map['occupancy_id'] = Variable<int>(occupancyId);
     map['name'] = Variable<String>(name);
     {
       map['relationship'] = Variable<String>(
@@ -5863,7 +5866,7 @@ class FamilyMemberEntity extends DataClass
   FamilyMembersCompanion toCompanion(bool nullToAbsent) {
     return FamilyMembersCompanion(
       id: Value(id),
-      tenantId: Value(tenantId),
+      occupancyId: Value(occupancyId),
       name: Value(name),
       relationship: Value(relationship),
       phone: phone == null && nullToAbsent
@@ -5887,7 +5890,7 @@ class FamilyMemberEntity extends DataClass
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return FamilyMemberEntity(
       id: serializer.fromJson<int>(json['id']),
-      tenantId: serializer.fromJson<int>(json['tenantId']),
+      occupancyId: serializer.fromJson<int>(json['occupancyId']),
       name: serializer.fromJson<String>(json['name']),
       relationship: $FamilyMembersTable.$converterrelationship.fromJson(
         serializer.fromJson<String>(json['relationship']),
@@ -5904,7 +5907,7 @@ class FamilyMemberEntity extends DataClass
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
-      'tenantId': serializer.toJson<int>(tenantId),
+      'occupancyId': serializer.toJson<int>(occupancyId),
       'name': serializer.toJson<String>(name),
       'relationship': serializer.toJson<String>(
         $FamilyMembersTable.$converterrelationship.toJson(relationship),
@@ -5919,7 +5922,7 @@ class FamilyMemberEntity extends DataClass
 
   FamilyMemberEntity copyWith({
     int? id,
-    int? tenantId,
+    int? occupancyId,
     String? name,
     FamilyRelationship? relationship,
     Value<String?> phone = const Value.absent(),
@@ -5929,7 +5932,7 @@ class FamilyMemberEntity extends DataClass
     DateTime? createdAt,
   }) => FamilyMemberEntity(
     id: id ?? this.id,
-    tenantId: tenantId ?? this.tenantId,
+    occupancyId: occupancyId ?? this.occupancyId,
     name: name ?? this.name,
     relationship: relationship ?? this.relationship,
     phone: phone.present ? phone.value : this.phone,
@@ -5941,7 +5944,9 @@ class FamilyMemberEntity extends DataClass
   FamilyMemberEntity copyWithCompanion(FamilyMembersCompanion data) {
     return FamilyMemberEntity(
       id: data.id.present ? data.id.value : this.id,
-      tenantId: data.tenantId.present ? data.tenantId.value : this.tenantId,
+      occupancyId: data.occupancyId.present
+          ? data.occupancyId.value
+          : this.occupancyId,
       name: data.name.present ? data.name.value : this.name,
       relationship: data.relationship.present
           ? data.relationship.value
@@ -5960,7 +5965,7 @@ class FamilyMemberEntity extends DataClass
   String toString() {
     return (StringBuffer('FamilyMemberEntity(')
           ..write('id: $id, ')
-          ..write('tenantId: $tenantId, ')
+          ..write('occupancyId: $occupancyId, ')
           ..write('name: $name, ')
           ..write('relationship: $relationship, ')
           ..write('phone: $phone, ')
@@ -5975,7 +5980,7 @@ class FamilyMemberEntity extends DataClass
   @override
   int get hashCode => Object.hash(
     id,
-    tenantId,
+    occupancyId,
     name,
     relationship,
     phone,
@@ -5989,7 +5994,7 @@ class FamilyMemberEntity extends DataClass
       identical(this, other) ||
       (other is FamilyMemberEntity &&
           other.id == this.id &&
-          other.tenantId == this.tenantId &&
+          other.occupancyId == this.occupancyId &&
           other.name == this.name &&
           other.relationship == this.relationship &&
           other.phone == this.phone &&
@@ -6001,7 +6006,7 @@ class FamilyMemberEntity extends DataClass
 
 class FamilyMembersCompanion extends UpdateCompanion<FamilyMemberEntity> {
   final Value<int> id;
-  final Value<int> tenantId;
+  final Value<int> occupancyId;
   final Value<String> name;
   final Value<FamilyRelationship> relationship;
   final Value<String?> phone;
@@ -6011,7 +6016,7 @@ class FamilyMembersCompanion extends UpdateCompanion<FamilyMemberEntity> {
   final Value<DateTime> createdAt;
   const FamilyMembersCompanion({
     this.id = const Value.absent(),
-    this.tenantId = const Value.absent(),
+    this.occupancyId = const Value.absent(),
     this.name = const Value.absent(),
     this.relationship = const Value.absent(),
     this.phone = const Value.absent(),
@@ -6022,7 +6027,7 @@ class FamilyMembersCompanion extends UpdateCompanion<FamilyMemberEntity> {
   });
   FamilyMembersCompanion.insert({
     this.id = const Value.absent(),
-    required int tenantId,
+    required int occupancyId,
     required String name,
     required FamilyRelationship relationship,
     this.phone = const Value.absent(),
@@ -6030,12 +6035,12 @@ class FamilyMembersCompanion extends UpdateCompanion<FamilyMemberEntity> {
     this.age = const Value.absent(),
     this.gender = const Value.absent(),
     this.createdAt = const Value.absent(),
-  }) : tenantId = Value(tenantId),
+  }) : occupancyId = Value(occupancyId),
        name = Value(name),
        relationship = Value(relationship);
   static Insertable<FamilyMemberEntity> custom({
     Expression<int>? id,
-    Expression<int>? tenantId,
+    Expression<int>? occupancyId,
     Expression<String>? name,
     Expression<String>? relationship,
     Expression<String>? phone,
@@ -6046,7 +6051,7 @@ class FamilyMembersCompanion extends UpdateCompanion<FamilyMemberEntity> {
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
-      if (tenantId != null) 'tenant_id': tenantId,
+      if (occupancyId != null) 'occupancy_id': occupancyId,
       if (name != null) 'name': name,
       if (relationship != null) 'relationship': relationship,
       if (phone != null) 'phone': phone,
@@ -6059,7 +6064,7 @@ class FamilyMembersCompanion extends UpdateCompanion<FamilyMemberEntity> {
 
   FamilyMembersCompanion copyWith({
     Value<int>? id,
-    Value<int>? tenantId,
+    Value<int>? occupancyId,
     Value<String>? name,
     Value<FamilyRelationship>? relationship,
     Value<String?>? phone,
@@ -6070,7 +6075,7 @@ class FamilyMembersCompanion extends UpdateCompanion<FamilyMemberEntity> {
   }) {
     return FamilyMembersCompanion(
       id: id ?? this.id,
-      tenantId: tenantId ?? this.tenantId,
+      occupancyId: occupancyId ?? this.occupancyId,
       name: name ?? this.name,
       relationship: relationship ?? this.relationship,
       phone: phone ?? this.phone,
@@ -6087,8 +6092,8 @@ class FamilyMembersCompanion extends UpdateCompanion<FamilyMemberEntity> {
     if (id.present) {
       map['id'] = Variable<int>(id.value);
     }
-    if (tenantId.present) {
-      map['tenant_id'] = Variable<int>(tenantId.value);
+    if (occupancyId.present) {
+      map['occupancy_id'] = Variable<int>(occupancyId.value);
     }
     if (name.present) {
       map['name'] = Variable<String>(name.value);
@@ -6120,7 +6125,7 @@ class FamilyMembersCompanion extends UpdateCompanion<FamilyMemberEntity> {
   String toString() {
     return (StringBuffer('FamilyMembersCompanion(')
           ..write('id: $id, ')
-          ..write('tenantId: $tenantId, ')
+          ..write('occupancyId: $occupancyId, ')
           ..write('name: $name, ')
           ..write('relationship: $relationship, ')
           ..write('phone: $phone, ')
@@ -9220,24 +9225,6 @@ final class $$TenantsTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
-
-  static MultiTypedResultKey<$FamilyMembersTable, List<FamilyMemberEntity>>
-  _familyMembersRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-    db.familyMembers,
-    aliasName: $_aliasNameGenerator(db.tenants.id, db.familyMembers.tenantId),
-  );
-
-  $$FamilyMembersTableProcessedTableManager get familyMembersRefs {
-    final manager = $$FamilyMembersTableTableManager(
-      $_db,
-      $_db.familyMembers,
-    ).filter((f) => f.tenantId.id.sqlEquals($_itemColumn<int>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_familyMembersRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
 }
 
 class $$TenantsTableFilterComposer
@@ -9405,31 +9392,6 @@ class $$TenantsTableFilterComposer
           }) => $$OccupanciesTableFilterComposer(
             $db: $db,
             $table: $db.occupancies,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<bool> familyMembersRefs(
-    Expression<bool> Function($$FamilyMembersTableFilterComposer f) f,
-  ) {
-    final $$FamilyMembersTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.familyMembers,
-      getReferencedColumn: (t) => t.tenantId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$FamilyMembersTableFilterComposer(
-            $db: $db,
-            $table: $db.familyMembers,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -9724,31 +9686,6 @@ class $$TenantsTableAnnotationComposer
     );
     return f(composer);
   }
-
-  Expression<T> familyMembersRefs<T extends Object>(
-    Expression<T> Function($$FamilyMembersTableAnnotationComposer a) f,
-  ) {
-    final $$FamilyMembersTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.familyMembers,
-      getReferencedColumn: (t) => t.tenantId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$FamilyMembersTableAnnotationComposer(
-            $db: $db,
-            $table: $db.familyMembers,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
 }
 
 class $$TenantsTableTableManager
@@ -9764,11 +9701,7 @@ class $$TenantsTableTableManager
           $$TenantsTableUpdateCompanionBuilder,
           (TenantEntity, $$TenantsTableReferences),
           TenantEntity,
-          PrefetchHooks Function({
-            bool customFieldsRefs,
-            bool occupanciesRefs,
-            bool familyMembersRefs,
-          })
+          PrefetchHooks Function({bool customFieldsRefs, bool occupanciesRefs})
         > {
   $$TenantsTableTableManager(_$AppDatabase db, $TenantsTable table)
     : super(
@@ -9890,17 +9823,12 @@ class $$TenantsTableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({
-                customFieldsRefs = false,
-                occupanciesRefs = false,
-                familyMembersRefs = false,
-              }) {
+              ({customFieldsRefs = false, occupanciesRefs = false}) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (customFieldsRefs) db.customFields,
                     if (occupanciesRefs) db.occupancies,
-                    if (familyMembersRefs) db.familyMembers,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -9947,27 +9875,6 @@ class $$TenantsTableTableManager
                               ),
                           typedResults: items,
                         ),
-                      if (familyMembersRefs)
-                        await $_getPrefetchedData<
-                          TenantEntity,
-                          $TenantsTable,
-                          FamilyMemberEntity
-                        >(
-                          currentTable: table,
-                          referencedTable: $$TenantsTableReferences
-                              ._familyMembersRefsTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$TenantsTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).familyMembersRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.tenantId == item.id,
-                              ),
-                          typedResults: items,
-                        ),
                     ];
                   },
                 );
@@ -9988,11 +9895,7 @@ typedef $$TenantsTableProcessedTableManager =
       $$TenantsTableUpdateCompanionBuilder,
       (TenantEntity, $$TenantsTableReferences),
       TenantEntity,
-      PrefetchHooks Function({
-        bool customFieldsRefs,
-        bool occupanciesRefs,
-        bool familyMembersRefs,
-      })
+      PrefetchHooks Function({bool customFieldsRefs, bool occupanciesRefs})
     >;
 typedef $$CustomFieldsTableCreateCompanionBuilder =
     CustomFieldsCompanion Function({
@@ -10382,6 +10285,27 @@ final class $$OccupanciesTableReferences
     );
   }
 
+  static MultiTypedResultKey<$FamilyMembersTable, List<FamilyMemberEntity>>
+  _familyMembersRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.familyMembers,
+    aliasName: $_aliasNameGenerator(
+      db.occupancies.id,
+      db.familyMembers.occupancyId,
+    ),
+  );
+
+  $$FamilyMembersTableProcessedTableManager get familyMembersRefs {
+    final manager = $$FamilyMembersTableTableManager(
+      $_db,
+      $_db.familyMembers,
+    ).filter((f) => f.occupancyId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_familyMembersRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
   static MultiTypedResultKey<
     $DepositTransactionsTable,
     List<DepositTransactionEntity>
@@ -10532,6 +10456,31 @@ class $$OccupanciesTableFilterComposer
           }) => $$BillsTableFilterComposer(
             $db: $db,
             $table: $db.bills,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> familyMembersRefs(
+    Expression<bool> Function($$FamilyMembersTableFilterComposer f) f,
+  ) {
+    final $$FamilyMembersTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.familyMembers,
+      getReferencedColumn: (t) => t.occupancyId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FamilyMembersTableFilterComposer(
+            $db: $db,
+            $table: $db.familyMembers,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -10800,6 +10749,31 @@ class $$OccupanciesTableAnnotationComposer
     return f(composer);
   }
 
+  Expression<T> familyMembersRefs<T extends Object>(
+    Expression<T> Function($$FamilyMembersTableAnnotationComposer a) f,
+  ) {
+    final $$FamilyMembersTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.familyMembers,
+      getReferencedColumn: (t) => t.occupancyId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FamilyMembersTableAnnotationComposer(
+            $db: $db,
+            $table: $db.familyMembers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
   Expression<T> depositTransactionsRefs<T extends Object>(
     Expression<T> Function($$DepositTransactionsTableAnnotationComposer a) f,
   ) {
@@ -10844,6 +10818,7 @@ class $$OccupanciesTableTableManager
             bool roomId,
             bool tenantId,
             bool billsRefs,
+            bool familyMembersRefs,
             bool depositTransactionsRefs,
           })
         > {
@@ -10927,12 +10902,14 @@ class $$OccupanciesTableTableManager
                 roomId = false,
                 tenantId = false,
                 billsRefs = false,
+                familyMembersRefs = false,
                 depositTransactionsRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (billsRefs) db.bills,
+                    if (familyMembersRefs) db.familyMembers,
                     if (depositTransactionsRefs) db.depositTransactions,
                   ],
                   addJoins:
@@ -11007,6 +10984,27 @@ class $$OccupanciesTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (familyMembersRefs)
+                        await $_getPrefetchedData<
+                          OccupancyEntity,
+                          $OccupanciesTable,
+                          FamilyMemberEntity
+                        >(
+                          currentTable: table,
+                          referencedTable: $$OccupanciesTableReferences
+                              ._familyMembersRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$OccupanciesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).familyMembersRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.occupancyId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                       if (depositTransactionsRefs)
                         await $_getPrefetchedData<
                           OccupancyEntity,
@@ -11052,6 +11050,7 @@ typedef $$OccupanciesTableProcessedTableManager =
         bool roomId,
         bool tenantId,
         bool billsRefs,
+        bool familyMembersRefs,
         bool depositTransactionsRefs,
       })
     >;
@@ -12298,7 +12297,7 @@ typedef $$ElectricityRatesTableProcessedTableManager =
 typedef $$FamilyMembersTableCreateCompanionBuilder =
     FamilyMembersCompanion Function({
       Value<int> id,
-      required int tenantId,
+      required int occupancyId,
       required String name,
       required FamilyRelationship relationship,
       Value<String?> phone,
@@ -12310,7 +12309,7 @@ typedef $$FamilyMembersTableCreateCompanionBuilder =
 typedef $$FamilyMembersTableUpdateCompanionBuilder =
     FamilyMembersCompanion Function({
       Value<int> id,
-      Value<int> tenantId,
+      Value<int> occupancyId,
       Value<String> name,
       Value<FamilyRelationship> relationship,
       Value<String?> phone,
@@ -12329,19 +12328,19 @@ final class $$FamilyMembersTableReferences
     super.$_typedResult,
   );
 
-  static $TenantsTable _tenantIdTable(_$AppDatabase db) =>
-      db.tenants.createAlias(
-        $_aliasNameGenerator(db.familyMembers.tenantId, db.tenants.id),
+  static $OccupanciesTable _occupancyIdTable(_$AppDatabase db) =>
+      db.occupancies.createAlias(
+        $_aliasNameGenerator(db.familyMembers.occupancyId, db.occupancies.id),
       );
 
-  $$TenantsTableProcessedTableManager get tenantId {
-    final $_column = $_itemColumn<int>('tenant_id')!;
+  $$OccupanciesTableProcessedTableManager get occupancyId {
+    final $_column = $_itemColumn<int>('occupancy_id')!;
 
-    final manager = $$TenantsTableTableManager(
+    final manager = $$OccupanciesTableTableManager(
       $_db,
-      $_db.tenants,
+      $_db.occupancies,
     ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_tenantIdTable($_db));
+    final item = $_typedResult.readTableOrNull(_occupancyIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: [item]),
@@ -12399,20 +12398,20 @@ class $$FamilyMembersTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  $$TenantsTableFilterComposer get tenantId {
-    final $$TenantsTableFilterComposer composer = $composerBuilder(
+  $$OccupanciesTableFilterComposer get occupancyId {
+    final $$OccupanciesTableFilterComposer composer = $composerBuilder(
       composer: this,
-      getCurrentColumn: (t) => t.tenantId,
-      referencedTable: $db.tenants,
+      getCurrentColumn: (t) => t.occupancyId,
+      referencedTable: $db.occupancies,
       getReferencedColumn: (t) => t.id,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$TenantsTableFilterComposer(
+          }) => $$OccupanciesTableFilterComposer(
             $db: $db,
-            $table: $db.tenants,
+            $table: $db.occupancies,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -12472,20 +12471,20 @@ class $$FamilyMembersTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  $$TenantsTableOrderingComposer get tenantId {
-    final $$TenantsTableOrderingComposer composer = $composerBuilder(
+  $$OccupanciesTableOrderingComposer get occupancyId {
+    final $$OccupanciesTableOrderingComposer composer = $composerBuilder(
       composer: this,
-      getCurrentColumn: (t) => t.tenantId,
-      referencedTable: $db.tenants,
+      getCurrentColumn: (t) => t.occupancyId,
+      referencedTable: $db.occupancies,
       getReferencedColumn: (t) => t.id,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$TenantsTableOrderingComposer(
+          }) => $$OccupanciesTableOrderingComposer(
             $db: $db,
-            $table: $db.tenants,
+            $table: $db.occupancies,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -12534,20 +12533,20 @@ class $$FamilyMembersTableAnnotationComposer
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
-  $$TenantsTableAnnotationComposer get tenantId {
-    final $$TenantsTableAnnotationComposer composer = $composerBuilder(
+  $$OccupanciesTableAnnotationComposer get occupancyId {
+    final $$OccupanciesTableAnnotationComposer composer = $composerBuilder(
       composer: this,
-      getCurrentColumn: (t) => t.tenantId,
-      referencedTable: $db.tenants,
+      getCurrentColumn: (t) => t.occupancyId,
+      referencedTable: $db.occupancies,
       getReferencedColumn: (t) => t.id,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$TenantsTableAnnotationComposer(
+          }) => $$OccupanciesTableAnnotationComposer(
             $db: $db,
-            $table: $db.tenants,
+            $table: $db.occupancies,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -12571,7 +12570,7 @@ class $$FamilyMembersTableTableManager
           $$FamilyMembersTableUpdateCompanionBuilder,
           (FamilyMemberEntity, $$FamilyMembersTableReferences),
           FamilyMemberEntity,
-          PrefetchHooks Function({bool tenantId})
+          PrefetchHooks Function({bool occupancyId})
         > {
   $$FamilyMembersTableTableManager(_$AppDatabase db, $FamilyMembersTable table)
     : super(
@@ -12587,7 +12586,7 @@ class $$FamilyMembersTableTableManager
           updateCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
-                Value<int> tenantId = const Value.absent(),
+                Value<int> occupancyId = const Value.absent(),
                 Value<String> name = const Value.absent(),
                 Value<FamilyRelationship> relationship = const Value.absent(),
                 Value<String?> phone = const Value.absent(),
@@ -12597,7 +12596,7 @@ class $$FamilyMembersTableTableManager
                 Value<DateTime> createdAt = const Value.absent(),
               }) => FamilyMembersCompanion(
                 id: id,
-                tenantId: tenantId,
+                occupancyId: occupancyId,
                 name: name,
                 relationship: relationship,
                 phone: phone,
@@ -12609,7 +12608,7 @@ class $$FamilyMembersTableTableManager
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
-                required int tenantId,
+                required int occupancyId,
                 required String name,
                 required FamilyRelationship relationship,
                 Value<String?> phone = const Value.absent(),
@@ -12619,7 +12618,7 @@ class $$FamilyMembersTableTableManager
                 Value<DateTime> createdAt = const Value.absent(),
               }) => FamilyMembersCompanion.insert(
                 id: id,
-                tenantId: tenantId,
+                occupancyId: occupancyId,
                 name: name,
                 relationship: relationship,
                 phone: phone,
@@ -12636,7 +12635,7 @@ class $$FamilyMembersTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({tenantId = false}) {
+          prefetchHooksCallback: ({occupancyId = false}) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [],
@@ -12656,15 +12655,15 @@ class $$FamilyMembersTableTableManager
                       dynamic
                     >
                   >(state) {
-                    if (tenantId) {
+                    if (occupancyId) {
                       state =
                           state.withJoin(
                                 currentTable: table,
-                                currentColumn: table.tenantId,
+                                currentColumn: table.occupancyId,
                                 referencedTable: $$FamilyMembersTableReferences
-                                    ._tenantIdTable(db),
+                                    ._occupancyIdTable(db),
                                 referencedColumn: $$FamilyMembersTableReferences
-                                    ._tenantIdTable(db)
+                                    ._occupancyIdTable(db)
                                     .id,
                               )
                               as T;
@@ -12693,7 +12692,7 @@ typedef $$FamilyMembersTableProcessedTableManager =
       $$FamilyMembersTableUpdateCompanionBuilder,
       (FamilyMemberEntity, $$FamilyMembersTableReferences),
       FamilyMemberEntity,
-      PrefetchHooks Function({bool tenantId})
+      PrefetchHooks Function({bool occupancyId})
     >;
 typedef $$DepositTransactionsTableCreateCompanionBuilder =
     DepositTransactionsCompanion Function({

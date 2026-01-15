@@ -180,40 +180,12 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
           aadhaarFrontPhotoPath: _aadhaarFrontPath,
           aadhaarBackPhotoPath: _aadhaarBackPath,
         );
-
-        // Add new family members for new tenant
-        for (final member in _newFamilyMembers) {
-          await db.tenantDao.insertFamilyMember(
-            FamilyMembersCompanion.insert(
-              tenantId: tenantId,
-              name: member.name,
-              relationship: member.relationship,
-              phone: Value(member.phone.isEmpty ? null : member.phone),
-              age: Value(member.age),
-              gender: Value(member.gender),
-            ),
-          );
-        }
       } else {
         tenantId = _selectedTenant!.id;
-
-        // Add new family members for existing tenant
-        for (final member in _newFamilyMembers) {
-          await db.tenantDao.insertFamilyMember(
-            FamilyMembersCompanion.insert(
-              tenantId: tenantId,
-              name: member.name,
-              relationship: member.relationship,
-              phone: Value(member.phone.isEmpty ? null : member.phone),
-              age: Value(member.age),
-              gender: Value(member.gender),
-            ),
-          );
-        }
       }
 
-      // Create occupancy
-      await tenantRepo.createOccupancy(
+      // Create occupancy first - family members now link to occupancy, not tenant
+      final occupancyId = await tenantRepo.createOccupancy(
         roomId: widget.roomId,
         tenantId: tenantId,
         moveInDate: _moveInDate,
@@ -221,6 +193,20 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
             double.tryParse(_rentController.text) ?? widget.room.baseRent,
         securityDeposit: double.tryParse(_depositController.text) ?? 0,
       );
+
+      // Add family members to this occupancy
+      for (final member in _newFamilyMembers) {
+        await db.tenantDao.insertFamilyMember(
+          FamilyMembersCompanion.insert(
+            occupancyId: occupancyId,
+            name: member.name,
+            relationship: member.relationship,
+            phone: Value(member.phone.isEmpty ? null : member.phone),
+            age: Value(member.age),
+            gender: Value(member.gender),
+          ),
+        );
+      }
 
       final totalFamily =
           _selectedFamilyMemberIds.length + _newFamilyMembers.length;

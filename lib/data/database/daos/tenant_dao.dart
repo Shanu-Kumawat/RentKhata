@@ -76,6 +76,10 @@ class TenantDao extends DatabaseAccessor<AppDatabase> with _$TenantDaoMixin {
   Future<List<OccupancyEntity>> getOccupanciesForTenant(int tenantId) =>
       (select(occupancies)..where((o) => o.tenantId.equals(tenantId))).get();
 
+  /// Get an occupancy by ID
+  Future<OccupancyEntity?> getOccupancyById(int id) =>
+      (select(occupancies)..where((o) => o.id.equals(id))).getSingleOrNull();
+
   /// Get active occupancy for a room
   Future<OccupancyEntity?> getActiveOccupancyForRoom(int roomId) =>
       (select(occupancies)
@@ -120,15 +124,46 @@ class TenantDao extends DatabaseAccessor<AppDatabase> with _$TenantDaoMixin {
 
   // ========== Family Member Operations ==========
 
-  /// Get family members for a tenant
-  Future<List<FamilyMemberEntity>> getFamilyMembersForTenant(int tenantId) =>
-      (select(familyMembers)..where((f) => f.tenantId.equals(tenantId))).get();
+  /// Get family members for a specific occupancy
+  Future<List<FamilyMemberEntity>> getFamilyMembersForOccupancy(
+    int occupancyId,
+  ) => (select(
+    familyMembers,
+  )..where((f) => f.occupancyId.equals(occupancyId))).get();
 
-  /// Watch family members for a tenant
-  Stream<List<FamilyMemberEntity>> watchFamilyMembersForTenant(int tenantId) =>
-      (select(
-        familyMembers,
-      )..where((f) => f.tenantId.equals(tenantId))).watch();
+  /// Watch family members for a specific occupancy
+  Stream<List<FamilyMemberEntity>> watchFamilyMembersForOccupancy(
+    int occupancyId,
+  ) => (select(
+    familyMembers,
+  )..where((f) => f.occupancyId.equals(occupancyId))).watch();
+
+  /// Get family members for a tenant's current active occupancy
+  /// Returns empty list if tenant has no active occupancy
+  Future<List<FamilyMemberEntity>> getFamilyMembersForTenant(
+    int tenantId,
+  ) async {
+    final activeOccupancy =
+        await (select(occupancies)..where(
+              (o) => o.tenantId.equals(tenantId) & o.isActive.equals(true),
+            ))
+            .getSingleOrNull();
+    if (activeOccupancy == null) return [];
+    return getFamilyMembersForOccupancy(activeOccupancy.id);
+  }
+
+  /// Watch family members for a tenant's current active occupancy
+  Stream<List<FamilyMemberEntity>> watchFamilyMembersForTenant(int tenantId) {
+    return watchActiveOccupancies()
+        .map(
+          (occupancies) =>
+              occupancies.where((o) => o.tenantId == tenantId).firstOrNull,
+        )
+        .asyncMap((occupancy) async {
+          if (occupancy == null) return <FamilyMemberEntity>[];
+          return getFamilyMembersForOccupancy(occupancy.id);
+        });
+  }
 
   /// Insert a family member
   Future<int> insertFamilyMember(FamilyMembersCompanion member) =>
@@ -142,13 +177,14 @@ class TenantDao extends DatabaseAccessor<AppDatabase> with _$TenantDaoMixin {
   Future<int> deleteFamilyMember(int id) =>
       (delete(familyMembers)..where((f) => f.id.equals(id))).go();
 
-  /// Delete all family members for a tenant
-  Future<int> deleteFamilyMembersForTenant(int tenantId) =>
-      (delete(familyMembers)..where((f) => f.tenantId.equals(tenantId))).go();
+  /// Delete all family members for an occupancy
+  Future<int> deleteFamilyMembersForOccupancy(int occupancyId) => (delete(
+    familyMembers,
+  )..where((f) => f.occupancyId.equals(occupancyId))).go();
 
-  /// Count family members for a tenant
-  Future<int> countFamilyMembersForTenant(int tenantId) async {
-    final members = await getFamilyMembersForTenant(tenantId);
+  /// Count family members for an occupancy
+  Future<int> countFamilyMembersForOccupancy(int occupancyId) async {
+    final members = await getFamilyMembersForOccupancy(occupancyId);
     return members.length;
   }
 }

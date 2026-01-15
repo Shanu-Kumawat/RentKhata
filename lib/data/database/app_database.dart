@@ -58,7 +58,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration {
@@ -113,6 +113,58 @@ class AppDatabase extends _$AppDatabase {
           // Add new family member columns
           await m.addColumn(familyMembers, familyMembers.age);
           await m.addColumn(familyMembers, familyMembers.gender);
+        }
+        if (from < 4) {
+          // Migrate family_members from tenant-linked to occupancy-linked
+          // This is a major schema change for occupancy-centric architecture
+
+          // Step 1: Create new table with occupancyId
+          await customStatement('''
+            CREATE TABLE family_members_new (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              occupancy_id INTEGER NOT NULL REFERENCES occupancies(id),
+              name TEXT NOT NULL,
+              relationship TEXT NOT NULL,
+              phone TEXT,
+              aadhar_number TEXT,
+              age INTEGER,
+              gender TEXT,
+              created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now') * 1000)
+            )
+          ''');
+
+          // Step 2: Migrate existing data - link family members to tenant's
+          // most recent (preferably active) occupancy
+          await customStatement('''
+            INSERT INTO family_members_new 
+              (id, occupancy_id, name, relationship, phone, aadhar_number, age, gender, created_at)
+            SELECT 
+              fm.id,
+              COALESCE(
+                (SELECT o.id FROM occupancies o 
+                 WHERE o.tenant_id = fm.tenant_id 
+                 ORDER BY o.is_active DESC, o.move_in_date DESC 
+                 LIMIT 1),
+                0
+              ) as occupancy_id,
+              fm.name,
+              fm.relationship,
+              fm.phone,
+              fm.aadhar_number,
+              fm.age,
+              fm.gender,
+              fm.created_at
+            FROM family_members fm
+            WHERE EXISTS (
+              SELECT 1 FROM occupancies o WHERE o.tenant_id = fm.tenant_id
+            )
+          ''');
+
+          // Step 3: Drop old table and rename new one
+          await customStatement('DROP TABLE family_members');
+          await customStatement(
+            'ALTER TABLE family_members_new RENAME TO family_members',
+          );
         }
       },
     );

@@ -794,23 +794,23 @@ class _TenantForRoomProviderElement
 String _$familyMembersForTenantHash() =>
     r'6bbff3cfcfccbef793adafd3faa575b0da0404e1';
 
-/// Stream of family members for a tenant.
+/// Stream of family members for a tenant's current active occupancy.
 ///
 /// Copied from [familyMembersForTenant].
 @ProviderFor(familyMembersForTenant)
 const familyMembersForTenantProvider = FamilyMembersForTenantFamily();
 
-/// Stream of family members for a tenant.
+/// Stream of family members for a tenant's current active occupancy.
 ///
 /// Copied from [familyMembersForTenant].
 class FamilyMembersForTenantFamily
     extends Family<AsyncValue<List<FamilyMemberEntity>>> {
-  /// Stream of family members for a tenant.
+  /// Stream of family members for a tenant's current active occupancy.
   ///
   /// Copied from [familyMembersForTenant].
   const FamilyMembersForTenantFamily();
 
-  /// Stream of family members for a tenant.
+  /// Stream of family members for a tenant's current active occupancy.
   ///
   /// Copied from [familyMembersForTenant].
   FamilyMembersForTenantProvider call(int tenantId) {
@@ -839,12 +839,12 @@ class FamilyMembersForTenantFamily
   String? get name => r'familyMembersForTenantProvider';
 }
 
-/// Stream of family members for a tenant.
+/// Stream of family members for a tenant's current active occupancy.
 ///
 /// Copied from [familyMembersForTenant].
 class FamilyMembersForTenantProvider
     extends AutoDisposeStreamProvider<List<FamilyMemberEntity>> {
-  /// Stream of family members for a tenant.
+  /// Stream of family members for a tenant's current active occupancy.
   ///
   /// Copied from [familyMembersForTenant].
   FamilyMembersForTenantProvider(int tenantId)
@@ -930,6 +930,156 @@ class _FamilyMembersForTenantProviderElement
 
   @override
   int get tenantId => (origin as FamilyMembersForTenantProvider).tenantId;
+}
+
+String _$familyMembersForOccupancyHash() =>
+    r'486067aee9087e0b819512e1f732324f5608de49';
+
+/// Stream of family members for a specific occupancy.
+/// This is the primary way to get family members in the occupancy-centric architecture.
+///
+/// Copied from [familyMembersForOccupancy].
+@ProviderFor(familyMembersForOccupancy)
+const familyMembersForOccupancyProvider = FamilyMembersForOccupancyFamily();
+
+/// Stream of family members for a specific occupancy.
+/// This is the primary way to get family members in the occupancy-centric architecture.
+///
+/// Copied from [familyMembersForOccupancy].
+class FamilyMembersForOccupancyFamily
+    extends Family<AsyncValue<List<FamilyMemberEntity>>> {
+  /// Stream of family members for a specific occupancy.
+  /// This is the primary way to get family members in the occupancy-centric architecture.
+  ///
+  /// Copied from [familyMembersForOccupancy].
+  const FamilyMembersForOccupancyFamily();
+
+  /// Stream of family members for a specific occupancy.
+  /// This is the primary way to get family members in the occupancy-centric architecture.
+  ///
+  /// Copied from [familyMembersForOccupancy].
+  FamilyMembersForOccupancyProvider call(int occupancyId) {
+    return FamilyMembersForOccupancyProvider(occupancyId);
+  }
+
+  @override
+  FamilyMembersForOccupancyProvider getProviderOverride(
+    covariant FamilyMembersForOccupancyProvider provider,
+  ) {
+    return call(provider.occupancyId);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'familyMembersForOccupancyProvider';
+}
+
+/// Stream of family members for a specific occupancy.
+/// This is the primary way to get family members in the occupancy-centric architecture.
+///
+/// Copied from [familyMembersForOccupancy].
+class FamilyMembersForOccupancyProvider
+    extends AutoDisposeStreamProvider<List<FamilyMemberEntity>> {
+  /// Stream of family members for a specific occupancy.
+  /// This is the primary way to get family members in the occupancy-centric architecture.
+  ///
+  /// Copied from [familyMembersForOccupancy].
+  FamilyMembersForOccupancyProvider(int occupancyId)
+    : this._internal(
+        (ref) => familyMembersForOccupancy(
+          ref as FamilyMembersForOccupancyRef,
+          occupancyId,
+        ),
+        from: familyMembersForOccupancyProvider,
+        name: r'familyMembersForOccupancyProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$familyMembersForOccupancyHash,
+        dependencies: FamilyMembersForOccupancyFamily._dependencies,
+        allTransitiveDependencies:
+            FamilyMembersForOccupancyFamily._allTransitiveDependencies,
+        occupancyId: occupancyId,
+      );
+
+  FamilyMembersForOccupancyProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.occupancyId,
+  }) : super.internal();
+
+  final int occupancyId;
+
+  @override
+  Override overrideWith(
+    Stream<List<FamilyMemberEntity>> Function(
+      FamilyMembersForOccupancyRef provider,
+    )
+    create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: FamilyMembersForOccupancyProvider._internal(
+        (ref) => create(ref as FamilyMembersForOccupancyRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        occupancyId: occupancyId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeStreamProviderElement<List<FamilyMemberEntity>> createElement() {
+    return _FamilyMembersForOccupancyProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is FamilyMembersForOccupancyProvider &&
+        other.occupancyId == occupancyId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, occupancyId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin FamilyMembersForOccupancyRef
+    on AutoDisposeStreamProviderRef<List<FamilyMemberEntity>> {
+  /// The parameter `occupancyId` of this provider.
+  int get occupancyId;
+}
+
+class _FamilyMembersForOccupancyProviderElement
+    extends AutoDisposeStreamProviderElement<List<FamilyMemberEntity>>
+    with FamilyMembersForOccupancyRef {
+  _FamilyMembersForOccupancyProviderElement(super.provider);
+
+  @override
+  int get occupancyId =>
+      (origin as FamilyMembersForOccupancyProvider).occupancyId;
 }
 
 String _$occupanciesForTenantHash() =>

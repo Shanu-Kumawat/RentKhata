@@ -19,6 +19,7 @@ import '../screens/tenants/tenant_detail_screen.dart';
 import '../screens/settings/settings_screen.dart';
 import '../screens/settings/backup_screen.dart';
 import '../screens/reports/reports_screen.dart';
+import '../screens/occupancies/occupancy_detail_screen.dart';
 import '../widgets/main_shell.dart';
 
 /// Route paths
@@ -39,6 +40,7 @@ class AppRoutes {
   static const String createBill = '/rooms/:roomId/bills/create';
   static const String billPreview = '/bills/:id';
   static const String reports = '/reports';
+  static const String occupancyDetail = '/occupancies/:id';
   static const String settings = '/settings';
   static const String backup = '/settings/backup';
 }
@@ -76,6 +78,15 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final id = int.parse(state.pathParameters['id']!);
           return RoomDetailScreen(roomId: id);
+        },
+      ),
+
+      // ========== Occupancy Detail (outside shell for full-screen) ==========
+      GoRoute(
+        path: AppRoutes.occupancyDetail,
+        builder: (context, state) {
+          final id = int.parse(state.pathParameters['id']!);
+          return OccupancyDetailScreen(occupancyId: id);
         },
       ),
 

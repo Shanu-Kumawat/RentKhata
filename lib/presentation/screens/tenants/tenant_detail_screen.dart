@@ -315,7 +315,24 @@ class _TenantDetailContent extends ConsumerWidget {
             const SizedBox(height: 16),
 
             // Family Members Section
-            _FamilyMembersSection(tenantId: tenant.id),
+            occupanciesAsync.when(
+              data: (occupancies) {
+                final activeOccupancy = occupancies
+                    .where((o) => o.isActive)
+                    .firstOrNull;
+                return _FamilyMembersSection(
+                  tenantId: tenant.id,
+                  currentOccupancyId: activeOccupancy?.id,
+                );
+              },
+              loading: () => const Card(
+                child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+              ),
+              error: (_, __) => _FamilyMembersSection(tenantId: tenant.id),
+            ),
             const SizedBox(height: 16),
 
             // Occupancy History Section
@@ -852,139 +869,215 @@ class _OccupancyHistorySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: ExpansionTile(
-        leading: const Icon(Icons.history_outlined, color: AppColors.primary),
-        title: const Text('Occupancy History'),
-        subtitle: occupanciesAsync.when(
-          data: (list) => Text('${list.length} stay(s)'),
-          loading: () => const Text('Loading...'),
-          error: (_, __) => const Text('Error'),
-        ),
-        children: [
-          occupanciesAsync.when(
-            data: (occupancies) {
-              if (occupancies.isEmpty) {
-                return Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.home_outlined,
-                        size: 48,
-                        color: AppColors.onSurfaceVariant.withValues(
-                          alpha: 0.5,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'No occupancy history',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: Row(
+            children: [
+              const Icon(
+                Icons.history_outlined,
+                size: 20,
+                color: AppColors.primary,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Occupancy History',
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              const Spacer(),
+              occupanciesAsync.when(
+                data: (list) => Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
                   ),
-                );
-              }
-              return Column(
-                children: occupancies
-                    .map((occ) => _OccupancyHistoryTile(occupancy: occ))
-                    .toList(),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceVariant,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '${list.length} stay${list.length != 1 ? 's' : ''}',
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: AppColors.onSurfaceVariant,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                loading: () => const SizedBox.shrink(),
+                error: (_, __) => const SizedBox.shrink(),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        occupanciesAsync.when(
+          data: (occupancies) {
+            if (occupancies.isEmpty) {
+              return Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Center(
+                    child: Column(
+                      children: [
+                        Icon(
+                          Icons.home_outlined,
+                          size: 48,
+                          color: AppColors.onSurfaceVariant.withValues(
+                            alpha: 0.5,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'No occupancy history yet',
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(color: AppColors.onSurfaceVariant),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               );
-            },
-            loading: () => const Padding(
-              padding: EdgeInsets.all(24),
+            }
+            return Column(
+              children: occupancies
+                  .map((occ) => _OccupancyHistoryCard(occupancy: occ))
+                  .toList(),
+            );
+          },
+          loading: () => const Card(
+            child: Padding(
+              padding: EdgeInsets.all(32),
               child: Center(child: CircularProgressIndicator()),
             ),
-            error: (e, _) => Padding(
+          ),
+          error: (e, _) => Card(
+            child: Padding(
               padding: const EdgeInsets.all(24),
-              child: Text('Error: $e'),
+              child: Center(child: Text('Error: $e')),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
 
-class _OccupancyHistoryTile extends StatelessWidget {
+class _OccupancyHistoryCard extends StatelessWidget {
   final Occupancy occupancy;
 
-  const _OccupancyHistoryTile({required this.occupancy});
+  const _OccupancyHistoryCard({required this.occupancy});
 
   @override
   Widget build(BuildContext context) {
-    final dateFormat = DateFormat('dd MMM yyyy');
-    final duration = occupancy.moveOutDate != null
-        ? occupancy.moveOutDate!.difference(occupancy.moveInDate).inDays
-        : DateTime.now().difference(occupancy.moveInDate).inDays;
+    final dateFormat = DateFormat('MMM yyyy');
+    final start = dateFormat.format(occupancy.moveInDate);
+    final end = occupancy.moveOutDate != null
+        ? dateFormat.format(occupancy.moveOutDate!)
+        : 'Present';
 
-    return ListTile(
-      leading: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: occupancy.isActive
-              ? AppColors.success.withValues(alpha: 0.1)
-              : AppColors.surfaceVariant,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Icon(
-          Icons.home_outlined,
-          color: occupancy.isActive
-              ? AppColors.success
-              : AppColors.onSurfaceVariant,
-        ),
-      ),
-      title: Text(
-        '${occupancy.propertyName ?? 'Property'} - Room ${occupancy.roomNumber ?? 'N/A'}',
-        style: const TextStyle(fontWeight: FontWeight.w600),
-      ),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '${dateFormat.format(occupancy.moveInDate)} - ${occupancy.moveOutDate != null ? dateFormat.format(occupancy.moveOutDate!) : 'Present'}',
-          ),
-          Row(
+    final isActive = occupancy.isActive;
+    final color = isActive ? AppColors.success : AppColors.onSurfaceVariant;
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () {
+          HapticFeedback.lightImpact();
+          context.push('/occupancies/${occupancy.id}');
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
             children: [
-              Text(
-                '$duration days',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.onSurfaceVariant,
+              // Icon Container
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  isActive ? Icons.home_filled : Icons.history,
+                  color: color,
+                  size: 24,
                 ),
               ),
-              const SizedBox(width: 8),
-              Text(
-                '• Rent: ${formatCurrency(occupancy.agreedRent)}/mo',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.onSurfaceVariant,
+              const SizedBox(width: 16),
+
+              // Details
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      occupancy.propertyName ?? 'Property',
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Room ${occupancy.roomNumber ?? 'N/A'}',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColors.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceVariant,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        '$start - $end',
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: AppColors.onSurfaceVariant,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
+              ),
+
+              // Rent & Chevron
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    formatCurrency(occupancy.agreedRent),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  Text(
+                    '/month',
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: AppColors.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 8),
+              Icon(
+                Icons.chevron_right,
+                size: 20,
+                color: AppColors.onSurfaceVariant.withValues(alpha: 0.5),
               ),
             ],
           ),
-        ],
+        ),
       ),
-      trailing: occupancy.isActive
-          ? Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: AppColors.success.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                'Active',
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: AppColors.success,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            )
-          : null,
-      onTap: () {
-        HapticFeedback.lightImpact();
-        context.push('/rooms/${occupancy.roomId}');
-      },
     );
   }
 }
@@ -993,8 +1086,12 @@ class _OccupancyHistoryTile extends StatelessWidget {
 
 class _FamilyMembersSection extends ConsumerWidget {
   final int tenantId;
+  final int? currentOccupancyId;
 
-  const _FamilyMembersSection({required this.tenantId});
+  const _FamilyMembersSection({
+    required this.tenantId,
+    this.currentOccupancyId,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -1010,7 +1107,11 @@ class _FamilyMembersSection extends ConsumerWidget {
         ),
         title: const Text('Family Members'),
         subtitle: familyMembersAsync.when(
-          data: (members) => Text('${members.length} member(s)'),
+          data: (members) => Text(
+            currentOccupancyId != null
+                ? '${members.length} current member(s)'
+                : 'View occupancy history for past members',
+          ),
           loading: () => const Text('Loading...'),
           error: (_, __) => const Text('Error'),
         ),
@@ -1034,7 +1135,10 @@ class _FamilyMembersSection extends ConsumerWidget {
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            'No family members added',
+                            currentOccupancyId != null
+                                ? 'No family members added'
+                                : 'No active occupancy - view past occupancies for family history',
+                            textAlign: TextAlign.center,
                             style: Theme.of(context).textTheme.bodyMedium
                                 ?.copyWith(color: AppColors.onSurfaceVariant),
                           ),
@@ -1061,22 +1165,36 @@ class _FamilyMembersSection extends ConsumerWidget {
                             if (member.gender != null) member.gender,
                           ].join(' • '),
                         ),
-                        trailing: IconButton(
-                          icon: const Icon(
-                            Icons.delete_outline,
-                            color: AppColors.error,
-                          ),
-                          onPressed: () =>
-                              _deleteFamilyMember(context, ref, member.id),
-                        ),
+                        trailing: currentOccupancyId != null
+                            ? IconButton(
+                                icon: const Icon(
+                                  Icons.delete_outline,
+                                  color: AppColors.error,
+                                ),
+                                onPressed: () => _deleteFamilyMember(
+                                  context,
+                                  ref,
+                                  member.id,
+                                ),
+                              )
+                            : null,
                       ),
                     ),
                   const SizedBox(height: 16),
-                  OutlinedButton.icon(
-                    onPressed: () => _showAddFamilyMember(context, ref),
-                    icon: const Icon(Icons.add),
-                    label: const Text('Add Family Member'),
-                  ),
+                  if (currentOccupancyId != null)
+                    OutlinedButton.icon(
+                      onPressed: () => _showAddFamilyMember(context, ref),
+                      icon: const Icon(Icons.add),
+                      label: const Text('Add Family Member'),
+                    )
+                  else
+                    Text(
+                      'Family members can only be added to active occupancies',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColors.onSurfaceVariant,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
                 ],
               ),
               loading: () => const Center(child: CircularProgressIndicator()),
@@ -1123,6 +1241,9 @@ class _FamilyMembersSection extends ConsumerWidget {
   }
 
   void _showAddFamilyMember(BuildContext context, WidgetRef ref) {
+    // Only allow adding if we have a current occupancy
+    if (currentOccupancyId == null) return;
+
     final nameController = TextEditingController();
     final phoneController = TextEditingController();
     final ageController = TextEditingController();
@@ -1256,7 +1377,7 @@ class _FamilyMembersSection extends ConsumerWidget {
                         final db = ref.read(appDatabaseProvider);
                         await db.tenantDao.insertFamilyMember(
                           FamilyMembersCompanion.insert(
-                            tenantId: tenantId,
+                            occupancyId: currentOccupancyId!,
                             name: nameController.text,
                             relationship: _stringToRelationship(
                               selectedRelationship!,

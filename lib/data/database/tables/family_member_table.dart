@@ -2,19 +2,20 @@
 library;
 
 import 'package:drift/drift.dart';
-import 'tenant_table.dart';
+import 'occupancy_table.dart';
 
 /// Relationship types for family members
 enum FamilyRelationship { spouse, child, parent, sibling, other }
 
-/// Table for storing tenant family members.
+/// Table for storing family members during a specific occupancy period.
+/// This allows historical tracking of who lived in a room during each stay.
 @DataClassName('FamilyMemberEntity')
 class FamilyMembers extends Table {
   /// Primary key
   IntColumn get id => integer().autoIncrement()();
 
-  /// Foreign key to tenant
-  IntColumn get tenantId => integer().references(Tenants, #id)();
+  /// Foreign key to occupancy (links family to a specific stay period)
+  IntColumn get occupancyId => integer().references(Occupancies, #id)();
 
   /// Family member's name
   TextColumn get name => text().withLength(min: 1, max: 100)();
