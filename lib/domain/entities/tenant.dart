@@ -18,6 +18,27 @@ class Tenant with _$Tenant {
     @Default(false) bool isPoliceVerified,
     String? policeVerificationDocPath,
     required DateTime createdAt,
+    // Identity fields
+    String? fatherName,
+    int? age,
+    String? gender,
+    // Additional contact
+    String? secondaryPhone,
+    // Permanent address
+    String? permanentAddressLine,
+    String? permanentCity,
+    String? permanentState,
+    String? permanentPincode,
+    // Work details
+    String? companyName,
+    String? officeAddress,
+    // ID document photos
+    String? aadhaarFrontPhotoPath,
+    String? aadhaarBackPhotoPath,
+    // Introducer/Reference
+    String? introducerName,
+    String? introducerAddress,
+    String? introducerPhone,
     // Denormalized fields
     int? currentRoomId,
     String? currentRoomNumber,

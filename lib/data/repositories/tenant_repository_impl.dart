@@ -20,10 +20,10 @@ class TenantRepositoryImpl implements TenantRepository {
   Future<Tenant> _tenantToDomain(TenantEntity entity) async {
     final occupancies = await _tenantDao.getOccupanciesForTenant(entity.id);
     final activeOccupancy = occupancies.where((o) => o.isActive).firstOrNull;
-    
+
     String? roomNumber;
     String? propertyName;
-    
+
     if (activeOccupancy != null) {
       final room = await _propertyDao.getRoomById(activeOccupancy.roomId);
       roomNumber = room?.roomNumber;
@@ -32,7 +32,7 @@ class TenantRepositoryImpl implements TenantRepository {
         propertyName = property?.name;
       }
     }
-    
+
     return Tenant(
       id: entity.id,
       name: entity.name,
@@ -42,6 +42,23 @@ class TenantRepositoryImpl implements TenantRepository {
       isPoliceVerified: entity.isPoliceVerified,
       policeVerificationDocPath: entity.policeVerificationDocPath,
       createdAt: entity.createdAt,
+      // New profile fields
+      fatherName: entity.fatherName,
+      age: entity.age,
+      gender: entity.gender,
+      secondaryPhone: entity.secondaryPhone,
+      permanentAddressLine: entity.permanentAddressLine,
+      permanentCity: entity.permanentCity,
+      permanentState: entity.permanentState,
+      permanentPincode: entity.permanentPincode,
+      companyName: entity.companyName,
+      officeAddress: entity.officeAddress,
+      aadhaarFrontPhotoPath: entity.aadhaarFrontPhotoPath,
+      aadhaarBackPhotoPath: entity.aadhaarBackPhotoPath,
+      introducerName: entity.introducerName,
+      introducerAddress: entity.introducerAddress,
+      introducerPhone: entity.introducerPhone,
+      // Denormalized fields
       currentRoomId: activeOccupancy?.roomId,
       currentRoomNumber: roomNumber,
       currentPropertyName: propertyName,
@@ -54,12 +71,12 @@ class TenantRepositoryImpl implements TenantRepository {
     final room = await _propertyDao.getRoomById(entity.roomId);
     final tenant = await _tenantDao.getTenantById(entity.tenantId);
     String? propertyName;
-    
+
     if (room != null) {
       final property = await _propertyDao.getPropertyById(room.propertyId);
       propertyName = property?.name;
     }
-    
+
     return Occupancy(
       id: entity.id,
       roomId: entity.roomId,
@@ -86,8 +103,8 @@ class TenantRepositoryImpl implements TenantRepository {
   @override
   Stream<List<Tenant>> watchAllTenants() {
     return _tenantDao.watchAllTenants().asyncMap(
-          (entities) => Future.wait(entities.map(_tenantToDomain)),
-        );
+      (entities) => Future.wait(entities.map(_tenantToDomain)),
+    );
   }
 
   @override
@@ -110,6 +127,27 @@ class TenantRepositoryImpl implements TenantRepository {
     String? photoPath,
     bool isPoliceVerified = false,
     String? policeVerificationDocPath,
+    // Identity fields
+    String? fatherName,
+    int? age,
+    String? gender,
+    // Additional contact
+    String? secondaryPhone,
+    // Permanent address
+    String? permanentAddressLine,
+    String? permanentCity,
+    String? permanentState,
+    String? permanentPincode,
+    // Work details
+    String? companyName,
+    String? officeAddress,
+    // ID document photos
+    String? aadhaarFrontPhotoPath,
+    String? aadhaarBackPhotoPath,
+    // Introducer/Reference
+    String? introducerName,
+    String? introducerAddress,
+    String? introducerPhone,
   }) async {
     final tenant = TenantsCompanion(
       name: Value(name),
@@ -118,6 +156,21 @@ class TenantRepositoryImpl implements TenantRepository {
       photoPath: Value(photoPath),
       isPoliceVerified: Value(isPoliceVerified),
       policeVerificationDocPath: Value(policeVerificationDocPath),
+      fatherName: Value(fatherName),
+      age: Value(age),
+      gender: Value(gender),
+      secondaryPhone: Value(secondaryPhone),
+      permanentAddressLine: Value(permanentAddressLine),
+      permanentCity: Value(permanentCity),
+      permanentState: Value(permanentState),
+      permanentPincode: Value(permanentPincode),
+      companyName: Value(companyName),
+      officeAddress: Value(officeAddress),
+      aadhaarFrontPhotoPath: Value(aadhaarFrontPhotoPath),
+      aadhaarBackPhotoPath: Value(aadhaarBackPhotoPath),
+      introducerName: Value(introducerName),
+      introducerAddress: Value(introducerAddress),
+      introducerPhone: Value(introducerPhone),
     );
     return _tenantDao.insertTenant(tenant);
   }
@@ -133,6 +186,21 @@ class TenantRepositoryImpl implements TenantRepository {
       isPoliceVerified: tenant.isPoliceVerified,
       policeVerificationDocPath: tenant.policeVerificationDocPath,
       createdAt: tenant.createdAt,
+      fatherName: tenant.fatherName,
+      age: tenant.age,
+      gender: tenant.gender,
+      secondaryPhone: tenant.secondaryPhone,
+      permanentAddressLine: tenant.permanentAddressLine,
+      permanentCity: tenant.permanentCity,
+      permanentState: tenant.permanentState,
+      permanentPincode: tenant.permanentPincode,
+      companyName: tenant.companyName,
+      officeAddress: tenant.officeAddress,
+      aadhaarFrontPhotoPath: tenant.aadhaarFrontPhotoPath,
+      aadhaarBackPhotoPath: tenant.aadhaarBackPhotoPath,
+      introducerName: tenant.introducerName,
+      introducerAddress: tenant.introducerAddress,
+      introducerPhone: tenant.introducerPhone,
     );
     return _tenantDao.updateTenant(entity);
   }
@@ -149,12 +217,14 @@ class TenantRepositoryImpl implements TenantRepository {
   Future<List<CustomField>> getCustomFieldsForTenant(int tenantId) async {
     final entities = await _tenantDao.getCustomFieldsForTenant(tenantId);
     return entities
-        .map((e) => CustomField(
-              id: e.id,
-              tenantId: e.tenantId,
-              fieldName: e.fieldName,
-              fieldValue: e.fieldValue,
-            ))
+        .map(
+          (e) => CustomField(
+            id: e.id,
+            tenantId: e.tenantId,
+            fieldName: e.fieldName,
+            fieldValue: e.fieldValue,
+          ),
+        )
         .toList();
   }
 
@@ -200,8 +270,8 @@ class TenantRepositoryImpl implements TenantRepository {
   @override
   Stream<List<Occupancy>> watchActiveOccupancies() {
     return _tenantDao.watchActiveOccupancies().asyncMap(
-          (entities) => Future.wait(entities.map(_occupancyToDomain)),
-        );
+      (entities) => Future.wait(entities.map(_occupancyToDomain)),
+    );
   }
 
   @override

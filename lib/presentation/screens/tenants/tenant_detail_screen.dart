@@ -1,15 +1,19 @@
-/// Tenant detail screen with custom fields and occupancy history.
+/// Tenant detail screen with comprehensive profile, occupancy history.
 library;
 
 import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import '../../../application/providers/tenant_providers.dart';
 import '../../../application/providers/repository_providers.dart';
 import '../../../application/providers/database_provider.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/currency_formatter.dart';
 import '../../../domain/entities/tenant.dart';
+import '../../../domain/entities/occupancy.dart';
 import '../../../data/database/app_database.dart';
 import '../../../data/database/tables/family_member_table.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -57,6 +61,7 @@ class _TenantDetailContent extends ConsumerWidget {
     final customFieldsAsync = ref.watch(
       customFieldsForTenantProvider(tenant.id),
     );
+    final occupanciesAsync = ref.watch(occupanciesForTenantProvider(tenant.id));
 
     return Scaffold(
       appBar: AppBar(
@@ -92,19 +97,51 @@ class _TenantDetailContent extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Profile card
+            // Profile card with status badge
             _ProfileCard(tenant: tenant),
             const SizedBox(height: 16),
 
-            // Current occupancy
+            // Current occupancy (if active)
             if (tenant.isCurrentlyOccupying) ...[
               _CurrentOccupancyCard(tenant: tenant),
               const SizedBox(height: 16),
             ],
 
-            // Contact info
-            _InfoSection(
+            // Personal Details Section
+            if (_hasPersonalDetails()) ...[
+              _buildInfoSection(
+                context,
+                title: 'Personal Details',
+                icon: Icons.person_outline,
+                children: [
+                  if (tenant.fatherName != null)
+                    _InfoRow(
+                      icon: Icons.person_outline,
+                      label: 'Father\'s Name',
+                      value: tenant.fatherName!,
+                    ),
+                  if (tenant.age != null)
+                    _InfoRow(
+                      icon: Icons.cake_outlined,
+                      label: 'Age',
+                      value: '${tenant.age} years',
+                    ),
+                  if (tenant.gender != null)
+                    _InfoRow(
+                      icon: Icons.wc_outlined,
+                      label: 'Gender',
+                      value: _formatGender(tenant.gender!),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 16),
+            ],
+
+            // Contact Information
+            _buildInfoSection(
+              context,
               title: 'Contact Information',
+              icon: Icons.phone_outlined,
               children: [
                 if (tenant.phone != null)
                   _InfoRow(
@@ -113,22 +150,125 @@ class _TenantDetailContent extends ConsumerWidget {
                     value: tenant.phone!,
                     onTap: () => _launchPhone(tenant.phone!),
                   ),
+                if (tenant.secondaryPhone != null)
+                  _InfoRow(
+                    icon: Icons.phone_outlined,
+                    label: 'Secondary Phone',
+                    value: tenant.secondaryPhone!,
+                    onTap: () => _launchPhone(tenant.secondaryPhone!),
+                  ),
                 if (tenant.aadharNumber != null)
                   _InfoRow(
                     icon: Icons.credit_card_outlined,
-                    label: 'Aadhar',
+                    label: 'Aadhaar',
                     value: tenant.aadharNumber!,
                   ),
               ],
             ),
             const SizedBox(height: 16),
 
+            // Permanent Address Section
+            if (_hasAddressDetails()) ...[
+              _buildInfoSection(
+                context,
+                title: 'Permanent Address',
+                icon: Icons.home_outlined,
+                children: [
+                  if (tenant.permanentAddressLine != null)
+                    _InfoRow(
+                      icon: Icons.location_on_outlined,
+                      label: 'Address',
+                      value: tenant.permanentAddressLine!,
+                    ),
+                  if (tenant.permanentCity != null ||
+                      tenant.permanentState != null)
+                    _InfoRow(
+                      icon: Icons.location_city_outlined,
+                      label: 'City, State',
+                      value: [
+                        tenant.permanentCity,
+                        tenant.permanentState,
+                      ].whereType<String>().join(', '),
+                    ),
+                  if (tenant.permanentPincode != null)
+                    _InfoRow(
+                      icon: Icons.pin_drop_outlined,
+                      label: 'Pincode',
+                      value: tenant.permanentPincode!,
+                    ),
+                ],
+              ),
+              const SizedBox(height: 16),
+            ],
+
+            // Work Details Section
+            if (_hasWorkDetails()) ...[
+              _buildInfoSection(
+                context,
+                title: 'Work Details',
+                icon: Icons.work_outline,
+                children: [
+                  if (tenant.companyName != null)
+                    _InfoRow(
+                      icon: Icons.business_outlined,
+                      label: 'Company',
+                      value: tenant.companyName!,
+                    ),
+                  if (tenant.officeAddress != null)
+                    _InfoRow(
+                      icon: Icons.location_city_outlined,
+                      label: 'Office Address',
+                      value: tenant.officeAddress!,
+                    ),
+                ],
+              ),
+              const SizedBox(height: 16),
+            ],
+
+            // Introducer Section
+            if (_hasIntroducerDetails()) ...[
+              _buildInfoSection(
+                context,
+                title: 'Introducer / Reference',
+                icon: Icons.handshake_outlined,
+                children: [
+                  if (tenant.introducerName != null)
+                    _InfoRow(
+                      icon: Icons.person_outline,
+                      label: 'Name',
+                      value: tenant.introducerName!,
+                    ),
+                  if (tenant.introducerAddress != null)
+                    _InfoRow(
+                      icon: Icons.location_on_outlined,
+                      label: 'Address',
+                      value: tenant.introducerAddress!,
+                    ),
+                  if (tenant.introducerPhone != null)
+                    _InfoRow(
+                      icon: Icons.phone_outlined,
+                      label: 'Phone',
+                      value: tenant.introducerPhone!,
+                      onTap: () => _launchPhone(tenant.introducerPhone!),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 16),
+            ],
+
             // Police verification
             _VerificationCard(tenant: tenant),
             const SizedBox(height: 16),
 
-            // Family Members placeholder section
+            // Family Members Section
             _FamilyMembersSection(tenantId: tenant.id),
+            const SizedBox(height: 16),
+
+            // Occupancy History Section
+            _OccupancyHistorySection(
+              occupanciesAsync: occupanciesAsync,
+              tenant: tenant,
+            ),
             const SizedBox(height: 16),
 
             // Custom fields
@@ -136,6 +276,70 @@ class _TenantDetailContent extends ConsumerWidget {
               customFieldsAsync: customFieldsAsync,
               tenantId: tenant.id,
             ),
+          ],
+        ),
+      ),
+      // Move In Again FAB for past tenants
+      floatingActionButton: !tenant.isCurrentlyOccupying
+          ? FloatingActionButton.extended(
+              onPressed: () => _showMoveInAgainSheet(context),
+              icon: const Icon(Icons.home_outlined),
+              label: const Text('Move In Again'),
+            )
+          : null,
+    );
+  }
+
+  bool _hasPersonalDetails() =>
+      tenant.fatherName != null || tenant.age != null || tenant.gender != null;
+
+  bool _hasAddressDetails() =>
+      tenant.permanentAddressLine != null ||
+      tenant.permanentCity != null ||
+      tenant.permanentState != null ||
+      tenant.permanentPincode != null;
+
+  bool _hasWorkDetails() =>
+      tenant.companyName != null || tenant.officeAddress != null;
+
+  bool _hasIntroducerDetails() =>
+      tenant.introducerName != null ||
+      tenant.introducerAddress != null ||
+      tenant.introducerPhone != null;
+
+  String _formatGender(String gender) {
+    return gender[0].toUpperCase() + gender.substring(1);
+  }
+
+  Widget _buildInfoSection(
+    BuildContext context, {
+    required String title,
+    required IconData icon,
+    required List<Widget> children,
+  }) {
+    final nonNullChildren = children.where((c) => c is _InfoRow).toList();
+    if (nonNullChildren.isEmpty) return const SizedBox.shrink();
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, color: AppColors.primary, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  title,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            ...nonNullChildren,
           ],
         ),
       ),
@@ -156,6 +360,14 @@ class _TenantDetailContent extends ConsumerWidget {
     }
   }
 
+  void _showMoveInAgainSheet(BuildContext context) {
+    // Navigate to room selection for move-in
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Select a room to move this tenant in')),
+    );
+    context.push('/rooms');
+  }
+
   void _confirmDelete(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
@@ -171,10 +383,10 @@ class _TenantDetailContent extends ConsumerWidget {
           ),
           FilledButton(
             onPressed: () async {
-              Navigator.pop(ctx); // Close dialog
+              Navigator.pop(ctx);
               await ref.read(tenantRepositoryProvider).deleteTenant(tenant.id);
               if (context.mounted) {
-                context.pop(); // Go back using GoRouter
+                context.pop();
                 ScaffoldMessenger.of(
                   context,
                 ).showSnackBar(const SnackBar(content: Text('Tenant deleted')));
@@ -188,6 +400,8 @@ class _TenantDetailContent extends ConsumerWidget {
     );
   }
 }
+
+// ============ Profile Card ============
 
 class _ProfileCard extends StatelessWidget {
   final Tenant tenant;
@@ -224,31 +438,47 @@ class _ProfileCard extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Container(
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: tenant.isCurrentlyOccupying
-                              ? AppColors.success
-                              : AppColors.onSurfaceVariant,
+                  const SizedBox(height: 8),
+                  // Status Badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: tenant.isCurrentlyOccupying
+                          ? AppColors.success.withValues(alpha: 0.1)
+                          : AppColors.onSurfaceVariant.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: tenant.isCurrentlyOccupying
+                                ? AppColors.success
+                                : AppColors.onSurfaceVariant,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        tenant.isCurrentlyOccupying
-                            ? 'Currently Occupying'
-                            : 'Not Assigned',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: tenant.isCurrentlyOccupying
-                              ? AppColors.success
-                              : AppColors.onSurfaceVariant,
+                        const SizedBox(width: 6),
+                        Text(
+                          tenant.isCurrentlyOccupying
+                              ? 'Current Tenant'
+                              : 'Past Tenant',
+                          style: Theme.of(context).textTheme.labelMedium
+                              ?.copyWith(
+                                color: tenant.isCurrentlyOccupying
+                                    ? AppColors.success
+                                    : AppColors.onSurfaceVariant,
+                                fontWeight: FontWeight.w600,
+                              ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -259,6 +489,8 @@ class _ProfileCard extends StatelessWidget {
     );
   }
 }
+
+// ============ Current Occupancy Card ============
 
 class _CurrentOccupancyCard extends StatelessWidget {
   final Tenant tenant;
@@ -294,36 +526,7 @@ class _CurrentOccupancyCard extends StatelessWidget {
   }
 }
 
-class _InfoSection extends StatelessWidget {
-  final String title;
-  final List<Widget> children;
-
-  const _InfoSection({required this.title, required this.children});
-
-  @override
-  Widget build(BuildContext context) {
-    if (children.isEmpty) return const SizedBox();
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: Theme.of(
-                context,
-              ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
-            ...children,
-          ],
-        ),
-      ),
-    );
-  }
-}
+// ============ Info Row ============
 
 class _InfoRow extends StatelessWidget {
   final IconData icon;
@@ -348,24 +551,34 @@ class _InfoRow extends StatelessWidget {
           children: [
             Icon(icon, size: 20, color: AppColors.onSurfaceVariant),
             const SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.onSurfaceVariant,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: AppColors.onSurfaceVariant,
+                    ),
                   ),
-                ),
-                Text(value, style: Theme.of(context).textTheme.bodyMedium),
-              ],
+                  Text(value, style: Theme.of(context).textTheme.bodyMedium),
+                ],
+              ),
             ),
+            if (onTap != null)
+              const Icon(
+                Icons.chevron_right,
+                size: 20,
+                color: AppColors.onSurfaceVariant,
+              ),
           ],
         ),
       ),
     );
   }
 }
+
+// ============ Verification Card ============
 
 class _VerificationCard extends StatelessWidget {
   final Tenant tenant;
@@ -406,6 +619,158 @@ class _VerificationCard extends StatelessWidget {
     );
   }
 }
+
+// ============ Occupancy History Section ============
+
+class _OccupancyHistorySection extends StatelessWidget {
+  final AsyncValue<List<Occupancy>> occupanciesAsync;
+  final Tenant tenant;
+
+  const _OccupancyHistorySection({
+    required this.occupanciesAsync,
+    required this.tenant,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: ExpansionTile(
+        leading: const Icon(Icons.history_outlined, color: AppColors.primary),
+        title: const Text('Occupancy History'),
+        subtitle: occupanciesAsync.when(
+          data: (list) => Text('${list.length} stay(s)'),
+          loading: () => const Text('Loading...'),
+          error: (_, __) => const Text('Error'),
+        ),
+        children: [
+          occupanciesAsync.when(
+            data: (occupancies) {
+              if (occupancies.isEmpty) {
+                return Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.home_outlined,
+                        size: 48,
+                        color: AppColors.onSurfaceVariant.withValues(
+                          alpha: 0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'No occupancy history',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppColors.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
+              return Column(
+                children: occupancies
+                    .map((occ) => _OccupancyHistoryTile(occupancy: occ))
+                    .toList(),
+              );
+            },
+            loading: () => const Padding(
+              padding: EdgeInsets.all(24),
+              child: Center(child: CircularProgressIndicator()),
+            ),
+            error: (e, _) => Padding(
+              padding: const EdgeInsets.all(24),
+              child: Text('Error: $e'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _OccupancyHistoryTile extends StatelessWidget {
+  final Occupancy occupancy;
+
+  const _OccupancyHistoryTile({required this.occupancy});
+
+  @override
+  Widget build(BuildContext context) {
+    final dateFormat = DateFormat('dd MMM yyyy');
+    final duration = occupancy.moveOutDate != null
+        ? occupancy.moveOutDate!.difference(occupancy.moveInDate).inDays
+        : DateTime.now().difference(occupancy.moveInDate).inDays;
+
+    return ListTile(
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: occupancy.isActive
+              ? AppColors.success.withValues(alpha: 0.1)
+              : AppColors.surfaceVariant,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(
+          Icons.home_outlined,
+          color: occupancy.isActive
+              ? AppColors.success
+              : AppColors.onSurfaceVariant,
+        ),
+      ),
+      title: Text(
+        '${occupancy.propertyName ?? 'Property'} - Room ${occupancy.roomNumber ?? 'N/A'}',
+        style: const TextStyle(fontWeight: FontWeight.w600),
+      ),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '${dateFormat.format(occupancy.moveInDate)} - ${occupancy.moveOutDate != null ? dateFormat.format(occupancy.moveOutDate!) : 'Present'}',
+          ),
+          Row(
+            children: [
+              Text(
+                '$duration days',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: AppColors.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '• Rent: ${formatCurrency(occupancy.agreedRent)}/mo',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: AppColors.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+      trailing: occupancy.isActive
+          ? Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: AppColors.success.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                'Active',
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: AppColors.success,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            )
+          : null,
+      onTap: () {
+        HapticFeedback.lightImpact();
+        context.push('/rooms/${occupancy.roomId}');
+      },
+    );
+  }
+}
+
+// ============ Family Members Section ============
 
 class _FamilyMembersSection extends ConsumerWidget {
   final int tenantId;
@@ -470,7 +835,13 @@ class _FamilyMembersSection extends ConsumerWidget {
                           ),
                         ),
                         title: Text(member.name),
-                        subtitle: Text(member.relationship.name),
+                        subtitle: Text(
+                          [
+                            member.relationship.name,
+                            if (member.age != null) '${member.age} yrs',
+                            if (member.gender != null) member.gender,
+                          ].join(' • '),
+                        ),
                         trailing: IconButton(
                           icon: const Icon(
                             Icons.delete_outline,
@@ -535,7 +906,9 @@ class _FamilyMembersSection extends ConsumerWidget {
   void _showAddFamilyMember(BuildContext context, WidgetRef ref) {
     final nameController = TextEditingController();
     final phoneController = TextEditingController();
+    final ageController = TextEditingController();
     String? selectedRelationship;
+    String? selectedGender;
 
     showModalBottomSheet(
       context: context,
@@ -568,21 +941,64 @@ class _FamilyMembersSection extends ConsumerWidget {
                 autofocus: true,
               ),
               const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                decoration: const InputDecoration(
-                  labelText: 'Relationship *',
-                  prefixIcon: Icon(Icons.family_restroom_outlined),
-                ),
-                value: selectedRelationship,
-                items: const [
-                  DropdownMenuItem(value: 'spouse', child: Text('Spouse')),
-                  DropdownMenuItem(value: 'child', child: Text('Child')),
-                  DropdownMenuItem(value: 'parent', child: Text('Parent')),
-                  DropdownMenuItem(value: 'sibling', child: Text('Sibling')),
-                  DropdownMenuItem(value: 'other', child: Text('Other')),
+              Row(
+                children: [
+                  Expanded(
+                    child: DropdownButtonFormField<String>(
+                      decoration: const InputDecoration(
+                        labelText: 'Relationship *',
+                      ),
+                      value: selectedRelationship,
+                      items: const [
+                        DropdownMenuItem(
+                          value: 'spouse',
+                          child: Text('Spouse'),
+                        ),
+                        DropdownMenuItem(value: 'child', child: Text('Child')),
+                        DropdownMenuItem(
+                          value: 'parent',
+                          child: Text('Parent'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'sibling',
+                          child: Text('Sibling'),
+                        ),
+                        DropdownMenuItem(value: 'other', child: Text('Other')),
+                      ],
+                      onChanged: (value) =>
+                          setState(() => selectedRelationship = value),
+                    ),
+                  ),
                 ],
-                onChanged: (value) =>
-                    setState(() => selectedRelationship = value),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      controller: ageController,
+                      decoration: const InputDecoration(labelText: 'Age'),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: DropdownButtonFormField<String>(
+                      decoration: const InputDecoration(labelText: 'Gender'),
+                      value: selectedGender,
+                      items: const [
+                        DropdownMenuItem(value: 'male', child: Text('Male')),
+                        DropdownMenuItem(
+                          value: 'female',
+                          child: Text('Female'),
+                        ),
+                        DropdownMenuItem(value: 'other', child: Text('Other')),
+                      ],
+                      onChanged: (value) =>
+                          setState(() => selectedGender = value),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -631,6 +1047,8 @@ class _FamilyMembersSection extends ConsumerWidget {
                                   ? null
                                   : phoneController.text,
                             ),
+                            age: Value(int.tryParse(ageController.text)),
+                            gender: Value(selectedGender),
                           ),
                         );
 
@@ -671,6 +1089,8 @@ class _FamilyMembersSection extends ConsumerWidget {
     }
   }
 }
+
+// ============ Custom Fields Section ============
 
 class _CustomFieldsSection extends ConsumerStatefulWidget {
   final AsyncValue<List<CustomField>> customFieldsAsync;
@@ -819,33 +1239,13 @@ class _CustomFieldTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  field.fieldName,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.onSurfaceVariant,
-                  ),
-                ),
-                Text(
-                  field.fieldValue,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-              ],
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.delete_outline, size: 18),
-            onPressed: onDelete,
-            color: AppColors.error,
-          ),
-        ],
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      title: Text(field.fieldName),
+      subtitle: Text(field.fieldValue),
+      trailing: IconButton(
+        icon: const Icon(Icons.delete_outline, size: 20),
+        onPressed: onDelete,
       ),
     );
   }

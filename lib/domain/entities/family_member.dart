@@ -19,6 +19,8 @@ class FamilyMember with _$FamilyMember {
     required FamilyRelationship relationship,
     String? phone,
     String? aadharNumber,
+    int? age,
+    String? gender,
     required DateTime createdAt,
   }) = _FamilyMember;
 

@@ -94,3 +94,12 @@ Stream<List<FamilyMemberEntity>> familyMembersForTenant(Ref ref, int tenantId) {
   final db = ref.watch(appDatabaseProvider);
   return db.tenantDao.watchFamilyMembersForTenant(tenantId);
 }
+
+/// Get all occupancies (history) for a tenant.
+@riverpod
+Future<List<Occupancy>> occupanciesForTenant(Ref ref, int tenantId) {
+  // Watch active occupancies stream to trigger refresh on changes
+  ref.watch(activeOccupanciesStreamProvider);
+  final repo = ref.watch(tenantRepositoryProvider);
+  return repo.getOccupanciesForTenant(tenantId);
+}

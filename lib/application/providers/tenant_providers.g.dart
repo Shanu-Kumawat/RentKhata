@@ -932,5 +932,139 @@ class _FamilyMembersForTenantProviderElement
   int get tenantId => (origin as FamilyMembersForTenantProvider).tenantId;
 }
 
+String _$occupanciesForTenantHash() =>
+    r'459231a24cc3b246ad862bb413a01988cae48cbf';
+
+/// Get all occupancies (history) for a tenant.
+///
+/// Copied from [occupanciesForTenant].
+@ProviderFor(occupanciesForTenant)
+const occupanciesForTenantProvider = OccupanciesForTenantFamily();
+
+/// Get all occupancies (history) for a tenant.
+///
+/// Copied from [occupanciesForTenant].
+class OccupanciesForTenantFamily extends Family<AsyncValue<List<Occupancy>>> {
+  /// Get all occupancies (history) for a tenant.
+  ///
+  /// Copied from [occupanciesForTenant].
+  const OccupanciesForTenantFamily();
+
+  /// Get all occupancies (history) for a tenant.
+  ///
+  /// Copied from [occupanciesForTenant].
+  OccupanciesForTenantProvider call(int tenantId) {
+    return OccupanciesForTenantProvider(tenantId);
+  }
+
+  @override
+  OccupanciesForTenantProvider getProviderOverride(
+    covariant OccupanciesForTenantProvider provider,
+  ) {
+    return call(provider.tenantId);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'occupanciesForTenantProvider';
+}
+
+/// Get all occupancies (history) for a tenant.
+///
+/// Copied from [occupanciesForTenant].
+class OccupanciesForTenantProvider
+    extends AutoDisposeFutureProvider<List<Occupancy>> {
+  /// Get all occupancies (history) for a tenant.
+  ///
+  /// Copied from [occupanciesForTenant].
+  OccupanciesForTenantProvider(int tenantId)
+    : this._internal(
+        (ref) => occupanciesForTenant(ref as OccupanciesForTenantRef, tenantId),
+        from: occupanciesForTenantProvider,
+        name: r'occupanciesForTenantProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$occupanciesForTenantHash,
+        dependencies: OccupanciesForTenantFamily._dependencies,
+        allTransitiveDependencies:
+            OccupanciesForTenantFamily._allTransitiveDependencies,
+        tenantId: tenantId,
+      );
+
+  OccupanciesForTenantProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.tenantId,
+  }) : super.internal();
+
+  final int tenantId;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<Occupancy>> Function(OccupanciesForTenantRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: OccupanciesForTenantProvider._internal(
+        (ref) => create(ref as OccupanciesForTenantRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        tenantId: tenantId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<Occupancy>> createElement() {
+    return _OccupanciesForTenantProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is OccupanciesForTenantProvider && other.tenantId == tenantId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, tenantId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin OccupanciesForTenantRef on AutoDisposeFutureProviderRef<List<Occupancy>> {
+  /// The parameter `tenantId` of this provider.
+  int get tenantId;
+}
+
+class _OccupanciesForTenantProviderElement
+    extends AutoDisposeFutureProviderElement<List<Occupancy>>
+    with OccupanciesForTenantRef {
+  _OccupanciesForTenantProviderElement(super.provider);
+
+  @override
+  int get tenantId => (origin as OccupanciesForTenantProvider).tenantId;
+}
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

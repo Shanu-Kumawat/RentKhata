@@ -27,6 +27,8 @@ mixin _$FamilyMember {
   FamilyRelationship get relationship => throw _privateConstructorUsedError;
   String? get phone => throw _privateConstructorUsedError;
   String? get aadharNumber => throw _privateConstructorUsedError;
+  int? get age => throw _privateConstructorUsedError;
+  String? get gender => throw _privateConstructorUsedError;
   DateTime get createdAt => throw _privateConstructorUsedError;
 
   /// Serializes this FamilyMember to a JSON map.
@@ -53,6 +55,8 @@ abstract class $FamilyMemberCopyWith<$Res> {
     FamilyRelationship relationship,
     String? phone,
     String? aadharNumber,
+    int? age,
+    String? gender,
     DateTime createdAt,
   });
 }
@@ -78,6 +82,8 @@ class _$FamilyMemberCopyWithImpl<$Res, $Val extends FamilyMember>
     Object? relationship = null,
     Object? phone = freezed,
     Object? aadharNumber = freezed,
+    Object? age = freezed,
+    Object? gender = freezed,
     Object? createdAt = null,
   }) {
     return _then(
@@ -106,6 +112,14 @@ class _$FamilyMemberCopyWithImpl<$Res, $Val extends FamilyMember>
                 ? _value.aadharNumber
                 : aadharNumber // ignore: cast_nullable_to_non_nullable
                       as String?,
+            age: freezed == age
+                ? _value.age
+                : age // ignore: cast_nullable_to_non_nullable
+                      as int?,
+            gender: freezed == gender
+                ? _value.gender
+                : gender // ignore: cast_nullable_to_non_nullable
+                      as String?,
             createdAt: null == createdAt
                 ? _value.createdAt
                 : createdAt // ignore: cast_nullable_to_non_nullable
@@ -132,6 +146,8 @@ abstract class _$$FamilyMemberImplCopyWith<$Res>
     FamilyRelationship relationship,
     String? phone,
     String? aadharNumber,
+    int? age,
+    String? gender,
     DateTime createdAt,
   });
 }
@@ -156,6 +172,8 @@ class __$$FamilyMemberImplCopyWithImpl<$Res>
     Object? relationship = null,
     Object? phone = freezed,
     Object? aadharNumber = freezed,
+    Object? age = freezed,
+    Object? gender = freezed,
     Object? createdAt = null,
   }) {
     return _then(
@@ -184,6 +202,14 @@ class __$$FamilyMemberImplCopyWithImpl<$Res>
             ? _value.aadharNumber
             : aadharNumber // ignore: cast_nullable_to_non_nullable
                   as String?,
+        age: freezed == age
+            ? _value.age
+            : age // ignore: cast_nullable_to_non_nullable
+                  as int?,
+        gender: freezed == gender
+            ? _value.gender
+            : gender // ignore: cast_nullable_to_non_nullable
+                  as String?,
         createdAt: null == createdAt
             ? _value.createdAt
             : createdAt // ignore: cast_nullable_to_non_nullable
@@ -203,6 +229,8 @@ class _$FamilyMemberImpl implements _FamilyMember {
     required this.relationship,
     this.phone,
     this.aadharNumber,
+    this.age,
+    this.gender,
     required this.createdAt,
   });
 
@@ -222,11 +250,15 @@ class _$FamilyMemberImpl implements _FamilyMember {
   @override
   final String? aadharNumber;
   @override
+  final int? age;
+  @override
+  final String? gender;
+  @override
   final DateTime createdAt;
 
   @override
   String toString() {
-    return 'FamilyMember(id: $id, tenantId: $tenantId, name: $name, relationship: $relationship, phone: $phone, aadharNumber: $aadharNumber, createdAt: $createdAt)';
+    return 'FamilyMember(id: $id, tenantId: $tenantId, name: $name, relationship: $relationship, phone: $phone, aadharNumber: $aadharNumber, age: $age, gender: $gender, createdAt: $createdAt)';
   }
 
   @override
@@ -243,6 +275,8 @@ class _$FamilyMemberImpl implements _FamilyMember {
             (identical(other.phone, phone) || other.phone == phone) &&
             (identical(other.aadharNumber, aadharNumber) ||
                 other.aadharNumber == aadharNumber) &&
+            (identical(other.age, age) || other.age == age) &&
+            (identical(other.gender, gender) || other.gender == gender) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt));
   }
@@ -257,6 +291,8 @@ class _$FamilyMemberImpl implements _FamilyMember {
     relationship,
     phone,
     aadharNumber,
+    age,
+    gender,
     createdAt,
   );
 
@@ -282,6 +318,8 @@ abstract class _FamilyMember implements FamilyMember {
     required final FamilyRelationship relationship,
     final String? phone,
     final String? aadharNumber,
+    final int? age,
+    final String? gender,
     required final DateTime createdAt,
   }) = _$FamilyMemberImpl;
 
@@ -300,6 +338,10 @@ abstract class _FamilyMember implements FamilyMember {
   String? get phone;
   @override
   String? get aadharNumber;
+  @override
+  int? get age;
+  @override
+  String? get gender;
   @override
   DateTime get createdAt;
 

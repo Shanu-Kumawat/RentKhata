@@ -17,6 +17,8 @@ _$FamilyMemberImpl _$$FamilyMemberImplFromJson(Map<String, dynamic> json) =>
       ),
       phone: json['phone'] as String?,
       aadharNumber: json['aadharNumber'] as String?,
+      age: (json['age'] as num?)?.toInt(),
+      gender: json['gender'] as String?,
       createdAt: DateTime.parse(json['createdAt'] as String),
     );
 
@@ -28,6 +30,8 @@ Map<String, dynamic> _$$FamilyMemberImplToJson(_$FamilyMemberImpl instance) =>
       'relationship': _$FamilyRelationshipEnumMap[instance.relationship]!,
       'phone': instance.phone,
       'aadharNumber': instance.aadharNumber,
+      'age': instance.age,
+      'gender': instance.gender,
       'createdAt': instance.createdAt.toIso8601String(),
     };
 

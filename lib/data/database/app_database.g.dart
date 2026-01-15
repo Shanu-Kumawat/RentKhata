@@ -1405,6 +1405,168 @@ class $TenantsTable extends Tenants
         type: DriftSqlType.string,
         requiredDuringInsert: false,
       );
+  static const VerificationMeta _fatherNameMeta = const VerificationMeta(
+    'fatherName',
+  );
+  @override
+  late final GeneratedColumn<String> fatherName = GeneratedColumn<String>(
+    'father_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _ageMeta = const VerificationMeta('age');
+  @override
+  late final GeneratedColumn<int> age = GeneratedColumn<int>(
+    'age',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _genderMeta = const VerificationMeta('gender');
+  @override
+  late final GeneratedColumn<String> gender = GeneratedColumn<String>(
+    'gender',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _secondaryPhoneMeta = const VerificationMeta(
+    'secondaryPhone',
+  );
+  @override
+  late final GeneratedColumn<String> secondaryPhone = GeneratedColumn<String>(
+    'secondary_phone',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _permanentAddressLineMeta =
+      const VerificationMeta('permanentAddressLine');
+  @override
+  late final GeneratedColumn<String> permanentAddressLine =
+      GeneratedColumn<String>(
+        'permanent_address_line',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _permanentCityMeta = const VerificationMeta(
+    'permanentCity',
+  );
+  @override
+  late final GeneratedColumn<String> permanentCity = GeneratedColumn<String>(
+    'permanent_city',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _permanentStateMeta = const VerificationMeta(
+    'permanentState',
+  );
+  @override
+  late final GeneratedColumn<String> permanentState = GeneratedColumn<String>(
+    'permanent_state',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _permanentPincodeMeta = const VerificationMeta(
+    'permanentPincode',
+  );
+  @override
+  late final GeneratedColumn<String> permanentPincode = GeneratedColumn<String>(
+    'permanent_pincode',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _companyNameMeta = const VerificationMeta(
+    'companyName',
+  );
+  @override
+  late final GeneratedColumn<String> companyName = GeneratedColumn<String>(
+    'company_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _officeAddressMeta = const VerificationMeta(
+    'officeAddress',
+  );
+  @override
+  late final GeneratedColumn<String> officeAddress = GeneratedColumn<String>(
+    'office_address',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _aadhaarFrontPhotoPathMeta =
+      const VerificationMeta('aadhaarFrontPhotoPath');
+  @override
+  late final GeneratedColumn<String> aadhaarFrontPhotoPath =
+      GeneratedColumn<String>(
+        'aadhaar_front_photo_path',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _aadhaarBackPhotoPathMeta =
+      const VerificationMeta('aadhaarBackPhotoPath');
+  @override
+  late final GeneratedColumn<String> aadhaarBackPhotoPath =
+      GeneratedColumn<String>(
+        'aadhaar_back_photo_path',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _introducerNameMeta = const VerificationMeta(
+    'introducerName',
+  );
+  @override
+  late final GeneratedColumn<String> introducerName = GeneratedColumn<String>(
+    'introducer_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _introducerAddressMeta = const VerificationMeta(
+    'introducerAddress',
+  );
+  @override
+  late final GeneratedColumn<String> introducerAddress =
+      GeneratedColumn<String>(
+        'introducer_address',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _introducerPhoneMeta = const VerificationMeta(
+    'introducerPhone',
+  );
+  @override
+  late final GeneratedColumn<String> introducerPhone = GeneratedColumn<String>(
+    'introducer_phone',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -1426,6 +1588,21 @@ class $TenantsTable extends Tenants
     photoPath,
     isPoliceVerified,
     policeVerificationDocPath,
+    fatherName,
+    age,
+    gender,
+    secondaryPhone,
+    permanentAddressLine,
+    permanentCity,
+    permanentState,
+    permanentPincode,
+    companyName,
+    officeAddress,
+    aadhaarFrontPhotoPath,
+    aadhaarBackPhotoPath,
+    introducerName,
+    introducerAddress,
+    introducerPhone,
     createdAt,
   ];
   @override
@@ -1490,6 +1667,132 @@ class $TenantsTable extends Tenants
         ),
       );
     }
+    if (data.containsKey('father_name')) {
+      context.handle(
+        _fatherNameMeta,
+        fatherName.isAcceptableOrUnknown(data['father_name']!, _fatherNameMeta),
+      );
+    }
+    if (data.containsKey('age')) {
+      context.handle(
+        _ageMeta,
+        age.isAcceptableOrUnknown(data['age']!, _ageMeta),
+      );
+    }
+    if (data.containsKey('gender')) {
+      context.handle(
+        _genderMeta,
+        gender.isAcceptableOrUnknown(data['gender']!, _genderMeta),
+      );
+    }
+    if (data.containsKey('secondary_phone')) {
+      context.handle(
+        _secondaryPhoneMeta,
+        secondaryPhone.isAcceptableOrUnknown(
+          data['secondary_phone']!,
+          _secondaryPhoneMeta,
+        ),
+      );
+    }
+    if (data.containsKey('permanent_address_line')) {
+      context.handle(
+        _permanentAddressLineMeta,
+        permanentAddressLine.isAcceptableOrUnknown(
+          data['permanent_address_line']!,
+          _permanentAddressLineMeta,
+        ),
+      );
+    }
+    if (data.containsKey('permanent_city')) {
+      context.handle(
+        _permanentCityMeta,
+        permanentCity.isAcceptableOrUnknown(
+          data['permanent_city']!,
+          _permanentCityMeta,
+        ),
+      );
+    }
+    if (data.containsKey('permanent_state')) {
+      context.handle(
+        _permanentStateMeta,
+        permanentState.isAcceptableOrUnknown(
+          data['permanent_state']!,
+          _permanentStateMeta,
+        ),
+      );
+    }
+    if (data.containsKey('permanent_pincode')) {
+      context.handle(
+        _permanentPincodeMeta,
+        permanentPincode.isAcceptableOrUnknown(
+          data['permanent_pincode']!,
+          _permanentPincodeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('company_name')) {
+      context.handle(
+        _companyNameMeta,
+        companyName.isAcceptableOrUnknown(
+          data['company_name']!,
+          _companyNameMeta,
+        ),
+      );
+    }
+    if (data.containsKey('office_address')) {
+      context.handle(
+        _officeAddressMeta,
+        officeAddress.isAcceptableOrUnknown(
+          data['office_address']!,
+          _officeAddressMeta,
+        ),
+      );
+    }
+    if (data.containsKey('aadhaar_front_photo_path')) {
+      context.handle(
+        _aadhaarFrontPhotoPathMeta,
+        aadhaarFrontPhotoPath.isAcceptableOrUnknown(
+          data['aadhaar_front_photo_path']!,
+          _aadhaarFrontPhotoPathMeta,
+        ),
+      );
+    }
+    if (data.containsKey('aadhaar_back_photo_path')) {
+      context.handle(
+        _aadhaarBackPhotoPathMeta,
+        aadhaarBackPhotoPath.isAcceptableOrUnknown(
+          data['aadhaar_back_photo_path']!,
+          _aadhaarBackPhotoPathMeta,
+        ),
+      );
+    }
+    if (data.containsKey('introducer_name')) {
+      context.handle(
+        _introducerNameMeta,
+        introducerName.isAcceptableOrUnknown(
+          data['introducer_name']!,
+          _introducerNameMeta,
+        ),
+      );
+    }
+    if (data.containsKey('introducer_address')) {
+      context.handle(
+        _introducerAddressMeta,
+        introducerAddress.isAcceptableOrUnknown(
+          data['introducer_address']!,
+          _introducerAddressMeta,
+        ),
+      );
+    }
+    if (data.containsKey('introducer_phone')) {
+      context.handle(
+        _introducerPhoneMeta,
+        introducerPhone.isAcceptableOrUnknown(
+          data['introducer_phone']!,
+          _introducerPhoneMeta,
+        ),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -1533,6 +1836,66 @@ class $TenantsTable extends Tenants
         DriftSqlType.string,
         data['${effectivePrefix}police_verification_doc_path'],
       ),
+      fatherName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}father_name'],
+      ),
+      age: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}age'],
+      ),
+      gender: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}gender'],
+      ),
+      secondaryPhone: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}secondary_phone'],
+      ),
+      permanentAddressLine: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}permanent_address_line'],
+      ),
+      permanentCity: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}permanent_city'],
+      ),
+      permanentState: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}permanent_state'],
+      ),
+      permanentPincode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}permanent_pincode'],
+      ),
+      companyName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}company_name'],
+      ),
+      officeAddress: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}office_address'],
+      ),
+      aadhaarFrontPhotoPath: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}aadhaar_front_photo_path'],
+      ),
+      aadhaarBackPhotoPath: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}aadhaar_back_photo_path'],
+      ),
+      introducerName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}introducer_name'],
+      ),
+      introducerAddress: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}introducer_address'],
+      ),
+      introducerPhone: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}introducer_phone'],
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -1568,6 +1931,51 @@ class TenantEntity extends DataClass implements Insertable<TenantEntity> {
   /// Path to police verification document
   final String? policeVerificationDocPath;
 
+  /// Father's name (important for legal agreements)
+  final String? fatherName;
+
+  /// Age of the tenant
+  final int? age;
+
+  /// Gender: 'male', 'female', 'other'
+  final String? gender;
+
+  /// Secondary/emergency phone number
+  final String? secondaryPhone;
+
+  /// Permanent address line
+  final String? permanentAddressLine;
+
+  /// City
+  final String? permanentCity;
+
+  /// State
+  final String? permanentState;
+
+  /// Pincode
+  final String? permanentPincode;
+
+  /// Company name
+  final String? companyName;
+
+  /// Office address
+  final String? officeAddress;
+
+  /// Aadhaar card front photo path
+  final String? aadhaarFrontPhotoPath;
+
+  /// Aadhaar card back photo path
+  final String? aadhaarBackPhotoPath;
+
+  /// Introducer's name (person who vouched for tenant)
+  final String? introducerName;
+
+  /// Introducer's address
+  final String? introducerAddress;
+
+  /// Introducer's phone number
+  final String? introducerPhone;
+
   /// Created timestamp
   final DateTime createdAt;
   const TenantEntity({
@@ -1578,6 +1986,21 @@ class TenantEntity extends DataClass implements Insertable<TenantEntity> {
     this.photoPath,
     required this.isPoliceVerified,
     this.policeVerificationDocPath,
+    this.fatherName,
+    this.age,
+    this.gender,
+    this.secondaryPhone,
+    this.permanentAddressLine,
+    this.permanentCity,
+    this.permanentState,
+    this.permanentPincode,
+    this.companyName,
+    this.officeAddress,
+    this.aadhaarFrontPhotoPath,
+    this.aadhaarBackPhotoPath,
+    this.introducerName,
+    this.introducerAddress,
+    this.introducerPhone,
     required this.createdAt,
   });
   @override
@@ -1599,6 +2022,51 @@ class TenantEntity extends DataClass implements Insertable<TenantEntity> {
       map['police_verification_doc_path'] = Variable<String>(
         policeVerificationDocPath,
       );
+    }
+    if (!nullToAbsent || fatherName != null) {
+      map['father_name'] = Variable<String>(fatherName);
+    }
+    if (!nullToAbsent || age != null) {
+      map['age'] = Variable<int>(age);
+    }
+    if (!nullToAbsent || gender != null) {
+      map['gender'] = Variable<String>(gender);
+    }
+    if (!nullToAbsent || secondaryPhone != null) {
+      map['secondary_phone'] = Variable<String>(secondaryPhone);
+    }
+    if (!nullToAbsent || permanentAddressLine != null) {
+      map['permanent_address_line'] = Variable<String>(permanentAddressLine);
+    }
+    if (!nullToAbsent || permanentCity != null) {
+      map['permanent_city'] = Variable<String>(permanentCity);
+    }
+    if (!nullToAbsent || permanentState != null) {
+      map['permanent_state'] = Variable<String>(permanentState);
+    }
+    if (!nullToAbsent || permanentPincode != null) {
+      map['permanent_pincode'] = Variable<String>(permanentPincode);
+    }
+    if (!nullToAbsent || companyName != null) {
+      map['company_name'] = Variable<String>(companyName);
+    }
+    if (!nullToAbsent || officeAddress != null) {
+      map['office_address'] = Variable<String>(officeAddress);
+    }
+    if (!nullToAbsent || aadhaarFrontPhotoPath != null) {
+      map['aadhaar_front_photo_path'] = Variable<String>(aadhaarFrontPhotoPath);
+    }
+    if (!nullToAbsent || aadhaarBackPhotoPath != null) {
+      map['aadhaar_back_photo_path'] = Variable<String>(aadhaarBackPhotoPath);
+    }
+    if (!nullToAbsent || introducerName != null) {
+      map['introducer_name'] = Variable<String>(introducerName);
+    }
+    if (!nullToAbsent || introducerAddress != null) {
+      map['introducer_address'] = Variable<String>(introducerAddress);
+    }
+    if (!nullToAbsent || introducerPhone != null) {
+      map['introducer_phone'] = Variable<String>(introducerPhone);
     }
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
@@ -1622,6 +2090,49 @@ class TenantEntity extends DataClass implements Insertable<TenantEntity> {
           policeVerificationDocPath == null && nullToAbsent
           ? const Value.absent()
           : Value(policeVerificationDocPath),
+      fatherName: fatherName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(fatherName),
+      age: age == null && nullToAbsent ? const Value.absent() : Value(age),
+      gender: gender == null && nullToAbsent
+          ? const Value.absent()
+          : Value(gender),
+      secondaryPhone: secondaryPhone == null && nullToAbsent
+          ? const Value.absent()
+          : Value(secondaryPhone),
+      permanentAddressLine: permanentAddressLine == null && nullToAbsent
+          ? const Value.absent()
+          : Value(permanentAddressLine),
+      permanentCity: permanentCity == null && nullToAbsent
+          ? const Value.absent()
+          : Value(permanentCity),
+      permanentState: permanentState == null && nullToAbsent
+          ? const Value.absent()
+          : Value(permanentState),
+      permanentPincode: permanentPincode == null && nullToAbsent
+          ? const Value.absent()
+          : Value(permanentPincode),
+      companyName: companyName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(companyName),
+      officeAddress: officeAddress == null && nullToAbsent
+          ? const Value.absent()
+          : Value(officeAddress),
+      aadhaarFrontPhotoPath: aadhaarFrontPhotoPath == null && nullToAbsent
+          ? const Value.absent()
+          : Value(aadhaarFrontPhotoPath),
+      aadhaarBackPhotoPath: aadhaarBackPhotoPath == null && nullToAbsent
+          ? const Value.absent()
+          : Value(aadhaarBackPhotoPath),
+      introducerName: introducerName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(introducerName),
+      introducerAddress: introducerAddress == null && nullToAbsent
+          ? const Value.absent()
+          : Value(introducerAddress),
+      introducerPhone: introducerPhone == null && nullToAbsent
+          ? const Value.absent()
+          : Value(introducerPhone),
       createdAt: Value(createdAt),
     );
   }
@@ -1641,6 +2152,29 @@ class TenantEntity extends DataClass implements Insertable<TenantEntity> {
       policeVerificationDocPath: serializer.fromJson<String?>(
         json['policeVerificationDocPath'],
       ),
+      fatherName: serializer.fromJson<String?>(json['fatherName']),
+      age: serializer.fromJson<int?>(json['age']),
+      gender: serializer.fromJson<String?>(json['gender']),
+      secondaryPhone: serializer.fromJson<String?>(json['secondaryPhone']),
+      permanentAddressLine: serializer.fromJson<String?>(
+        json['permanentAddressLine'],
+      ),
+      permanentCity: serializer.fromJson<String?>(json['permanentCity']),
+      permanentState: serializer.fromJson<String?>(json['permanentState']),
+      permanentPincode: serializer.fromJson<String?>(json['permanentPincode']),
+      companyName: serializer.fromJson<String?>(json['companyName']),
+      officeAddress: serializer.fromJson<String?>(json['officeAddress']),
+      aadhaarFrontPhotoPath: serializer.fromJson<String?>(
+        json['aadhaarFrontPhotoPath'],
+      ),
+      aadhaarBackPhotoPath: serializer.fromJson<String?>(
+        json['aadhaarBackPhotoPath'],
+      ),
+      introducerName: serializer.fromJson<String?>(json['introducerName']),
+      introducerAddress: serializer.fromJson<String?>(
+        json['introducerAddress'],
+      ),
+      introducerPhone: serializer.fromJson<String?>(json['introducerPhone']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
   }
@@ -1657,6 +2191,23 @@ class TenantEntity extends DataClass implements Insertable<TenantEntity> {
       'policeVerificationDocPath': serializer.toJson<String?>(
         policeVerificationDocPath,
       ),
+      'fatherName': serializer.toJson<String?>(fatherName),
+      'age': serializer.toJson<int?>(age),
+      'gender': serializer.toJson<String?>(gender),
+      'secondaryPhone': serializer.toJson<String?>(secondaryPhone),
+      'permanentAddressLine': serializer.toJson<String?>(permanentAddressLine),
+      'permanentCity': serializer.toJson<String?>(permanentCity),
+      'permanentState': serializer.toJson<String?>(permanentState),
+      'permanentPincode': serializer.toJson<String?>(permanentPincode),
+      'companyName': serializer.toJson<String?>(companyName),
+      'officeAddress': serializer.toJson<String?>(officeAddress),
+      'aadhaarFrontPhotoPath': serializer.toJson<String?>(
+        aadhaarFrontPhotoPath,
+      ),
+      'aadhaarBackPhotoPath': serializer.toJson<String?>(aadhaarBackPhotoPath),
+      'introducerName': serializer.toJson<String?>(introducerName),
+      'introducerAddress': serializer.toJson<String?>(introducerAddress),
+      'introducerPhone': serializer.toJson<String?>(introducerPhone),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
@@ -1669,6 +2220,21 @@ class TenantEntity extends DataClass implements Insertable<TenantEntity> {
     Value<String?> photoPath = const Value.absent(),
     bool? isPoliceVerified,
     Value<String?> policeVerificationDocPath = const Value.absent(),
+    Value<String?> fatherName = const Value.absent(),
+    Value<int?> age = const Value.absent(),
+    Value<String?> gender = const Value.absent(),
+    Value<String?> secondaryPhone = const Value.absent(),
+    Value<String?> permanentAddressLine = const Value.absent(),
+    Value<String?> permanentCity = const Value.absent(),
+    Value<String?> permanentState = const Value.absent(),
+    Value<String?> permanentPincode = const Value.absent(),
+    Value<String?> companyName = const Value.absent(),
+    Value<String?> officeAddress = const Value.absent(),
+    Value<String?> aadhaarFrontPhotoPath = const Value.absent(),
+    Value<String?> aadhaarBackPhotoPath = const Value.absent(),
+    Value<String?> introducerName = const Value.absent(),
+    Value<String?> introducerAddress = const Value.absent(),
+    Value<String?> introducerPhone = const Value.absent(),
     DateTime? createdAt,
   }) => TenantEntity(
     id: id ?? this.id,
@@ -1680,6 +2246,43 @@ class TenantEntity extends DataClass implements Insertable<TenantEntity> {
     policeVerificationDocPath: policeVerificationDocPath.present
         ? policeVerificationDocPath.value
         : this.policeVerificationDocPath,
+    fatherName: fatherName.present ? fatherName.value : this.fatherName,
+    age: age.present ? age.value : this.age,
+    gender: gender.present ? gender.value : this.gender,
+    secondaryPhone: secondaryPhone.present
+        ? secondaryPhone.value
+        : this.secondaryPhone,
+    permanentAddressLine: permanentAddressLine.present
+        ? permanentAddressLine.value
+        : this.permanentAddressLine,
+    permanentCity: permanentCity.present
+        ? permanentCity.value
+        : this.permanentCity,
+    permanentState: permanentState.present
+        ? permanentState.value
+        : this.permanentState,
+    permanentPincode: permanentPincode.present
+        ? permanentPincode.value
+        : this.permanentPincode,
+    companyName: companyName.present ? companyName.value : this.companyName,
+    officeAddress: officeAddress.present
+        ? officeAddress.value
+        : this.officeAddress,
+    aadhaarFrontPhotoPath: aadhaarFrontPhotoPath.present
+        ? aadhaarFrontPhotoPath.value
+        : this.aadhaarFrontPhotoPath,
+    aadhaarBackPhotoPath: aadhaarBackPhotoPath.present
+        ? aadhaarBackPhotoPath.value
+        : this.aadhaarBackPhotoPath,
+    introducerName: introducerName.present
+        ? introducerName.value
+        : this.introducerName,
+    introducerAddress: introducerAddress.present
+        ? introducerAddress.value
+        : this.introducerAddress,
+    introducerPhone: introducerPhone.present
+        ? introducerPhone.value
+        : this.introducerPhone,
     createdAt: createdAt ?? this.createdAt,
   );
   TenantEntity copyWithCompanion(TenantsCompanion data) {
@@ -1697,6 +2300,47 @@ class TenantEntity extends DataClass implements Insertable<TenantEntity> {
       policeVerificationDocPath: data.policeVerificationDocPath.present
           ? data.policeVerificationDocPath.value
           : this.policeVerificationDocPath,
+      fatherName: data.fatherName.present
+          ? data.fatherName.value
+          : this.fatherName,
+      age: data.age.present ? data.age.value : this.age,
+      gender: data.gender.present ? data.gender.value : this.gender,
+      secondaryPhone: data.secondaryPhone.present
+          ? data.secondaryPhone.value
+          : this.secondaryPhone,
+      permanentAddressLine: data.permanentAddressLine.present
+          ? data.permanentAddressLine.value
+          : this.permanentAddressLine,
+      permanentCity: data.permanentCity.present
+          ? data.permanentCity.value
+          : this.permanentCity,
+      permanentState: data.permanentState.present
+          ? data.permanentState.value
+          : this.permanentState,
+      permanentPincode: data.permanentPincode.present
+          ? data.permanentPincode.value
+          : this.permanentPincode,
+      companyName: data.companyName.present
+          ? data.companyName.value
+          : this.companyName,
+      officeAddress: data.officeAddress.present
+          ? data.officeAddress.value
+          : this.officeAddress,
+      aadhaarFrontPhotoPath: data.aadhaarFrontPhotoPath.present
+          ? data.aadhaarFrontPhotoPath.value
+          : this.aadhaarFrontPhotoPath,
+      aadhaarBackPhotoPath: data.aadhaarBackPhotoPath.present
+          ? data.aadhaarBackPhotoPath.value
+          : this.aadhaarBackPhotoPath,
+      introducerName: data.introducerName.present
+          ? data.introducerName.value
+          : this.introducerName,
+      introducerAddress: data.introducerAddress.present
+          ? data.introducerAddress.value
+          : this.introducerAddress,
+      introducerPhone: data.introducerPhone.present
+          ? data.introducerPhone.value
+          : this.introducerPhone,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
     );
   }
@@ -1711,13 +2355,28 @@ class TenantEntity extends DataClass implements Insertable<TenantEntity> {
           ..write('photoPath: $photoPath, ')
           ..write('isPoliceVerified: $isPoliceVerified, ')
           ..write('policeVerificationDocPath: $policeVerificationDocPath, ')
+          ..write('fatherName: $fatherName, ')
+          ..write('age: $age, ')
+          ..write('gender: $gender, ')
+          ..write('secondaryPhone: $secondaryPhone, ')
+          ..write('permanentAddressLine: $permanentAddressLine, ')
+          ..write('permanentCity: $permanentCity, ')
+          ..write('permanentState: $permanentState, ')
+          ..write('permanentPincode: $permanentPincode, ')
+          ..write('companyName: $companyName, ')
+          ..write('officeAddress: $officeAddress, ')
+          ..write('aadhaarFrontPhotoPath: $aadhaarFrontPhotoPath, ')
+          ..write('aadhaarBackPhotoPath: $aadhaarBackPhotoPath, ')
+          ..write('introducerName: $introducerName, ')
+          ..write('introducerAddress: $introducerAddress, ')
+          ..write('introducerPhone: $introducerPhone, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     id,
     name,
     phone,
@@ -1725,8 +2384,23 @@ class TenantEntity extends DataClass implements Insertable<TenantEntity> {
     photoPath,
     isPoliceVerified,
     policeVerificationDocPath,
+    fatherName,
+    age,
+    gender,
+    secondaryPhone,
+    permanentAddressLine,
+    permanentCity,
+    permanentState,
+    permanentPincode,
+    companyName,
+    officeAddress,
+    aadhaarFrontPhotoPath,
+    aadhaarBackPhotoPath,
+    introducerName,
+    introducerAddress,
+    introducerPhone,
     createdAt,
-  );
+  ]);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1738,6 +2412,21 @@ class TenantEntity extends DataClass implements Insertable<TenantEntity> {
           other.photoPath == this.photoPath &&
           other.isPoliceVerified == this.isPoliceVerified &&
           other.policeVerificationDocPath == this.policeVerificationDocPath &&
+          other.fatherName == this.fatherName &&
+          other.age == this.age &&
+          other.gender == this.gender &&
+          other.secondaryPhone == this.secondaryPhone &&
+          other.permanentAddressLine == this.permanentAddressLine &&
+          other.permanentCity == this.permanentCity &&
+          other.permanentState == this.permanentState &&
+          other.permanentPincode == this.permanentPincode &&
+          other.companyName == this.companyName &&
+          other.officeAddress == this.officeAddress &&
+          other.aadhaarFrontPhotoPath == this.aadhaarFrontPhotoPath &&
+          other.aadhaarBackPhotoPath == this.aadhaarBackPhotoPath &&
+          other.introducerName == this.introducerName &&
+          other.introducerAddress == this.introducerAddress &&
+          other.introducerPhone == this.introducerPhone &&
           other.createdAt == this.createdAt);
 }
 
@@ -1749,6 +2438,21 @@ class TenantsCompanion extends UpdateCompanion<TenantEntity> {
   final Value<String?> photoPath;
   final Value<bool> isPoliceVerified;
   final Value<String?> policeVerificationDocPath;
+  final Value<String?> fatherName;
+  final Value<int?> age;
+  final Value<String?> gender;
+  final Value<String?> secondaryPhone;
+  final Value<String?> permanentAddressLine;
+  final Value<String?> permanentCity;
+  final Value<String?> permanentState;
+  final Value<String?> permanentPincode;
+  final Value<String?> companyName;
+  final Value<String?> officeAddress;
+  final Value<String?> aadhaarFrontPhotoPath;
+  final Value<String?> aadhaarBackPhotoPath;
+  final Value<String?> introducerName;
+  final Value<String?> introducerAddress;
+  final Value<String?> introducerPhone;
   final Value<DateTime> createdAt;
   const TenantsCompanion({
     this.id = const Value.absent(),
@@ -1758,6 +2462,21 @@ class TenantsCompanion extends UpdateCompanion<TenantEntity> {
     this.photoPath = const Value.absent(),
     this.isPoliceVerified = const Value.absent(),
     this.policeVerificationDocPath = const Value.absent(),
+    this.fatherName = const Value.absent(),
+    this.age = const Value.absent(),
+    this.gender = const Value.absent(),
+    this.secondaryPhone = const Value.absent(),
+    this.permanentAddressLine = const Value.absent(),
+    this.permanentCity = const Value.absent(),
+    this.permanentState = const Value.absent(),
+    this.permanentPincode = const Value.absent(),
+    this.companyName = const Value.absent(),
+    this.officeAddress = const Value.absent(),
+    this.aadhaarFrontPhotoPath = const Value.absent(),
+    this.aadhaarBackPhotoPath = const Value.absent(),
+    this.introducerName = const Value.absent(),
+    this.introducerAddress = const Value.absent(),
+    this.introducerPhone = const Value.absent(),
     this.createdAt = const Value.absent(),
   });
   TenantsCompanion.insert({
@@ -1768,6 +2487,21 @@ class TenantsCompanion extends UpdateCompanion<TenantEntity> {
     this.photoPath = const Value.absent(),
     this.isPoliceVerified = const Value.absent(),
     this.policeVerificationDocPath = const Value.absent(),
+    this.fatherName = const Value.absent(),
+    this.age = const Value.absent(),
+    this.gender = const Value.absent(),
+    this.secondaryPhone = const Value.absent(),
+    this.permanentAddressLine = const Value.absent(),
+    this.permanentCity = const Value.absent(),
+    this.permanentState = const Value.absent(),
+    this.permanentPincode = const Value.absent(),
+    this.companyName = const Value.absent(),
+    this.officeAddress = const Value.absent(),
+    this.aadhaarFrontPhotoPath = const Value.absent(),
+    this.aadhaarBackPhotoPath = const Value.absent(),
+    this.introducerName = const Value.absent(),
+    this.introducerAddress = const Value.absent(),
+    this.introducerPhone = const Value.absent(),
     this.createdAt = const Value.absent(),
   }) : name = Value(name);
   static Insertable<TenantEntity> custom({
@@ -1778,6 +2512,21 @@ class TenantsCompanion extends UpdateCompanion<TenantEntity> {
     Expression<String>? photoPath,
     Expression<bool>? isPoliceVerified,
     Expression<String>? policeVerificationDocPath,
+    Expression<String>? fatherName,
+    Expression<int>? age,
+    Expression<String>? gender,
+    Expression<String>? secondaryPhone,
+    Expression<String>? permanentAddressLine,
+    Expression<String>? permanentCity,
+    Expression<String>? permanentState,
+    Expression<String>? permanentPincode,
+    Expression<String>? companyName,
+    Expression<String>? officeAddress,
+    Expression<String>? aadhaarFrontPhotoPath,
+    Expression<String>? aadhaarBackPhotoPath,
+    Expression<String>? introducerName,
+    Expression<String>? introducerAddress,
+    Expression<String>? introducerPhone,
     Expression<DateTime>? createdAt,
   }) {
     return RawValuesInsertable({
@@ -1789,6 +2538,24 @@ class TenantsCompanion extends UpdateCompanion<TenantEntity> {
       if (isPoliceVerified != null) 'is_police_verified': isPoliceVerified,
       if (policeVerificationDocPath != null)
         'police_verification_doc_path': policeVerificationDocPath,
+      if (fatherName != null) 'father_name': fatherName,
+      if (age != null) 'age': age,
+      if (gender != null) 'gender': gender,
+      if (secondaryPhone != null) 'secondary_phone': secondaryPhone,
+      if (permanentAddressLine != null)
+        'permanent_address_line': permanentAddressLine,
+      if (permanentCity != null) 'permanent_city': permanentCity,
+      if (permanentState != null) 'permanent_state': permanentState,
+      if (permanentPincode != null) 'permanent_pincode': permanentPincode,
+      if (companyName != null) 'company_name': companyName,
+      if (officeAddress != null) 'office_address': officeAddress,
+      if (aadhaarFrontPhotoPath != null)
+        'aadhaar_front_photo_path': aadhaarFrontPhotoPath,
+      if (aadhaarBackPhotoPath != null)
+        'aadhaar_back_photo_path': aadhaarBackPhotoPath,
+      if (introducerName != null) 'introducer_name': introducerName,
+      if (introducerAddress != null) 'introducer_address': introducerAddress,
+      if (introducerPhone != null) 'introducer_phone': introducerPhone,
       if (createdAt != null) 'created_at': createdAt,
     });
   }
@@ -1801,6 +2568,21 @@ class TenantsCompanion extends UpdateCompanion<TenantEntity> {
     Value<String?>? photoPath,
     Value<bool>? isPoliceVerified,
     Value<String?>? policeVerificationDocPath,
+    Value<String?>? fatherName,
+    Value<int?>? age,
+    Value<String?>? gender,
+    Value<String?>? secondaryPhone,
+    Value<String?>? permanentAddressLine,
+    Value<String?>? permanentCity,
+    Value<String?>? permanentState,
+    Value<String?>? permanentPincode,
+    Value<String?>? companyName,
+    Value<String?>? officeAddress,
+    Value<String?>? aadhaarFrontPhotoPath,
+    Value<String?>? aadhaarBackPhotoPath,
+    Value<String?>? introducerName,
+    Value<String?>? introducerAddress,
+    Value<String?>? introducerPhone,
     Value<DateTime>? createdAt,
   }) {
     return TenantsCompanion(
@@ -1812,6 +2594,22 @@ class TenantsCompanion extends UpdateCompanion<TenantEntity> {
       isPoliceVerified: isPoliceVerified ?? this.isPoliceVerified,
       policeVerificationDocPath:
           policeVerificationDocPath ?? this.policeVerificationDocPath,
+      fatherName: fatherName ?? this.fatherName,
+      age: age ?? this.age,
+      gender: gender ?? this.gender,
+      secondaryPhone: secondaryPhone ?? this.secondaryPhone,
+      permanentAddressLine: permanentAddressLine ?? this.permanentAddressLine,
+      permanentCity: permanentCity ?? this.permanentCity,
+      permanentState: permanentState ?? this.permanentState,
+      permanentPincode: permanentPincode ?? this.permanentPincode,
+      companyName: companyName ?? this.companyName,
+      officeAddress: officeAddress ?? this.officeAddress,
+      aadhaarFrontPhotoPath:
+          aadhaarFrontPhotoPath ?? this.aadhaarFrontPhotoPath,
+      aadhaarBackPhotoPath: aadhaarBackPhotoPath ?? this.aadhaarBackPhotoPath,
+      introducerName: introducerName ?? this.introducerName,
+      introducerAddress: introducerAddress ?? this.introducerAddress,
+      introducerPhone: introducerPhone ?? this.introducerPhone,
       createdAt: createdAt ?? this.createdAt,
     );
   }
@@ -1842,6 +2640,57 @@ class TenantsCompanion extends UpdateCompanion<TenantEntity> {
         policeVerificationDocPath.value,
       );
     }
+    if (fatherName.present) {
+      map['father_name'] = Variable<String>(fatherName.value);
+    }
+    if (age.present) {
+      map['age'] = Variable<int>(age.value);
+    }
+    if (gender.present) {
+      map['gender'] = Variable<String>(gender.value);
+    }
+    if (secondaryPhone.present) {
+      map['secondary_phone'] = Variable<String>(secondaryPhone.value);
+    }
+    if (permanentAddressLine.present) {
+      map['permanent_address_line'] = Variable<String>(
+        permanentAddressLine.value,
+      );
+    }
+    if (permanentCity.present) {
+      map['permanent_city'] = Variable<String>(permanentCity.value);
+    }
+    if (permanentState.present) {
+      map['permanent_state'] = Variable<String>(permanentState.value);
+    }
+    if (permanentPincode.present) {
+      map['permanent_pincode'] = Variable<String>(permanentPincode.value);
+    }
+    if (companyName.present) {
+      map['company_name'] = Variable<String>(companyName.value);
+    }
+    if (officeAddress.present) {
+      map['office_address'] = Variable<String>(officeAddress.value);
+    }
+    if (aadhaarFrontPhotoPath.present) {
+      map['aadhaar_front_photo_path'] = Variable<String>(
+        aadhaarFrontPhotoPath.value,
+      );
+    }
+    if (aadhaarBackPhotoPath.present) {
+      map['aadhaar_back_photo_path'] = Variable<String>(
+        aadhaarBackPhotoPath.value,
+      );
+    }
+    if (introducerName.present) {
+      map['introducer_name'] = Variable<String>(introducerName.value);
+    }
+    if (introducerAddress.present) {
+      map['introducer_address'] = Variable<String>(introducerAddress.value);
+    }
+    if (introducerPhone.present) {
+      map['introducer_phone'] = Variable<String>(introducerPhone.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -1858,6 +2707,21 @@ class TenantsCompanion extends UpdateCompanion<TenantEntity> {
           ..write('photoPath: $photoPath, ')
           ..write('isPoliceVerified: $isPoliceVerified, ')
           ..write('policeVerificationDocPath: $policeVerificationDocPath, ')
+          ..write('fatherName: $fatherName, ')
+          ..write('age: $age, ')
+          ..write('gender: $gender, ')
+          ..write('secondaryPhone: $secondaryPhone, ')
+          ..write('permanentAddressLine: $permanentAddressLine, ')
+          ..write('permanentCity: $permanentCity, ')
+          ..write('permanentState: $permanentState, ')
+          ..write('permanentPincode: $permanentPincode, ')
+          ..write('companyName: $companyName, ')
+          ..write('officeAddress: $officeAddress, ')
+          ..write('aadhaarFrontPhotoPath: $aadhaarFrontPhotoPath, ')
+          ..write('aadhaarBackPhotoPath: $aadhaarBackPhotoPath, ')
+          ..write('introducerName: $introducerName, ')
+          ..write('introducerAddress: $introducerAddress, ')
+          ..write('introducerPhone: $introducerPhone, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
@@ -4763,6 +5627,24 @@ class $FamilyMembersTable extends FamilyMembers
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _ageMeta = const VerificationMeta('age');
+  @override
+  late final GeneratedColumn<int> age = GeneratedColumn<int>(
+    'age',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _genderMeta = const VerificationMeta('gender');
+  @override
+  late final GeneratedColumn<String> gender = GeneratedColumn<String>(
+    'gender',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -4783,6 +5665,8 @@ class $FamilyMembersTable extends FamilyMembers
     relationship,
     phone,
     aadharNumber,
+    age,
+    gender,
     createdAt,
   ];
   @override
@@ -4831,6 +5715,18 @@ class $FamilyMembersTable extends FamilyMembers
         ),
       );
     }
+    if (data.containsKey('age')) {
+      context.handle(
+        _ageMeta,
+        age.isAcceptableOrUnknown(data['age']!, _ageMeta),
+      );
+    }
+    if (data.containsKey('gender')) {
+      context.handle(
+        _genderMeta,
+        gender.isAcceptableOrUnknown(data['gender']!, _genderMeta),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -4872,6 +5768,14 @@ class $FamilyMembersTable extends FamilyMembers
         DriftSqlType.string,
         data['${effectivePrefix}aadhar_number'],
       ),
+      age: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}age'],
+      ),
+      gender: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}gender'],
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -4910,6 +5814,12 @@ class FamilyMemberEntity extends DataClass
   /// Aadhar number (optional)
   final String? aadharNumber;
 
+  /// Age of the family member
+  final int? age;
+
+  /// Gender: 'male', 'female', 'other'
+  final String? gender;
+
   /// Created timestamp
   final DateTime createdAt;
   const FamilyMemberEntity({
@@ -4919,6 +5829,8 @@ class FamilyMemberEntity extends DataClass
     required this.relationship,
     this.phone,
     this.aadharNumber,
+    this.age,
+    this.gender,
     required this.createdAt,
   });
   @override
@@ -4938,6 +5850,12 @@ class FamilyMemberEntity extends DataClass
     if (!nullToAbsent || aadharNumber != null) {
       map['aadhar_number'] = Variable<String>(aadharNumber);
     }
+    if (!nullToAbsent || age != null) {
+      map['age'] = Variable<int>(age);
+    }
+    if (!nullToAbsent || gender != null) {
+      map['gender'] = Variable<String>(gender);
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
   }
@@ -4954,6 +5872,10 @@ class FamilyMemberEntity extends DataClass
       aadharNumber: aadharNumber == null && nullToAbsent
           ? const Value.absent()
           : Value(aadharNumber),
+      age: age == null && nullToAbsent ? const Value.absent() : Value(age),
+      gender: gender == null && nullToAbsent
+          ? const Value.absent()
+          : Value(gender),
       createdAt: Value(createdAt),
     );
   }
@@ -4972,6 +5894,8 @@ class FamilyMemberEntity extends DataClass
       ),
       phone: serializer.fromJson<String?>(json['phone']),
       aadharNumber: serializer.fromJson<String?>(json['aadharNumber']),
+      age: serializer.fromJson<int?>(json['age']),
+      gender: serializer.fromJson<String?>(json['gender']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
   }
@@ -4987,6 +5911,8 @@ class FamilyMemberEntity extends DataClass
       ),
       'phone': serializer.toJson<String?>(phone),
       'aadharNumber': serializer.toJson<String?>(aadharNumber),
+      'age': serializer.toJson<int?>(age),
+      'gender': serializer.toJson<String?>(gender),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
@@ -4998,6 +5924,8 @@ class FamilyMemberEntity extends DataClass
     FamilyRelationship? relationship,
     Value<String?> phone = const Value.absent(),
     Value<String?> aadharNumber = const Value.absent(),
+    Value<int?> age = const Value.absent(),
+    Value<String?> gender = const Value.absent(),
     DateTime? createdAt,
   }) => FamilyMemberEntity(
     id: id ?? this.id,
@@ -5006,6 +5934,8 @@ class FamilyMemberEntity extends DataClass
     relationship: relationship ?? this.relationship,
     phone: phone.present ? phone.value : this.phone,
     aadharNumber: aadharNumber.present ? aadharNumber.value : this.aadharNumber,
+    age: age.present ? age.value : this.age,
+    gender: gender.present ? gender.value : this.gender,
     createdAt: createdAt ?? this.createdAt,
   );
   FamilyMemberEntity copyWithCompanion(FamilyMembersCompanion data) {
@@ -5020,6 +5950,8 @@ class FamilyMemberEntity extends DataClass
       aadharNumber: data.aadharNumber.present
           ? data.aadharNumber.value
           : this.aadharNumber,
+      age: data.age.present ? data.age.value : this.age,
+      gender: data.gender.present ? data.gender.value : this.gender,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
     );
   }
@@ -5033,6 +5965,8 @@ class FamilyMemberEntity extends DataClass
           ..write('relationship: $relationship, ')
           ..write('phone: $phone, ')
           ..write('aadharNumber: $aadharNumber, ')
+          ..write('age: $age, ')
+          ..write('gender: $gender, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
@@ -5046,6 +5980,8 @@ class FamilyMemberEntity extends DataClass
     relationship,
     phone,
     aadharNumber,
+    age,
+    gender,
     createdAt,
   );
   @override
@@ -5058,6 +5994,8 @@ class FamilyMemberEntity extends DataClass
           other.relationship == this.relationship &&
           other.phone == this.phone &&
           other.aadharNumber == this.aadharNumber &&
+          other.age == this.age &&
+          other.gender == this.gender &&
           other.createdAt == this.createdAt);
 }
 
@@ -5068,6 +6006,8 @@ class FamilyMembersCompanion extends UpdateCompanion<FamilyMemberEntity> {
   final Value<FamilyRelationship> relationship;
   final Value<String?> phone;
   final Value<String?> aadharNumber;
+  final Value<int?> age;
+  final Value<String?> gender;
   final Value<DateTime> createdAt;
   const FamilyMembersCompanion({
     this.id = const Value.absent(),
@@ -5076,6 +6016,8 @@ class FamilyMembersCompanion extends UpdateCompanion<FamilyMemberEntity> {
     this.relationship = const Value.absent(),
     this.phone = const Value.absent(),
     this.aadharNumber = const Value.absent(),
+    this.age = const Value.absent(),
+    this.gender = const Value.absent(),
     this.createdAt = const Value.absent(),
   });
   FamilyMembersCompanion.insert({
@@ -5085,6 +6027,8 @@ class FamilyMembersCompanion extends UpdateCompanion<FamilyMemberEntity> {
     required FamilyRelationship relationship,
     this.phone = const Value.absent(),
     this.aadharNumber = const Value.absent(),
+    this.age = const Value.absent(),
+    this.gender = const Value.absent(),
     this.createdAt = const Value.absent(),
   }) : tenantId = Value(tenantId),
        name = Value(name),
@@ -5096,6 +6040,8 @@ class FamilyMembersCompanion extends UpdateCompanion<FamilyMemberEntity> {
     Expression<String>? relationship,
     Expression<String>? phone,
     Expression<String>? aadharNumber,
+    Expression<int>? age,
+    Expression<String>? gender,
     Expression<DateTime>? createdAt,
   }) {
     return RawValuesInsertable({
@@ -5105,6 +6051,8 @@ class FamilyMembersCompanion extends UpdateCompanion<FamilyMemberEntity> {
       if (relationship != null) 'relationship': relationship,
       if (phone != null) 'phone': phone,
       if (aadharNumber != null) 'aadhar_number': aadharNumber,
+      if (age != null) 'age': age,
+      if (gender != null) 'gender': gender,
       if (createdAt != null) 'created_at': createdAt,
     });
   }
@@ -5116,6 +6064,8 @@ class FamilyMembersCompanion extends UpdateCompanion<FamilyMemberEntity> {
     Value<FamilyRelationship>? relationship,
     Value<String?>? phone,
     Value<String?>? aadharNumber,
+    Value<int?>? age,
+    Value<String?>? gender,
     Value<DateTime>? createdAt,
   }) {
     return FamilyMembersCompanion(
@@ -5125,6 +6075,8 @@ class FamilyMembersCompanion extends UpdateCompanion<FamilyMemberEntity> {
       relationship: relationship ?? this.relationship,
       phone: phone ?? this.phone,
       aadharNumber: aadharNumber ?? this.aadharNumber,
+      age: age ?? this.age,
+      gender: gender ?? this.gender,
       createdAt: createdAt ?? this.createdAt,
     );
   }
@@ -5152,6 +6104,12 @@ class FamilyMembersCompanion extends UpdateCompanion<FamilyMemberEntity> {
     if (aadharNumber.present) {
       map['aadhar_number'] = Variable<String>(aadharNumber.value);
     }
+    if (age.present) {
+      map['age'] = Variable<int>(age.value);
+    }
+    if (gender.present) {
+      map['gender'] = Variable<String>(gender.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -5167,6 +6125,8 @@ class FamilyMembersCompanion extends UpdateCompanion<FamilyMemberEntity> {
           ..write('relationship: $relationship, ')
           ..write('phone: $phone, ')
           ..write('aadharNumber: $aadharNumber, ')
+          ..write('age: $age, ')
+          ..write('gender: $gender, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
@@ -8177,6 +9137,21 @@ typedef $$TenantsTableCreateCompanionBuilder =
       Value<String?> photoPath,
       Value<bool> isPoliceVerified,
       Value<String?> policeVerificationDocPath,
+      Value<String?> fatherName,
+      Value<int?> age,
+      Value<String?> gender,
+      Value<String?> secondaryPhone,
+      Value<String?> permanentAddressLine,
+      Value<String?> permanentCity,
+      Value<String?> permanentState,
+      Value<String?> permanentPincode,
+      Value<String?> companyName,
+      Value<String?> officeAddress,
+      Value<String?> aadhaarFrontPhotoPath,
+      Value<String?> aadhaarBackPhotoPath,
+      Value<String?> introducerName,
+      Value<String?> introducerAddress,
+      Value<String?> introducerPhone,
       Value<DateTime> createdAt,
     });
 typedef $$TenantsTableUpdateCompanionBuilder =
@@ -8188,6 +9163,21 @@ typedef $$TenantsTableUpdateCompanionBuilder =
       Value<String?> photoPath,
       Value<bool> isPoliceVerified,
       Value<String?> policeVerificationDocPath,
+      Value<String?> fatherName,
+      Value<int?> age,
+      Value<String?> gender,
+      Value<String?> secondaryPhone,
+      Value<String?> permanentAddressLine,
+      Value<String?> permanentCity,
+      Value<String?> permanentState,
+      Value<String?> permanentPincode,
+      Value<String?> companyName,
+      Value<String?> officeAddress,
+      Value<String?> aadhaarFrontPhotoPath,
+      Value<String?> aadhaarBackPhotoPath,
+      Value<String?> introducerName,
+      Value<String?> introducerAddress,
+      Value<String?> introducerPhone,
       Value<DateTime> createdAt,
     });
 
@@ -8291,6 +9281,81 @@ class $$TenantsTableFilterComposer
 
   ColumnFilters<String> get policeVerificationDocPath => $composableBuilder(
     column: $table.policeVerificationDocPath,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get fatherName => $composableBuilder(
+    column: $table.fatherName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get age => $composableBuilder(
+    column: $table.age,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get gender => $composableBuilder(
+    column: $table.gender,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get secondaryPhone => $composableBuilder(
+    column: $table.secondaryPhone,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get permanentAddressLine => $composableBuilder(
+    column: $table.permanentAddressLine,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get permanentCity => $composableBuilder(
+    column: $table.permanentCity,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get permanentState => $composableBuilder(
+    column: $table.permanentState,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get permanentPincode => $composableBuilder(
+    column: $table.permanentPincode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get companyName => $composableBuilder(
+    column: $table.companyName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get officeAddress => $composableBuilder(
+    column: $table.officeAddress,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get aadhaarFrontPhotoPath => $composableBuilder(
+    column: $table.aadhaarFrontPhotoPath,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get aadhaarBackPhotoPath => $composableBuilder(
+    column: $table.aadhaarBackPhotoPath,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get introducerName => $composableBuilder(
+    column: $table.introducerName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get introducerAddress => $composableBuilder(
+    column: $table.introducerAddress,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get introducerPhone => $composableBuilder(
+    column: $table.introducerPhone,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -8419,6 +9484,81 @@ class $$TenantsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get fatherName => $composableBuilder(
+    column: $table.fatherName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get age => $composableBuilder(
+    column: $table.age,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get gender => $composableBuilder(
+    column: $table.gender,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get secondaryPhone => $composableBuilder(
+    column: $table.secondaryPhone,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get permanentAddressLine => $composableBuilder(
+    column: $table.permanentAddressLine,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get permanentCity => $composableBuilder(
+    column: $table.permanentCity,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get permanentState => $composableBuilder(
+    column: $table.permanentState,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get permanentPincode => $composableBuilder(
+    column: $table.permanentPincode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get companyName => $composableBuilder(
+    column: $table.companyName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get officeAddress => $composableBuilder(
+    column: $table.officeAddress,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get aadhaarFrontPhotoPath => $composableBuilder(
+    column: $table.aadhaarFrontPhotoPath,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get aadhaarBackPhotoPath => $composableBuilder(
+    column: $table.aadhaarBackPhotoPath,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get introducerName => $composableBuilder(
+    column: $table.introducerName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get introducerAddress => $composableBuilder(
+    column: $table.introducerAddress,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get introducerPhone => $composableBuilder(
+    column: $table.introducerPhone,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -8458,6 +9598,77 @@ class $$TenantsTableAnnotationComposer
 
   GeneratedColumn<String> get policeVerificationDocPath => $composableBuilder(
     column: $table.policeVerificationDocPath,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get fatherName => $composableBuilder(
+    column: $table.fatherName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get age =>
+      $composableBuilder(column: $table.age, builder: (column) => column);
+
+  GeneratedColumn<String> get gender =>
+      $composableBuilder(column: $table.gender, builder: (column) => column);
+
+  GeneratedColumn<String> get secondaryPhone => $composableBuilder(
+    column: $table.secondaryPhone,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get permanentAddressLine => $composableBuilder(
+    column: $table.permanentAddressLine,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get permanentCity => $composableBuilder(
+    column: $table.permanentCity,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get permanentState => $composableBuilder(
+    column: $table.permanentState,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get permanentPincode => $composableBuilder(
+    column: $table.permanentPincode,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get companyName => $composableBuilder(
+    column: $table.companyName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get officeAddress => $composableBuilder(
+    column: $table.officeAddress,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get aadhaarFrontPhotoPath => $composableBuilder(
+    column: $table.aadhaarFrontPhotoPath,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get aadhaarBackPhotoPath => $composableBuilder(
+    column: $table.aadhaarBackPhotoPath,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get introducerName => $composableBuilder(
+    column: $table.introducerName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get introducerAddress => $composableBuilder(
+    column: $table.introducerAddress,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get introducerPhone => $composableBuilder(
+    column: $table.introducerPhone,
     builder: (column) => column,
   );
 
@@ -8579,6 +9790,21 @@ class $$TenantsTableTableManager
                 Value<String?> photoPath = const Value.absent(),
                 Value<bool> isPoliceVerified = const Value.absent(),
                 Value<String?> policeVerificationDocPath = const Value.absent(),
+                Value<String?> fatherName = const Value.absent(),
+                Value<int?> age = const Value.absent(),
+                Value<String?> gender = const Value.absent(),
+                Value<String?> secondaryPhone = const Value.absent(),
+                Value<String?> permanentAddressLine = const Value.absent(),
+                Value<String?> permanentCity = const Value.absent(),
+                Value<String?> permanentState = const Value.absent(),
+                Value<String?> permanentPincode = const Value.absent(),
+                Value<String?> companyName = const Value.absent(),
+                Value<String?> officeAddress = const Value.absent(),
+                Value<String?> aadhaarFrontPhotoPath = const Value.absent(),
+                Value<String?> aadhaarBackPhotoPath = const Value.absent(),
+                Value<String?> introducerName = const Value.absent(),
+                Value<String?> introducerAddress = const Value.absent(),
+                Value<String?> introducerPhone = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
               }) => TenantsCompanion(
                 id: id,
@@ -8588,6 +9814,21 @@ class $$TenantsTableTableManager
                 photoPath: photoPath,
                 isPoliceVerified: isPoliceVerified,
                 policeVerificationDocPath: policeVerificationDocPath,
+                fatherName: fatherName,
+                age: age,
+                gender: gender,
+                secondaryPhone: secondaryPhone,
+                permanentAddressLine: permanentAddressLine,
+                permanentCity: permanentCity,
+                permanentState: permanentState,
+                permanentPincode: permanentPincode,
+                companyName: companyName,
+                officeAddress: officeAddress,
+                aadhaarFrontPhotoPath: aadhaarFrontPhotoPath,
+                aadhaarBackPhotoPath: aadhaarBackPhotoPath,
+                introducerName: introducerName,
+                introducerAddress: introducerAddress,
+                introducerPhone: introducerPhone,
                 createdAt: createdAt,
               ),
           createCompanionCallback:
@@ -8599,6 +9840,21 @@ class $$TenantsTableTableManager
                 Value<String?> photoPath = const Value.absent(),
                 Value<bool> isPoliceVerified = const Value.absent(),
                 Value<String?> policeVerificationDocPath = const Value.absent(),
+                Value<String?> fatherName = const Value.absent(),
+                Value<int?> age = const Value.absent(),
+                Value<String?> gender = const Value.absent(),
+                Value<String?> secondaryPhone = const Value.absent(),
+                Value<String?> permanentAddressLine = const Value.absent(),
+                Value<String?> permanentCity = const Value.absent(),
+                Value<String?> permanentState = const Value.absent(),
+                Value<String?> permanentPincode = const Value.absent(),
+                Value<String?> companyName = const Value.absent(),
+                Value<String?> officeAddress = const Value.absent(),
+                Value<String?> aadhaarFrontPhotoPath = const Value.absent(),
+                Value<String?> aadhaarBackPhotoPath = const Value.absent(),
+                Value<String?> introducerName = const Value.absent(),
+                Value<String?> introducerAddress = const Value.absent(),
+                Value<String?> introducerPhone = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
               }) => TenantsCompanion.insert(
                 id: id,
@@ -8608,6 +9864,21 @@ class $$TenantsTableTableManager
                 photoPath: photoPath,
                 isPoliceVerified: isPoliceVerified,
                 policeVerificationDocPath: policeVerificationDocPath,
+                fatherName: fatherName,
+                age: age,
+                gender: gender,
+                secondaryPhone: secondaryPhone,
+                permanentAddressLine: permanentAddressLine,
+                permanentCity: permanentCity,
+                permanentState: permanentState,
+                permanentPincode: permanentPincode,
+                companyName: companyName,
+                officeAddress: officeAddress,
+                aadhaarFrontPhotoPath: aadhaarFrontPhotoPath,
+                aadhaarBackPhotoPath: aadhaarBackPhotoPath,
+                introducerName: introducerName,
+                introducerAddress: introducerAddress,
+                introducerPhone: introducerPhone,
                 createdAt: createdAt,
               ),
           withReferenceMapper: (p0) => p0
@@ -11032,6 +12303,8 @@ typedef $$FamilyMembersTableCreateCompanionBuilder =
       required FamilyRelationship relationship,
       Value<String?> phone,
       Value<String?> aadharNumber,
+      Value<int?> age,
+      Value<String?> gender,
       Value<DateTime> createdAt,
     });
 typedef $$FamilyMembersTableUpdateCompanionBuilder =
@@ -11042,6 +12315,8 @@ typedef $$FamilyMembersTableUpdateCompanionBuilder =
       Value<FamilyRelationship> relationship,
       Value<String?> phone,
       Value<String?> aadharNumber,
+      Value<int?> age,
+      Value<String?> gender,
       Value<DateTime> createdAt,
     });
 
@@ -11109,6 +12384,16 @@ class $$FamilyMembersTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<int> get age => $composableBuilder(
+    column: $table.age,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get gender => $composableBuilder(
+    column: $table.gender,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnFilters(column),
@@ -11172,6 +12457,16 @@ class $$FamilyMembersTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get age => $composableBuilder(
+    column: $table.age,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get gender => $composableBuilder(
+    column: $table.gender,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -11229,6 +12524,12 @@ class $$FamilyMembersTableAnnotationComposer
     column: $table.aadharNumber,
     builder: (column) => column,
   );
+
+  GeneratedColumn<int> get age =>
+      $composableBuilder(column: $table.age, builder: (column) => column);
+
+  GeneratedColumn<String> get gender =>
+      $composableBuilder(column: $table.gender, builder: (column) => column);
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -11291,6 +12592,8 @@ class $$FamilyMembersTableTableManager
                 Value<FamilyRelationship> relationship = const Value.absent(),
                 Value<String?> phone = const Value.absent(),
                 Value<String?> aadharNumber = const Value.absent(),
+                Value<int?> age = const Value.absent(),
+                Value<String?> gender = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
               }) => FamilyMembersCompanion(
                 id: id,
@@ -11299,6 +12602,8 @@ class $$FamilyMembersTableTableManager
                 relationship: relationship,
                 phone: phone,
                 aadharNumber: aadharNumber,
+                age: age,
+                gender: gender,
                 createdAt: createdAt,
               ),
           createCompanionCallback:
@@ -11309,6 +12614,8 @@ class $$FamilyMembersTableTableManager
                 required FamilyRelationship relationship,
                 Value<String?> phone = const Value.absent(),
                 Value<String?> aadharNumber = const Value.absent(),
+                Value<int?> age = const Value.absent(),
+                Value<String?> gender = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
               }) => FamilyMembersCompanion.insert(
                 id: id,
@@ -11317,6 +12624,8 @@ class $$FamilyMembersTableTableManager
                 relationship: relationship,
                 phone: phone,
                 aadharNumber: aadharNumber,
+                age: age,
+                gender: gender,
                 createdAt: createdAt,
               ),
           withReferenceMapper: (p0) => p0

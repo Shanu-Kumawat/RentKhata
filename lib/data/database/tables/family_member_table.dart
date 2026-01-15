@@ -28,6 +28,12 @@ class FamilyMembers extends Table {
   /// Aadhar number (optional)
   TextColumn get aadharNumber => text().nullable()();
 
+  /// Age of the family member
+  IntColumn get age => integer().nullable()();
+
+  /// Gender: 'male', 'female', 'other'
+  TextColumn get gender => text().nullable()();
+
   /// Created timestamp
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }

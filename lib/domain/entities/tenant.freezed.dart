@@ -29,6 +29,27 @@ mixin _$Tenant {
   bool get isPoliceVerified => throw _privateConstructorUsedError;
   String? get policeVerificationDocPath => throw _privateConstructorUsedError;
   DateTime get createdAt =>
+      throw _privateConstructorUsedError; // Identity fields
+  String? get fatherName => throw _privateConstructorUsedError;
+  int? get age => throw _privateConstructorUsedError;
+  String? get gender =>
+      throw _privateConstructorUsedError; // Additional contact
+  String? get secondaryPhone =>
+      throw _privateConstructorUsedError; // Permanent address
+  String? get permanentAddressLine => throw _privateConstructorUsedError;
+  String? get permanentCity => throw _privateConstructorUsedError;
+  String? get permanentState => throw _privateConstructorUsedError;
+  String? get permanentPincode =>
+      throw _privateConstructorUsedError; // Work details
+  String? get companyName => throw _privateConstructorUsedError;
+  String? get officeAddress =>
+      throw _privateConstructorUsedError; // ID document photos
+  String? get aadhaarFrontPhotoPath => throw _privateConstructorUsedError;
+  String? get aadhaarBackPhotoPath =>
+      throw _privateConstructorUsedError; // Introducer/Reference
+  String? get introducerName => throw _privateConstructorUsedError;
+  String? get introducerAddress => throw _privateConstructorUsedError;
+  String? get introducerPhone =>
       throw _privateConstructorUsedError; // Denormalized fields
   int? get currentRoomId => throw _privateConstructorUsedError;
   String? get currentRoomNumber => throw _privateConstructorUsedError;
@@ -58,6 +79,21 @@ abstract class $TenantCopyWith<$Res> {
     bool isPoliceVerified,
     String? policeVerificationDocPath,
     DateTime createdAt,
+    String? fatherName,
+    int? age,
+    String? gender,
+    String? secondaryPhone,
+    String? permanentAddressLine,
+    String? permanentCity,
+    String? permanentState,
+    String? permanentPincode,
+    String? companyName,
+    String? officeAddress,
+    String? aadhaarFrontPhotoPath,
+    String? aadhaarBackPhotoPath,
+    String? introducerName,
+    String? introducerAddress,
+    String? introducerPhone,
     int? currentRoomId,
     String? currentRoomNumber,
     String? currentPropertyName,
@@ -88,6 +124,21 @@ class _$TenantCopyWithImpl<$Res, $Val extends Tenant>
     Object? isPoliceVerified = null,
     Object? policeVerificationDocPath = freezed,
     Object? createdAt = null,
+    Object? fatherName = freezed,
+    Object? age = freezed,
+    Object? gender = freezed,
+    Object? secondaryPhone = freezed,
+    Object? permanentAddressLine = freezed,
+    Object? permanentCity = freezed,
+    Object? permanentState = freezed,
+    Object? permanentPincode = freezed,
+    Object? companyName = freezed,
+    Object? officeAddress = freezed,
+    Object? aadhaarFrontPhotoPath = freezed,
+    Object? aadhaarBackPhotoPath = freezed,
+    Object? introducerName = freezed,
+    Object? introducerAddress = freezed,
+    Object? introducerPhone = freezed,
     Object? currentRoomId = freezed,
     Object? currentRoomNumber = freezed,
     Object? currentPropertyName = freezed,
@@ -127,6 +178,66 @@ class _$TenantCopyWithImpl<$Res, $Val extends Tenant>
                 ? _value.createdAt
                 : createdAt // ignore: cast_nullable_to_non_nullable
                       as DateTime,
+            fatherName: freezed == fatherName
+                ? _value.fatherName
+                : fatherName // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            age: freezed == age
+                ? _value.age
+                : age // ignore: cast_nullable_to_non_nullable
+                      as int?,
+            gender: freezed == gender
+                ? _value.gender
+                : gender // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            secondaryPhone: freezed == secondaryPhone
+                ? _value.secondaryPhone
+                : secondaryPhone // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            permanentAddressLine: freezed == permanentAddressLine
+                ? _value.permanentAddressLine
+                : permanentAddressLine // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            permanentCity: freezed == permanentCity
+                ? _value.permanentCity
+                : permanentCity // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            permanentState: freezed == permanentState
+                ? _value.permanentState
+                : permanentState // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            permanentPincode: freezed == permanentPincode
+                ? _value.permanentPincode
+                : permanentPincode // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            companyName: freezed == companyName
+                ? _value.companyName
+                : companyName // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            officeAddress: freezed == officeAddress
+                ? _value.officeAddress
+                : officeAddress // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            aadhaarFrontPhotoPath: freezed == aadhaarFrontPhotoPath
+                ? _value.aadhaarFrontPhotoPath
+                : aadhaarFrontPhotoPath // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            aadhaarBackPhotoPath: freezed == aadhaarBackPhotoPath
+                ? _value.aadhaarBackPhotoPath
+                : aadhaarBackPhotoPath // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            introducerName: freezed == introducerName
+                ? _value.introducerName
+                : introducerName // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            introducerAddress: freezed == introducerAddress
+                ? _value.introducerAddress
+                : introducerAddress // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            introducerPhone: freezed == introducerPhone
+                ? _value.introducerPhone
+                : introducerPhone // ignore: cast_nullable_to_non_nullable
+                      as String?,
             currentRoomId: freezed == currentRoomId
                 ? _value.currentRoomId
                 : currentRoomId // ignore: cast_nullable_to_non_nullable
@@ -166,6 +277,21 @@ abstract class _$$TenantImplCopyWith<$Res> implements $TenantCopyWith<$Res> {
     bool isPoliceVerified,
     String? policeVerificationDocPath,
     DateTime createdAt,
+    String? fatherName,
+    int? age,
+    String? gender,
+    String? secondaryPhone,
+    String? permanentAddressLine,
+    String? permanentCity,
+    String? permanentState,
+    String? permanentPincode,
+    String? companyName,
+    String? officeAddress,
+    String? aadhaarFrontPhotoPath,
+    String? aadhaarBackPhotoPath,
+    String? introducerName,
+    String? introducerAddress,
+    String? introducerPhone,
     int? currentRoomId,
     String? currentRoomNumber,
     String? currentPropertyName,
@@ -195,6 +321,21 @@ class __$$TenantImplCopyWithImpl<$Res>
     Object? isPoliceVerified = null,
     Object? policeVerificationDocPath = freezed,
     Object? createdAt = null,
+    Object? fatherName = freezed,
+    Object? age = freezed,
+    Object? gender = freezed,
+    Object? secondaryPhone = freezed,
+    Object? permanentAddressLine = freezed,
+    Object? permanentCity = freezed,
+    Object? permanentState = freezed,
+    Object? permanentPincode = freezed,
+    Object? companyName = freezed,
+    Object? officeAddress = freezed,
+    Object? aadhaarFrontPhotoPath = freezed,
+    Object? aadhaarBackPhotoPath = freezed,
+    Object? introducerName = freezed,
+    Object? introducerAddress = freezed,
+    Object? introducerPhone = freezed,
     Object? currentRoomId = freezed,
     Object? currentRoomNumber = freezed,
     Object? currentPropertyName = freezed,
@@ -234,6 +375,66 @@ class __$$TenantImplCopyWithImpl<$Res>
             ? _value.createdAt
             : createdAt // ignore: cast_nullable_to_non_nullable
                   as DateTime,
+        fatherName: freezed == fatherName
+            ? _value.fatherName
+            : fatherName // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        age: freezed == age
+            ? _value.age
+            : age // ignore: cast_nullable_to_non_nullable
+                  as int?,
+        gender: freezed == gender
+            ? _value.gender
+            : gender // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        secondaryPhone: freezed == secondaryPhone
+            ? _value.secondaryPhone
+            : secondaryPhone // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        permanentAddressLine: freezed == permanentAddressLine
+            ? _value.permanentAddressLine
+            : permanentAddressLine // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        permanentCity: freezed == permanentCity
+            ? _value.permanentCity
+            : permanentCity // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        permanentState: freezed == permanentState
+            ? _value.permanentState
+            : permanentState // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        permanentPincode: freezed == permanentPincode
+            ? _value.permanentPincode
+            : permanentPincode // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        companyName: freezed == companyName
+            ? _value.companyName
+            : companyName // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        officeAddress: freezed == officeAddress
+            ? _value.officeAddress
+            : officeAddress // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        aadhaarFrontPhotoPath: freezed == aadhaarFrontPhotoPath
+            ? _value.aadhaarFrontPhotoPath
+            : aadhaarFrontPhotoPath // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        aadhaarBackPhotoPath: freezed == aadhaarBackPhotoPath
+            ? _value.aadhaarBackPhotoPath
+            : aadhaarBackPhotoPath // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        introducerName: freezed == introducerName
+            ? _value.introducerName
+            : introducerName // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        introducerAddress: freezed == introducerAddress
+            ? _value.introducerAddress
+            : introducerAddress // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        introducerPhone: freezed == introducerPhone
+            ? _value.introducerPhone
+            : introducerPhone // ignore: cast_nullable_to_non_nullable
+                  as String?,
         currentRoomId: freezed == currentRoomId
             ? _value.currentRoomId
             : currentRoomId // ignore: cast_nullable_to_non_nullable
@@ -267,6 +468,21 @@ class _$TenantImpl implements _Tenant {
     this.isPoliceVerified = false,
     this.policeVerificationDocPath,
     required this.createdAt,
+    this.fatherName,
+    this.age,
+    this.gender,
+    this.secondaryPhone,
+    this.permanentAddressLine,
+    this.permanentCity,
+    this.permanentState,
+    this.permanentPincode,
+    this.companyName,
+    this.officeAddress,
+    this.aadhaarFrontPhotoPath,
+    this.aadhaarBackPhotoPath,
+    this.introducerName,
+    this.introducerAddress,
+    this.introducerPhone,
     this.currentRoomId,
     this.currentRoomNumber,
     this.currentPropertyName,
@@ -293,6 +509,42 @@ class _$TenantImpl implements _Tenant {
   final String? policeVerificationDocPath;
   @override
   final DateTime createdAt;
+  // Identity fields
+  @override
+  final String? fatherName;
+  @override
+  final int? age;
+  @override
+  final String? gender;
+  // Additional contact
+  @override
+  final String? secondaryPhone;
+  // Permanent address
+  @override
+  final String? permanentAddressLine;
+  @override
+  final String? permanentCity;
+  @override
+  final String? permanentState;
+  @override
+  final String? permanentPincode;
+  // Work details
+  @override
+  final String? companyName;
+  @override
+  final String? officeAddress;
+  // ID document photos
+  @override
+  final String? aadhaarFrontPhotoPath;
+  @override
+  final String? aadhaarBackPhotoPath;
+  // Introducer/Reference
+  @override
+  final String? introducerName;
+  @override
+  final String? introducerAddress;
+  @override
+  final String? introducerPhone;
   // Denormalized fields
   @override
   final int? currentRoomId;
@@ -306,7 +558,7 @@ class _$TenantImpl implements _Tenant {
 
   @override
   String toString() {
-    return 'Tenant(id: $id, name: $name, phone: $phone, aadharNumber: $aadharNumber, photoPath: $photoPath, isPoliceVerified: $isPoliceVerified, policeVerificationDocPath: $policeVerificationDocPath, createdAt: $createdAt, currentRoomId: $currentRoomId, currentRoomNumber: $currentRoomNumber, currentPropertyName: $currentPropertyName, isCurrentlyOccupying: $isCurrentlyOccupying)';
+    return 'Tenant(id: $id, name: $name, phone: $phone, aadharNumber: $aadharNumber, photoPath: $photoPath, isPoliceVerified: $isPoliceVerified, policeVerificationDocPath: $policeVerificationDocPath, createdAt: $createdAt, fatherName: $fatherName, age: $age, gender: $gender, secondaryPhone: $secondaryPhone, permanentAddressLine: $permanentAddressLine, permanentCity: $permanentCity, permanentState: $permanentState, permanentPincode: $permanentPincode, companyName: $companyName, officeAddress: $officeAddress, aadhaarFrontPhotoPath: $aadhaarFrontPhotoPath, aadhaarBackPhotoPath: $aadhaarBackPhotoPath, introducerName: $introducerName, introducerAddress: $introducerAddress, introducerPhone: $introducerPhone, currentRoomId: $currentRoomId, currentRoomNumber: $currentRoomNumber, currentPropertyName: $currentPropertyName, isCurrentlyOccupying: $isCurrentlyOccupying)';
   }
 
   @override
@@ -330,6 +582,34 @@ class _$TenantImpl implements _Tenant {
                 other.policeVerificationDocPath == policeVerificationDocPath) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
+            (identical(other.fatherName, fatherName) ||
+                other.fatherName == fatherName) &&
+            (identical(other.age, age) || other.age == age) &&
+            (identical(other.gender, gender) || other.gender == gender) &&
+            (identical(other.secondaryPhone, secondaryPhone) ||
+                other.secondaryPhone == secondaryPhone) &&
+            (identical(other.permanentAddressLine, permanentAddressLine) ||
+                other.permanentAddressLine == permanentAddressLine) &&
+            (identical(other.permanentCity, permanentCity) ||
+                other.permanentCity == permanentCity) &&
+            (identical(other.permanentState, permanentState) ||
+                other.permanentState == permanentState) &&
+            (identical(other.permanentPincode, permanentPincode) ||
+                other.permanentPincode == permanentPincode) &&
+            (identical(other.companyName, companyName) ||
+                other.companyName == companyName) &&
+            (identical(other.officeAddress, officeAddress) ||
+                other.officeAddress == officeAddress) &&
+            (identical(other.aadhaarFrontPhotoPath, aadhaarFrontPhotoPath) ||
+                other.aadhaarFrontPhotoPath == aadhaarFrontPhotoPath) &&
+            (identical(other.aadhaarBackPhotoPath, aadhaarBackPhotoPath) ||
+                other.aadhaarBackPhotoPath == aadhaarBackPhotoPath) &&
+            (identical(other.introducerName, introducerName) ||
+                other.introducerName == introducerName) &&
+            (identical(other.introducerAddress, introducerAddress) ||
+                other.introducerAddress == introducerAddress) &&
+            (identical(other.introducerPhone, introducerPhone) ||
+                other.introducerPhone == introducerPhone) &&
             (identical(other.currentRoomId, currentRoomId) ||
                 other.currentRoomId == currentRoomId) &&
             (identical(other.currentRoomNumber, currentRoomNumber) ||
@@ -342,7 +622,7 @@ class _$TenantImpl implements _Tenant {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     runtimeType,
     id,
     name,
@@ -352,11 +632,26 @@ class _$TenantImpl implements _Tenant {
     isPoliceVerified,
     policeVerificationDocPath,
     createdAt,
+    fatherName,
+    age,
+    gender,
+    secondaryPhone,
+    permanentAddressLine,
+    permanentCity,
+    permanentState,
+    permanentPincode,
+    companyName,
+    officeAddress,
+    aadhaarFrontPhotoPath,
+    aadhaarBackPhotoPath,
+    introducerName,
+    introducerAddress,
+    introducerPhone,
     currentRoomId,
     currentRoomNumber,
     currentPropertyName,
     isCurrentlyOccupying,
-  );
+  ]);
 
   /// Create a copy of Tenant
   /// with the given fields replaced by the non-null parameter values.
@@ -382,6 +677,21 @@ abstract class _Tenant implements Tenant {
     final bool isPoliceVerified,
     final String? policeVerificationDocPath,
     required final DateTime createdAt,
+    final String? fatherName,
+    final int? age,
+    final String? gender,
+    final String? secondaryPhone,
+    final String? permanentAddressLine,
+    final String? permanentCity,
+    final String? permanentState,
+    final String? permanentPincode,
+    final String? companyName,
+    final String? officeAddress,
+    final String? aadhaarFrontPhotoPath,
+    final String? aadhaarBackPhotoPath,
+    final String? introducerName,
+    final String? introducerAddress,
+    final String? introducerPhone,
     final int? currentRoomId,
     final String? currentRoomNumber,
     final String? currentPropertyName,
@@ -405,7 +715,37 @@ abstract class _Tenant implements Tenant {
   @override
   String? get policeVerificationDocPath;
   @override
-  DateTime get createdAt; // Denormalized fields
+  DateTime get createdAt; // Identity fields
+  @override
+  String? get fatherName;
+  @override
+  int? get age;
+  @override
+  String? get gender; // Additional contact
+  @override
+  String? get secondaryPhone; // Permanent address
+  @override
+  String? get permanentAddressLine;
+  @override
+  String? get permanentCity;
+  @override
+  String? get permanentState;
+  @override
+  String? get permanentPincode; // Work details
+  @override
+  String? get companyName;
+  @override
+  String? get officeAddress; // ID document photos
+  @override
+  String? get aadhaarFrontPhotoPath;
+  @override
+  String? get aadhaarBackPhotoPath; // Introducer/Reference
+  @override
+  String? get introducerName;
+  @override
+  String? get introducerAddress;
+  @override
+  String? get introducerPhone; // Denormalized fields
   @override
   int? get currentRoomId;
   @override

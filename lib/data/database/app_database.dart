@@ -58,7 +58,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration {
@@ -91,6 +91,28 @@ class AppDatabase extends _$AppDatabase {
           await m.addColumn(occupancies, occupancies.depositReceivedDate);
           await m.addColumn(occupancies, occupancies.depositReturnedDate);
           await m.addColumn(occupancies, occupancies.depositReturnedAmount);
+        }
+        if (from < 3) {
+          // Add new tenant profile columns
+          await m.addColumn(tenants, tenants.fatherName);
+          await m.addColumn(tenants, tenants.age);
+          await m.addColumn(tenants, tenants.gender);
+          await m.addColumn(tenants, tenants.secondaryPhone);
+          await m.addColumn(tenants, tenants.permanentAddressLine);
+          await m.addColumn(tenants, tenants.permanentCity);
+          await m.addColumn(tenants, tenants.permanentState);
+          await m.addColumn(tenants, tenants.permanentPincode);
+          await m.addColumn(tenants, tenants.companyName);
+          await m.addColumn(tenants, tenants.officeAddress);
+          await m.addColumn(tenants, tenants.aadhaarFrontPhotoPath);
+          await m.addColumn(tenants, tenants.aadhaarBackPhotoPath);
+          await m.addColumn(tenants, tenants.introducerName);
+          await m.addColumn(tenants, tenants.introducerAddress);
+          await m.addColumn(tenants, tenants.introducerPhone);
+
+          // Add new family member columns
+          await m.addColumn(familyMembers, familyMembers.age);
+          await m.addColumn(familyMembers, familyMembers.gender);
         }
       },
     );

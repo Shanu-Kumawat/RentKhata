@@ -58,7 +58,9 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
       context: context,
       initialDate: _moveInDate,
       firstDate: DateTime(2020),
-      lastDate: DateTime.now(),
+      lastDate: DateTime.now().add(
+        const Duration(days: 30),
+      ), // Allow 30 days in future
     );
     if (date != null) {
       setState(() => _moveInDate = date);
