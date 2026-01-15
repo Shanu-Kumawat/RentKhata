@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../application/providers/dashboard_providers.dart';
+import '../../../application/providers/billing_providers.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../services/local_notification_service.dart';
 import 'edit_profile_screen.dart';
 import 'electricity_rates_screen.dart';
 
@@ -59,17 +61,6 @@ class SettingsScreen extends ConsumerWidget {
                     builder: (_) => const ElectricityRatesScreen(),
                   ),
                 ),
-              ),
-              _SettingsTile(
-                icon: Icons.schedule_outlined,
-                title: 'Auto-Billing',
-                subtitle: 'Configure automatic bill generation',
-                onTap: () {
-                  showModalBottomSheet(
-                    context: context,
-                    builder: (context) => const _AutoBillingSettingsSheet(),
-                  );
-                },
               ),
             ],
           ),
@@ -241,104 +232,21 @@ class _SettingsTile extends StatelessWidget {
   }
 }
 
-/// Auto-billing settings sheet
-class _AutoBillingSettingsSheet extends StatefulWidget {
-  const _AutoBillingSettingsSheet();
-
-  @override
-  State<_AutoBillingSettingsSheet> createState() =>
-      _AutoBillingSettingsSheetState();
-}
-
-class _AutoBillingSettingsSheetState extends State<_AutoBillingSettingsSheet> {
-  bool _enabled = false;
-  int _generationDay = 1;
-  int _dueDayOffset = 5;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Auto-Billing Settings',
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 24),
-          SwitchListTile(
-            title: const Text('Enable Auto-Billing'),
-            subtitle: const Text('Generate bills automatically each month'),
-            value: _enabled,
-            onChanged: (v) => setState(() => _enabled = v),
-          ),
-          const SizedBox(height: 16),
-          ListTile(
-            title: const Text('Generation Day'),
-            subtitle: Text('Day $_generationDay of each month'),
-            trailing: DropdownButton<int>(
-              value: _generationDay,
-              items: List.generate(
-                28,
-                (i) => DropdownMenuItem(value: i + 1, child: Text('${i + 1}')),
-              ),
-              onChanged: _enabled
-                  ? (v) => setState(() => _generationDay = v!)
-                  : null,
-            ),
-          ),
-          ListTile(
-            title: const Text('Due Date Offset'),
-            subtitle: Text('$_dueDayOffset days after generation'),
-            trailing: DropdownButton<int>(
-              value: _dueDayOffset,
-              items: [5, 7, 10, 15]
-                  .map(
-                    (d) => DropdownMenuItem(value: d, child: Text('$d days')),
-                  )
-                  .toList(),
-              onChanged: _enabled
-                  ? (v) => setState(() => _dueDayOffset = v!)
-                  : null,
-            ),
-          ),
-          const SizedBox(height: 24),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton(
-              onPressed: () {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Auto-billing settings saved!')),
-                );
-              },
-              child: const Text('Save Settings'),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 /// Notification settings sheet
-class _NotificationSettingsSheet extends StatefulWidget {
+class _NotificationSettingsSheet extends ConsumerStatefulWidget {
   const _NotificationSettingsSheet();
 
   @override
-  State<_NotificationSettingsSheet> createState() =>
+  ConsumerState<_NotificationSettingsSheet> createState() =>
       _NotificationSettingsSheetState();
 }
 
 class _NotificationSettingsSheetState
-    extends State<_NotificationSettingsSheet> {
+    extends ConsumerState<_NotificationSettingsSheet> {
   bool _dueSoon = true;
   bool _overdue = true;
   int _daysBefore = 3;
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -383,17 +291,83 @@ class _NotificationSettingsSheetState
           SizedBox(
             width: double.infinity,
             child: FilledButton(
-              onPressed: () {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Notification settings saved!')),
-                );
-              },
-              child: const Text('Save Settings'),
+              onPressed: _isLoading ? null : _saveAndSchedule,
+              child: _isLoading
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text('Save & Schedule Reminders'),
             ),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _saveAndSchedule() async {
+    setState(() => _isLoading = true);
+
+    try {
+      // Import notification service
+      final notificationService = LocalNotificationService();
+
+      // Request permission first
+      final granted = await notificationService.requestPermission();
+      if (!granted) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Notification permission denied')),
+          );
+        }
+        setState(() => _isLoading = false);
+        return;
+      }
+
+      // Cancel all existing notifications first
+      await notificationService.cancelAll();
+
+      // Get all unpaid bills
+      final bills = await ref.read(unpaidBillsProvider.future);
+      int scheduledCount = 0;
+
+      for (final bill in bills) {
+        // Schedule due soon reminder
+        if (_dueSoon && bill.dueDate != null) {
+          await notificationService.scheduleDueBillReminder(
+            bill: bill,
+            daysBefore: _daysBefore,
+          );
+          scheduledCount++;
+        }
+
+        // Schedule overdue reminder
+        if (_overdue && bill.dueDate != null) {
+          await notificationService.scheduleOverdueReminder(bill: bill);
+        }
+      }
+
+      if (mounted) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              scheduledCount > 0
+                  ? 'Scheduled reminders for $scheduledCount bill(s)!'
+                  : 'Settings saved. No pending bills to schedule.',
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 }

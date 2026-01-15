@@ -4,13 +4,13 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'app.dart';
+import 'services/local_notification_service.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  runApp(
-    const ProviderScope(
-      child: RentKhataApp(),
-    ),
-  );
+
+  // Initialize notification service
+  await LocalNotificationService().initialize();
+
+  runApp(const ProviderScope(child: RentKhataApp()));
 }

@@ -6,9 +6,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../application/providers/billing_providers.dart';
 import '../../../application/providers/dashboard_providers.dart';
+import '../../../application/providers/repository_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../domain/entities/bill.dart';
+import '../../../domain/entities/payment.dart';
 import '../../../services/share_service.dart';
 import '../../../services/invoice_pdf_service.dart';
 import '../billing/record_payment_sheet.dart';
@@ -324,7 +326,7 @@ class _BillCard extends ConsumerWidget {
                 TextButton.icon(
                   onPressed: () {
                     HapticFeedback.lightImpact();
-                    _showBillDetails(context, bill);
+                    _showBillDetails(context, ref, bill);
                   },
                   icon: const Icon(Icons.visibility_outlined, size: 18),
                   label: const Text('View'),
@@ -348,38 +350,12 @@ class _BillCard extends ConsumerWidget {
     );
   }
 
-  void _showBillDetails(BuildContext context, Bill bill) {
-    showDialog(
+  void _showBillDetails(BuildContext context, WidgetRef ref, Bill bill) {
+    showModalBottomSheet(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('${bill.billType.name.toUpperCase()} Bill'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Period: ${bill.billingPeriod}'),
-            if (bill.roomNumber != null) Text('Room: ${bill.roomNumber}'),
-            const SizedBox(height: 8),
-            Text('Amount: ${formatCurrency(bill.amount)}'),
-            Text('Paid: ${formatCurrency(bill.paidAmount)}'),
-            Text('Pending: ${formatCurrency(bill.pendingAmount)}'),
-            if (bill.electricityPrevReading != null) ...[
-              const SizedBox(height: 8),
-              Text('Previous Reading: ${bill.electricityPrevReading}'),
-              Text('Current Reading: ${bill.electricityCurrReading}'),
-              Text(
-                'Units: ${(bill.electricityCurrReading ?? 0) - (bill.electricityPrevReading ?? 0)}',
-              ),
-            ],
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
-          ),
-        ],
-      ),
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (context) => _BillDetailsSheet(bill: bill),
     );
   }
 
@@ -490,6 +466,475 @@ class _BillCard extends ConsumerWidget {
         return Colors.purple;
       case BillType.other:
         return AppColors.secondary;
+    }
+  }
+}
+
+/// Bottom sheet showing bill details with payments list and edit/delete options
+class _BillDetailsSheet extends ConsumerWidget {
+  final Bill bill;
+
+  const _BillDetailsSheet({required this.bill});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final paymentsAsync = ref.watch(paymentsForBillProvider(bill.id));
+
+    return DraggableScrollableSheet(
+      initialChildSize: 0.7,
+      minChildSize: 0.5,
+      maxChildSize: 0.95,
+      expand: false,
+      builder: (context, scrollController) => Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+        child: Column(
+          children: [
+            // Handle bar
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            // Header
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      '${bill.billType.name.toUpperCase()} Bill',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.close),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(),
+            // Content
+            Expanded(
+              child: ListView(
+                controller: scrollController,
+                padding: const EdgeInsets.all(16),
+                children: [
+                  // Bill Info Card
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Bill Details',
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 12),
+                          _InfoRow('Period', bill.billingPeriod),
+                          if (bill.roomNumber != null)
+                            _InfoRow('Room', bill.roomNumber!),
+                          if (bill.tenantName != null)
+                            _InfoRow('Tenant', bill.tenantName!),
+                          const Divider(),
+                          _InfoRow('Total Amount', formatCurrency(bill.amount)),
+                          _InfoRow(
+                            'Paid',
+                            formatCurrency(bill.paidAmount),
+                            color: AppColors.success,
+                          ),
+                          _InfoRow(
+                            'Pending',
+                            formatCurrency(bill.pendingAmount),
+                            color: bill.pendingAmount > 0
+                                ? AppColors.error
+                                : AppColors.success,
+                          ),
+                          if (bill.electricityPrevReading != null) ...[
+                            const Divider(),
+                            _InfoRow(
+                              'Previous Reading',
+                              bill.electricityPrevReading!.toStringAsFixed(0),
+                            ),
+                            _InfoRow(
+                              'Current Reading',
+                              bill.electricityCurrReading?.toStringAsFixed(0) ??
+                                  'N/A',
+                            ),
+                            _InfoRow(
+                              'Units Consumed',
+                              '${((bill.electricityCurrReading ?? 0) - (bill.electricityPrevReading ?? 0)).toStringAsFixed(0)}',
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Payments Section
+                  Text(
+                    'Payments',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+
+                  paymentsAsync.when(
+                    data: (payments) {
+                      if (payments.isEmpty) {
+                        return Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(24),
+                            child: Center(
+                              child: Column(
+                                children: [
+                                  Icon(
+                                    Icons.payment_outlined,
+                                    size: 48,
+                                    color: Colors.grey.shade400,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'No payments recorded yet',
+                                    style: TextStyle(
+                                      color: Colors.grey.shade600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+
+                      return Column(
+                        children: payments
+                            .map(
+                              (payment) => Card(
+                                margin: const EdgeInsets.only(bottom: 8),
+                                child: ListTile(
+                                  leading: CircleAvatar(
+                                    backgroundColor: AppColors.success
+                                        .withValues(alpha: 0.1),
+                                    child: const Icon(
+                                      Icons.check,
+                                      color: AppColors.success,
+                                    ),
+                                  ),
+                                  title: Text(formatCurrency(payment.amount)),
+                                  subtitle: Text(
+                                    '${payment.paymentMode.name.toUpperCase()} • ${_formatDate(payment.paymentDate)}',
+                                  ),
+                                  trailing: PopupMenuButton<String>(
+                                    onSelected: (action) {
+                                      if (action == 'edit') {
+                                        _editPayment(context, ref, payment);
+                                      } else if (action == 'delete') {
+                                        _deletePayment(context, ref, payment);
+                                      }
+                                    },
+                                    itemBuilder: (context) => [
+                                      const PopupMenuItem(
+                                        value: 'edit',
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.edit_outlined, size: 20),
+                                            SizedBox(width: 8),
+                                            Text('Edit'),
+                                          ],
+                                        ),
+                                      ),
+                                      const PopupMenuItem(
+                                        value: 'delete',
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              Icons.delete_outline,
+                                              size: 20,
+                                              color: Colors.red,
+                                            ),
+                                            SizedBox(width: 8),
+                                            Text(
+                                              'Delete',
+                                              style: TextStyle(
+                                                color: Colors.red,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            )
+                            .toList(),
+                      );
+                    },
+                    loading: () =>
+                        const Center(child: CircularProgressIndicator()),
+                    error: (e, _) => Center(child: Text('Error: $e')),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
+  }
+
+  void _editPayment(BuildContext context, WidgetRef ref, Payment payment) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) =>
+          _EditPaymentSheet(payment: payment, billId: bill.id),
+    );
+  }
+
+  void _deletePayment(
+    BuildContext context,
+    WidgetRef ref,
+    Payment payment,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Payment?'),
+        content: Text(
+          'Delete ${formatCurrency(payment.amount)} payment from ${_formatDate(payment.paymentDate)}?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      final repo = ref.read(billingRepositoryProvider);
+      await repo.deletePayment(payment.id);
+      ref.invalidate(paymentsForBillProvider(bill.id));
+      ref.invalidate(billsStreamProvider);
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Payment deleted')));
+      }
+    }
+  }
+}
+
+class _InfoRow extends StatelessWidget {
+  final String label;
+  final String value;
+  final Color? color;
+
+  const _InfoRow(this.label, this.value, {this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: TextStyle(color: Colors.grey.shade600)),
+          Text(
+            value,
+            style: TextStyle(fontWeight: FontWeight.w500, color: color),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Bottom sheet for editing a payment
+class _EditPaymentSheet extends ConsumerStatefulWidget {
+  final Payment payment;
+  final int billId;
+
+  const _EditPaymentSheet({required this.payment, required this.billId});
+
+  @override
+  ConsumerState<_EditPaymentSheet> createState() => _EditPaymentSheetState();
+}
+
+class _EditPaymentSheetState extends ConsumerState<_EditPaymentSheet> {
+  late final TextEditingController _amountController;
+  late PaymentMode _selectedMode;
+  late DateTime _selectedDate;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _amountController = TextEditingController(
+      text: widget.payment.amount.toStringAsFixed(0),
+    );
+    _selectedMode = widget.payment.paymentMode;
+    _selectedDate = widget.payment.paymentDate;
+  }
+
+  @override
+  void dispose() {
+    _amountController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+        left: 24,
+        right: 24,
+        top: 24,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Edit Payment',
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 24),
+
+          TextFormField(
+            controller: _amountController,
+            decoration: const InputDecoration(
+              labelText: 'Amount (₹)',
+              prefixIcon: Icon(Icons.currency_rupee),
+            ),
+            keyboardType: TextInputType.number,
+          ),
+          const SizedBox(height: 16),
+
+          DropdownButtonFormField<PaymentMode>(
+            value: _selectedMode,
+            decoration: const InputDecoration(
+              labelText: 'Payment Mode',
+              prefixIcon: Icon(Icons.payment),
+            ),
+            items: PaymentMode.values
+                .map(
+                  (mode) => DropdownMenuItem(
+                    value: mode,
+                    child: Text(mode.name.toUpperCase()),
+                  ),
+                )
+                .toList(),
+            onChanged: (mode) => setState(() => _selectedMode = mode!),
+          ),
+          const SizedBox(height: 16),
+
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.calendar_today),
+            title: const Text('Payment Date'),
+            subtitle: Text(
+              '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
+            ),
+            onTap: () async {
+              final date = await showDatePicker(
+                context: context,
+                initialDate: _selectedDate,
+                firstDate: DateTime(2020),
+                lastDate: DateTime.now(),
+              );
+              if (date != null) {
+                setState(() => _selectedDate = date);
+              }
+            },
+          ),
+          const SizedBox(height: 24),
+
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: FilledButton(
+                  onPressed: _isLoading ? null : _savePayment,
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text('Save'),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _savePayment() async {
+    final amount = double.tryParse(_amountController.text);
+    if (amount == null || amount <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a valid amount')),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    final repo = ref.read(billingRepositoryProvider);
+    await repo.updatePayment(
+      paymentId: widget.payment.id,
+      amount: amount,
+      paymentMode: _selectedMode,
+      paymentDate: _selectedDate,
+    );
+
+    ref.invalidate(paymentsForBillProvider(widget.billId));
+    ref.invalidate(billsStreamProvider);
+    ref.invalidate(dashboardSummaryProvider);
+
+    if (mounted) {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Payment updated!')));
     }
   }
 }

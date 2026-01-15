@@ -86,7 +86,8 @@ class _RoomDetailContent extends ConsumerWidget {
                 _OccupancyCard(
                   occupancy: occupancy,
                   room: room,
-                  onEndOccupancy: () => _confirmMoveOut(context, ref, occupancy),
+                  onEndOccupancy: () =>
+                      _confirmMoveOut(context, ref, occupancy),
                 ),
                 const SizedBox(height: 16),
 
@@ -128,9 +129,7 @@ class _RoomDetailContent extends ConsumerWidget {
                 _BillsSection(occupancyId: occupancy.id),
               ] else ...[
                 // Vacant room
-                _VacantRoomCard(
-                  onMoveIn: () => _showMoveIn(context, room),
-                ),
+                _VacantRoomCard(onMoveIn: () => _showMoveIn(context, room)),
               ],
             ],
           ),
@@ -186,10 +185,8 @@ class _RoomDetailContent extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      builder: (context) => AddRoomSheet(
-        propertyId: room.propertyId,
-        existingRoom: room,
-      ),
+      builder: (context) =>
+          AddRoomSheet(propertyId: room.propertyId, existingRoom: room),
     );
   }
 
@@ -198,39 +195,11 @@ class _RoomDetailContent extends ConsumerWidget {
     WidgetRef ref,
     Occupancy occupancy,
   ) {
-    showDialog(
+    showModalBottomSheet(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Move Out Tenant?'),
-        content: Text(
-          'Are you sure you want to move out ${occupancy.tenantName ?? 'tenant'}? '
-          'This will end the current occupancy.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              await ref.read(tenantRepositoryProvider).endOccupancy(
-                    occupancy.id,
-                    DateTime.now(),
-                  );
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Tenant moved out')),
-                );
-              }
-            },
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.warning,
-            ),
-            child: const Text('Move Out'),
-          ),
-        ],
-      ),
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (context) => _MoveOutSheet(occupancy: occupancy),
     );
   }
 }
@@ -276,18 +245,18 @@ class _RoomInfoCard extends StatelessWidget {
                       Text(
                         room.propertyName ?? 'Property',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: AppColors.onSurfaceVariant,
-                            ),
+                          color: AppColors.onSurfaceVariant,
+                        ),
                       ),
                       Text(
                         room.isOccupied ? 'Occupied' : 'Vacant',
-                        style:
-                            Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: room.isOccupied
-                                      ? AppColors.success
-                                      : AppColors.onSurfaceVariant,
-                                ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: room.isOccupied
+                                  ? AppColors.success
+                                  : AppColors.onSurfaceVariant,
+                            ),
                       ),
                     ],
                   ),
@@ -298,14 +267,14 @@ class _RoomInfoCard extends StatelessWidget {
                     Text(
                       formatCurrency(room.baseRent),
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     Text(
                       '/month',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.onSurfaceVariant,
-                          ),
+                        color: AppColors.onSurfaceVariant,
+                      ),
                     ),
                   ],
                 ),
@@ -317,14 +286,17 @@ class _RoomInfoCard extends StatelessWidget {
               const SizedBox(height: 8),
               Row(
                 children: [
-                  const Icon(Icons.bolt_outlined,
-                      size: 16, color: AppColors.warning),
+                  const Icon(
+                    Icons.bolt_outlined,
+                    size: 16,
+                    color: AppColors.warning,
+                  ),
                   const SizedBox(width: 8),
                   Text(
                     'Electricity meter @ ${formatCurrency(room.currentElectricityRate)}/unit',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.onSurfaceVariant,
-                        ),
+                      color: AppColors.onSurfaceVariant,
+                    ),
                   ),
                 ],
               ),
@@ -376,16 +348,14 @@ class _OccupancyCard extends StatelessWidget {
                     children: [
                       Text(
                         occupancy.tenantName ?? 'Tenant',
-                        style:
-                            Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w600),
                       ),
                       Text(
                         'Since ${occupancy.moveInDate.day}/${occupancy.moveInDate.month}/${occupancy.moveInDate.year}',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: AppColors.onSurfaceVariant,
-                            ),
+                          color: AppColors.onSurfaceVariant,
+                        ),
                       ),
                     ],
                   ),
@@ -444,15 +414,15 @@ class _InfoTile extends StatelessWidget {
       children: [
         Text(
           label,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.onSurfaceVariant,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: AppColors.onSurfaceVariant),
         ),
         Text(
           value,
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
         ),
       ],
     );
@@ -486,16 +456,16 @@ class _VacantRoomCard extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               'Room is Vacant',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 4),
             Text(
               'Assign a tenant to start collecting rent',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.onSurfaceVariant,
-                  ),
+                color: AppColors.onSurfaceVariant,
+              ),
             ),
             const SizedBox(height: 16),
             FilledButton.icon(
@@ -524,9 +494,9 @@ class _BillsSection extends ConsumerWidget {
       children: [
         Text(
           'Bills',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 12),
         billsAsync.when(
@@ -537,8 +507,8 @@ class _BillsSection extends ConsumerWidget {
                     child: Text(
                       'No bills yet',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppColors.onSurfaceVariant,
-                          ),
+                        color: AppColors.onSurfaceVariant,
+                      ),
                     ),
                   ),
                 )
@@ -563,8 +533,8 @@ class _BillTile extends StatelessWidget {
     final statusColor = bill.isFullyPaid
         ? AppColors.success
         : bill.isOverdue
-            ? AppColors.error
-            : AppColors.warning;
+        ? AppColors.error
+        : AppColors.warning;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
@@ -592,9 +562,9 @@ class _BillTile extends StatelessWidget {
         ),
         trailing: Text(
           formatCurrency(bill.amount),
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
         ),
       ),
     );
@@ -606,6 +576,315 @@ class _BillTile extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       builder: (context) => RecordPaymentSheet(bill: bill),
+    );
+  }
+}
+
+/// Move out bottom sheet with deposit settlement
+class _MoveOutSheet extends ConsumerStatefulWidget {
+  final Occupancy occupancy;
+
+  const _MoveOutSheet({required this.occupancy});
+
+  @override
+  ConsumerState<_MoveOutSheet> createState() => _MoveOutSheetState();
+}
+
+class _MoveOutSheetState extends ConsumerState<_MoveOutSheet> {
+  final _deductionController = TextEditingController();
+  final _reasonController = TextEditingController();
+  DateTime _moveOutDate = DateTime.now();
+  bool _isLoading = false;
+
+  double get deposit => widget.occupancy.securityDeposit;
+  double get deduction => double.tryParse(_deductionController.text) ?? 0;
+  double get refundable => (deposit - deduction).clamp(0, deposit);
+
+  @override
+  void dispose() {
+    _deductionController.dispose();
+    _reasonController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Get bills for this occupancy and filter for unpaid
+    final billsAsync = ref.watch(
+      billsForOccupancyProvider(widget.occupancy.id),
+    );
+
+    return DraggableScrollableSheet(
+      initialChildSize: 0.7,
+      minChildSize: 0.5,
+      maxChildSize: 0.9,
+      expand: false,
+      builder: (context, scrollController) => Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+        child: Column(
+          children: [
+            // Handle bar
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            // Header
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Move Out ${widget.occupancy.tenantName ?? 'Tenant'}',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.close),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(),
+            // Content
+            Expanded(
+              child: ListView(
+                controller: scrollController,
+                padding: const EdgeInsets.all(16),
+                children: [
+                  // Move out date
+                  Card(
+                    child: ListTile(
+                      leading: const Icon(
+                        Icons.calendar_today,
+                        color: AppColors.primary,
+                      ),
+                      title: const Text('Move Out Date'),
+                      subtitle: Text(
+                        '${_moveOutDate.day}/${_moveOutDate.month}/${_moveOutDate.year}',
+                      ),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () async {
+                        final date = await showDatePicker(
+                          context: context,
+                          initialDate: _moveOutDate,
+                          firstDate: widget.occupancy.moveInDate,
+                          lastDate: DateTime.now(),
+                        );
+                        if (date != null) {
+                          setState(() => _moveOutDate = date);
+                        }
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Pending Bills Warning
+                  billsAsync.when(
+                    data: (allBills) {
+                      final bills = allBills
+                          .where((b) => !b.isFullyPaid)
+                          .toList();
+                      if (bills.isEmpty) return const SizedBox.shrink();
+                      final total = bills.fold<double>(
+                        0,
+                        (sum, b) => sum + b.pendingAmount,
+                      );
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 16),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppColors.warning.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: AppColors.warning),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.warning_amber,
+                              color: AppColors.warning,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                '${bills.length} pending bill(s) totaling ${formatCurrency(total)}. '
+                                'Consider deducting from deposit.',
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    loading: () => const SizedBox.shrink(),
+                    error: (_, __) => const SizedBox.shrink(),
+                  ),
+
+                  // Deposit Summary Card
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Deposit Settlement',
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 16),
+                          _SettlementRow(
+                            'Security Deposit',
+                            formatCurrency(deposit),
+                          ),
+                          const SizedBox(height: 12),
+
+                          // Deduction Input
+                          TextFormField(
+                            controller: _deductionController,
+                            decoration: const InputDecoration(
+                              labelText: 'Deduction Amount (₹)',
+                              hintText: '0',
+                              prefixIcon: Icon(Icons.remove_circle_outline),
+                            ),
+                            keyboardType: TextInputType.number,
+                            onChanged: (_) => setState(() {}),
+                          ),
+                          const SizedBox(height: 8),
+                          TextFormField(
+                            controller: _reasonController,
+                            decoration: const InputDecoration(
+                              labelText: 'Reason for Deduction (Optional)',
+                              hintText: 'e.g., Unpaid bills, damages',
+                              prefixIcon: Icon(Icons.notes_outlined),
+                            ),
+                          ),
+                          const Divider(height: 24),
+                          _SettlementRow(
+                            'Refundable Amount',
+                            formatCurrency(refundable),
+                            highlight: true,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Action Buttons
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('Cancel'),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: FilledButton(
+                          onPressed: _isLoading ? null : _completeMoveOut,
+                          style: FilledButton.styleFrom(
+                            backgroundColor: AppColors.warning,
+                          ),
+                          child: _isLoading
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Text('Confirm Move Out'),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _completeMoveOut() async {
+    setState(() => _isLoading = true);
+
+    try {
+      // End the occupancy
+      await ref
+          .read(tenantRepositoryProvider)
+          .endOccupancy(widget.occupancy.id, _moveOutDate);
+
+      // Log the deposit settlement (for future: could store in a deposit_transactions table)
+      // For now, just complete the move out
+
+      if (mounted) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              refundable > 0
+                  ? 'Tenant moved out. Refund: ${formatCurrency(refundable)}'
+                  : 'Tenant moved out successfully',
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      setState(() => _isLoading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
+    }
+  }
+}
+
+class _SettlementRow extends StatelessWidget {
+  final String label;
+  final String value;
+  final bool highlight;
+
+  const _SettlementRow(this.label, this.value, {this.highlight = false});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: highlight
+              ? Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)
+              : TextStyle(color: Colors.grey.shade600),
+        ),
+        Text(
+          value,
+          style: highlight
+              ? Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.success,
+                )
+              : const TextStyle(fontWeight: FontWeight.w500),
+        ),
+      ],
     );
   }
 }
