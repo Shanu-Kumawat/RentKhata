@@ -324,7 +324,7 @@ class _OccupancyCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: InkWell(
-        onTap: () => context.push('/tenants/${occupancy.tenantId}'),
+        onTap: () => context.go('/tenants/${occupancy.tenantId}'),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16),
