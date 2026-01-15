@@ -1,6 +1,7 @@
 /// Tenant detail screen with comprehensive profile, occupancy history.
 library;
 
+import 'dart:io';
 import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -251,6 +252,58 @@ class _TenantDetailContent extends ConsumerWidget {
                       value: tenant.introducerPhone!,
                       onTap: () => _launchPhone(tenant.introducerPhone!),
                     ),
+                ],
+              ),
+              const SizedBox(height: 16),
+            ],
+
+            // ID Documents Section (Aadhaar photos)
+            if (tenant.aadhaarFrontPhotoPath != null ||
+                tenant.aadhaarBackPhotoPath != null) ...[
+              _buildInfoSection(
+                context,
+                title: 'ID Documents',
+                icon: Icons.badge_outlined,
+                children: [
+                  if (tenant.aadharNumber != null)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.credit_card_outlined,
+                            size: 18,
+                            color: AppColors.onSurfaceVariant,
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            'Aadhaar: ${tenant.aadharNumber}',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                        ],
+                      ),
+                    ),
+                  Row(
+                    children: [
+                      if (tenant.aadhaarFrontPhotoPath != null)
+                        Expanded(
+                          child: _AadhaarPhotoTile(
+                            label: 'Front',
+                            imagePath: tenant.aadhaarFrontPhotoPath!,
+                          ),
+                        ),
+                      if (tenant.aadhaarFrontPhotoPath != null &&
+                          tenant.aadhaarBackPhotoPath != null)
+                        const SizedBox(width: 12),
+                      if (tenant.aadhaarBackPhotoPath != null)
+                        Expanded(
+                          child: _AadhaarPhotoTile(
+                            label: 'Back',
+                            imagePath: tenant.aadhaarBackPhotoPath!,
+                          ),
+                        ),
+                    ],
+                  ),
                 ],
               ),
               const SizedBox(height: 16),
@@ -575,6 +628,179 @@ class _InfoRow extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+// ============ Aadhaar Photo Tile with Fullscreen View ============
+
+class _AadhaarPhotoTile extends StatelessWidget {
+  final String label;
+  final String imagePath;
+
+  const _AadhaarPhotoTile({required this.label, required this.imagePath});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        GestureDetector(
+          onTap: () => _showFullscreenImage(context),
+          child: Container(
+            height: 100,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: AppColors.onSurfaceVariant.withValues(alpha: 0.2),
+              ),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.file(
+                    File(imagePath),
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      color: AppColors.surfaceVariant,
+                      child: const Center(
+                        child: Icon(
+                          Icons.broken_image_outlined,
+                          color: AppColors.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Expand indicator
+                  Positioned(
+                    bottom: 4,
+                    right: 4,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.5),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: const Icon(
+                        Icons.fullscreen,
+                        color: Colors.white,
+                        size: 16,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: AppColors.onSurfaceVariant),
+        ),
+      ],
+    );
+  }
+
+  void _showFullscreenImage(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => _FullscreenImageViewer(
+          imagePath: imagePath,
+          title: 'Aadhaar $label',
+        ),
+      ),
+    );
+  }
+}
+
+// ============ Fullscreen Image Viewer with Share ============
+
+class _FullscreenImageViewer extends StatelessWidget {
+  final String imagePath;
+  final String title;
+
+  const _FullscreenImageViewer({required this.imagePath, required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
+        title: Text(title),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.share_outlined),
+            tooltip: 'Share',
+            onPressed: () => _shareImage(context),
+          ),
+        ],
+      ),
+      body: InteractiveViewer(
+        minScale: 0.5,
+        maxScale: 4.0,
+        child: Center(
+          child: Image.file(
+            File(imagePath),
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) => Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.broken_image_outlined,
+                  size: 64,
+                  color: Colors.white54,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Unable to load image',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyLarge?.copyWith(color: Colors.white54),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _shareImage(BuildContext context) async {
+    try {
+      final file = File(imagePath);
+      if (await file.exists()) {
+        // Use platform share sheet
+        // Note: This requires share_plus package - fall back to showing path if not available
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Image path: $imagePath'),
+            action: SnackBarAction(
+              label: 'Copy',
+              onPressed: () {
+                Clipboard.setData(ClipboardData(text: imagePath));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Path copied to clipboard')),
+                );
+              },
+            ),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Image file not found')));
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error sharing: $e')));
+    }
   }
 }
 

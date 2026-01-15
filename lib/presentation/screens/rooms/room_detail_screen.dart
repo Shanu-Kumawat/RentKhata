@@ -3,6 +3,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../application/providers/property_providers.dart';
 import '../../../application/providers/tenant_providers.dart';
 import '../../../application/providers/billing_providers.dart';
@@ -322,79 +323,82 @@ class _OccupancyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 24,
-                  backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                  child: Text(
-                    (occupancy.tenantName ?? 'T')[0].toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primary,
+      child: InkWell(
+        onTap: () => context.push('/tenants/${occupancy.tenantId}'),
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 24,
+                    backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                    child: Text(
+                      (occupancy.tenantName ?? 'T')[0].toUpperCase(),
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primary,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        occupancy.tenantName ?? 'Tenant',
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(fontWeight: FontWeight.w600),
-                      ),
-                      Text(
-                        'Since ${occupancy.moveInDate.day}/${occupancy.moveInDate.month}/${occupancy.moveInDate.year}',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.onSurfaceVariant,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          occupancy.tenantName ?? 'Tenant',
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w600),
+                        ),
+                        Text(
+                          'Since ${occupancy.moveInDate.day}/${occupancy.moveInDate.month}/${occupancy.moveInDate.year}',
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: AppColors.onSurfaceVariant),
+                        ),
+                      ],
+                    ),
+                  ),
+                  PopupMenuButton<String>(
+                    onSelected: (value) {
+                      if (value == 'move_out') onEndOccupancy();
+                    },
+                    itemBuilder: (context) => [
+                      const PopupMenuItem(
+                        value: 'move_out',
+                        child: Row(
+                          children: [
+                            Icon(Icons.exit_to_app, color: AppColors.warning),
+                            SizedBox(width: 8),
+                            Text('Move Out'),
+                          ],
                         ),
                       ),
                     ],
                   ),
-                ),
-                PopupMenuButton<String>(
-                  onSelected: (value) {
-                    if (value == 'move_out') onEndOccupancy();
-                  },
-                  itemBuilder: (context) => [
-                    const PopupMenuItem(
-                      value: 'move_out',
-                      child: Row(
-                        children: [
-                          Icon(Icons.exit_to_app, color: AppColors.warning),
-                          SizedBox(width: 8),
-                          Text('Move Out'),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                _InfoTile(
-                  label: 'Agreed Rent',
-                  value: formatCurrency(occupancy.agreedRent),
-                ),
-                const SizedBox(width: 24),
-                if (occupancy.securityDeposit > 0)
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
                   _InfoTile(
-                    label: 'Security Deposit',
-                    value: formatCurrency(occupancy.securityDeposit),
+                    label: 'Agreed Rent',
+                    value: formatCurrency(occupancy.agreedRent),
                   ),
-              ],
-            ),
-          ],
+                  const SizedBox(width: 24),
+                  if (occupancy.securityDeposit > 0)
+                    _InfoTile(
+                      label: 'Security Deposit',
+                      value: formatCurrency(occupancy.securityDeposit),
+                    ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
