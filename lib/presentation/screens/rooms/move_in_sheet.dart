@@ -7,6 +7,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../application/providers/repository_providers.dart';
 import '../../../application/providers/tenant_providers.dart';
+import '../../../application/providers/property_providers.dart';
+import '../../../application/providers/dashboard_providers.dart';
 import '../../../application/providers/database_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/validators.dart';
@@ -224,6 +226,12 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
           _selectedFamilyMemberIds.length + _newFamilyMembers.length;
 
       if (mounted) {
+        // Invalidate providers to refresh state across screens
+        ref.invalidate(tenantsProvider);
+        ref.invalidate(tenantProvider(tenantId));
+        ref.invalidate(roomProvider(widget.roomId));
+        ref.invalidate(dashboardSummaryProvider);
+
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

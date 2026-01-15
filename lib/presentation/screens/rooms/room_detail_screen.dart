@@ -684,7 +684,9 @@ class _MoveOutSheetState extends ConsumerState<_MoveOutSheet> {
                           context: context,
                           initialDate: _moveOutDate,
                           firstDate: widget.occupancy.moveInDate,
-                          lastDate: DateTime.now(),
+                          lastDate: DateTime.now().add(
+                            const Duration(days: 365 * 5),
+                          ), // Allow future dates
                         );
                         if (date != null) {
                           setState(() => _moveOutDate = date);
@@ -837,6 +839,12 @@ class _MoveOutSheetState extends ConsumerState<_MoveOutSheet> {
       // For now, just complete the move out
 
       if (mounted) {
+        // Invalidate providers to refresh state
+        ref.invalidate(roomProvider(widget.occupancy.roomId));
+        ref.invalidate(tenantsProvider);
+        ref.invalidate(tenantProvider(widget.occupancy.tenantId));
+        ref.invalidate(dashboardSummaryProvider);
+
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
