@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../application/providers/repository_providers.dart';
+import '../../../application/providers/tenant_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/validators.dart';
 import '../../../domain/entities/tenant.dart';
@@ -224,6 +225,12 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
               ? null
               : _introducerPhoneController.text.trim(),
         );
+      }
+
+      // Invalidate tenant providers to refresh data
+      ref.invalidate(tenantsProvider);
+      if (isEditing) {
+        ref.invalidate(tenantProvider(widget.tenant!.id));
       }
 
       if (mounted) {
