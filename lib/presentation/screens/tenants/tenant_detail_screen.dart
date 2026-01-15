@@ -18,6 +18,7 @@ import '../../../domain/entities/occupancy.dart';
 import '../../../data/database/app_database.dart';
 import '../../../data/database/tables/family_member_table.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:share_plus/share_plus.dart';
 import 'add_tenant_screen.dart';
 
 /// Tenant detail screen showing profile, custom fields, and history.
@@ -100,18 +101,6 @@ class _TenantDetailContent extends ConsumerWidget {
           children: [
             // Profile card with status badge
             _ProfileCard(tenant: tenant),
-            // DEBUG: Print Aadhaar paths
-            Builder(
-              builder: (context) {
-                debugPrint(
-                  'DEBUG: aadhaarFrontPhotoPath = ${tenant.aadhaarFrontPhotoPath}',
-                );
-                debugPrint(
-                  'DEBUG: aadhaarBackPhotoPath = ${tenant.aadhaarBackPhotoPath}',
-                );
-                return const SizedBox.shrink();
-              },
-            ),
             const SizedBox(height: 16),
 
             // Current occupancy (if active)
@@ -787,31 +776,23 @@ class _FullscreenImageViewer extends StatelessWidget {
     try {
       final file = File(imagePath);
       if (await file.exists()) {
-        // Use platform share sheet
-        // Note: This requires share_plus package - fall back to showing path if not available
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Image path: $imagePath'),
-            action: SnackBarAction(
-              label: 'Copy',
-              onPressed: () {
-                Clipboard.setData(ClipboardData(text: imagePath));
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Path copied to clipboard')),
-                );
-              },
-            ),
-          ),
-        );
+        // Use share_plus to share the image file
+        await Share.shareXFiles([
+          XFile(imagePath),
+        ], text: 'Aadhaar Card - $title');
       } else {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Image file not found')));
+        if (context.mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Image file not found')));
+        }
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error sharing: $e')));
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error sharing: $e')));
+      }
     }
   }
 }
