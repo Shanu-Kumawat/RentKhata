@@ -680,13 +680,22 @@ class _MoveOutSheetState extends ConsumerState<_MoveOutSheet> {
                       ),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () async {
+                        // Allow dates from move-in date to 5 years in future
+                        final earliestDate = widget.occupancy.moveInDate;
+                        final latestDate = DateTime.now().add(
+                          const Duration(days: 365 * 5),
+                        );
+                        // Ensure initial date is within valid range
+                        var initial = _moveOutDate;
+                        if (initial.isBefore(earliestDate))
+                          initial = earliestDate;
+                        if (initial.isAfter(latestDate)) initial = latestDate;
+
                         final date = await showDatePicker(
                           context: context,
-                          initialDate: _moveOutDate,
-                          firstDate: widget.occupancy.moveInDate,
-                          lastDate: DateTime.now().add(
-                            const Duration(days: 365 * 5),
-                          ), // Allow future dates
+                          initialDate: initial,
+                          firstDate: earliestDate,
+                          lastDate: latestDate,
                         );
                         if (date != null) {
                           setState(() => _moveOutDate = date);
