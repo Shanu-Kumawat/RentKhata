@@ -1,16 +1,20 @@
-/// Move-in flow screen for assigning tenant to room with family member selection.
+/// Move-in flow with full tenant form, family member selection, and add new family.
 library;
 
+import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../application/providers/repository_providers.dart';
 import '../../../application/providers/tenant_providers.dart';
+import '../../../application/providers/database_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/validators.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../domain/entities/tenant.dart';
 import '../../../domain/entities/room.dart';
+import '../../../data/database/app_database.dart';
+import '../../../data/database/tables/family_member_table.dart';
 
 /// Bottom sheet for moving a tenant into a room.
 class MoveInSheet extends ConsumerStatefulWidget {
@@ -33,16 +37,35 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
   bool _isLoading = false;
   bool _createNewTenant = false;
 
-  // New tenant fields
+  // New tenant fields - FULL FORM matching edit screen
   final _newNameController = TextEditingController();
-  final _newPhoneController = TextEditingController();
   final _newFatherNameController = TextEditingController();
   final _newAgeController = TextEditingController();
+  final _newPhoneController = TextEditingController();
+  final _newSecondaryPhoneController = TextEditingController();
   final _newAadharController = TextEditingController();
   String? _selectedGender;
 
+  // Permanent Address
+  final _addressLineController = TextEditingController();
+  final _cityController = TextEditingController();
+  final _stateController = TextEditingController();
+  final _pincodeController = TextEditingController();
+
+  // Work Details
+  final _companyNameController = TextEditingController();
+  final _officeAddressController = TextEditingController();
+
+  // Introducer
+  final _introducerNameController = TextEditingController();
+  final _introducerAddressController = TextEditingController();
+  final _introducerPhoneController = TextEditingController();
+
   // Family member selection for returning tenants
   Set<int> _selectedFamilyMemberIds = {};
+
+  // New family members to add during move-in
+  List<_NewFamilyMember> _newFamilyMembers = [];
 
   @override
   void initState() {
@@ -55,10 +78,20 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
     _rentController.dispose();
     _depositController.dispose();
     _newNameController.dispose();
-    _newPhoneController.dispose();
     _newFatherNameController.dispose();
     _newAgeController.dispose();
+    _newPhoneController.dispose();
+    _newSecondaryPhoneController.dispose();
     _newAadharController.dispose();
+    _addressLineController.dispose();
+    _cityController.dispose();
+    _stateController.dispose();
+    _pincodeController.dispose();
+    _companyNameController.dispose();
+    _officeAddressController.dispose();
+    _introducerNameController.dispose();
+    _introducerAddressController.dispose();
+    _introducerPhoneController.dispose();
     super.dispose();
   }
 
@@ -74,6 +107,26 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
     }
   }
 
+  // Check if form is partially filled
+  bool get _isPartiallyFilled {
+    return _newNameController.text.isNotEmpty &&
+        (_newFatherNameController.text.isEmpty ||
+            _newPhoneController.text.isEmpty ||
+            _newAadharController.text.isEmpty ||
+            _addressLineController.text.isEmpty ||
+            _cityController.text.isEmpty);
+  }
+
+  // Check if all essential fields are filled
+  bool get _isFullyFilled {
+    return _newNameController.text.isNotEmpty &&
+        _newFatherNameController.text.isNotEmpty &&
+        _newPhoneController.text.isNotEmpty &&
+        _newAadharController.text.isNotEmpty &&
+        _addressLineController.text.isNotEmpty &&
+        _cityController.text.isNotEmpty;
+  }
+
   Future<void> _saveOccupancy() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -84,31 +137,70 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
       return;
     }
 
+    // Check partial fill for new tenant
+    if (_createNewTenant && _isPartiallyFilled && !_isFullyFilled) {
+      final proceed = await _showPartialFillDialog();
+      if (proceed != true) return;
+    }
+
     setState(() => _isLoading = true);
     HapticFeedback.mediumImpact();
 
     try {
       final tenantRepo = ref.read(tenantRepositoryProvider);
+      final db = ref.read(appDatabaseProvider);
       int tenantId;
 
       if (_createNewTenant) {
-        // Create new tenant with expanded fields
+        // Create new tenant with ALL fields
         tenantId = await tenantRepo.createTenant(
           name: _newNameController.text.trim(),
-          phone: _newPhoneController.text.trim().isEmpty
-              ? null
-              : _newPhoneController.text.trim(),
-          fatherName: _newFatherNameController.text.trim().isEmpty
-              ? null
-              : _newFatherNameController.text.trim(),
+          phone: _emptyToNull(_newPhoneController.text),
+          fatherName: _emptyToNull(_newFatherNameController.text),
           age: int.tryParse(_newAgeController.text),
           gender: _selectedGender,
-          aadharNumber: _newAadharController.text.trim().isEmpty
-              ? null
-              : _newAadharController.text.trim(),
+          aadharNumber: _emptyToNull(_newAadharController.text),
+          secondaryPhone: _emptyToNull(_newSecondaryPhoneController.text),
+          permanentAddressLine: _emptyToNull(_addressLineController.text),
+          permanentCity: _emptyToNull(_cityController.text),
+          permanentState: _emptyToNull(_stateController.text),
+          permanentPincode: _emptyToNull(_pincodeController.text),
+          companyName: _emptyToNull(_companyNameController.text),
+          officeAddress: _emptyToNull(_officeAddressController.text),
+          introducerName: _emptyToNull(_introducerNameController.text),
+          introducerAddress: _emptyToNull(_introducerAddressController.text),
+          introducerPhone: _emptyToNull(_introducerPhoneController.text),
         );
+
+        // Add new family members for new tenant
+        for (final member in _newFamilyMembers) {
+          await db.tenantDao.insertFamilyMember(
+            FamilyMembersCompanion.insert(
+              tenantId: tenantId,
+              name: member.name,
+              relationship: member.relationship,
+              phone: Value(member.phone.isEmpty ? null : member.phone),
+              age: Value(member.age),
+              gender: Value(member.gender),
+            ),
+          );
+        }
       } else {
         tenantId = _selectedTenant!.id;
+
+        // Add new family members for existing tenant
+        for (final member in _newFamilyMembers) {
+          await db.tenantDao.insertFamilyMember(
+            FamilyMembersCompanion.insert(
+              tenantId: tenantId,
+              name: member.name,
+              relationship: member.relationship,
+              phone: Value(member.phone.isEmpty ? null : member.phone),
+              age: Value(member.age),
+              gender: Value(member.gender),
+            ),
+          );
+        }
       }
 
       // Create occupancy
@@ -121,13 +213,16 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
         securityDeposit: double.tryParse(_depositController.text) ?? 0,
       );
 
+      final totalFamily =
+          _selectedFamilyMemberIds.length + _newFamilyMembers.length;
+
       if (mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              _selectedFamilyMemberIds.isNotEmpty
-                  ? 'Tenant moved in with ${_selectedFamilyMemberIds.length} family members'
+              totalFamily > 0
+                  ? 'Tenant moved in with $totalFamily family member(s)'
                   : 'Tenant moved in successfully',
             ),
           ),
@@ -144,6 +239,225 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
     }
   }
 
+  String? _emptyToNull(String text) => text.trim().isEmpty ? null : text.trim();
+
+  Future<bool?> _showPartialFillDialog() {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        icon: const Icon(
+          Icons.info_outline,
+          color: AppColors.warning,
+          size: 48,
+        ),
+        title: const Text('Incomplete Profile'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Some fields are not filled:'),
+            const SizedBox(height: 12),
+            if (_newFatherNameController.text.isEmpty)
+              _MissingFieldItem('Father\'s Name'),
+            if (_newPhoneController.text.isEmpty)
+              _MissingFieldItem('Phone Number'),
+            if (_newAadharController.text.isEmpty)
+              _MissingFieldItem('Aadhaar Number'),
+            if (_addressLineController.text.isEmpty)
+              _MissingFieldItem('Permanent Address'),
+            if (_cityController.text.isEmpty) _MissingFieldItem('City'),
+            const SizedBox(height: 12),
+            Text(
+              'You can complete these later from the Edit Tenant page.',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: AppColors.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Go Back'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Save Partial'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAddFamilyMemberDialog() {
+    final nameController = TextEditingController();
+    final ageController = TextEditingController();
+    final phoneController = TextEditingController();
+    String? relationship;
+    String? gender;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setLocalState) => Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(ctx).viewInsets.bottom,
+            left: 24,
+            right: 24,
+            top: 24,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Add Family Member',
+                style: Theme.of(
+                  ctx,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Name *',
+                  prefixIcon: Icon(Icons.person_outline),
+                ),
+                autofocus: true,
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: DropdownButtonFormField<String>(
+                      decoration: const InputDecoration(
+                        labelText: 'Relationship *',
+                      ),
+                      value: relationship,
+                      items: const [
+                        DropdownMenuItem(
+                          value: 'spouse',
+                          child: Text('Spouse'),
+                        ),
+                        DropdownMenuItem(value: 'child', child: Text('Child')),
+                        DropdownMenuItem(
+                          value: 'parent',
+                          child: Text('Parent'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'sibling',
+                          child: Text('Sibling'),
+                        ),
+                        DropdownMenuItem(value: 'other', child: Text('Other')),
+                      ],
+                      onChanged: (v) => setLocalState(() => relationship = v),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      controller: ageController,
+                      decoration: const InputDecoration(labelText: 'Age'),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: DropdownButtonFormField<String>(
+                      decoration: const InputDecoration(labelText: 'Gender'),
+                      value: gender,
+                      items: const [
+                        DropdownMenuItem(value: 'male', child: Text('Male')),
+                        DropdownMenuItem(
+                          value: 'female',
+                          child: Text('Female'),
+                        ),
+                        DropdownMenuItem(value: 'other', child: Text('Other')),
+                      ],
+                      onChanged: (v) => setLocalState(() => gender = v),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: phoneController,
+                decoration: const InputDecoration(
+                  labelText: 'Phone (Optional)',
+                  prefixIcon: Icon(Icons.phone_outlined),
+                ),
+                keyboardType: TextInputType.phone,
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      child: const Text('Cancel'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: () {
+                        if (nameController.text.isEmpty ||
+                            relationship == null) {
+                          ScaffoldMessenger.of(ctx).showSnackBar(
+                            const SnackBar(
+                              content: Text('Name and relationship required'),
+                            ),
+                          );
+                          return;
+                        }
+                        Navigator.pop(ctx);
+                        setState(() {
+                          _newFamilyMembers.add(
+                            _NewFamilyMember(
+                              name: nameController.text.trim(),
+                              relationship: _stringToRelationship(
+                                relationship!,
+                              ),
+                              age: int.tryParse(ageController.text),
+                              gender: gender,
+                              phone: phoneController.text.trim(),
+                            ),
+                          );
+                        });
+                      },
+                      child: const Text('Add'),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  FamilyRelationship _stringToRelationship(String value) {
+    switch (value) {
+      case 'spouse':
+        return FamilyRelationship.spouse;
+      case 'child':
+        return FamilyRelationship.child;
+      case 'parent':
+        return FamilyRelationship.parent;
+      case 'sibling':
+        return FamilyRelationship.sibling;
+      default:
+        return FamilyRelationship.other;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final tenantsAsync = ref.watch(tenantsProvider);
@@ -153,9 +467,9 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
       child: DraggableScrollableSheet(
-        initialChildSize: 0.9,
+        initialChildSize: 0.95,
         minChildSize: 0.5,
-        maxChildSize: 0.95,
+        maxChildSize: 0.98,
         expand: false,
         builder: (context, scrollController) {
           return Container(
@@ -166,115 +480,28 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
                 controller: scrollController,
                 children: [
                   // Header
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Move In Tenant',
-                            style: Theme.of(context).textTheme.titleLarge
-                                ?.copyWith(fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Room ${widget.room.roomNumber}',
-                            style: Theme.of(context).textTheme.bodyMedium
-                                ?.copyWith(color: AppColors.onSurfaceVariant),
-                          ),
-                        ],
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                    ],
-                  ),
+                  _buildHeader(),
                   const SizedBox(height: 24),
 
                   // Toggle: Select existing or create new
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _ToggleButton(
-                          label: 'Existing Tenant',
-                          isSelected: !_createNewTenant,
-                          onTap: () => setState(() {
-                            _createNewTenant = false;
-                            _selectedFamilyMemberIds.clear();
-                          }),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _ToggleButton(
-                          label: 'New Tenant',
-                          isSelected: _createNewTenant,
-                          onTap: () => setState(() {
-                            _createNewTenant = true;
-                            _selectedTenant = null;
-                            _selectedFamilyMemberIds.clear();
-                          }),
-                        ),
-                      ),
-                    ],
-                  ),
+                  _buildToggle(),
                   const SizedBox(height: 24),
 
                   if (_createNewTenant) ...[
-                    // New tenant fields - expanded
-                    _buildNewTenantForm(),
+                    _buildFullNewTenantForm(),
                   ] else ...[
-                    // Tenant selection
-                    tenantsAsync.when(
-                      data: (tenants) {
-                        // Filter out tenants who are already occupying a room
-                        final availableTenants = tenants
-                            .where((t) => !t.isCurrentlyOccupying)
-                            .toList();
-
-                        if (availableTenants.isEmpty) {
-                          return _buildNoTenantsMessage();
-                        }
-
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Select Tenant',
-                              style: Theme.of(context).textTheme.titleSmall,
-                            ),
-                            const SizedBox(height: 8),
-                            ...availableTenants.map(
-                              (tenant) => _TenantRadioTile(
-                                tenant: tenant,
-                                isSelected: _selectedTenant?.id == tenant.id,
-                                onTap: () {
-                                  setState(() {
-                                    _selectedTenant = tenant;
-                                    _selectedFamilyMemberIds.clear();
-                                  });
-                                },
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                      loading: () =>
-                          const Center(child: CircularProgressIndicator()),
-                      error: (e, s) => Text('Error: $e'),
-                    ),
-
-                    // Family member selection for returning tenants
+                    _buildExistingTenantSelection(tenantsAsync),
                     if (_selectedTenant != null) ...[
                       const SizedBox(height: 16),
                       _FamilyMemberSelection(
                         tenantId: _selectedTenant!.id,
                         selectedIds: _selectedFamilyMemberIds,
-                        onSelectionChanged: (ids) {
-                          setState(() => _selectedFamilyMemberIds = ids);
-                        },
+                        onSelectionChanged: (ids) =>
+                            setState(() => _selectedFamilyMemberIds = ids),
+                        newFamilyMembers: _newFamilyMembers,
+                        onAddNew: _showAddFamilyMemberDialog,
+                        onRemoveNew: (idx) =>
+                            setState(() => _newFamilyMembers.removeAt(idx)),
                       ),
                     ],
                   ],
@@ -283,118 +510,11 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
                   const SizedBox(height: 16),
 
                   // Move-in details
-                  Text(
-                    'Move-in Details',
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Move-in date with future date indicator
-                  InkWell(
-                    onTap: _selectMoveInDate,
-                    child: InputDecorator(
-                      decoration: InputDecoration(
-                        labelText: 'Move-in Date',
-                        prefixIcon: const Icon(Icons.calendar_today_outlined),
-                        suffixIcon: _moveInDate.isAfter(DateTime.now())
-                            ? Container(
-                                margin: const EdgeInsets.all(8),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: AppColors.info.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text(
-                                  'Future',
-                                  style: Theme.of(context).textTheme.labelSmall
-                                      ?.copyWith(color: AppColors.info),
-                                ),
-                              )
-                            : null,
-                      ),
-                      child: Text(
-                        '${_moveInDate.day}/${_moveInDate.month}/${_moveInDate.year}',
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Agreed rent
-                  TextFormField(
-                    controller: _rentController,
-                    decoration: InputDecoration(
-                      labelText: 'Agreed Monthly Rent (₹)',
-                      prefixIcon: const Icon(Icons.currency_rupee),
-                      helperText:
-                          'Base rent: ${formatCurrency(widget.room.baseRent)}',
-                    ),
-                    keyboardType: TextInputType.number,
-                    validator: (v) => validatePositiveNumber(v, 'Rent'),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Security deposit
-                  TextFormField(
-                    controller: _depositController,
-                    decoration: const InputDecoration(
-                      labelText: 'Security Deposit (₹)',
-                      prefixIcon: Icon(Icons.shield_outlined),
-                      hintText: '0',
-                    ),
-                    keyboardType: TextInputType.number,
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Info card
-                  Card(
-                    color: AppColors.surfaceVariant.withValues(alpha: 0.3),
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.info_outline,
-                            color: AppColors.primary,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              'Security deposit will be marked as collected on move-in date',
-                              style: Theme.of(context).textTheme.bodySmall
-                                  ?.copyWith(color: AppColors.onSurfaceVariant),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  _buildMoveInDetails(),
                   const SizedBox(height: 32),
 
                   // Save button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _isLoading ? null : _saveOccupancy,
-                      child: _isLoading
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          : Text(
-                              _selectedFamilyMemberIds.isEmpty
-                                  ? 'Confirm Move-In'
-                                  : 'Move-In with ${_selectedFamilyMemberIds.length} Family Members',
-                            ),
-                    ),
-                  ),
+                  _buildSaveButton(),
                 ],
               ),
             ),
@@ -404,7 +524,326 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
     );
   }
 
-  Widget _buildNewTenantForm() {
+  Widget _buildHeader() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Move In Tenant',
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Room ${widget.room.roomNumber}',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AppColors.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+        IconButton(
+          icon: const Icon(Icons.close),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildToggle() {
+    return Row(
+      children: [
+        Expanded(
+          child: _ToggleButton(
+            label: 'Existing Tenant',
+            isSelected: !_createNewTenant,
+            onTap: () => setState(() {
+              _createNewTenant = false;
+              _selectedFamilyMemberIds.clear();
+            }),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: _ToggleButton(
+            label: 'New Tenant',
+            isSelected: _createNewTenant,
+            onTap: () => setState(() {
+              _createNewTenant = true;
+              _selectedTenant = null;
+              _selectedFamilyMemberIds.clear();
+            }),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFullNewTenantForm() {
+    return Column(
+      children: [
+        // Essential Info Section
+        _buildSection('Essential Information', Icons.person_outline, [
+          TextFormField(
+            controller: _newNameController,
+            decoration: const InputDecoration(
+              labelText: 'Full Name *',
+              prefixIcon: Icon(Icons.person_outline),
+            ),
+            textCapitalization: TextCapitalization.words,
+            validator: (v) => validateRequired(v, 'Name'),
+          ),
+          const SizedBox(height: 16),
+          TextFormField(
+            controller: _newFatherNameController,
+            decoration: const InputDecoration(
+              labelText: 'Father\'s Name',
+              prefixIcon: Icon(Icons.person_outline),
+            ),
+            textCapitalization: TextCapitalization.words,
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: TextFormField(
+                  controller: _newAgeController,
+                  decoration: const InputDecoration(labelText: 'Age'),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: DropdownButtonFormField<String>(
+                  value: _selectedGender,
+                  decoration: const InputDecoration(labelText: 'Gender'),
+                  items: const [
+                    DropdownMenuItem(value: 'male', child: Text('Male')),
+                    DropdownMenuItem(value: 'female', child: Text('Female')),
+                    DropdownMenuItem(value: 'other', child: Text('Other')),
+                  ],
+                  onChanged: (v) => setState(() => _selectedGender = v),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          TextFormField(
+            controller: _newPhoneController,
+            decoration: const InputDecoration(
+              labelText: 'Phone Number',
+              prefixIcon: Icon(Icons.phone_outlined),
+            ),
+            keyboardType: TextInputType.phone,
+          ),
+          const SizedBox(height: 16),
+          TextFormField(
+            controller: _newSecondaryPhoneController,
+            decoration: const InputDecoration(
+              labelText: 'Secondary Phone',
+              prefixIcon: Icon(Icons.phone_outlined),
+            ),
+            keyboardType: TextInputType.phone,
+          ),
+          const SizedBox(height: 16),
+          TextFormField(
+            controller: _newAadharController,
+            decoration: const InputDecoration(
+              labelText: 'Aadhaar Number',
+              hintText: '12-digit',
+              prefixIcon: Icon(Icons.credit_card_outlined),
+            ),
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          ),
+        ]),
+        const SizedBox(height: 16),
+
+        // Permanent Address Section
+        _buildSection('Permanent Address', Icons.home_outlined, [
+          TextFormField(
+            controller: _addressLineController,
+            decoration: const InputDecoration(
+              labelText: 'Address Line',
+              prefixIcon: Icon(Icons.location_on_outlined),
+            ),
+            maxLines: 2,
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: TextFormField(
+                  controller: _cityController,
+                  decoration: const InputDecoration(labelText: 'City'),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: TextFormField(
+                  controller: _stateController,
+                  decoration: const InputDecoration(labelText: 'State'),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          TextFormField(
+            controller: _pincodeController,
+            decoration: const InputDecoration(
+              labelText: 'Pincode',
+              prefixIcon: Icon(Icons.pin_drop_outlined),
+            ),
+            keyboardType: TextInputType.number,
+          ),
+        ]),
+        const SizedBox(height: 16),
+
+        // Work Details Section
+        _buildSection('Work Details', Icons.work_outline, [
+          TextFormField(
+            controller: _companyNameController,
+            decoration: const InputDecoration(
+              labelText: 'Company Name',
+              prefixIcon: Icon(Icons.business_outlined),
+            ),
+          ),
+          const SizedBox(height: 16),
+          TextFormField(
+            controller: _officeAddressController,
+            decoration: const InputDecoration(
+              labelText: 'Office Address',
+              prefixIcon: Icon(Icons.location_city_outlined),
+            ),
+            maxLines: 2,
+          ),
+        ]),
+        const SizedBox(height: 16),
+
+        // Introducer Section
+        _buildSection('Introducer / Reference', Icons.handshake_outlined, [
+          TextFormField(
+            controller: _introducerNameController,
+            decoration: const InputDecoration(
+              labelText: 'Introducer Name',
+              prefixIcon: Icon(Icons.person_outline),
+            ),
+          ),
+          const SizedBox(height: 16),
+          TextFormField(
+            controller: _introducerAddressController,
+            decoration: const InputDecoration(
+              labelText: 'Introducer Address',
+              prefixIcon: Icon(Icons.location_on_outlined),
+            ),
+            maxLines: 2,
+          ),
+          const SizedBox(height: 16),
+          TextFormField(
+            controller: _introducerPhoneController,
+            decoration: const InputDecoration(
+              labelText: 'Introducer Phone',
+              prefixIcon: Icon(Icons.phone_outlined),
+            ),
+            keyboardType: TextInputType.phone,
+          ),
+        ]),
+        const SizedBox(height: 16),
+
+        // Family Members
+        _buildFamilyMembersSectionForNew(),
+      ],
+    );
+  }
+
+  Widget _buildFamilyMembersSectionForNew() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.family_restroom_outlined,
+                      color: AppColors.primary,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Family Members',
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                TextButton.icon(
+                  onPressed: _showAddFamilyMemberDialog,
+                  icon: const Icon(Icons.add, size: 18),
+                  label: const Text('Add'),
+                ),
+              ],
+            ),
+            if (_newFamilyMembers.isEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Text(
+                  'No family members added yet',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: AppColors.onSurfaceVariant,
+                  ),
+                ),
+              )
+            else
+              ..._newFamilyMembers.asMap().entries.map((e) {
+                final idx = e.key;
+                final member = e.value;
+                return ListTile(
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                  leading: CircleAvatar(
+                    radius: 18,
+                    backgroundColor: AppColors.secondary.withValues(alpha: 0.1),
+                    child: Text(
+                      member.name[0].toUpperCase(),
+                      style: const TextStyle(
+                        color: AppColors.secondary,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                  title: Text(member.name),
+                  subtitle: Text(
+                    '${member.relationship.name}${member.age != null ? ' • ${member.age} yrs' : ''}',
+                  ),
+                  trailing: IconButton(
+                    icon: const Icon(
+                      Icons.remove_circle_outline,
+                      color: AppColors.error,
+                      size: 20,
+                    ),
+                    onPressed: () =>
+                        setState(() => _newFamilyMembers.removeAt(idx)),
+                  ),
+                );
+              }),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSection(String title, IconData icon, List<Widget> children) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -413,14 +852,10 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
           children: [
             Row(
               children: [
-                const Icon(
-                  Icons.person_add_outlined,
-                  color: AppColors.primary,
-                  size: 20,
-                ),
+                Icon(icon, color: AppColors.primary, size: 20),
                 const SizedBox(width: 8),
                 Text(
-                  'New Tenant Details',
+                  title,
                   style: Theme.of(
                     context,
                   ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
@@ -428,99 +863,44 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
               ],
             ),
             const SizedBox(height: 16),
-            TextFormField(
-              controller: _newNameController,
-              decoration: const InputDecoration(
-                labelText: 'Full Name *',
-                prefixIcon: Icon(Icons.person_outline),
-              ),
-              textCapitalization: TextCapitalization.words,
-              validator: (v) => validateRequired(v, 'Name'),
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _newFatherNameController,
-              decoration: const InputDecoration(
-                labelText: 'Father\'s Name',
-                prefixIcon: Icon(Icons.person_outline),
-              ),
-              textCapitalization: TextCapitalization.words,
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: TextFormField(
-                    controller: _newAgeController,
-                    decoration: const InputDecoration(labelText: 'Age'),
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    value: _selectedGender,
-                    decoration: const InputDecoration(labelText: 'Gender'),
-                    items: const [
-                      DropdownMenuItem(value: 'male', child: Text('Male')),
-                      DropdownMenuItem(value: 'female', child: Text('Female')),
-                      DropdownMenuItem(value: 'other', child: Text('Other')),
-                    ],
-                    onChanged: (v) => setState(() => _selectedGender = v),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _newPhoneController,
-              decoration: const InputDecoration(
-                labelText: 'Phone Number',
-                prefixIcon: Icon(Icons.phone_outlined),
-              ),
-              keyboardType: TextInputType.phone,
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _newAadharController,
-              decoration: const InputDecoration(
-                labelText: 'Aadhaar Number',
-                prefixIcon: Icon(Icons.credit_card_outlined),
-                hintText: '12-digit number',
-              ),
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            ),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppColors.info.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.info_outline,
-                    color: AppColors.info,
-                    size: 16,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'You can add more details like documents and family members after move-in',
-                      style: Theme.of(
-                        context,
-                      ).textTheme.bodySmall?.copyWith(color: AppColors.info),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            ...children,
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildExistingTenantSelection(AsyncValue<List<Tenant>> tenantsAsync) {
+    return tenantsAsync.when(
+      data: (tenants) {
+        final availableTenants = tenants
+            .where((t) => !t.isCurrentlyOccupying)
+            .toList();
+        if (availableTenants.isEmpty) return _buildNoTenantsMessage();
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Select Tenant',
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
+            const SizedBox(height: 8),
+            ...availableTenants.map(
+              (t) => _TenantRadioTile(
+                tenant: t,
+                isSelected: _selectedTenant?.id == t.id,
+                onTap: () => setState(() {
+                  _selectedTenant = t;
+                  _selectedFamilyMemberIds.clear();
+                  _newFamilyMembers.clear();
+                }),
+              ),
+            ),
+          ],
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, s) => Text('Error: $e'),
     );
   }
 
@@ -537,10 +917,134 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              'No available tenants. Create a new tenant or add tenants who are not currently occupying any room.',
+              'No available tenants. Create a new tenant.',
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMoveInDetails() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Move-in Details', style: Theme.of(context).textTheme.titleSmall),
+        const SizedBox(height: 16),
+        InkWell(
+          onTap: _selectMoveInDate,
+          child: InputDecorator(
+            decoration: InputDecoration(
+              labelText: 'Move-in Date',
+              prefixIcon: const Icon(Icons.calendar_today_outlined),
+              suffixIcon: _moveInDate.isAfter(DateTime.now())
+                  ? Container(
+                      margin: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.info.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        'Future',
+                        style: Theme.of(
+                          context,
+                        ).textTheme.labelSmall?.copyWith(color: AppColors.info),
+                      ),
+                    )
+                  : null,
+            ),
+            child: Text(
+              '${_moveInDate.day}/${_moveInDate.month}/${_moveInDate.year}',
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        TextFormField(
+          controller: _rentController,
+          decoration: InputDecoration(
+            labelText: 'Agreed Rent (₹)',
+            prefixIcon: const Icon(Icons.currency_rupee),
+            helperText: 'Base: ${formatCurrency(widget.room.baseRent)}',
+          ),
+          keyboardType: TextInputType.number,
+          validator: (v) => validatePositiveNumber(v, 'Rent'),
+        ),
+        const SizedBox(height: 16),
+        TextFormField(
+          controller: _depositController,
+          decoration: const InputDecoration(
+            labelText: 'Security Deposit (₹)',
+            prefixIcon: Icon(Icons.shield_outlined),
+            hintText: '0',
+          ),
+          keyboardType: TextInputType.number,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSaveButton() {
+    final totalFamily =
+        _selectedFamilyMemberIds.length + _newFamilyMembers.length;
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: _isLoading ? null : _saveOccupancy,
+        child: _isLoading
+            ? const SizedBox(
+                height: 20,
+                width: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              )
+            : Text(
+                totalFamily == 0
+                    ? 'Confirm Move-In'
+                    : 'Move-In with $totalFamily Family Member${totalFamily > 1 ? 's' : ''}',
+              ),
+      ),
+    );
+  }
+}
+
+// ============ Helper Classes ============
+
+class _NewFamilyMember {
+  final String name;
+  final FamilyRelationship relationship;
+  final int? age;
+  final String? gender;
+  final String phone;
+
+  _NewFamilyMember({
+    required this.name,
+    required this.relationship,
+    this.age,
+    this.gender,
+    required this.phone,
+  });
+}
+
+class _MissingFieldItem extends StatelessWidget {
+  final String field;
+  const _MissingFieldItem(this.field);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 8, bottom: 4),
+      child: Row(
+        children: [
+          const Icon(Icons.circle, size: 6, color: AppColors.warning),
+          const SizedBox(width: 8),
+          Text(field, style: Theme.of(context).textTheme.bodySmall),
         ],
       ),
     );
@@ -553,11 +1057,17 @@ class _FamilyMemberSelection extends ConsumerWidget {
   final int tenantId;
   final Set<int> selectedIds;
   final Function(Set<int>) onSelectionChanged;
+  final List<_NewFamilyMember> newFamilyMembers;
+  final VoidCallback onAddNew;
+  final Function(int) onRemoveNew;
 
   const _FamilyMemberSelection({
     required this.tenantId,
     required this.selectedIds,
     required this.onSelectionChanged,
+    required this.newFamilyMembers,
+    required this.onAddNew,
+    required this.onRemoveNew,
   });
 
   @override
@@ -566,109 +1076,149 @@ class _FamilyMemberSelection extends ConsumerWidget {
       familyMembersForTenantProvider(tenantId),
     );
 
-    return familyMembersAsync.when(
-      data: (members) {
-        if (members.isEmpty) {
-          return const SizedBox.shrink();
-        }
-
-        return Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.family_restroom_outlined,
-                          color: AppColors.primary,
-                          size: 20,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Family Members',
-                          style: Theme.of(context).textTheme.titleSmall
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ),
-                      ],
+                    const Icon(
+                      Icons.family_restroom_outlined,
+                      color: AppColors.primary,
+                      size: 20,
                     ),
-                    TextButton(
-                      onPressed: () {
-                        if (selectedIds.length == members.length) {
-                          onSelectionChanged({});
-                        } else {
-                          onSelectionChanged(members.map((m) => m.id).toSet());
-                        }
-                      },
-                      child: Text(
-                        selectedIds.length == members.length
-                            ? 'Deselect All'
-                            : 'Select All',
+                    const SizedBox(width: 8),
+                    Text(
+                      'Family Members',
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  'Select family members who will also move in:',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.onSurfaceVariant,
-                  ),
+                TextButton.icon(
+                  onPressed: onAddNew,
+                  icon: const Icon(Icons.add, size: 18),
+                  label: const Text('Add New'),
                 ),
-                const SizedBox(height: 12),
-                ...members.map(
-                  (member) => CheckboxListTile(
-                    dense: true,
-                    contentPadding: EdgeInsets.zero,
-                    value: selectedIds.contains(member.id),
-                    onChanged: (checked) {
-                      final newSet = Set<int>.from(selectedIds);
-                      if (checked ?? false) {
-                        newSet.add(member.id);
-                      } else {
-                        newSet.remove(member.id);
-                      }
-                      onSelectionChanged(newSet);
-                    },
-                    title: Text(member.name),
-                    subtitle: Text(
-                      [
-                        member.relationship.name,
-                        if (member.age != null) '${member.age} yrs',
-                      ].join(' • '),
+              ],
+            ),
+            const SizedBox(height: 8),
+            familyMembersAsync.when(
+              data: (members) {
+                if (members.isEmpty && newFamilyMembers.isEmpty) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    child: Text(
+                      'No family members. Tap "Add New" to add.',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: AppColors.onSurfaceVariant,
                       ),
                     ),
-                    secondary: CircleAvatar(
-                      radius: 18,
-                      backgroundColor: AppColors.secondary.withValues(
-                        alpha: 0.1,
-                      ),
-                      child: Text(
-                        member.name[0].toUpperCase(),
-                        style: const TextStyle(
-                          color: AppColors.secondary,
-                          fontSize: 14,
+                  );
+                }
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (members.isNotEmpty) ...[
+                      Text(
+                        'Existing members:',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.onSurfaceVariant,
                         ),
                       ),
-                    ),
-                  ),
-                ),
-              ],
+                      const SizedBox(height: 8),
+                      ...members.map(
+                        (m) => CheckboxListTile(
+                          dense: true,
+                          contentPadding: EdgeInsets.zero,
+                          value: selectedIds.contains(m.id),
+                          onChanged: (checked) {
+                            final newSet = Set<int>.from(selectedIds);
+                            if (checked ?? false) {
+                              newSet.add(m.id);
+                            } else {
+                              newSet.remove(m.id);
+                            }
+                            onSelectionChanged(newSet);
+                          },
+                          title: Text(m.name),
+                          subtitle: Text(
+                            '${m.relationship.name}${m.age != null ? ' • ${m.age} yrs' : ''}',
+                          ),
+                          secondary: CircleAvatar(
+                            radius: 18,
+                            backgroundColor: AppColors.secondary.withValues(
+                              alpha: 0.1,
+                            ),
+                            child: Text(
+                              m.name[0].toUpperCase(),
+                              style: const TextStyle(
+                                color: AppColors.secondary,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                    if (newFamilyMembers.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        'New members to add:',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.success,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      ...newFamilyMembers.asMap().entries.map((e) {
+                        final idx = e.key;
+                        final m = e.value;
+                        return ListTile(
+                          dense: true,
+                          contentPadding: EdgeInsets.zero,
+                          leading: CircleAvatar(
+                            radius: 18,
+                            backgroundColor: AppColors.success.withValues(
+                              alpha: 0.1,
+                            ),
+                            child: Text(
+                              m.name[0].toUpperCase(),
+                              style: const TextStyle(
+                                color: AppColors.success,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                          title: Text(m.name),
+                          subtitle: Text(
+                            '${m.relationship.name}${m.age != null ? ' • ${m.age} yrs' : ''}',
+                          ),
+                          trailing: IconButton(
+                            icon: const Icon(
+                              Icons.remove_circle_outline,
+                              color: AppColors.error,
+                              size: 20,
+                            ),
+                            onPressed: () => onRemoveNew(idx),
+                          ),
+                        );
+                      }),
+                    ],
+                  ],
+                );
+              },
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (_, __) => const SizedBox.shrink(),
             ),
-          ),
-        );
-      },
-      loading: () => const Padding(
-        padding: EdgeInsets.all(16),
-        child: Center(child: CircularProgressIndicator()),
+          ],
+        ),
       ),
-      error: (e, _) => const SizedBox.shrink(),
     );
   }
 }
@@ -743,7 +1293,6 @@ class _TenantRadioTile extends StatelessWidget {
                 ),
               ),
             ),
-            // Past tenant indicator
             Positioned(
               bottom: 0,
               right: 0,
