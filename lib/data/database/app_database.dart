@@ -22,6 +22,7 @@ import 'tables/deposit_transaction_table.dart';
 import 'tables/meter_photo_table.dart';
 import 'tables/auto_bill_setting_table.dart';
 import 'tables/notification_setting_table.dart';
+import '../../domain/entities/occupancy.dart';
 
 // DAOs
 import 'daos/landlord_dao.dart';
@@ -58,7 +59,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration {
@@ -165,6 +166,16 @@ class AppDatabase extends _$AppDatabase {
           await customStatement(
             'ALTER TABLE family_members_new RENAME TO family_members',
           );
+          await customStatement(
+            'ALTER TABLE family_members_new RENAME TO family_members',
+          );
+        }
+        if (from < 5) {
+          // Add settlement columns to occupancies
+          await m.addColumn(occupancies, occupancies.deductionAmount);
+          await m.addColumn(occupancies, occupancies.deductionReason);
+          await m.addColumn(occupancies, occupancies.settlementNotes);
+          await m.addColumn(occupancies, occupancies.isSettled);
         }
       },
     );

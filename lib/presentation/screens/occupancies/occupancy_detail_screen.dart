@@ -695,12 +695,45 @@ class _DepositSettlementCard extends StatelessWidget {
             const Divider(height: 24),
             _RowItem('Amount', formatCurrency(occupancy.securityDeposit)),
             const SizedBox(height: 8),
+            if (occupancy.deductionAmount > 0) ...[
+              _RowItem(
+                'Deductions',
+                '- ${formatCurrency(occupancy.deductionAmount)}',
+                valueColor: AppColors.error,
+              ),
+              const SizedBox(height: 8),
+            ],
             _RowItem(
               'Return Amount',
               occupancy.depositReturnedAmount != null
                   ? formatCurrency(occupancy.depositReturnedAmount!)
                   : '-',
+              valueColor: occupancy.depositReturnedAmount != null
+                  ? AppColors.success
+                  : null,
             ),
+            if (occupancy.deductionReason != null &&
+                occupancy.deductionReason!.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              const Divider(),
+              const SizedBox(height: 8),
+              _DetailRow(
+                'Reason',
+                occupancy.deductionReason!,
+                icon: Icons.info_outline,
+              ),
+            ],
+            if (occupancy.settlementNotes != null &&
+                occupancy.settlementNotes!.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              if (occupancy.deductionReason == null) const Divider(),
+              const SizedBox(height: 8),
+              _DetailRow(
+                'Notes',
+                occupancy.settlementNotes!,
+                icon: Icons.notes,
+              ),
+            ],
           ],
         ),
       ),
@@ -724,8 +757,9 @@ class _DepositSettlementCard extends StatelessWidget {
 class _RowItem extends StatelessWidget {
   final String label;
   final String value;
+  final Color? valueColor;
 
-  const _RowItem(this.label, this.value);
+  const _RowItem(this.label, this.value, {this.valueColor});
 
   @override
   Widget build(BuildContext context) {
@@ -740,9 +774,44 @@ class _RowItem extends StatelessWidget {
         ),
         Text(
           value,
-          style: Theme.of(
-            context,
-          ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+            color: valueColor,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _DetailRow extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+
+  const _DetailRow(this.label, this.value, {required this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 16, color: AppColors.onSurfaceVariant),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: AppColors.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(value, style: Theme.of(context).textTheme.bodySmall),
+            ],
+          ),
         ),
       ],
     );

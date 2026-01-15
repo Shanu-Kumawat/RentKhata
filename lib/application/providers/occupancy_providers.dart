@@ -6,7 +6,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../domain/entities/occupancy.dart';
 import '../../domain/entities/bill.dart';
 import '../../data/database/app_database.dart';
-import '../../data/database/tables/occupancy_table.dart' as table;
 import 'repository_providers.dart';
 import 'database_provider.dart';
 
@@ -29,19 +28,6 @@ class OccupancyDetail {
     required this.totalPaid,
     required this.totalPending,
   });
-}
-
-DepositStatus _mapDepositStatus(table.DepositStatus status) {
-  switch (status) {
-    case table.DepositStatus.pending:
-      return DepositStatus.pending;
-    case table.DepositStatus.received:
-      return DepositStatus.received;
-    case table.DepositStatus.partiallyReturned:
-      return DepositStatus.partiallyReturned;
-    case table.DepositStatus.returned:
-      return DepositStatus.returned;
-  }
 }
 
 /// Get occupancy by ID with room and tenant info.
@@ -69,7 +55,7 @@ Future<Occupancy?> occupancy(Ref ref, int occupancyId) async {
     agreedRent: entity.agreedRent,
     securityDeposit: entity.securityDeposit,
     isActive: entity.isActive,
-    depositStatus: _mapDepositStatus(entity.depositStatus),
+    depositStatus: entity.depositStatus ?? DepositStatus.pending,
     depositReceivedDate: entity.depositReceivedDate,
     depositReturnedDate: entity.depositReturnedDate,
     depositReturnedAmount: entity.depositReturnedAmount,

@@ -5,8 +5,7 @@ import 'package:drift/drift.dart';
 import 'room_table.dart';
 import 'tenant_table.dart';
 
-/// Deposit status enumeration
-enum DepositStatus { pending, received, partiallyReturned, returned }
+import '../../../domain/entities/occupancy.dart';
 
 /// Table for storing tenant-room occupancy relationships.
 /// This is the join table that allows tenants to move between rooms.
@@ -49,4 +48,16 @@ class Occupancies extends Table {
 
   /// Amount returned (may differ from original if deductions)
   RealColumn get depositReturnedAmount => real().nullable()();
+
+  /// Deduction amount from deposit (manual deductions like damages)
+  RealColumn get deductionAmount => real().withDefault(const Constant(0.0))();
+
+  /// Reason for deduction
+  TextColumn get deductionReason => text().nullable()();
+
+  /// Notes regarding settlement
+  TextColumn get settlementNotes => text().nullable()();
+
+  /// Whether the occupancy is fully settled (deposit returned/forfeited)
+  BoolColumn get isSettled => boolean().withDefault(const Constant(false))();
 }

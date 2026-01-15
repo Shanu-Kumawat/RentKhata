@@ -26,6 +26,11 @@ class Occupancy with _$Occupancy {
     DateTime? depositReceivedDate,
     DateTime? depositReturnedDate,
     double? depositReturnedAmount,
+    // Settlement details
+    @Default(0.0) double deductionAmount,
+    String? deductionReason,
+    String? settlementNotes,
+    @Default(false) bool isSettled,
     // Denormalized fields
     String? roomNumber,
     String? tenantName,

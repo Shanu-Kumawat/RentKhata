@@ -3193,6 +3193,55 @@ class $OccupanciesTable extends Occupancies
         type: DriftSqlType.double,
         requiredDuringInsert: false,
       );
+  static const VerificationMeta _deductionAmountMeta = const VerificationMeta(
+    'deductionAmount',
+  );
+  @override
+  late final GeneratedColumn<double> deductionAmount = GeneratedColumn<double>(
+    'deduction_amount',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0.0),
+  );
+  static const VerificationMeta _deductionReasonMeta = const VerificationMeta(
+    'deductionReason',
+  );
+  @override
+  late final GeneratedColumn<String> deductionReason = GeneratedColumn<String>(
+    'deduction_reason',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _settlementNotesMeta = const VerificationMeta(
+    'settlementNotes',
+  );
+  @override
+  late final GeneratedColumn<String> settlementNotes = GeneratedColumn<String>(
+    'settlement_notes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _isSettledMeta = const VerificationMeta(
+    'isSettled',
+  );
+  @override
+  late final GeneratedColumn<bool> isSettled = GeneratedColumn<bool>(
+    'is_settled',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_settled" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -3207,6 +3256,10 @@ class $OccupanciesTable extends Occupancies
     depositReceivedDate,
     depositReturnedDate,
     depositReturnedAmount,
+    deductionAmount,
+    deductionReason,
+    settlementNotes,
+    isSettled,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -3309,6 +3362,39 @@ class $OccupanciesTable extends Occupancies
         ),
       );
     }
+    if (data.containsKey('deduction_amount')) {
+      context.handle(
+        _deductionAmountMeta,
+        deductionAmount.isAcceptableOrUnknown(
+          data['deduction_amount']!,
+          _deductionAmountMeta,
+        ),
+      );
+    }
+    if (data.containsKey('deduction_reason')) {
+      context.handle(
+        _deductionReasonMeta,
+        deductionReason.isAcceptableOrUnknown(
+          data['deduction_reason']!,
+          _deductionReasonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('settlement_notes')) {
+      context.handle(
+        _settlementNotesMeta,
+        settlementNotes.isAcceptableOrUnknown(
+          data['settlement_notes']!,
+          _settlementNotesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('is_settled')) {
+      context.handle(
+        _isSettledMeta,
+        isSettled.isAcceptableOrUnknown(data['is_settled']!, _isSettledMeta),
+      );
+    }
     return context;
   }
 
@@ -3368,6 +3454,22 @@ class $OccupanciesTable extends Occupancies
         DriftSqlType.double,
         data['${effectivePrefix}deposit_returned_amount'],
       ),
+      deductionAmount: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}deduction_amount'],
+      )!,
+      deductionReason: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}deduction_reason'],
+      ),
+      settlementNotes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}settlement_notes'],
+      ),
+      isSettled: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_settled'],
+      )!,
     );
   }
 
@@ -3418,6 +3520,18 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
 
   /// Amount returned (may differ from original if deductions)
   final double? depositReturnedAmount;
+
+  /// Deduction amount from deposit (manual deductions like damages)
+  final double deductionAmount;
+
+  /// Reason for deduction
+  final String? deductionReason;
+
+  /// Notes regarding settlement
+  final String? settlementNotes;
+
+  /// Whether the occupancy is fully settled (deposit returned/forfeited)
+  final bool isSettled;
   const OccupancyEntity({
     required this.id,
     required this.roomId,
@@ -3431,6 +3545,10 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
     this.depositReceivedDate,
     this.depositReturnedDate,
     this.depositReturnedAmount,
+    required this.deductionAmount,
+    this.deductionReason,
+    this.settlementNotes,
+    required this.isSettled,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -3459,6 +3577,14 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
     if (!nullToAbsent || depositReturnedAmount != null) {
       map['deposit_returned_amount'] = Variable<double>(depositReturnedAmount);
     }
+    map['deduction_amount'] = Variable<double>(deductionAmount);
+    if (!nullToAbsent || deductionReason != null) {
+      map['deduction_reason'] = Variable<String>(deductionReason);
+    }
+    if (!nullToAbsent || settlementNotes != null) {
+      map['settlement_notes'] = Variable<String>(settlementNotes);
+    }
+    map['is_settled'] = Variable<bool>(isSettled);
     return map;
   }
 
@@ -3484,6 +3610,14 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
       depositReturnedAmount: depositReturnedAmount == null && nullToAbsent
           ? const Value.absent()
           : Value(depositReturnedAmount),
+      deductionAmount: Value(deductionAmount),
+      deductionReason: deductionReason == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deductionReason),
+      settlementNotes: settlementNotes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(settlementNotes),
+      isSettled: Value(isSettled),
     );
   }
 
@@ -3513,6 +3647,10 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
       depositReturnedAmount: serializer.fromJson<double?>(
         json['depositReturnedAmount'],
       ),
+      deductionAmount: serializer.fromJson<double>(json['deductionAmount']),
+      deductionReason: serializer.fromJson<String?>(json['deductionReason']),
+      settlementNotes: serializer.fromJson<String?>(json['settlementNotes']),
+      isSettled: serializer.fromJson<bool>(json['isSettled']),
     );
   }
   @override
@@ -3535,6 +3673,10 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
       'depositReturnedAmount': serializer.toJson<double?>(
         depositReturnedAmount,
       ),
+      'deductionAmount': serializer.toJson<double>(deductionAmount),
+      'deductionReason': serializer.toJson<String?>(deductionReason),
+      'settlementNotes': serializer.toJson<String?>(settlementNotes),
+      'isSettled': serializer.toJson<bool>(isSettled),
     };
   }
 
@@ -3551,6 +3693,10 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
     Value<DateTime?> depositReceivedDate = const Value.absent(),
     Value<DateTime?> depositReturnedDate = const Value.absent(),
     Value<double?> depositReturnedAmount = const Value.absent(),
+    double? deductionAmount,
+    Value<String?> deductionReason = const Value.absent(),
+    Value<String?> settlementNotes = const Value.absent(),
+    bool? isSettled,
   }) => OccupancyEntity(
     id: id ?? this.id,
     roomId: roomId ?? this.roomId,
@@ -3570,6 +3716,14 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
     depositReturnedAmount: depositReturnedAmount.present
         ? depositReturnedAmount.value
         : this.depositReturnedAmount,
+    deductionAmount: deductionAmount ?? this.deductionAmount,
+    deductionReason: deductionReason.present
+        ? deductionReason.value
+        : this.deductionReason,
+    settlementNotes: settlementNotes.present
+        ? settlementNotes.value
+        : this.settlementNotes,
+    isSettled: isSettled ?? this.isSettled,
   );
   OccupancyEntity copyWithCompanion(OccupanciesCompanion data) {
     return OccupancyEntity(
@@ -3601,6 +3755,16 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
       depositReturnedAmount: data.depositReturnedAmount.present
           ? data.depositReturnedAmount.value
           : this.depositReturnedAmount,
+      deductionAmount: data.deductionAmount.present
+          ? data.deductionAmount.value
+          : this.deductionAmount,
+      deductionReason: data.deductionReason.present
+          ? data.deductionReason.value
+          : this.deductionReason,
+      settlementNotes: data.settlementNotes.present
+          ? data.settlementNotes.value
+          : this.settlementNotes,
+      isSettled: data.isSettled.present ? data.isSettled.value : this.isSettled,
     );
   }
 
@@ -3618,7 +3782,11 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
           ..write('depositStatus: $depositStatus, ')
           ..write('depositReceivedDate: $depositReceivedDate, ')
           ..write('depositReturnedDate: $depositReturnedDate, ')
-          ..write('depositReturnedAmount: $depositReturnedAmount')
+          ..write('depositReturnedAmount: $depositReturnedAmount, ')
+          ..write('deductionAmount: $deductionAmount, ')
+          ..write('deductionReason: $deductionReason, ')
+          ..write('settlementNotes: $settlementNotes, ')
+          ..write('isSettled: $isSettled')
           ..write(')'))
         .toString();
   }
@@ -3637,6 +3805,10 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
     depositReceivedDate,
     depositReturnedDate,
     depositReturnedAmount,
+    deductionAmount,
+    deductionReason,
+    settlementNotes,
+    isSettled,
   );
   @override
   bool operator ==(Object other) =>
@@ -3653,7 +3825,11 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
           other.depositStatus == this.depositStatus &&
           other.depositReceivedDate == this.depositReceivedDate &&
           other.depositReturnedDate == this.depositReturnedDate &&
-          other.depositReturnedAmount == this.depositReturnedAmount);
+          other.depositReturnedAmount == this.depositReturnedAmount &&
+          other.deductionAmount == this.deductionAmount &&
+          other.deductionReason == this.deductionReason &&
+          other.settlementNotes == this.settlementNotes &&
+          other.isSettled == this.isSettled);
 }
 
 class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
@@ -3669,6 +3845,10 @@ class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
   final Value<DateTime?> depositReceivedDate;
   final Value<DateTime?> depositReturnedDate;
   final Value<double?> depositReturnedAmount;
+  final Value<double> deductionAmount;
+  final Value<String?> deductionReason;
+  final Value<String?> settlementNotes;
+  final Value<bool> isSettled;
   const OccupanciesCompanion({
     this.id = const Value.absent(),
     this.roomId = const Value.absent(),
@@ -3682,6 +3862,10 @@ class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
     this.depositReceivedDate = const Value.absent(),
     this.depositReturnedDate = const Value.absent(),
     this.depositReturnedAmount = const Value.absent(),
+    this.deductionAmount = const Value.absent(),
+    this.deductionReason = const Value.absent(),
+    this.settlementNotes = const Value.absent(),
+    this.isSettled = const Value.absent(),
   });
   OccupanciesCompanion.insert({
     this.id = const Value.absent(),
@@ -3696,6 +3880,10 @@ class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
     this.depositReceivedDate = const Value.absent(),
     this.depositReturnedDate = const Value.absent(),
     this.depositReturnedAmount = const Value.absent(),
+    this.deductionAmount = const Value.absent(),
+    this.deductionReason = const Value.absent(),
+    this.settlementNotes = const Value.absent(),
+    this.isSettled = const Value.absent(),
   }) : roomId = Value(roomId),
        tenantId = Value(tenantId),
        moveInDate = Value(moveInDate),
@@ -3713,6 +3901,10 @@ class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
     Expression<DateTime>? depositReceivedDate,
     Expression<DateTime>? depositReturnedDate,
     Expression<double>? depositReturnedAmount,
+    Expression<double>? deductionAmount,
+    Expression<String>? deductionReason,
+    Expression<String>? settlementNotes,
+    Expression<bool>? isSettled,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -3730,6 +3922,10 @@ class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
         'deposit_returned_date': depositReturnedDate,
       if (depositReturnedAmount != null)
         'deposit_returned_amount': depositReturnedAmount,
+      if (deductionAmount != null) 'deduction_amount': deductionAmount,
+      if (deductionReason != null) 'deduction_reason': deductionReason,
+      if (settlementNotes != null) 'settlement_notes': settlementNotes,
+      if (isSettled != null) 'is_settled': isSettled,
     });
   }
 
@@ -3746,6 +3942,10 @@ class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
     Value<DateTime?>? depositReceivedDate,
     Value<DateTime?>? depositReturnedDate,
     Value<double?>? depositReturnedAmount,
+    Value<double>? deductionAmount,
+    Value<String?>? deductionReason,
+    Value<String?>? settlementNotes,
+    Value<bool>? isSettled,
   }) {
     return OccupanciesCompanion(
       id: id ?? this.id,
@@ -3761,6 +3961,10 @@ class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
       depositReturnedDate: depositReturnedDate ?? this.depositReturnedDate,
       depositReturnedAmount:
           depositReturnedAmount ?? this.depositReturnedAmount,
+      deductionAmount: deductionAmount ?? this.deductionAmount,
+      deductionReason: deductionReason ?? this.deductionReason,
+      settlementNotes: settlementNotes ?? this.settlementNotes,
+      isSettled: isSettled ?? this.isSettled,
     );
   }
 
@@ -3811,6 +4015,18 @@ class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
         depositReturnedAmount.value,
       );
     }
+    if (deductionAmount.present) {
+      map['deduction_amount'] = Variable<double>(deductionAmount.value);
+    }
+    if (deductionReason.present) {
+      map['deduction_reason'] = Variable<String>(deductionReason.value);
+    }
+    if (settlementNotes.present) {
+      map['settlement_notes'] = Variable<String>(settlementNotes.value);
+    }
+    if (isSettled.present) {
+      map['is_settled'] = Variable<bool>(isSettled.value);
+    }
     return map;
   }
 
@@ -3828,7 +4044,11 @@ class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
           ..write('depositStatus: $depositStatus, ')
           ..write('depositReceivedDate: $depositReceivedDate, ')
           ..write('depositReturnedDate: $depositReturnedDate, ')
-          ..write('depositReturnedAmount: $depositReturnedAmount')
+          ..write('depositReturnedAmount: $depositReturnedAmount, ')
+          ..write('deductionAmount: $deductionAmount, ')
+          ..write('deductionReason: $deductionReason, ')
+          ..write('settlementNotes: $settlementNotes, ')
+          ..write('isSettled: $isSettled')
           ..write(')'))
         .toString();
   }
@@ -10208,6 +10428,10 @@ typedef $$OccupanciesTableCreateCompanionBuilder =
       Value<DateTime?> depositReceivedDate,
       Value<DateTime?> depositReturnedDate,
       Value<double?> depositReturnedAmount,
+      Value<double> deductionAmount,
+      Value<String?> deductionReason,
+      Value<String?> settlementNotes,
+      Value<bool> isSettled,
     });
 typedef $$OccupanciesTableUpdateCompanionBuilder =
     OccupanciesCompanion Function({
@@ -10223,6 +10447,10 @@ typedef $$OccupanciesTableUpdateCompanionBuilder =
       Value<DateTime?> depositReceivedDate,
       Value<DateTime?> depositReturnedDate,
       Value<double?> depositReturnedAmount,
+      Value<double> deductionAmount,
+      Value<String?> deductionReason,
+      Value<String?> settlementNotes,
+      Value<bool> isSettled,
     });
 
 final class $$OccupanciesTableReferences
@@ -10391,6 +10619,26 @@ class $$OccupanciesTableFilterComposer
 
   ColumnFilters<double> get depositReturnedAmount => $composableBuilder(
     column: $table.depositReturnedAmount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get deductionAmount => $composableBuilder(
+    column: $table.deductionAmount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deductionReason => $composableBuilder(
+    column: $table.deductionReason,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get settlementNotes => $composableBuilder(
+    column: $table.settlementNotes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isSettled => $composableBuilder(
+    column: $table.isSettled,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -10575,6 +10823,26 @@ class $$OccupanciesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<double> get deductionAmount => $composableBuilder(
+    column: $table.deductionAmount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deductionReason => $composableBuilder(
+    column: $table.deductionReason,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get settlementNotes => $composableBuilder(
+    column: $table.settlementNotes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isSettled => $composableBuilder(
+    column: $table.isSettled,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$RoomsTableOrderingComposer get roomId {
     final $$RoomsTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -10677,6 +10945,24 @@ class $$OccupanciesTableAnnotationComposer
     column: $table.depositReturnedAmount,
     builder: (column) => column,
   );
+
+  GeneratedColumn<double> get deductionAmount => $composableBuilder(
+    column: $table.deductionAmount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get deductionReason => $composableBuilder(
+    column: $table.deductionReason,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get settlementNotes => $composableBuilder(
+    column: $table.settlementNotes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isSettled =>
+      $composableBuilder(column: $table.isSettled, builder: (column) => column);
 
   $$RoomsTableAnnotationComposer get roomId {
     final $$RoomsTableAnnotationComposer composer = $composerBuilder(
@@ -10847,6 +11133,10 @@ class $$OccupanciesTableTableManager
                 Value<DateTime?> depositReceivedDate = const Value.absent(),
                 Value<DateTime?> depositReturnedDate = const Value.absent(),
                 Value<double?> depositReturnedAmount = const Value.absent(),
+                Value<double> deductionAmount = const Value.absent(),
+                Value<String?> deductionReason = const Value.absent(),
+                Value<String?> settlementNotes = const Value.absent(),
+                Value<bool> isSettled = const Value.absent(),
               }) => OccupanciesCompanion(
                 id: id,
                 roomId: roomId,
@@ -10860,6 +11150,10 @@ class $$OccupanciesTableTableManager
                 depositReceivedDate: depositReceivedDate,
                 depositReturnedDate: depositReturnedDate,
                 depositReturnedAmount: depositReturnedAmount,
+                deductionAmount: deductionAmount,
+                deductionReason: deductionReason,
+                settlementNotes: settlementNotes,
+                isSettled: isSettled,
               ),
           createCompanionCallback:
               ({
@@ -10875,6 +11169,10 @@ class $$OccupanciesTableTableManager
                 Value<DateTime?> depositReceivedDate = const Value.absent(),
                 Value<DateTime?> depositReturnedDate = const Value.absent(),
                 Value<double?> depositReturnedAmount = const Value.absent(),
+                Value<double> deductionAmount = const Value.absent(),
+                Value<String?> deductionReason = const Value.absent(),
+                Value<String?> settlementNotes = const Value.absent(),
+                Value<bool> isSettled = const Value.absent(),
               }) => OccupanciesCompanion.insert(
                 id: id,
                 roomId: roomId,
@@ -10888,6 +11186,10 @@ class $$OccupanciesTableTableManager
                 depositReceivedDate: depositReceivedDate,
                 depositReturnedDate: depositReturnedDate,
                 depositReturnedAmount: depositReturnedAmount,
+                deductionAmount: deductionAmount,
+                deductionReason: deductionReason,
+                settlementNotes: settlementNotes,
+                isSettled: isSettled,
               ),
           withReferenceMapper: (p0) => p0
               .map(

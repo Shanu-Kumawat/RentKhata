@@ -86,6 +86,16 @@ class TenantRepositoryImpl implements TenantRepository {
       agreedRent: entity.agreedRent,
       securityDeposit: entity.securityDeposit,
       isActive: entity.isActive,
+      // Deposit info
+      depositStatus: entity.depositStatus ?? DepositStatus.pending,
+      depositReceivedDate: entity.depositReceivedDate,
+      depositReturnedDate: entity.depositReturnedDate,
+      depositReturnedAmount: entity.depositReturnedAmount,
+      // Settlement info
+      deductionAmount: entity.deductionAmount,
+      deductionReason: entity.deductionReason,
+      settlementNotes: entity.settlementNotes,
+      isSettled: entity.isSettled,
       roomNumber: room?.roomNumber,
       tenantName: tenant?.name,
       propertyName: propertyName,
@@ -306,8 +316,25 @@ class TenantRepositoryImpl implements TenantRepository {
   }
 
   @override
-  Future<bool> endOccupancy(int occupancyId, DateTime moveOutDate) async {
-    return _tenantDao.endOccupancy(occupancyId, moveOutDate);
+  @override
+  Future<bool> endOccupancy(
+    int occupancyId,
+    DateTime moveOutDate, {
+    double deductionAmount = 0,
+    String? deductionReason,
+    String? settlementNotes,
+    bool isSettled = false,
+    double? depositReturnedAmount,
+  }) async {
+    return _tenantDao.endOccupancy(
+      occupancyId,
+      moveOutDate,
+      deductionAmount: deductionAmount,
+      deductionReason: deductionReason,
+      settlementNotes: settlementNotes,
+      isSettled: isSettled,
+      depositReturnedAmount: depositReturnedAmount,
+    );
   }
 
   @override

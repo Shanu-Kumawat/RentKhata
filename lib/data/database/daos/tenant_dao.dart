@@ -7,6 +7,7 @@ import '../tables/tenant_table.dart';
 import '../tables/custom_field_table.dart';
 import '../tables/occupancy_table.dart';
 import '../tables/family_member_table.dart';
+import '../../../domain/entities/occupancy.dart';
 
 part 'tenant_dao.g.dart';
 
@@ -103,7 +104,15 @@ class TenantDao extends DatabaseAccessor<AppDatabase> with _$TenantDaoMixin {
       update(occupancies).replace(occupancy);
 
   /// End an occupancy (set move-out date and inactive)
-  Future<bool> endOccupancy(int occupancyId, DateTime moveOutDate) async {
+  Future<bool> endOccupancy(
+    int occupancyId,
+    DateTime moveOutDate, {
+    double deductionAmount = 0,
+    String? deductionReason,
+    String? settlementNotes,
+    bool isSettled = false,
+    double? depositReturnedAmount,
+  }) async {
     final occupancy = await (select(
       occupancies,
     )..where((o) => o.id.equals(occupancyId))).getSingleOrNull();
@@ -111,7 +120,19 @@ class TenantDao extends DatabaseAccessor<AppDatabase> with _$TenantDaoMixin {
     if (occupancy == null) return false;
 
     return update(occupancies).replace(
-      occupancy.copyWith(moveOutDate: Value(moveOutDate), isActive: false),
+      occupancy.copyWith(
+        moveOutDate: Value(moveOutDate),
+        isActive: false,
+        deductionAmount: deductionAmount,
+        deductionReason: Value(deductionReason),
+        settlementNotes: Value(settlementNotes),
+        isSettled: isSettled,
+        depositReturnedAmount: Value(depositReturnedAmount),
+        depositReturnedDate: isSettled
+            ? Value(DateTime.now())
+            : const Value.absent(),
+        depositStatus: isSettled ? DepositStatus.returned : null,
+      ),
     );
   }
 

@@ -99,7 +99,15 @@ abstract class TenantRepository {
   });
 
   /// End an occupancy (move tenant out)
-  Future<bool> endOccupancy(int occupancyId, DateTime moveOutDate);
+  Future<bool> endOccupancy(
+    int occupancyId,
+    DateTime moveOutDate, {
+    double deductionAmount = 0,
+    String? deductionReason,
+    String? settlementNotes,
+    bool isSettled = false,
+    double? depositReturnedAmount,
+  });
 
   /// Get tenant for a room
   Future<Tenant?> getTenantByRoom(int roomId);

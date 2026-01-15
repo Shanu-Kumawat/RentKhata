@@ -33,6 +33,11 @@ mixin _$Occupancy {
   DateTime? get depositReceivedDate => throw _privateConstructorUsedError;
   DateTime? get depositReturnedDate => throw _privateConstructorUsedError;
   double? get depositReturnedAmount =>
+      throw _privateConstructorUsedError; // Settlement details
+  double get deductionAmount => throw _privateConstructorUsedError;
+  String? get deductionReason => throw _privateConstructorUsedError;
+  String? get settlementNotes => throw _privateConstructorUsedError;
+  bool get isSettled =>
       throw _privateConstructorUsedError; // Denormalized fields
   String? get roomNumber => throw _privateConstructorUsedError;
   String? get tenantName => throw _privateConstructorUsedError;
@@ -66,6 +71,10 @@ abstract class $OccupancyCopyWith<$Res> {
     DateTime? depositReceivedDate,
     DateTime? depositReturnedDate,
     double? depositReturnedAmount,
+    double deductionAmount,
+    String? deductionReason,
+    String? settlementNotes,
+    bool isSettled,
     String? roomNumber,
     String? tenantName,
     String? propertyName,
@@ -99,6 +108,10 @@ class _$OccupancyCopyWithImpl<$Res, $Val extends Occupancy>
     Object? depositReceivedDate = freezed,
     Object? depositReturnedDate = freezed,
     Object? depositReturnedAmount = freezed,
+    Object? deductionAmount = null,
+    Object? deductionReason = freezed,
+    Object? settlementNotes = freezed,
+    Object? isSettled = null,
     Object? roomNumber = freezed,
     Object? tenantName = freezed,
     Object? propertyName = freezed,
@@ -153,6 +166,22 @@ class _$OccupancyCopyWithImpl<$Res, $Val extends Occupancy>
                 ? _value.depositReturnedAmount
                 : depositReturnedAmount // ignore: cast_nullable_to_non_nullable
                       as double?,
+            deductionAmount: null == deductionAmount
+                ? _value.deductionAmount
+                : deductionAmount // ignore: cast_nullable_to_non_nullable
+                      as double,
+            deductionReason: freezed == deductionReason
+                ? _value.deductionReason
+                : deductionReason // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            settlementNotes: freezed == settlementNotes
+                ? _value.settlementNotes
+                : settlementNotes // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            isSettled: null == isSettled
+                ? _value.isSettled
+                : isSettled // ignore: cast_nullable_to_non_nullable
+                      as bool,
             roomNumber: freezed == roomNumber
                 ? _value.roomNumber
                 : roomNumber // ignore: cast_nullable_to_non_nullable
@@ -193,6 +222,10 @@ abstract class _$$OccupancyImplCopyWith<$Res>
     DateTime? depositReceivedDate,
     DateTime? depositReturnedDate,
     double? depositReturnedAmount,
+    double deductionAmount,
+    String? deductionReason,
+    String? settlementNotes,
+    bool isSettled,
     String? roomNumber,
     String? tenantName,
     String? propertyName,
@@ -225,6 +258,10 @@ class __$$OccupancyImplCopyWithImpl<$Res>
     Object? depositReceivedDate = freezed,
     Object? depositReturnedDate = freezed,
     Object? depositReturnedAmount = freezed,
+    Object? deductionAmount = null,
+    Object? deductionReason = freezed,
+    Object? settlementNotes = freezed,
+    Object? isSettled = null,
     Object? roomNumber = freezed,
     Object? tenantName = freezed,
     Object? propertyName = freezed,
@@ -279,6 +316,22 @@ class __$$OccupancyImplCopyWithImpl<$Res>
             ? _value.depositReturnedAmount
             : depositReturnedAmount // ignore: cast_nullable_to_non_nullable
                   as double?,
+        deductionAmount: null == deductionAmount
+            ? _value.deductionAmount
+            : deductionAmount // ignore: cast_nullable_to_non_nullable
+                  as double,
+        deductionReason: freezed == deductionReason
+            ? _value.deductionReason
+            : deductionReason // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        settlementNotes: freezed == settlementNotes
+            ? _value.settlementNotes
+            : settlementNotes // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        isSettled: null == isSettled
+            ? _value.isSettled
+            : isSettled // ignore: cast_nullable_to_non_nullable
+                  as bool,
         roomNumber: freezed == roomNumber
             ? _value.roomNumber
             : roomNumber // ignore: cast_nullable_to_non_nullable
@@ -312,6 +365,10 @@ class _$OccupancyImpl implements _Occupancy {
     this.depositReceivedDate,
     this.depositReturnedDate,
     this.depositReturnedAmount,
+    this.deductionAmount = 0.0,
+    this.deductionReason,
+    this.settlementNotes,
+    this.isSettled = false,
     this.roomNumber,
     this.tenantName,
     this.propertyName,
@@ -348,6 +405,17 @@ class _$OccupancyImpl implements _Occupancy {
   final DateTime? depositReturnedDate;
   @override
   final double? depositReturnedAmount;
+  // Settlement details
+  @override
+  @JsonKey()
+  final double deductionAmount;
+  @override
+  final String? deductionReason;
+  @override
+  final String? settlementNotes;
+  @override
+  @JsonKey()
+  final bool isSettled;
   // Denormalized fields
   @override
   final String? roomNumber;
@@ -358,7 +426,7 @@ class _$OccupancyImpl implements _Occupancy {
 
   @override
   String toString() {
-    return 'Occupancy(id: $id, roomId: $roomId, tenantId: $tenantId, moveInDate: $moveInDate, moveOutDate: $moveOutDate, agreedRent: $agreedRent, securityDeposit: $securityDeposit, isActive: $isActive, depositStatus: $depositStatus, depositReceivedDate: $depositReceivedDate, depositReturnedDate: $depositReturnedDate, depositReturnedAmount: $depositReturnedAmount, roomNumber: $roomNumber, tenantName: $tenantName, propertyName: $propertyName)';
+    return 'Occupancy(id: $id, roomId: $roomId, tenantId: $tenantId, moveInDate: $moveInDate, moveOutDate: $moveOutDate, agreedRent: $agreedRent, securityDeposit: $securityDeposit, isActive: $isActive, depositStatus: $depositStatus, depositReceivedDate: $depositReceivedDate, depositReturnedDate: $depositReturnedDate, depositReturnedAmount: $depositReturnedAmount, deductionAmount: $deductionAmount, deductionReason: $deductionReason, settlementNotes: $settlementNotes, isSettled: $isSettled, roomNumber: $roomNumber, tenantName: $tenantName, propertyName: $propertyName)';
   }
 
   @override
@@ -388,6 +456,14 @@ class _$OccupancyImpl implements _Occupancy {
                 other.depositReturnedDate == depositReturnedDate) &&
             (identical(other.depositReturnedAmount, depositReturnedAmount) ||
                 other.depositReturnedAmount == depositReturnedAmount) &&
+            (identical(other.deductionAmount, deductionAmount) ||
+                other.deductionAmount == deductionAmount) &&
+            (identical(other.deductionReason, deductionReason) ||
+                other.deductionReason == deductionReason) &&
+            (identical(other.settlementNotes, settlementNotes) ||
+                other.settlementNotes == settlementNotes) &&
+            (identical(other.isSettled, isSettled) ||
+                other.isSettled == isSettled) &&
             (identical(other.roomNumber, roomNumber) ||
                 other.roomNumber == roomNumber) &&
             (identical(other.tenantName, tenantName) ||
@@ -398,7 +474,7 @@ class _$OccupancyImpl implements _Occupancy {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     runtimeType,
     id,
     roomId,
@@ -412,10 +488,14 @@ class _$OccupancyImpl implements _Occupancy {
     depositReceivedDate,
     depositReturnedDate,
     depositReturnedAmount,
+    deductionAmount,
+    deductionReason,
+    settlementNotes,
+    isSettled,
     roomNumber,
     tenantName,
     propertyName,
-  );
+  ]);
 
   /// Create a copy of Occupancy
   /// with the given fields replaced by the non-null parameter values.
@@ -445,6 +525,10 @@ abstract class _Occupancy implements Occupancy {
     final DateTime? depositReceivedDate,
     final DateTime? depositReturnedDate,
     final double? depositReturnedAmount,
+    final double deductionAmount,
+    final String? deductionReason,
+    final String? settlementNotes,
+    final bool isSettled,
     final String? roomNumber,
     final String? tenantName,
     final String? propertyName,
@@ -476,7 +560,15 @@ abstract class _Occupancy implements Occupancy {
   @override
   DateTime? get depositReturnedDate;
   @override
-  double? get depositReturnedAmount; // Denormalized fields
+  double? get depositReturnedAmount; // Settlement details
+  @override
+  double get deductionAmount;
+  @override
+  String? get deductionReason;
+  @override
+  String? get settlementNotes;
+  @override
+  bool get isSettled; // Denormalized fields
   @override
   String? get roomNumber;
   @override
