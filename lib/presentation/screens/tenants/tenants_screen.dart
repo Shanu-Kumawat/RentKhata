@@ -1,14 +1,16 @@
-/// Tenants list screen.
+/// Tenants list screen with payment status badges.
 library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import '../../../application/providers/tenant_providers.dart';
+
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/tenant.dart';
 
-/// Screen displaying all tenants.
+/// Screen displaying all tenants with payment status.
 class TenantsScreen extends ConsumerStatefulWidget {
   const TenantsScreen({super.key});
 
@@ -64,7 +66,7 @@ class _TenantsScreenState extends ConsumerState<TenantsScreen> {
             child: tenantsAsync.when(
               data: (tenants) => tenants.isEmpty
                   ? _buildEmptyState(context)
-                  : _buildTenantList(context, tenants),
+                  : _buildTenantList(context, tenants, ref),
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, s) => Center(child: Text('Error: $e')),
             ),
@@ -116,25 +118,40 @@ class _TenantsScreenState extends ConsumerState<TenantsScreen> {
     );
   }
 
-  Widget _buildTenantList(BuildContext context, List<Tenant> tenants) {
+  Widget _buildTenantList(
+    BuildContext context,
+    List<Tenant> tenants,
+    WidgetRef ref,
+  ) {
+    // Sort: current tenants first, then past tenants
+    final sortedTenants = [...tenants]
+      ..sort((a, b) {
+        if (a.isCurrentlyOccupying && !b.isCurrentlyOccupying) return -1;
+        if (!a.isCurrentlyOccupying && b.isCurrentlyOccupying) return 1;
+        return a.name.compareTo(b.name);
+      });
+
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      itemCount: tenants.length,
+      itemCount: sortedTenants.length,
       itemBuilder: (context, index) {
-        final tenant = tenants[index];
+        final tenant = sortedTenants[index];
         return _TenantCard(tenant: tenant);
       },
     );
   }
 }
 
-class _TenantCard extends StatelessWidget {
+class _TenantCard extends ConsumerWidget {
   final Tenant tenant;
 
   const _TenantCard({required this.tenant});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Get occupancy history for past tenants
+    final occupanciesAsync = ref.watch(occupanciesForTenantProvider(tenant.id));
+
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
@@ -144,25 +161,44 @@ class _TenantCard extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              // Avatar
-              CircleAvatar(
-                radius: 28,
-                backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                backgroundImage: tenant.photoPath != null
-                    ? AssetImage(tenant.photoPath!)
-                    : null,
-                child: tenant.photoPath == null
-                    ? Text(
-                        tenant.name.isNotEmpty
-                            ? tenant.name[0].toUpperCase()
-                            : '?',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primary,
-                        ),
-                      )
-                    : null,
+              // Avatar with status indicator
+              Stack(
+                children: [
+                  CircleAvatar(
+                    radius: 28,
+                    backgroundColor: tenant.isCurrentlyOccupying
+                        ? AppColors.success.withValues(alpha: 0.1)
+                        : AppColors.onSurfaceVariant.withValues(alpha: 0.1),
+                    child: Text(
+                      tenant.name.isNotEmpty
+                          ? tenant.name[0].toUpperCase()
+                          : '?',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: tenant.isCurrentlyOccupying
+                            ? AppColors.success
+                            : AppColors.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                  // Status badge on avatar
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: Container(
+                      width: 14,
+                      height: 14,
+                      decoration: BoxDecoration(
+                        color: tenant.isCurrentlyOccupying
+                            ? AppColors.success
+                            : AppColors.onSurfaceVariant,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 2),
+                      ),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(width: 16),
               // Tenant info
@@ -170,6 +206,7 @@ class _TenantCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Name and verified badge
                     Row(
                       children: [
                         Expanded(
@@ -182,34 +219,130 @@ class _TenantCard extends StatelessWidget {
                         if (tenant.isPoliceVerified)
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
+                              horizontal: 6,
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
                               color: AppColors.success.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(8),
                             ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.verified_outlined,
-                                  size: 12,
-                                  color: AppColors.success,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  'Verified',
-                                  style: Theme.of(context).textTheme.labelSmall
-                                      ?.copyWith(color: AppColors.success),
-                                ),
-                              ],
+                            child: const Icon(
+                              Icons.verified,
+                              size: 14,
+                              color: AppColors.success,
                             ),
                           ),
                       ],
                     ),
                     const SizedBox(height: 4),
-                    if (tenant.phone != null)
+
+                    // Current/Past Badge
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: tenant.isCurrentlyOccupying
+                                ? AppColors.success.withValues(alpha: 0.1)
+                                : AppColors.onSurfaceVariant.withValues(
+                                    alpha: 0.1,
+                                  ),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                tenant.isCurrentlyOccupying ? '🟢' : '⚫',
+                                style: const TextStyle(fontSize: 8),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                tenant.isCurrentlyOccupying
+                                    ? 'Current'
+                                    : 'Past',
+                                style: Theme.of(context).textTheme.labelSmall
+                                    ?.copyWith(
+                                      color: tenant.isCurrentlyOccupying
+                                          ? AppColors.success
+                                          : AppColors.onSurfaceVariant,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+
+                    // Location info
+                    if (tenant.isCurrentlyOccupying &&
+                        tenant.currentRoomNumber != null)
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.home_outlined,
+                            size: 14,
+                            color: AppColors.onSurfaceVariant,
+                          ),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              '${tenant.currentPropertyName ?? ''} - Room ${tenant.currentRoomNumber}',
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(color: AppColors.onSurfaceVariant),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      )
+                    else
+                      // Past tenant - show last stay info
+                      occupanciesAsync.when(
+                        data: (occupancies) {
+                          if (occupancies.isEmpty) {
+                            return const SizedBox.shrink();
+                          }
+                          // Get last occupancy
+                          final lastOccupancy = occupancies.reduce(
+                            (a, b) =>
+                                a.moveInDate.isAfter(b.moveInDate) ? a : b,
+                          );
+                          final dateFormat = DateFormat('MMM yyyy');
+                          return Row(
+                            children: [
+                              const Icon(
+                                Icons.history_outlined,
+                                size: 14,
+                                color: AppColors.onSurfaceVariant,
+                              ),
+                              const SizedBox(width: 4),
+                              Expanded(
+                                child: Text(
+                                  '${lastOccupancy.propertyName ?? 'Property'} - Room ${lastOccupancy.roomNumber ?? 'N/A'} • ${dateFormat.format(lastOccupancy.moveOutDate ?? lastOccupancy.moveInDate)}',
+                                  style: Theme.of(context).textTheme.bodySmall
+                                      ?.copyWith(
+                                        color: AppColors.onSurfaceVariant,
+                                      ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                        loading: () => const SizedBox.shrink(),
+                        error: (_, __) => const SizedBox.shrink(),
+                      ),
+
+                    // Phone
+                    if (tenant.phone != null) ...[
+                      const SizedBox(height: 2),
                       Row(
                         children: [
                           const Icon(
@@ -225,48 +358,7 @@ class _TenantCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                    const SizedBox(height: 4),
-                    // Current occupancy status
-                    if (tenant.isCurrentlyOccupying &&
-                        tenant.currentRoomNumber != null)
-                      Row(
-                        children: [
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: const BoxDecoration(
-                              color: AppColors.success,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          Expanded(
-                            child: Text(
-                              '${tenant.currentPropertyName ?? ''} - Room ${tenant.currentRoomNumber}',
-                              style: Theme.of(context).textTheme.bodySmall
-                                  ?.copyWith(color: AppColors.success),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      )
-                    else
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.onSurfaceVariant.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          'Past Tenant',
-                          style: Theme.of(context).textTheme.labelSmall
-                              ?.copyWith(color: AppColors.onSurfaceVariant),
-                        ),
-                      ),
+                    ],
                   ],
                 ),
               ),

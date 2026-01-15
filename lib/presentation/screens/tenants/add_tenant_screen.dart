@@ -1,7 +1,6 @@
 /// Add/Edit tenant screen with comprehensive profile fields.
 library;
 
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -447,22 +446,41 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
                 ),
                 const SizedBox(height: 12),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Expanded(
-                      child: _buildDocumentPicker(
-                        label: 'Front',
-                        path: _aadhaarFrontPath,
-                        onSelected: (p) =>
-                            setState(() => _aadhaarFrontPath = p),
-                      ),
+                    Column(
+                      children: [
+                        ImagePickerWidget(
+                          initialImagePath: _aadhaarFrontPath,
+                          placeholderIcon: Icons.credit_card,
+                          size: 100,
+                          onImageSelected: (p) =>
+                              setState(() => _aadhaarFrontPath = p),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Front',
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: AppColors.onSurfaceVariant),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: _buildDocumentPicker(
-                        label: 'Back',
-                        path: _aadhaarBackPath,
-                        onSelected: (p) => setState(() => _aadhaarBackPath = p),
-                      ),
+                    Column(
+                      children: [
+                        ImagePickerWidget(
+                          initialImagePath: _aadhaarBackPath,
+                          placeholderIcon: Icons.credit_card,
+                          size: 100,
+                          onImageSelected: (p) =>
+                              setState(() => _aadhaarBackPath = p),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Back',
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: AppColors.onSurfaceVariant),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -599,50 +617,6 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildDocumentPicker({
-    required String label,
-    required String? path,
-    required Function(String?) onSelected,
-  }) {
-    return Column(
-      children: [
-        Container(
-          height: 100,
-          decoration: BoxDecoration(
-            color: AppColors.surfaceVariant.withValues(alpha: 0.3),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: AppColors.onSurfaceVariant.withValues(alpha: 0.3),
-            ),
-          ),
-          child: path != null
-              ? ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.file(
-                    File(path),
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                  ),
-                )
-              : Center(
-                  child: Icon(
-                    Icons.add_photo_alternate_outlined,
-                    size: 32,
-                    color: AppColors.onSurfaceVariant.withValues(alpha: 0.5),
-                  ),
-                ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: Theme.of(
-            context,
-          ).textTheme.bodySmall?.copyWith(color: AppColors.onSurfaceVariant),
-        ),
-      ],
     );
   }
 }
