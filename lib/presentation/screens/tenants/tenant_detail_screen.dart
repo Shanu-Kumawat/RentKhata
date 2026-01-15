@@ -100,6 +100,18 @@ class _TenantDetailContent extends ConsumerWidget {
           children: [
             // Profile card with status badge
             _ProfileCard(tenant: tenant),
+            // DEBUG: Print Aadhaar paths
+            Builder(
+              builder: (context) {
+                debugPrint(
+                  'DEBUG: aadhaarFrontPhotoPath = ${tenant.aadhaarFrontPhotoPath}',
+                );
+                debugPrint(
+                  'DEBUG: aadhaarBackPhotoPath = ${tenant.aadhaarBackPhotoPath}',
+                );
+                return const SizedBox.shrink();
+              },
+            ),
             const SizedBox(height: 16),
 
             // Current occupancy (if active)
@@ -370,8 +382,8 @@ class _TenantDetailContent extends ConsumerWidget {
     required IconData icon,
     required List<Widget> children,
   }) {
-    final nonNullChildren = children.where((c) => c is _InfoRow).toList();
-    if (nonNullChildren.isEmpty) return const SizedBox.shrink();
+    // Allow all widget types - just check if we have any children
+    if (children.isEmpty) return const SizedBox.shrink();
 
     return Card(
       child: Padding(
@@ -392,7 +404,7 @@ class _TenantDetailContent extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: 12),
-            ...nonNullChildren,
+            ...children,
           ],
         ),
       ),
