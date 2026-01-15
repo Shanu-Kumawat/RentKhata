@@ -15,6 +15,7 @@ import '../../../domain/entities/tenant.dart';
 import '../../../domain/entities/room.dart';
 import '../../../data/database/app_database.dart';
 import '../../../data/database/tables/family_member_table.dart';
+import '../../widgets/image_picker_widget.dart';
 
 /// Bottom sheet for moving a tenant into a room.
 class MoveInSheet extends ConsumerStatefulWidget {
@@ -60,6 +61,10 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
   final _introducerNameController = TextEditingController();
   final _introducerAddressController = TextEditingController();
   final _introducerPhoneController = TextEditingController();
+
+  // ID Documents - Aadhaar photos
+  String? _aadhaarFrontPath;
+  String? _aadhaarBackPath;
 
   // Family member selection for returning tenants
   Set<int> _selectedFamilyMemberIds = {};
@@ -170,6 +175,8 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
           introducerName: _emptyToNull(_introducerNameController.text),
           introducerAddress: _emptyToNull(_introducerAddressController.text),
           introducerPhone: _emptyToNull(_introducerPhoneController.text),
+          aadhaarFrontPhotoPath: _aadhaarFrontPath,
+          aadhaarBackPhotoPath: _aadhaarBackPath,
         );
 
         // Add new family members for new tenant
@@ -242,49 +249,147 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
   String? _emptyToNull(String text) => text.trim().isEmpty ? null : text.trim();
 
   Future<bool?> _showPartialFillDialog() {
+    final missingFields = <String>[];
+    if (_newFatherNameController.text.isEmpty)
+      missingFields.add('Father\'s Name');
+    if (_newPhoneController.text.isEmpty) missingFields.add('Phone Number');
+    if (_newAadharController.text.isEmpty) missingFields.add('Aadhaar Number');
+    if (_addressLineController.text.isEmpty)
+      missingFields.add('Permanent Address');
+    if (_cityController.text.isEmpty) missingFields.add('City');
+    if (_aadhaarFrontPath == null) missingFields.add('Aadhaar Front Photo');
+    if (_aadhaarBackPath == null) missingFields.add('Aadhaar Back Photo');
+
     return showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        icon: const Icon(
-          Icons.info_outline,
-          color: AppColors.warning,
-          size: 48,
-        ),
-        title: const Text('Incomplete Profile'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Some fields are not filled:'),
-            const SizedBox(height: 12),
-            if (_newFatherNameController.text.isEmpty)
-              _MissingFieldItem('Father\'s Name'),
-            if (_newPhoneController.text.isEmpty)
-              _MissingFieldItem('Phone Number'),
-            if (_newAadharController.text.isEmpty)
-              _MissingFieldItem('Aadhaar Number'),
-            if (_addressLineController.text.isEmpty)
-              _MissingFieldItem('Permanent Address'),
-            if (_cityController.text.isEmpty) _MissingFieldItem('City'),
-            const SizedBox(height: 12),
-            Text(
-              'You can complete these later from the Edit Tenant page.',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.onSurfaceVariant,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 400),
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header with warning icon
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.warning.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.warning_amber_rounded,
+                  color: AppColors.warning,
+                  size: 48,
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 20),
+              Text(
+                'Incomplete Profile',
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '${missingFields.length} fields are not filled',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 20),
+              // Missing fields list
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceVariant.withValues(alpha: 0.5),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  children: missingFields
+                      .map(
+                        (field) => Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 8,
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  color: AppColors.warning,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  field,
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                      .toList(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              // Info message
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.info.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.lightbulb_outline,
+                      color: AppColors.info,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Complete these later from the Edit Tenant page',
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodySmall?.copyWith(color: AppColors.info),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+              // Actions
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      child: const Text('Go Back'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      style: FilledButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        backgroundColor: AppColors.warning,
+                      ),
+                      child: const Text('Save Anyway'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Go Back'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Save Partial'),
-          ),
-        ],
       ),
     );
   }
@@ -650,17 +755,6 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
             ),
             keyboardType: TextInputType.phone,
           ),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: _newAadharController,
-            decoration: const InputDecoration(
-              labelText: 'Aadhaar Number',
-              hintText: '12-digit',
-              prefixIcon: Icon(Icons.credit_card_outlined),
-            ),
-            keyboardType: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          ),
         ]),
         const SizedBox(height: 16),
 
@@ -700,6 +794,68 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
               prefixIcon: Icon(Icons.pin_drop_outlined),
             ),
             keyboardType: TextInputType.number,
+          ),
+        ]),
+        const SizedBox(height: 16),
+
+        // ID Documents Section
+        _buildSection('ID Documents', Icons.badge_outlined, [
+          TextFormField(
+            controller: _newAadharController,
+            decoration: const InputDecoration(
+              labelText: 'Aadhaar Number',
+              hintText: '12-digit number',
+              prefixIcon: Icon(Icons.credit_card_outlined),
+            ),
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          ),
+          const SizedBox(height: 20),
+          Text(
+            'Aadhaar Card Photos',
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Column(
+                children: [
+                  ImagePickerWidget(
+                    initialImagePath: _aadhaarFrontPath,
+                    placeholderIcon: Icons.credit_card,
+                    size: 100,
+                    onImageSelected: (p) =>
+                        setState(() => _aadhaarFrontPath = p),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Front',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: AppColors.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+              Column(
+                children: [
+                  ImagePickerWidget(
+                    initialImagePath: _aadhaarBackPath,
+                    placeholderIcon: Icons.credit_card,
+                    size: 100,
+                    onImageSelected: (p) =>
+                        setState(() => _aadhaarBackPath = p),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Back',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: AppColors.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ]),
         const SizedBox(height: 16),
@@ -1030,25 +1186,6 @@ class _NewFamilyMember {
     this.gender,
     required this.phone,
   });
-}
-
-class _MissingFieldItem extends StatelessWidget {
-  final String field;
-  const _MissingFieldItem(this.field);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 8, bottom: 4),
-      child: Row(
-        children: [
-          const Icon(Icons.circle, size: 6, color: AppColors.warning),
-          const SizedBox(width: 8),
-          Text(field, style: Theme.of(context).textTheme.bodySmall),
-        ],
-      ),
-    );
-  }
 }
 
 // ============ Family Member Selection Widget ============
