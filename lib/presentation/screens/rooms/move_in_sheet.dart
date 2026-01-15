@@ -226,10 +226,12 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
           _selectedFamilyMemberIds.length + _newFamilyMembers.length;
 
       if (mounted) {
-        // Invalidate providers to refresh state across screens
+        // Invalidate providers to refresh state across all screens
         ref.invalidate(tenantsProvider);
         ref.invalidate(tenantProvider(tenantId));
         ref.invalidate(roomProvider(widget.roomId));
+        ref.invalidate(allRoomsProvider);
+        ref.invalidate(propertiesStreamProvider);
         ref.invalidate(dashboardSummaryProvider);
 
         Navigator.pop(context);

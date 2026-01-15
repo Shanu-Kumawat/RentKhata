@@ -848,8 +848,10 @@ class _MoveOutSheetState extends ConsumerState<_MoveOutSheet> {
       // For now, just complete the move out
 
       if (mounted) {
-        // Invalidate providers to refresh state
+        // Invalidate providers to refresh state across all screens
         ref.invalidate(roomProvider(widget.occupancy.roomId));
+        ref.invalidate(allRoomsProvider);
+        ref.invalidate(propertiesStreamProvider);
         ref.invalidate(tenantsProvider);
         ref.invalidate(tenantProvider(widget.occupancy.tenantId));
         ref.invalidate(dashboardSummaryProvider);
