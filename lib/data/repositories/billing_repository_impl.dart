@@ -13,6 +13,7 @@ import '../database/daos/property_dao.dart';
 import '../database/tables/bill_table.dart' as db;
 import '../database/tables/payment_table.dart' as db;
 import '../database/tables/message_template_table.dart' as db;
+import '../database/tables/audit_log_table.dart';
 
 /// Implementation of [BillingRepository] using Drift database.
 class BillingRepositoryImpl implements BillingRepository {
@@ -266,11 +267,25 @@ class BillingRepositoryImpl implements BillingRepository {
       periodStartDate: Value(periodStartDate),
       periodEndDate: Value(periodEndDate),
     );
-    return _billingDao.insertBill(bill);
+    final billId = await _billingDao.insertBill(bill);
+
+    // Log audit entry for bill creation
+    await _billingDao.insertAuditLog(
+      entityType: AuditEntityType.bill,
+      entityId: billId,
+      action: AuditAction.create,
+      notes:
+          'Bill created: ${billType.name} for $billingMonth/$billingYear, amount: $amount',
+    );
+
+    return billId;
   }
 
   @override
   Future<bool> updateBill(Bill bill) async {
+    // Get old bill for diff logging
+    final oldBill = await _billingDao.getBillById(bill.id);
+
     final entity = BillEntity(
       id: bill.id,
       occupancyId: bill.occupancyId,
@@ -289,12 +304,53 @@ class BillingRepositoryImpl implements BillingRepository {
       createdAt: bill.createdAt,
       dueDate: bill.dueDate,
     );
-    return _billingDao.updateBill(entity);
+    final result = await _billingDao.updateBill(entity);
+
+    // Log audit entry for bill update with diff
+    if (result && oldBill != null) {
+      final changes = <String>[];
+      if (oldBill.amount != bill.amount) {
+        changes.add('amount: ${oldBill.amount} → ${bill.amount}');
+      }
+      if (oldBill.status != _billStatusToDb(bill.status)) {
+        changes.add('status: ${oldBill.status.name} → ${bill.status.name}');
+      }
+      if (oldBill.notes != bill.notes) {
+        changes.add('notes updated');
+      }
+
+      await _billingDao.insertAuditLog(
+        entityType: AuditEntityType.bill,
+        entityId: bill.id,
+        action: AuditAction.update,
+        fieldName: changes.isNotEmpty ? 'multiple' : null,
+        oldValue: oldBill.amount.toString(),
+        newValue: bill.amount.toString(),
+        notes: changes.isNotEmpty ? changes.join(', ') : 'Bill updated',
+      );
+    }
+
+    return result;
   }
 
   @override
   Future<bool> deleteBill(int id) async {
+    // Get bill info before deletion for audit
+    final bill = await _billingDao.getBillById(id);
+
     final result = await _billingDao.deleteBill(id);
+
+    // Log audit entry for bill deletion
+    if (result > 0 && bill != null) {
+      await _billingDao.insertAuditLog(
+        entityType: AuditEntityType.bill,
+        entityId: id,
+        action: AuditAction.delete,
+        notes:
+            'Bill deleted: ${bill.billType.name} for ${bill.billingMonth}/${bill.billingYear}, amount: ${bill.amount}',
+      );
+    }
+
     return result > 0;
   }
 
@@ -338,7 +394,21 @@ class BillingRepositoryImpl implements BillingRepository {
       notes: Value(notes),
       paymentDate: Value(paymentDate ?? DateTime.now()),
     );
-    return _billingDao.insertPayment(payment);
+    final paymentId = await _billingDao.insertPayment(payment);
+
+    // Recalculate bill status after payment
+    await _billingDao.recalculateBillStatus(billId);
+
+    // Log audit entry for payment
+    await _billingDao.insertAuditLog(
+      entityType: AuditEntityType.payment,
+      entityId: paymentId,
+      action: AuditAction.create,
+      notes:
+          'Payment recorded: $amount via ${paymentMode.name} for bill #$billId',
+    );
+
+    return paymentId;
   }
 
   @override
@@ -349,19 +419,92 @@ class BillingRepositoryImpl implements BillingRepository {
     String? notes,
     DateTime? paymentDate,
   }) async {
+    // Get billId from existing payment record by querying all bills
+    int? billId;
+    final allBills = await _billingDao.getAllBills();
+    for (final bill in allBills) {
+      final payments = await _billingDao.getPaymentsForBill(bill.id);
+      if (payments.any((p) => p.id == paymentId)) {
+        billId = bill.id;
+        final oldP = payments.firstWhere((p) => p.id == paymentId);
+        // Store old amount for audit
+        final oldAmount = oldP.amount;
+
+        final payment = PaymentsCompanion(
+          id: Value(paymentId),
+          amount: Value(amount),
+          paymentMode: Value(_paymentModeToDb(paymentMode)),
+          notes: Value(notes),
+          paymentDate: Value(paymentDate ?? DateTime.now()),
+          updatedAt: Value(DateTime.now()),
+          originalAmount: Value(oldAmount.toString()),
+        );
+        final result = await _billingDao.updatePayment(payment);
+
+        if (result) {
+          // Recalculate bill status
+          await _billingDao.recalculateBillStatus(billId);
+
+          // Log audit entry
+          await _billingDao.insertAuditLog(
+            entityType: AuditEntityType.payment,
+            entityId: paymentId,
+            action: AuditAction.update,
+            oldValue: oldAmount.toString(),
+            newValue: amount.toString(),
+            notes: 'Payment updated: $oldAmount → $amount',
+          );
+        }
+        return result;
+      }
+    }
+
+    // Fallback if payment not found in any bill
     final payment = PaymentsCompanion(
       id: Value(paymentId),
       amount: Value(amount),
       paymentMode: Value(_paymentModeToDb(paymentMode)),
       notes: Value(notes),
       paymentDate: Value(paymentDate ?? DateTime.now()),
+      updatedAt: Value(DateTime.now()),
     );
     return _billingDao.updatePayment(payment);
   }
 
   @override
   Future<bool> deletePayment(int id) async {
+    // Find the payment and its bill for audit and status update
+    int? billId;
+    double? oldAmount;
+    final allBills = await _billingDao.getAllBills();
+    for (final bill in allBills) {
+      final payments = await _billingDao.getPaymentsForBill(bill.id);
+      final payment = payments.where((p) => p.id == id).firstOrNull;
+      if (payment != null) {
+        billId = bill.id;
+        oldAmount = payment.amount;
+        break;
+      }
+    }
+
     final result = await _billingDao.deletePayment(id);
+
+    if (result > 0) {
+      // Recalculate bill status
+      if (billId != null) {
+        await _billingDao.recalculateBillStatus(billId);
+      }
+
+      // Log audit entry
+      await _billingDao.insertAuditLog(
+        entityType: AuditEntityType.payment,
+        entityId: id,
+        action: AuditAction.delete,
+        notes:
+            'Payment deleted: ${oldAmount ?? 'unknown'} from bill #${billId ?? 'unknown'}',
+      );
+    }
+
     return result > 0;
   }
 
@@ -396,11 +539,27 @@ class BillingRepositoryImpl implements BillingRepository {
 
   @override
   Future<int> addElectricityRate(double rate, DateTime effectiveFrom) async {
+    // Get current rate for audit
+    final currentRate = await _billingDao.getCurrentElectricityRate();
+
     final rateEntry = ElectricityRatesCompanion(
       ratePerUnit: Value(rate),
       effectiveFrom: Value(effectiveFrom),
     );
-    return _billingDao.insertElectricityRate(rateEntry);
+    final id = await _billingDao.insertElectricityRate(rateEntry);
+
+    // Log audit entry for rate change
+    await _billingDao.insertAuditLog(
+      entityType: AuditEntityType.electricityRate,
+      entityId: id,
+      action: AuditAction.create,
+      oldValue: currentRate?.ratePerUnit.toString(),
+      newValue: rate.toString(),
+      notes:
+          'Electricity rate changed: ${currentRate?.ratePerUnit ?? 'none'} → $rate per unit',
+    );
+
+    return id;
   }
 
   // ========== Message Template Operations ==========

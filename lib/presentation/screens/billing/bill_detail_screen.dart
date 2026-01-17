@@ -7,12 +7,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../application/providers/billing_providers.dart';
 import '../../../application/providers/dashboard_providers.dart';
+import '../../../application/providers/repository_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../domain/entities/bill.dart';
 import '../../../domain/entities/payment.dart';
 import 'invoice_preview_screen.dart';
 import 'record_payment_sheet.dart';
+import 'edit_payment_sheet.dart';
 
 /// Screen to view detailed bill information including payments.
 class BillDetailScreen extends ConsumerWidget {
@@ -176,7 +178,7 @@ class _BillDetailContent extends ConsumerWidget {
                     )
                   : Column(
                       children: payments
-                          .map((p) => _PaymentTile(payment: p))
+                          .map((p) => _PaymentTile(payment: p, bill: bill))
                           .toList(),
                     ),
             ),
@@ -274,23 +276,45 @@ class _BillDetailContent extends ConsumerWidget {
   void _confirmDeleteBill(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Delete Bill?'),
         content: Text(
           'Are you sure you want to delete this ${bill.billType.name} bill for ${bill.billingPeriod}?\n\nThis action cannot be undone.',
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              // TODO: Implement delete
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Delete bill coming soon')),
-              );
+            onPressed: () async {
+              Navigator.pop(dialogContext);
+
+              try {
+                final repo = ref.read(billingRepositoryProvider);
+                final success = await repo.deleteBill(bill.id);
+
+                if (success && context.mounted) {
+                  // Invalidate providers to refresh UI
+                  ref.invalidate(billsForOccupancyProvider(bill.occupancyId));
+                  ref.invalidate(
+                    billsForOccupancyStreamProvider(bill.occupancyId),
+                  );
+                  ref.invalidate(unpaidBillsProvider);
+                  ref.invalidate(dashboardSummaryProvider);
+
+                  Navigator.pop(context); // Go back to room/occupancy screen
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(const SnackBar(content: Text('Bill deleted')));
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error deleting bill: $e')),
+                  );
+                }
+              }
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: const Text('Delete'),
@@ -792,14 +816,15 @@ class _InfoRow extends StatelessWidget {
   }
 }
 
-/// A tile showing a single payment.
-class _PaymentTile extends StatelessWidget {
+/// A tile showing a single payment with edit/delete actions.
+class _PaymentTile extends ConsumerWidget {
   final Payment payment;
+  final Bill bill;
 
-  const _PaymentTile({required this.payment});
+  const _PaymentTile({required this.payment, required this.bill});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
 
     return Card(
@@ -823,12 +848,99 @@ class _PaymentTile extends StatelessWidget {
         subtitle: Text(
           '${_getPaymentModeLabel(payment.paymentMode)} • ${_formatDate(payment.paymentDate)}',
         ),
-        trailing: payment.notes != null && payment.notes!.isNotEmpty
-            ? Tooltip(
-                message: payment.notes!,
-                child: const Icon(Icons.note_outlined, size: 18),
-              )
-            : null,
+        trailing: PopupMenuButton<String>(
+          icon: const Icon(Icons.more_vert, size: 20),
+          onSelected: (action) => _handleAction(context, ref, action),
+          itemBuilder: (context) => [
+            const PopupMenuItem(
+              value: 'edit',
+              child: ListTile(
+                leading: Icon(Icons.edit_outlined),
+                title: Text('Edit Payment'),
+                contentPadding: EdgeInsets.zero,
+              ),
+            ),
+            const PopupMenuItem(
+              value: 'delete',
+              child: ListTile(
+                leading: Icon(Icons.delete_outline, color: Colors.red),
+                title: Text(
+                  'Delete Payment',
+                  style: TextStyle(color: Colors.red),
+                ),
+                contentPadding: EdgeInsets.zero,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _handleAction(BuildContext context, WidgetRef ref, String action) {
+    switch (action) {
+      case 'edit':
+        _editPayment(context, ref);
+        break;
+      case 'delete':
+        _confirmDeletePayment(context, ref);
+        break;
+    }
+  }
+
+  void _editPayment(BuildContext context, WidgetRef ref) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => EditPaymentSheet(payment: payment, bill: bill),
+    );
+  }
+
+  void _confirmDeletePayment(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Delete Payment?'),
+        content: Text(
+          'Delete payment of ${formatCurrency(payment.amount)} made on ${_formatDate(payment.paymentDate)}?\n\nThis will update the bill balance.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(dialogContext);
+
+              try {
+                final repo = ref.read(billingRepositoryProvider);
+                final success = await repo.deletePayment(payment.id);
+
+                if (success && context.mounted) {
+                  // Invalidate providers to refresh UI
+                  ref.invalidate(billByIdProvider(bill.id));
+                  ref.invalidate(paymentsForBillProvider(bill.id));
+                  ref.invalidate(billsForOccupancyProvider(bill.occupancyId));
+                  ref.invalidate(unpaidBillsProvider);
+                  ref.invalidate(dashboardSummaryProvider);
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Payment deleted')),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text('Error: $e')));
+                }
+              }
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
       ),
     );
   }

@@ -8,10 +8,12 @@ import 'package:image_picker/image_picker.dart';
 import '../../../application/providers/repository_providers.dart';
 import '../../../application/providers/billing_providers.dart';
 import '../../../application/providers/dashboard_providers.dart';
+import '../../../application/providers/database_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/validators.dart';
 import '../../../domain/entities/bill.dart';
+import '../../../data/database/tables/bill_table.dart' as db;
 import '../../../services/image_service.dart';
 
 /// Bottom sheet to create a new bill.
@@ -84,6 +86,24 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
     super.dispose();
   }
 
+  String _getMonthName(int month) {
+    const months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
+    return months[month - 1];
+  }
+
   void _updateAmount() {
     if (_selectedBillType == BillType.rent) {
       _amountController.text = widget.agreedRent.toStringAsFixed(0);
@@ -152,6 +172,53 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
 
     try {
       final repo = ref.read(billingRepositoryProvider);
+      final dao = ref.read(billingDaoProvider);
+
+      // Check for duplicate bill
+      final dbBillType = switch (_selectedBillType) {
+        BillType.rent => db.BillType.rent,
+        BillType.electricity => db.BillType.electricity,
+        BillType.water => db.BillType.water,
+        BillType.maintenance => db.BillType.maintenance,
+        BillType.other => db.BillType.other,
+      };
+
+      final existingBill = await dao.checkDuplicateBill(
+        occupancyId: widget.occupancyId,
+        billType: dbBillType,
+        billingMonth: _billingMonth,
+        billingYear: _billingYear,
+      );
+
+      if (existingBill != null && mounted) {
+        // Show duplicate warning dialog
+        final proceed = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Bill Already Exists'),
+            content: Text(
+              'A ${_selectedBillType.name} bill for ${_getMonthName(_billingMonth)} $_billingYear '
+              'already exists (${existingBill.billNumber ?? "Draft"}).\n\n'
+              'Do you want to create another bill anyway?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('Create Anyway'),
+              ),
+            ],
+          ),
+        );
+
+        if (proceed != true) {
+          setState(() => _isLoading = false);
+          return;
+        }
+      }
 
       // Calculate period dates from month/year
       final periodStart = DateTime(_billingYear, _billingMonth, 1);
