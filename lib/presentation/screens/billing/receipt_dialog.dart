@@ -192,20 +192,11 @@ class ReceiptDialog extends StatelessWidget {
     }
 
     final shareService = ShareService();
-    final success = await shareService.shareReceiptToWhatsApp(
+    await shareService.shareReceipt(
       bill: bill,
       payment: latestPayment!,
       landlordName: landlordName ?? 'Landlord',
-      tenantPhone: null, // Will open WhatsApp to select contact
     );
-
-    if (!success && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Could not open WhatsApp. Is it installed?'),
-        ),
-      );
-    }
   }
 
   String _formatDate(DateTime date) {

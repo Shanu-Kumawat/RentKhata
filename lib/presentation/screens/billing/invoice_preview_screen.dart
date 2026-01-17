@@ -33,7 +33,7 @@ class InvoicePreviewScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.share_outlined),
-            tooltip: 'Share via WhatsApp',
+            tooltip: 'Share Invoice',
             onPressed: () => _shareInvoice(context),
           ),
         ],
@@ -57,20 +57,18 @@ class InvoicePreviewScreen extends ConsumerWidget {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close),
-                  label: const Text('Close'),
-                ),
+              // Close button - icon only to prevent text wrapping
+              IconButton.outlined(
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(Icons.close),
+                tooltip: 'Close',
               ),
               const SizedBox(width: 12),
               Expanded(
-                flex: 2,
                 child: ElevatedButton.icon(
                   onPressed: () => _shareInvoice(context),
-                  icon: const Icon(Icons.send),
-                  label: const Text('Share Invoice'),
+                  icon: const Icon(Icons.share),
+                  label: const Text('Share'),
                 ),
               ),
             ],
@@ -82,20 +80,11 @@ class InvoicePreviewScreen extends ConsumerWidget {
 
   Future<void> _shareInvoice(BuildContext context) async {
     final shareService = ShareService();
-    final success = await shareService.shareInvoiceToWhatsApp(
+    await shareService.shareInvoice(
       bill: bill,
       landlordName: landlordName ?? 'Landlord',
       landlordUpi: landlordUpi,
-      tenantPhone: null, // Will open WhatsApp to select contact
     );
-
-    if (!success && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Could not open WhatsApp. Is it installed?'),
-        ),
-      );
-    }
   }
 }
 

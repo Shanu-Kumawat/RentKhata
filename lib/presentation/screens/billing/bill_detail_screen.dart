@@ -1,6 +1,8 @@
 /// Bill detail screen with comprehensive bill information.
 library;
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../application/providers/billing_providers.dart';
@@ -364,7 +366,7 @@ class _StatusCard extends StatelessWidget {
                     _AmountColumn(
                       label: 'Total',
                       amount: bill.amount,
-                      color: AppColors.onSurface,
+                      color: AppColors.primary,
                     ),
                     Container(
                       height: 40,
@@ -603,7 +605,7 @@ class _ElectricityDetailsCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.amber.shade50,
+                color: Colors.amber.shade100,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -611,17 +613,99 @@ class _ElectricityDetailsCard extends StatelessWidget {
                 children: [
                   Text(
                     '${units.toStringAsFixed(0)} units @ ${formatCurrency(bill.electricityRateAtBilling ?? 0)}/unit',
-                    style: theme.textTheme.bodyMedium,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: Colors.amber.shade900,
+                    ),
                   ),
                   Text(
                     formatCurrency(bill.electricityCharges ?? 0),
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
+                      color: Colors.amber.shade900,
                     ),
                   ),
                 ],
               ),
             ),
+            // Meter Photo (if present)
+            if (bill.meterPhotoPath != null &&
+                bill.meterPhotoPath!.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              InkWell(
+                onTap: () {
+                  // Show full screen image
+                  showDialog(
+                    context: context,
+                    builder: (context) => Dialog(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          AppBar(
+                            title: const Text('Meter Photo'),
+                            automaticallyImplyLeading: false,
+                            actions: [
+                              IconButton(
+                                onPressed: () => Navigator.pop(context),
+                                icon: const Icon(Icons.close),
+                              ),
+                            ],
+                          ),
+                          Image.file(
+                            File(bill.meterPhotoPath!),
+                            fit: BoxFit.contain,
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+                child: Container(
+                  height: 100,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  child: Row(
+                    children: [
+                      ClipRRect(
+                        borderRadius: const BorderRadius.horizontal(
+                          left: Radius.circular(7),
+                        ),
+                        child: Image.file(
+                          File(bill.meterPhotoPath!),
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Meter Photo',
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              'Tap to view full size',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: AppColors.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Icon(Icons.chevron_right),
+                      const SizedBox(width: 12),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),

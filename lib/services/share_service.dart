@@ -82,6 +82,24 @@ class ShareService {
     return shareToWhatsApp(message: message, phoneNumber: tenantPhone);
   }
 
+  /// Share invoice using native share dialog.
+  Future<void> shareInvoice({
+    required Bill bill,
+    required String landlordName,
+    String? landlordUpi,
+  }) async {
+    final message = generateInvoiceMessage(
+      bill: bill,
+      landlordName: landlordName,
+      landlordUpi: landlordUpi,
+    );
+
+    await Share.share(
+      message,
+      subject: 'Invoice - ${bill.billNumber ?? bill.billingPeriod}',
+    );
+  }
+
   /// Share payment receipt to WhatsApp.
   Future<bool> shareReceiptToWhatsApp({
     required Bill bill,
@@ -96,6 +114,24 @@ class ShareService {
     );
 
     return shareToWhatsApp(message: message, phoneNumber: tenantPhone);
+  }
+
+  /// Share payment receipt using native share dialog.
+  Future<void> shareReceipt({
+    required Bill bill,
+    required Payment payment,
+    required String landlordName,
+  }) async {
+    final message = generateReceiptMessage(
+      bill: bill,
+      payment: payment,
+      landlordName: landlordName,
+    );
+
+    await Share.share(
+      message,
+      subject: 'Payment Receipt - ${bill.billNumber ?? bill.billingPeriod}',
+    );
   }
 
   /// Generate invoice message from bill.

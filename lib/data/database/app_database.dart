@@ -79,6 +79,66 @@ class AppDatabase extends _$AppDatabase {
             effectiveFrom: DateTime.now(),
           ),
         );
+        // Insert default bill settings
+        await into(billSettings).insert(BillSettingsCompanion.insert());
+        // Insert default message templates
+        await into(messageTemplates).insert(
+          MessageTemplatesCompanion.insert(
+            templateType: TemplateType.invoice,
+            name: 'Default Invoice',
+            body: '''Dear {tenantName},
+
+Your {billType} bill for {period} is ready.
+
+Bill #: {billNumber}
+Amount: ₹{amount}
+Due Date: {dueDate}
+
+Please make the payment at your earliest convenience.
+
+Thank you,
+{landlordName}''',
+            isDefault: const Value(true),
+          ),
+        );
+        await into(messageTemplates).insert(
+          MessageTemplatesCompanion.insert(
+            templateType: TemplateType.receipt,
+            name: 'Default Receipt',
+            body: '''Dear {tenantName},
+
+Payment Received!
+
+Bill: {billType} - {period}
+Amount: ₹{amount}
+Payment Mode: {paymentMode}
+
+Thank you for your payment.
+
+{landlordName}''',
+            isDefault: const Value(true),
+          ),
+        );
+        await into(messageTemplates).insert(
+          MessageTemplatesCompanion.insert(
+            templateType: TemplateType.reminder,
+            name: 'Default Reminder',
+            body: '''Dear {tenantName},
+
+This is a reminder for your pending {billType} bill.
+
+Bill #: {billNumber}
+Period: {period}
+Amount Due: ₹{amount}
+Due Date: {dueDate}
+
+Please make the payment at your earliest convenience.
+
+Thank you,
+{landlordName}''',
+            isDefault: const Value(true),
+          ),
+        );
       },
       onUpgrade: (Migrator m, int from, int to) async {
         if (from < 2) {
