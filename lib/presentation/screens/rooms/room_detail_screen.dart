@@ -7,11 +7,13 @@ import 'package:go_router/go_router.dart';
 import '../../../application/providers/property_providers.dart';
 import '../../../application/providers/tenant_providers.dart';
 import '../../../application/providers/billing_providers.dart';
+import '../../../application/providers/dashboard_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../domain/entities/room.dart';
 import '../../../domain/entities/occupancy.dart';
 import '../../../domain/entities/bill.dart';
+import '../../../services/share_service.dart';
 import '../billing/create_bill_sheet.dart';
 import '../billing/record_payment_sheet.dart';
 import '../billing/bill_detail_screen.dart';
@@ -487,13 +489,13 @@ class _BillsSection extends ConsumerWidget {
   }
 }
 
-class _BillTile extends StatelessWidget {
+class _BillTile extends ConsumerWidget {
   final Bill bill;
 
   const _BillTile({required this.bill});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final statusColor = bill.isFullyPaid
         ? AppColors.success
         : bill.isOverdue
@@ -548,6 +550,14 @@ class _BillTile extends StatelessWidget {
             if (!bill.isFullyPaid) ...[
               const SizedBox(width: 4),
               IconButton(
+                icon: const Icon(Icons.notifications_active_outlined, size: 18),
+                tooltip: 'Send Reminder',
+                onPressed: () => _sendReminder(context, ref),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+              ),
+              const SizedBox(width: 4),
+              IconButton(
                 icon: const Icon(Icons.payment, size: 20),
                 tooltip: 'Record Payment',
                 onPressed: () => _showRecordPayment(context),
@@ -574,5 +584,25 @@ class _BillTile extends StatelessWidget {
       isScrollControlled: true,
       builder: (context) => RecordPaymentSheet(bill: bill),
     );
+  }
+
+  void _sendReminder(BuildContext context, WidgetRef ref) async {
+    final landlord = await ref.read(landlordProvider.future);
+    final landlordName = landlord?.name ?? 'Landlord';
+
+    final message = ShareService.billReminderMessage(
+      tenantName: bill.tenantName ?? 'Tenant',
+      billType: bill.billType.name,
+      period: bill.billingPeriod,
+      amount: bill.pendingAmount,
+      dueDate: bill.dueDate ?? DateTime.now(),
+      landlordName: landlordName,
+    );
+
+    final shareService = ShareService();
+    final success = await shareService.shareToWhatsApp(message: message);
+    if (!success && context.mounted) {
+      await shareService.shareText(text: message, subject: 'Payment Reminder');
+    }
   }
 }

@@ -1,6 +1,7 @@
 /// Billing repository interface.
 library;
 
+import '../entities/audit_log.dart';
 import '../entities/bill.dart';
 import '../entities/message_template.dart';
 import '../entities/payment.dart';
@@ -132,4 +133,12 @@ abstract class BillingRepository {
 
   /// Delete a message template
   Future<int> deleteMessageTemplate(int id);
+
+  // ========== Audit Log Operations ==========
+
+  /// Get audit logs for a bill
+  Future<List<AuditLog>> getAuditLogsForBill(int billId);
+
+  /// Get audit logs for a payment
+  Future<List<AuditLog>> getAuditLogsForPayment(int paymentId);
 }

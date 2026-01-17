@@ -9,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:printing/printing.dart';
 import '../domain/entities/bill.dart';
 import '../domain/entities/payment.dart';
+import 'upi_qr_service.dart';
 
 /// Service for generating PDF invoices and receipts.
 class InvoicePdfService {
@@ -202,8 +203,32 @@ class InvoicePdfService {
               ),
               pw.SizedBox(height: 40),
 
-              // Payment info
-              if (landlordUpiId != null) ...[
+              // Payment info with QR code
+              if (landlordUpiId != null && bill.pendingAmount > 0) ...[
+                pw.Divider(),
+                pw.SizedBox(height: 10),
+                pw.Text(
+                  'Payment Information',
+                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                ),
+                pw.SizedBox(height: 10),
+                pw.Row(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Expanded(
+                      child: pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                        children: [
+                          pw.Text('UPI ID: $landlordUpiId'),
+                          pw.SizedBox(height: 5),
+                          pw.Text('Scan QR code to pay'),
+                        ],
+                      ),
+                    ),
+                    // QR Code placeholder - will be added via async method
+                  ],
+                ),
+              ] else if (landlordUpiId != null) ...[
                 pw.Divider(),
                 pw.SizedBox(height: 10),
                 pw.Text(
@@ -232,6 +257,51 @@ class InvoicePdfService {
         },
       ),
     );
+
+    // If UPI ID is provided and there's pending amount, add QR code on a second pass
+    if (landlordUpiId != null && bill.pendingAmount > 0) {
+      final qrBytes = await UpiQrService.generateQrImageBytes(
+        upiId: landlordUpiId,
+        payeeName: landlordName,
+        amount: bill.pendingAmount,
+        transactionNote: '${bill.billType.name} - ${bill.billingPeriod}',
+        size: 150,
+      );
+
+      if (qrBytes != null) {
+        // Add a page with QR code at the bottom
+        pdf.addPage(
+          pw.Page(
+            pageFormat: PdfPageFormat.a4,
+            build: (pw.Context context) {
+              return pw.Center(
+                child: pw.Column(
+                  mainAxisAlignment: pw.MainAxisAlignment.center,
+                  children: [
+                    pw.Text(
+                      'Scan to Pay',
+                      style: pw.TextStyle(
+                        fontSize: 18,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                    pw.SizedBox(height: 20),
+                    pw.Image(pw.MemoryImage(qrBytes), width: 150, height: 150),
+                    pw.SizedBox(height: 10),
+                    pw.Text('UPI ID: $landlordUpiId'),
+                    pw.SizedBox(height: 5),
+                    pw.Text(
+                      'Amount: ₹${bill.pendingAmount.toStringAsFixed(2)}',
+                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        );
+      }
+    }
 
     return _savePdf(pdf, 'invoice_${bill.id}');
   }

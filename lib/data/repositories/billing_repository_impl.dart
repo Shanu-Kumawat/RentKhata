@@ -2,6 +2,7 @@
 library;
 
 import 'package:drift/drift.dart';
+import '../../domain/entities/audit_log.dart';
 import '../../domain/entities/bill.dart';
 import '../../domain/entities/message_template.dart';
 import '../../domain/entities/payment.dart';
@@ -13,7 +14,7 @@ import '../database/daos/property_dao.dart';
 import '../database/tables/bill_table.dart' as db;
 import '../database/tables/payment_table.dart' as db;
 import '../database/tables/message_template_table.dart' as db;
-import '../database/tables/audit_log_table.dart';
+import '../database/tables/audit_log_table.dart' as dbAudit;
 
 /// Implementation of [BillingRepository] using Drift database.
 class BillingRepositoryImpl implements BillingRepository {
@@ -271,9 +272,9 @@ class BillingRepositoryImpl implements BillingRepository {
 
     // Log audit entry for bill creation
     await _billingDao.insertAuditLog(
-      entityType: AuditEntityType.bill,
+      entityType: dbAudit.AuditEntityType.bill,
       entityId: billId,
-      action: AuditAction.create,
+      action: dbAudit.AuditAction.create,
       notes:
           'Bill created: ${billType.name} for $billingMonth/$billingYear, amount: $amount',
     );
@@ -320,9 +321,9 @@ class BillingRepositoryImpl implements BillingRepository {
       }
 
       await _billingDao.insertAuditLog(
-        entityType: AuditEntityType.bill,
+        entityType: dbAudit.AuditEntityType.bill,
         entityId: bill.id,
-        action: AuditAction.update,
+        action: dbAudit.AuditAction.update,
         fieldName: changes.isNotEmpty ? 'multiple' : null,
         oldValue: oldBill.amount.toString(),
         newValue: bill.amount.toString(),
@@ -343,9 +344,9 @@ class BillingRepositoryImpl implements BillingRepository {
     // Log audit entry for bill deletion
     if (result > 0 && bill != null) {
       await _billingDao.insertAuditLog(
-        entityType: AuditEntityType.bill,
+        entityType: dbAudit.AuditEntityType.bill,
         entityId: id,
-        action: AuditAction.delete,
+        action: dbAudit.AuditAction.delete,
         notes:
             'Bill deleted: ${bill.billType.name} for ${bill.billingMonth}/${bill.billingYear}, amount: ${bill.amount}',
       );
@@ -401,9 +402,9 @@ class BillingRepositoryImpl implements BillingRepository {
 
     // Log audit entry for payment
     await _billingDao.insertAuditLog(
-      entityType: AuditEntityType.payment,
+      entityType: dbAudit.AuditEntityType.payment,
       entityId: paymentId,
-      action: AuditAction.create,
+      action: dbAudit.AuditAction.create,
       notes:
           'Payment recorded: $amount via ${paymentMode.name} for bill #$billId',
     );
@@ -447,9 +448,9 @@ class BillingRepositoryImpl implements BillingRepository {
 
           // Log audit entry
           await _billingDao.insertAuditLog(
-            entityType: AuditEntityType.payment,
+            entityType: dbAudit.AuditEntityType.payment,
             entityId: paymentId,
-            action: AuditAction.update,
+            action: dbAudit.AuditAction.update,
             oldValue: oldAmount.toString(),
             newValue: amount.toString(),
             notes: 'Payment updated: $oldAmount → $amount',
@@ -497,9 +498,9 @@ class BillingRepositoryImpl implements BillingRepository {
 
       // Log audit entry
       await _billingDao.insertAuditLog(
-        entityType: AuditEntityType.payment,
+        entityType: dbAudit.AuditEntityType.payment,
         entityId: id,
-        action: AuditAction.delete,
+        action: dbAudit.AuditAction.delete,
         notes:
             'Payment deleted: ${oldAmount ?? 'unknown'} from bill #${billId ?? 'unknown'}',
       );
@@ -550,9 +551,9 @@ class BillingRepositoryImpl implements BillingRepository {
 
     // Log audit entry for rate change
     await _billingDao.insertAuditLog(
-      entityType: AuditEntityType.electricityRate,
+      entityType: dbAudit.AuditEntityType.electricityRate,
       entityId: id,
-      action: AuditAction.create,
+      action: dbAudit.AuditAction.create,
       oldValue: currentRate?.ratePerUnit.toString(),
       newValue: rate.toString(),
       notes:
@@ -645,6 +646,59 @@ class BillingRepositoryImpl implements BillingRepository {
       TemplateType.invoice => db.TemplateType.invoice,
       TemplateType.receipt => db.TemplateType.receipt,
       TemplateType.reminder => db.TemplateType.reminder,
+    };
+  }
+
+  // ========== Audit Log Operations ==========
+
+  @override
+  Future<List<AuditLog>> getAuditLogsForBill(int billId) async {
+    final entities = await _billingDao.getAuditLogsForEntity(
+      entityType: dbAudit.AuditEntityType.bill,
+      entityId: billId,
+    );
+    return entities.map(_auditLogToDomain).toList();
+  }
+
+  @override
+  Future<List<AuditLog>> getAuditLogsForPayment(int paymentId) async {
+    final entities = await _billingDao.getAuditLogsForEntity(
+      entityType: dbAudit.AuditEntityType.payment,
+      entityId: paymentId,
+    );
+    return entities.map(_auditLogToDomain).toList();
+  }
+
+  // Helper method for AuditLog conversion
+  AuditLog _auditLogToDomain(AuditLogEntity entity) {
+    return AuditLog(
+      id: entity.id,
+      entityType: _auditEntityTypeToDomain(entity.entityType),
+      entityId: entity.entityId,
+      action: _auditActionToDomain(entity.action),
+      fieldName: entity.fieldName,
+      oldValue: entity.oldValue,
+      newValue: entity.newValue,
+      notes: entity.notes,
+      createdAt: entity.createdAt,
+    );
+  }
+
+  AuditEntityType _auditEntityTypeToDomain(dbAudit.AuditEntityType type) {
+    return switch (type) {
+      dbAudit.AuditEntityType.bill => AuditEntityType.bill,
+      dbAudit.AuditEntityType.payment => AuditEntityType.payment,
+      dbAudit.AuditEntityType.electricityRate =>
+        AuditEntityType.electricityRate,
+    };
+  }
+
+  AuditAction _auditActionToDomain(dbAudit.AuditAction action) {
+    return switch (action) {
+      dbAudit.AuditAction.create => AuditAction.create,
+      dbAudit.AuditAction.update => AuditAction.update,
+      dbAudit.AuditAction.delete => AuditAction.delete,
+      dbAudit.AuditAction.void_ => AuditAction.void_,
     };
   }
 }

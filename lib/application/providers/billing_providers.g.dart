@@ -1202,5 +1202,311 @@ class _MessageTemplatesByTypeProviderElement
   TemplateType get type => (origin as MessageTemplatesByTypeProvider).type;
 }
 
+String _$auditLogsForBillHash() => r'cdc82884884abe7699981bf6ea1f3c913b9c1ae0';
+
+/// Get audit logs for a bill.
+///
+/// Copied from [auditLogsForBill].
+@ProviderFor(auditLogsForBill)
+const auditLogsForBillProvider = AuditLogsForBillFamily();
+
+/// Get audit logs for a bill.
+///
+/// Copied from [auditLogsForBill].
+class AuditLogsForBillFamily extends Family<AsyncValue<List<AuditLog>>> {
+  /// Get audit logs for a bill.
+  ///
+  /// Copied from [auditLogsForBill].
+  const AuditLogsForBillFamily();
+
+  /// Get audit logs for a bill.
+  ///
+  /// Copied from [auditLogsForBill].
+  AuditLogsForBillProvider call(int billId) {
+    return AuditLogsForBillProvider(billId);
+  }
+
+  @override
+  AuditLogsForBillProvider getProviderOverride(
+    covariant AuditLogsForBillProvider provider,
+  ) {
+    return call(provider.billId);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'auditLogsForBillProvider';
+}
+
+/// Get audit logs for a bill.
+///
+/// Copied from [auditLogsForBill].
+class AuditLogsForBillProvider
+    extends AutoDisposeFutureProvider<List<AuditLog>> {
+  /// Get audit logs for a bill.
+  ///
+  /// Copied from [auditLogsForBill].
+  AuditLogsForBillProvider(int billId)
+    : this._internal(
+        (ref) => auditLogsForBill(ref as AuditLogsForBillRef, billId),
+        from: auditLogsForBillProvider,
+        name: r'auditLogsForBillProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$auditLogsForBillHash,
+        dependencies: AuditLogsForBillFamily._dependencies,
+        allTransitiveDependencies:
+            AuditLogsForBillFamily._allTransitiveDependencies,
+        billId: billId,
+      );
+
+  AuditLogsForBillProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.billId,
+  }) : super.internal();
+
+  final int billId;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<AuditLog>> Function(AuditLogsForBillRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: AuditLogsForBillProvider._internal(
+        (ref) => create(ref as AuditLogsForBillRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        billId: billId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<AuditLog>> createElement() {
+    return _AuditLogsForBillProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is AuditLogsForBillProvider && other.billId == billId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, billId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin AuditLogsForBillRef on AutoDisposeFutureProviderRef<List<AuditLog>> {
+  /// The parameter `billId` of this provider.
+  int get billId;
+}
+
+class _AuditLogsForBillProviderElement
+    extends AutoDisposeFutureProviderElement<List<AuditLog>>
+    with AuditLogsForBillRef {
+  _AuditLogsForBillProviderElement(super.provider);
+
+  @override
+  int get billId => (origin as AuditLogsForBillProvider).billId;
+}
+
+String _$defaultTemplateHash() => r'8d592664788b2bc46106a4a88e31c89ebd458bb8';
+
+/// Get default message template for a type.
+///
+/// Copied from [defaultTemplate].
+@ProviderFor(defaultTemplate)
+const defaultTemplateProvider = DefaultTemplateFamily();
+
+/// Get default message template for a type.
+///
+/// Copied from [defaultTemplate].
+class DefaultTemplateFamily extends Family<AsyncValue<MessageTemplate?>> {
+  /// Get default message template for a type.
+  ///
+  /// Copied from [defaultTemplate].
+  const DefaultTemplateFamily();
+
+  /// Get default message template for a type.
+  ///
+  /// Copied from [defaultTemplate].
+  DefaultTemplateProvider call(TemplateType type) {
+    return DefaultTemplateProvider(type);
+  }
+
+  @override
+  DefaultTemplateProvider getProviderOverride(
+    covariant DefaultTemplateProvider provider,
+  ) {
+    return call(provider.type);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'defaultTemplateProvider';
+}
+
+/// Get default message template for a type.
+///
+/// Copied from [defaultTemplate].
+class DefaultTemplateProvider
+    extends AutoDisposeFutureProvider<MessageTemplate?> {
+  /// Get default message template for a type.
+  ///
+  /// Copied from [defaultTemplate].
+  DefaultTemplateProvider(TemplateType type)
+    : this._internal(
+        (ref) => defaultTemplate(ref as DefaultTemplateRef, type),
+        from: defaultTemplateProvider,
+        name: r'defaultTemplateProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$defaultTemplateHash,
+        dependencies: DefaultTemplateFamily._dependencies,
+        allTransitiveDependencies:
+            DefaultTemplateFamily._allTransitiveDependencies,
+        type: type,
+      );
+
+  DefaultTemplateProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.type,
+  }) : super.internal();
+
+  final TemplateType type;
+
+  @override
+  Override overrideWith(
+    FutureOr<MessageTemplate?> Function(DefaultTemplateRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: DefaultTemplateProvider._internal(
+        (ref) => create(ref as DefaultTemplateRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        type: type,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<MessageTemplate?> createElement() {
+    return _DefaultTemplateProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is DefaultTemplateProvider && other.type == type;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, type.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin DefaultTemplateRef on AutoDisposeFutureProviderRef<MessageTemplate?> {
+  /// The parameter `type` of this provider.
+  TemplateType get type;
+}
+
+class _DefaultTemplateProviderElement
+    extends AutoDisposeFutureProviderElement<MessageTemplate?>
+    with DefaultTemplateRef {
+  _DefaultTemplateProviderElement(super.provider);
+
+  @override
+  TemplateType get type => (origin as DefaultTemplateProvider).type;
+}
+
+String _$templateServiceHash() => r'6e667e81a46f403232acd5b8956373cd4f5f414d';
+
+/// Provider for TemplateService.
+///
+/// Copied from [templateService].
+@ProviderFor(templateService)
+final templateServiceProvider = AutoDisposeProvider<TemplateService>.internal(
+  templateService,
+  name: r'templateServiceProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$templateServiceHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef TemplateServiceRef = AutoDisposeProviderRef<TemplateService>;
+String _$ensureDefaultTemplatesHash() =>
+    r'f3d35b837cadf965db80a18792dc3740d829dab8';
+
+/// Ensures default templates exist. Call this during app initialization.
+/// Returns true when complete.
+///
+/// Copied from [ensureDefaultTemplates].
+@ProviderFor(ensureDefaultTemplates)
+final ensureDefaultTemplatesProvider = AutoDisposeFutureProvider<bool>.internal(
+  ensureDefaultTemplates,
+  name: r'ensureDefaultTemplatesProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$ensureDefaultTemplatesHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef EnsureDefaultTemplatesRef = AutoDisposeFutureProviderRef<bool>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

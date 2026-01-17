@@ -3,9 +3,11 @@ library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../../domain/entities/audit_log.dart';
 import '../../domain/entities/bill.dart';
 import '../../domain/entities/message_template.dart';
 import '../../domain/entities/payment.dart';
+import '../../services/template_service.dart';
 import 'repository_providers.dart';
 
 part 'billing_providers.g.dart';
@@ -121,4 +123,34 @@ Future<List<MessageTemplate>> messageTemplatesByType(
 ) async {
   final repo = ref.read(billingRepositoryProvider);
   return repo.getTemplatesByType(type);
+}
+
+/// Get audit logs for a bill.
+@riverpod
+Future<List<AuditLog>> auditLogsForBill(Ref ref, int billId) async {
+  final repo = ref.read(billingRepositoryProvider);
+  return repo.getAuditLogsForBill(billId);
+}
+
+/// Get default message template for a type.
+@riverpod
+Future<MessageTemplate?> defaultTemplate(Ref ref, TemplateType type) async {
+  final repo = ref.read(billingRepositoryProvider);
+  return repo.getDefaultTemplate(type);
+}
+
+/// Provider for TemplateService.
+@riverpod
+TemplateService templateService(Ref ref) {
+  final repo = ref.watch(billingRepositoryProvider);
+  return TemplateService(repo);
+}
+
+/// Ensures default templates exist. Call this during app initialization.
+/// Returns true when complete.
+@riverpod
+Future<bool> ensureDefaultTemplates(Ref ref) async {
+  final service = ref.watch(templateServiceProvider);
+  await service.ensureDefaultTemplatesExist();
+  return true;
 }

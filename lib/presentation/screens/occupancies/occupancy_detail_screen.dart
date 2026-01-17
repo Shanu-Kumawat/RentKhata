@@ -11,7 +11,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../domain/entities/bill.dart';
 import '../../../domain/entities/occupancy.dart';
-import '../billing/record_payment_sheet.dart';
+import '../billing/bill_detail_screen.dart';
 
 /// Screen showing complete historical details of an occupancy period.
 class OccupancyDetailScreen extends ConsumerWidget {
@@ -455,13 +455,12 @@ class _BillCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () {
-          if (!bill.isFullyPaid) {
-            showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              builder: (context) => RecordPaymentSheet(bill: bill),
-            );
-          }
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => BillDetailScreen(bill: bill),
+            ),
+          );
         },
         child: Padding(
           padding: const EdgeInsets.all(16),

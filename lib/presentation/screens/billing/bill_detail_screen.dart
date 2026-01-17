@@ -5,13 +5,17 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import '../../../application/providers/billing_providers.dart';
 import '../../../application/providers/dashboard_providers.dart';
 import '../../../application/providers/repository_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
+import '../../../domain/entities/audit_log.dart';
 import '../../../domain/entities/bill.dart';
 import '../../../domain/entities/payment.dart';
+import '../../../services/share_service.dart';
+import 'edit_bill_sheet.dart';
 import 'invoice_preview_screen.dart';
 import 'record_payment_sheet.dart';
 import 'edit_payment_sheet.dart';
@@ -107,6 +111,15 @@ class _BillDetailContent extends ConsumerWidget {
                   contentPadding: EdgeInsets.zero,
                 ),
               ),
+              if (!bill.isFullyPaid)
+                const PopupMenuItem(
+                  value: 'reminder',
+                  child: ListTile(
+                    leading: Icon(Icons.notifications_active_outlined),
+                    title: Text('Send Reminder'),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
             ],
           ),
         ],
@@ -205,6 +218,10 @@ class _BillDetailContent extends ConsumerWidget {
                 ),
               ),
             ],
+
+            // Audit History Section
+            const SizedBox(height: 16),
+            _AuditHistorySection(billId: bill.id),
           ],
         ),
       ),
@@ -259,10 +276,7 @@ class _BillDetailContent extends ConsumerWidget {
   ) {
     switch (action) {
       case 'edit':
-        // TODO: Navigate to edit bill screen
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Edit bill coming soon')));
+        _editBill(context);
         break;
       case 'delete':
         _confirmDeleteBill(context, ref);
@@ -270,6 +284,35 @@ class _BillDetailContent extends ConsumerWidget {
       case 'share':
         _viewInvoice(context, landlordName, landlordUpi);
         break;
+      case 'reminder':
+        _sendReminder(context, landlordName);
+        break;
+    }
+  }
+
+  void _editBill(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => EditBillSheet(bill: bill),
+    );
+  }
+
+  void _sendReminder(BuildContext context, String? landlordName) async {
+    final message = ShareService.billReminderMessage(
+      tenantName: bill.tenantName ?? 'Tenant',
+      billType: bill.billType.name,
+      period: bill.billingPeriod,
+      amount: bill.pendingAmount,
+      dueDate: bill.dueDate ?? DateTime.now(),
+      landlordName: landlordName ?? 'Landlord',
+    );
+
+    final shareService = ShareService();
+    final success = await shareService.shareToWhatsApp(message: message);
+    if (!success && context.mounted) {
+      // Fallback to native share
+      await shareService.shareText(text: message, subject: 'Payment Reminder');
     }
   }
 
@@ -966,6 +1009,127 @@ class _PaymentTile extends ConsumerWidget {
       PaymentMode.bankTransfer => 'Bank Transfer',
       PaymentMode.cheque => 'Cheque',
       PaymentMode.other => 'Other',
+    };
+  }
+}
+
+/// Expandable section showing audit history for a bill.
+class _AuditHistorySection extends ConsumerWidget {
+  final int billId;
+
+  const _AuditHistorySection({required this.billId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final auditLogsAsync = ref.watch(auditLogsForBillProvider(billId));
+
+    return Card(
+      child: ExpansionTile(
+        leading: const Icon(Icons.history, size: 20),
+        title: Text(
+          'Audit History',
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        children: [
+          auditLogsAsync.when(
+            loading: () => const Padding(
+              padding: EdgeInsets.all(16),
+              child: Center(child: CircularProgressIndicator()),
+            ),
+            error: (e, _) => Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text('Error loading audit logs: $e'),
+            ),
+            data: (logs) {
+              if (logs.isEmpty) {
+                return Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text(
+                    'No changes recorded',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: AppColors.onSurfaceVariant,
+                    ),
+                  ),
+                );
+              }
+              return Column(
+                children: logs.map((log) => _AuditLogTile(log: log)).toList(),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// A tile showing a single audit log entry.
+class _AuditLogTile extends StatelessWidget {
+  final AuditLog log;
+
+  const _AuditLogTile({required this.log});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final (icon, color) = _getActionDetails(log.action);
+    final dateFormat = DateFormat('dd MMM yyyy, HH:mm');
+
+    return ListTile(
+      dense: true,
+      leading: CircleAvatar(
+        radius: 14,
+        backgroundColor: color.withValues(alpha: 0.1),
+        child: Icon(icon, size: 14, color: color),
+      ),
+      title: Text(
+        _getActionLabel(log.action),
+        style: theme.textTheme.bodyMedium?.copyWith(
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (log.notes != null && log.notes!.isNotEmpty)
+            Text(
+              log.notes!,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: AppColors.onSurfaceVariant,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          Text(
+            dateFormat.format(log.createdAt),
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: AppColors.onSurfaceVariant,
+            ),
+          ),
+        ],
+      ),
+      isThreeLine: log.notes != null && log.notes!.isNotEmpty,
+    );
+  }
+
+  (IconData, Color) _getActionDetails(AuditAction action) {
+    return switch (action) {
+      AuditAction.create => (Icons.add_circle_outline, Colors.green),
+      AuditAction.update => (Icons.edit_outlined, Colors.blue),
+      AuditAction.delete => (Icons.delete_outline, Colors.red),
+      AuditAction.void_ => (Icons.cancel_outlined, Colors.grey),
+    };
+  }
+
+  String _getActionLabel(AuditAction action) {
+    return switch (action) {
+      AuditAction.create => 'Created',
+      AuditAction.update => 'Updated',
+      AuditAction.delete => 'Deleted',
+      AuditAction.void_ => 'Voided',
     };
   }
 }
