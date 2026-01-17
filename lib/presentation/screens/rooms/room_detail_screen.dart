@@ -8,6 +8,7 @@ import '../../../application/providers/property_providers.dart';
 import '../../../application/providers/tenant_providers.dart';
 import '../../../application/providers/billing_providers.dart';
 import '../../../application/providers/dashboard_providers.dart';
+import '../../../application/providers/repository_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../domain/entities/room.dart';
@@ -15,7 +16,6 @@ import '../../../domain/entities/occupancy.dart';
 import '../../../domain/entities/bill.dart';
 import '../../../services/share_service.dart';
 import '../billing/create_bill_sheet.dart';
-import '../billing/record_payment_sheet.dart';
 import '../billing/bill_detail_screen.dart';
 import 'move_in_sheet.dart';
 import 'add_room_screen.dart';
@@ -496,93 +496,221 @@ class _BillTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final statusColor = bill.isFullyPaid
-        ? AppColors.success
-        : bill.isOverdue
-        ? AppColors.error
-        : AppColors.warning;
+    final theme = Theme.of(context);
+    final isPaid = bill.isFullyPaid;
+    final isPartial = bill.paidAmount > 0 && !isPaid;
+    final isOverdue = bill.isOverdue;
+
+    // Status colors
+    final (statusColor, statusBg, statusLabel) = isPaid
+        ? (AppColors.success, AppColors.success.withValues(alpha: 0.12), 'PAID')
+        : isPartial
+        ? (Colors.orange, Colors.orange.withValues(alpha: 0.12), 'PARTIAL')
+        : isOverdue
+        ? (AppColors.error, AppColors.error.withValues(alpha: 0.12), 'OVERDUE')
+        : (
+            AppColors.warning,
+            AppColors.warning.withValues(alpha: 0.12),
+            'UNPAID',
+          );
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
+      margin: const EdgeInsets.only(bottom: 12),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: statusColor.withValues(alpha: 0.3), width: 1.5),
+      ),
+      child: InkWell(
         onTap: () => _viewBillDetails(context),
-        leading: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: statusColor.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(
-            bill.isFullyPaid ? Icons.check_circle : Icons.pending,
-            color: statusColor,
-          ),
-        ),
-        title: Text(
-          '${bill.billType.name.toUpperCase()} - ${bill.billingPeriod}',
-          style: const TextStyle(fontWeight: FontWeight.w600),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              bill.isFullyPaid
-                  ? 'Paid'
-                  : 'Pending: ${formatCurrency(bill.pendingAmount)}',
-            ),
-            if (bill.billNumber != null)
-              Text(
-                bill.billNumber!,
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: AppColors.onSurfaceVariant,
-                ),
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              // Top row: Bill type & Status badge
+              Row(
+                children: [
+                  // Bill type icon
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          statusColor.withValues(alpha: 0.2),
+                          statusColor.withValues(alpha: 0.05),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      _getBillIcon(bill.billType),
+                      color: statusColor,
+                      size: 22,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  // Bill type & period
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _getBillLabel(bill.billType),
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          bill.billingPeriod,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: AppColors.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Status badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: statusBg,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      statusLabel,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: statusColor,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-          ],
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              formatCurrency(bill.amount),
-              style: Theme.of(
-                context,
-              ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            if (!bill.isFullyPaid) ...[
-              const SizedBox(width: 4),
-              IconButton(
-                icon: const Icon(Icons.notifications_active_outlined, size: 18),
-                tooltip: 'Send Reminder',
-                onPressed: () => _sendReminder(context, ref),
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-              ),
-              const SizedBox(width: 4),
-              IconButton(
-                icon: const Icon(Icons.payment, size: 20),
-                tooltip: 'Record Payment',
-                onPressed: () => _showRecordPayment(context),
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
+              const SizedBox(height: 16),
+              // Amount row
+              Row(
+                children: [
+                  // Amount info
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              formatCurrency(bill.amount),
+                              style: theme.textTheme.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: isPaid ? statusColor : null,
+                              ),
+                            ),
+                            if (isPartial) ...[
+                              const SizedBox(width: 8),
+                              Text(
+                                '(${formatCurrency(bill.pendingAmount)} due)',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: Colors.orange.shade700,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                        if (!isPaid && bill.dueDate != null) ...[
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.calendar_today_outlined,
+                                size: 14,
+                                color: isOverdue
+                                    ? AppColors.error
+                                    : AppColors.onSurfaceVariant,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'Due ${bill.dueDate!.day}/${bill.dueDate!.month}/${bill.dueDate!.year}',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: isOverdue
+                                      ? AppColors.error
+                                      : AppColors.onSurfaceVariant,
+                                  fontWeight: isOverdue
+                                      ? FontWeight.w600
+                                      : null,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  // Quick action button
+                  if (!isPaid)
+                    IconButton.filledTonal(
+                      onPressed: () => _sendReminder(context, ref),
+                      icon: const Icon(
+                        Icons.notifications_active_outlined,
+                        size: 20,
+                      ),
+                      tooltip: 'Send Reminder',
+                      style: IconButton.styleFrom(
+                        backgroundColor: statusColor.withValues(alpha: 0.1),
+                        foregroundColor: statusColor,
+                      ),
+                    )
+                  else
+                    IconButton.filledTonal(
+                      onPressed: () => _shareInvoice(context, ref),
+                      icon: const Icon(Icons.share_outlined, size: 20),
+                      tooltip: 'Share Invoice',
+                      style: IconButton.styleFrom(
+                        backgroundColor: AppColors.success.withValues(
+                          alpha: 0.1,
+                        ),
+                        foregroundColor: AppColors.success,
+                      ),
+                    ),
+                ],
               ),
             ],
-          ],
+          ),
         ),
       ),
     );
+  }
+
+  IconData _getBillIcon(BillType type) {
+    return switch (type) {
+      BillType.rent => Icons.home_outlined,
+      BillType.electricity => Icons.bolt_outlined,
+      BillType.water => Icons.water_drop_outlined,
+      BillType.maintenance => Icons.build_outlined,
+      BillType.other => Icons.receipt_long_outlined,
+    };
+  }
+
+  String _getBillLabel(BillType type) {
+    return switch (type) {
+      BillType.rent => 'Rent',
+      BillType.electricity => 'Electricity',
+      BillType.water => 'Water',
+      BillType.maintenance => 'Maintenance',
+      BillType.other => 'Other',
+    };
   }
 
   void _viewBillDetails(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => BillDetailScreen(bill: bill)),
-    );
-  }
-
-  void _showRecordPayment(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) => RecordPaymentSheet(bill: bill),
     );
   }
 
@@ -599,10 +727,23 @@ class _BillTile extends ConsumerWidget {
       landlordName: landlordName,
     );
 
-    final shareService = ShareService();
+    final repo = ref.read(billingRepositoryProvider);
+    final shareService = ShareService(repo);
     final success = await shareService.shareToWhatsApp(message: message);
     if (!success && context.mounted) {
       await shareService.shareText(text: message, subject: 'Payment Reminder');
     }
+  }
+
+  void _shareInvoice(BuildContext context, WidgetRef ref) async {
+    final landlord = await ref.read(landlordProvider.future);
+
+    final repo = ref.read(billingRepositoryProvider);
+    final shareService = ShareService(repo);
+    await shareService.shareInvoice(
+      bill: bill,
+      landlordName: landlord?.name ?? 'Landlord',
+      landlordUpi: landlord?.upiId,
+    );
   }
 }

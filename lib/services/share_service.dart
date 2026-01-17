@@ -6,10 +6,17 @@ import 'package:share_plus/share_plus.dart';
 import 'dart:io';
 import '../domain/entities/bill.dart';
 import '../domain/entities/payment.dart';
+import '../domain/entities/message_template.dart';
+import '../domain/repositories/billing_repository.dart';
 import 'upi_qr_service.dart';
+import 'template_service.dart';
 
 /// Service for sharing content via WhatsApp and other apps.
 class ShareService {
+  final BillingRepository? _repository;
+
+  ShareService([this._repository]);
+
   /// Share text message to WhatsApp.
   /// If [phoneNumber] is provided, opens chat with that number.
   /// Otherwise opens WhatsApp to let user select a contact.
@@ -83,16 +90,43 @@ class ShareService {
   }
 
   /// Share invoice using native share dialog.
+  /// Uses template from database if repository is available.
   Future<void> shareInvoice({
     required Bill bill,
     required String landlordName,
     String? landlordUpi,
   }) async {
-    final message = generateInvoiceMessage(
-      bill: bill,
-      landlordName: landlordName,
-      landlordUpi: landlordUpi,
-    );
+    String message;
+
+    if (_repository != null) {
+      // Use template from database
+      final template = await _repository.getDefaultTemplate(
+        TemplateType.invoice,
+      );
+      if (template != null) {
+        message = _substituteInvoicePlaceholders(
+          template.body,
+          bill: bill,
+          landlordName: landlordName,
+          landlordUpi: landlordUpi,
+        );
+      } else {
+        // Fallback to default template
+        message = _substituteInvoicePlaceholders(
+          TemplateService.getDefaultBody(TemplateType.invoice),
+          bill: bill,
+          landlordName: landlordName,
+          landlordUpi: landlordUpi,
+        );
+      }
+    } else {
+      // Legacy: use static method
+      message = generateInvoiceMessage(
+        bill: bill,
+        landlordName: landlordName,
+        landlordUpi: landlordUpi,
+      );
+    }
 
     await Share.share(
       message,
@@ -331,5 +365,75 @@ $landlordName
       PaymentMode.cheque => 'Cheque',
       PaymentMode.other => 'Other',
     };
+  }
+
+  /// Substitute placeholders in invoice template.
+  String _substituteInvoicePlaceholders(
+    String template, {
+    required Bill bill,
+    required String landlordName,
+    String? landlordUpi,
+  }) {
+    final dueDate = bill.dueDate;
+    final dueDateStr = dueDate != null
+        ? '${dueDate.day}/${dueDate.month}/${dueDate.year}'
+        : 'N/A';
+
+    var result = template
+        .replaceAll('{tenant_name}', bill.tenantName ?? 'Tenant')
+        .replaceAll('{tenantName}', bill.tenantName ?? 'Tenant')
+        .replaceAll('{landlord_name}', landlordName)
+        .replaceAll('{landlordName}', landlordName)
+        .replaceAll('{bill_type}', _getBillTypeLabel(bill.billType))
+        .replaceAll('{billType}', _getBillTypeLabel(bill.billType))
+        .replaceAll('{period}', bill.billingPeriod)
+        .replaceAll('{amount}', bill.pendingAmount.toStringAsFixed(0))
+        .replaceAll('{due_date}', dueDateStr)
+        .replaceAll('{dueDate}', dueDateStr)
+        .replaceAll('{bill_number}', bill.billNumber ?? '')
+        .replaceAll('{billNumber}', bill.billNumber ?? '')
+        .replaceAll('{room_number}', bill.roomNumber ?? '')
+        .replaceAll('{roomNumber}', bill.roomNumber ?? '')
+        .replaceAll('{property_name}', bill.propertyName ?? '')
+        .replaceAll('{propertyName}', bill.propertyName ?? '');
+
+    // Add UPI link if available
+    if (landlordUpi != null &&
+        landlordUpi.isNotEmpty &&
+        bill.pendingAmount > 0) {
+      final upiLink = UpiQrService.generateUpiLink(
+        upiId: landlordUpi,
+        payeeName: landlordName,
+        amount: bill.pendingAmount,
+        transactionNote: '${bill.billType.name} - ${bill.billingPeriod}',
+      );
+      result += '\n\n💳 *Pay Now:*\n$upiLink';
+    }
+
+    return result;
+  }
+
+  /// Substitute placeholders in reminder template.
+  String _substituteReminderPlaceholders(
+    String template, {
+    required Bill bill,
+    required String landlordName,
+  }) {
+    final dueDate = bill.dueDate;
+    final dueDateStr = dueDate != null
+        ? '${dueDate.day}/${dueDate.month}/${dueDate.year}'
+        : 'N/A';
+
+    return template
+        .replaceAll('{tenant_name}', bill.tenantName ?? 'Tenant')
+        .replaceAll('{tenantName}', bill.tenantName ?? 'Tenant')
+        .replaceAll('{landlord_name}', landlordName)
+        .replaceAll('{landlordName}', landlordName)
+        .replaceAll('{bill_type}', _getBillTypeLabel(bill.billType))
+        .replaceAll('{billType}', _getBillTypeLabel(bill.billType))
+        .replaceAll('{period}', bill.billingPeriod)
+        .replaceAll('{amount}', bill.pendingAmount.toStringAsFixed(0))
+        .replaceAll('{due_date}', dueDateStr)
+        .replaceAll('{dueDate}', dueDateStr);
   }
 }

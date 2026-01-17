@@ -6,8 +6,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../domain/entities/bill.dart';
+import '../../../application/providers/repository_providers.dart';
+import '../../../services/invoice_pdf_service.dart';
 import '../../../services/share_service.dart';
 import '../../../services/upi_qr_service.dart';
+import '../../widgets/share_bottom_sheet.dart';
 
 /// Screen to preview an invoice before sharing.
 class InvoicePreviewScreen extends ConsumerWidget {
@@ -28,16 +31,7 @@ class InvoicePreviewScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: Colors.grey.shade200,
-      appBar: AppBar(
-        title: const Text('Invoice Preview'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.share_outlined),
-            tooltip: 'Share Invoice',
-            onPressed: () => _shareInvoice(context),
-          ),
-        ],
-      ),
+      appBar: AppBar(title: const Text('Invoice Preview')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Center(
@@ -57,16 +51,17 @@ class InvoicePreviewScreen extends ConsumerWidget {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              // Close button - icon only to prevent text wrapping
+              // Close button
               IconButton.outlined(
                 onPressed: () => Navigator.pop(context),
                 icon: Icon(Icons.close, color: AppColors.primary),
                 tooltip: 'Close',
               ),
               const SizedBox(width: 12),
+              // Share button - opens bottom sheet
               Expanded(
                 child: ElevatedButton.icon(
-                  onPressed: () => _shareInvoice(context),
+                  onPressed: () => _showShareOptions(context, ref),
                   icon: const Icon(Icons.share),
                   label: const Text('Share'),
                 ),
@@ -78,13 +73,47 @@ class InvoicePreviewScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _shareInvoice(BuildContext context) async {
-    final shareService = ShareService();
+  void _showShareOptions(BuildContext context, WidgetRef ref) {
+    ShareBottomSheet.show(
+      context: context,
+      contentType: ShareContentType.invoice,
+      onShareAsMessage: () => _shareAsMessage(context, ref),
+      onShareAsPdf: () => _shareAsPdf(context),
+    );
+  }
+
+  Future<void> _shareAsMessage(BuildContext context, WidgetRef ref) async {
+    final repo = ref.read(billingRepositoryProvider);
+    final shareService = ShareService(repo);
     await shareService.shareInvoice(
       bill: bill,
       landlordName: landlordName ?? 'Landlord',
       landlordUpi: landlordUpi,
     );
+  }
+
+  Future<void> _shareAsPdf(BuildContext context) async {
+    try {
+      final pdfService = InvoicePdfService();
+      final file = await pdfService.generateInvoice(
+        bill: bill,
+        landlordName: landlordName ?? 'Landlord',
+        landlordPhone: landlordPhone ?? '',
+        landlordUpiId: landlordUpi,
+      );
+
+      final shareService = ShareService();
+      await shareService.shareFiles(
+        files: [file],
+        subject: 'Invoice ${bill.billNumber ?? ""}',
+      );
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error sharing PDF: $e')));
+      }
+    }
   }
 }
 

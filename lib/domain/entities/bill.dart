@@ -64,16 +64,23 @@ class Bill with _$Bill {
   bool get isOverdue =>
       !isFullyPaid && dueDate != null && DateTime.now().isAfter(dueDate!);
 
-  /// Check if bill can be edited
+  /// Check if bill can be fully edited (unpaid only)
   bool get canEdit =>
       status != BillStatus.paid &&
       status != BillStatus.voided &&
       paidAmount == 0;
 
-  /// Check if bill amount can be edited (more restrictive)
-  bool get canEditAmount => status == BillStatus.draft && paidAmount == 0;
+  /// Check if bill allows limited editing (partial bills: notes, due date, increase amount)
+  bool get canEditLimited =>
+      status != BillStatus.paid &&
+      status != BillStatus.voided &&
+      paidAmount > 0 &&
+      !isFullyPaid;
 
-  /// Check if bill can be deleted
+  /// Check if bill amount can be edited (only unpaid bills)
+  bool get canEditAmount => paidAmount == 0;
+
+  /// Check if bill can be deleted (only unpaid bills)
   bool get canDelete => paidAmount == 0 && status != BillStatus.voided;
 
   /// Check if bill can record payments

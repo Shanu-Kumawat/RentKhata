@@ -15,6 +15,7 @@ import '../../../domain/entities/audit_log.dart';
 import '../../../domain/entities/bill.dart';
 import '../../../domain/entities/payment.dart';
 import '../../../services/share_service.dart';
+import '../../../services/invoice_pdf_service.dart';
 import 'edit_bill_sheet.dart';
 import 'invoice_preview_screen.dart';
 import 'record_payment_sheet.dart';
@@ -82,7 +83,7 @@ class _BillDetailContent extends ConsumerWidget {
               landlordUpi,
             ),
             itemBuilder: (context) => [
-              if (bill.canEdit)
+              if (bill.canEdit || bill.canEditLimited)
                 const PopupMenuItem(
                   value: 'edit',
                   child: ListTile(
@@ -103,14 +104,6 @@ class _BillDetailContent extends ConsumerWidget {
                     contentPadding: EdgeInsets.zero,
                   ),
                 ),
-              const PopupMenuItem(
-                value: 'share',
-                child: ListTile(
-                  leading: Icon(Icons.share_outlined),
-                  title: Text('Share Invoice'),
-                  contentPadding: EdgeInsets.zero,
-                ),
-              ),
               if (!bill.isFullyPaid)
                 const PopupMenuItem(
                   value: 'reminder',
@@ -225,20 +218,73 @@ class _BillDetailContent extends ConsumerWidget {
           ],
         ),
       ),
-      bottomNavigationBar: bill.canRecordPayment
-          ? SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: ElevatedButton.icon(
-                  onPressed: () => _recordPayment(context),
-                  icon: const Icon(Icons.payment),
-                  label: Text(
-                    'Record Payment (${formatCurrency(bill.pendingAmount)} due)',
-                  ),
-                ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Main action buttons
+              Row(
+                children: [
+                  if (bill.canRecordPayment) ...[
+                    // Unpaid/Partial: Share Invoice (secondary)
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () =>
+                            _shareInvoice(context, landlordName, landlordUpi),
+                        icon: const Icon(Icons.share_outlined),
+                        label: const Text('Share'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    // Unpaid/Partial: Record Payment (primary)
+                    Expanded(
+                      flex: 2,
+                      child: ElevatedButton.icon(
+                        onPressed: () => _recordPayment(context),
+                        icon: const Icon(Icons.payment),
+                        label: Text(
+                          'Pay ${formatCurrency(bill.pendingAmount)}',
+                        ),
+                      ),
+                    ),
+                  ] else ...[
+                    // Paid: Save Invoice PDF (secondary)
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () =>
+                            _savePdf(context, landlordName, landlordUpi),
+                        icon: const Icon(Icons.save_alt_outlined),
+                        label: const Text('Save PDF'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    // Paid: Share Invoice (primary)
+                    Expanded(
+                      flex: 2,
+                      child: ElevatedButton.icon(
+                        onPressed: () =>
+                            _shareInvoice(context, landlordName, landlordUpi),
+                        icon: const Icon(Icons.share),
+                        label: const Text('Share Invoice'),
+                      ),
+                    ),
+                  ],
+                ],
               ),
-            )
-          : null,
+              // Save PDF link for unpaid bills
+              if (bill.canRecordPayment) ...[
+                const SizedBox(height: 8),
+                TextButton(
+                  onPressed: () => _savePdf(context, landlordName, landlordUpi),
+                  child: const Text('Save Invoice PDF'),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -281,9 +327,6 @@ class _BillDetailContent extends ConsumerWidget {
       case 'delete':
         _confirmDeleteBill(context, ref);
         break;
-      case 'share':
-        _viewInvoice(context, landlordName, landlordUpi);
-        break;
       case 'reminder':
         _sendReminder(context, landlordName);
         break;
@@ -296,6 +339,52 @@ class _BillDetailContent extends ConsumerWidget {
       isScrollControlled: true,
       builder: (context) => EditBillSheet(bill: bill),
     );
+  }
+
+  void _shareInvoice(
+    BuildContext context,
+    String? landlordName,
+    String? landlordUpi,
+  ) {
+    // Directly open invoice preview screen
+    _viewInvoice(context, landlordName, landlordUpi);
+  }
+
+  Future<void> _savePdf(
+    BuildContext context,
+    String? landlordName,
+    String? landlordUpi,
+  ) async {
+    try {
+      final pdfService = InvoicePdfService();
+      final file = await pdfService.generateInvoice(
+        bill: bill,
+        landlordName: landlordName ?? 'Landlord',
+        landlordPhone: '',
+        landlordUpiId: landlordUpi,
+      );
+
+      // Copy to Downloads folder
+      final downloadsPath = '/storage/emulated/0/Download';
+      final fileName =
+          'Invoice_${bill.billNumber ?? bill.id}_${DateTime.now().millisecondsSinceEpoch}.pdf';
+      await file.copy('$downloadsPath/$fileName');
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Invoice saved to Downloads'),
+            action: SnackBarAction(label: 'OK', onPressed: () {}),
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error saving PDF: $e')));
+      }
+    }
   }
 
   void _sendReminder(BuildContext context, String? landlordName) async {

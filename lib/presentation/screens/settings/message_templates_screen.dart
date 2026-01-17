@@ -7,539 +7,422 @@ import '../../../application/providers/billing_providers.dart';
 import '../../../application/providers/repository_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/message_template.dart';
+import '../../../services/template_service.dart';
 
 /// Screen to manage message templates for invoices, receipts, and reminders.
-class MessageTemplatesScreen extends ConsumerStatefulWidget {
+/// Each template type (Invoice, Receipt, Reminder) has exactly ONE editable template.
+class MessageTemplatesScreen extends ConsumerWidget {
   const MessageTemplatesScreen({super.key});
 
   @override
-  ConsumerState<MessageTemplatesScreen> createState() =>
-      _MessageTemplatesScreenState();
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Message Templates')),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          _buildInfoCard(context),
+          const SizedBox(height: 16),
+          _TemplateEditor(type: TemplateType.invoice),
+          const SizedBox(height: 16),
+          _TemplateEditor(type: TemplateType.receipt),
+          const SizedBox(height: 16),
+          _TemplateEditor(type: TemplateType.reminder),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoCard(BuildContext context) {
+    return Card(
+      color: AppColors.primary.withValues(alpha: 0.05),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: AppColors.primary.withValues(alpha: 0.2)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Icon(Icons.info_outline, color: AppColors.primary),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Edit templates used for invoices, receipts, and reminders. '
+                'Use placeholders like {tenantName}, {amount}, etc.',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: AppColors.onSurfaceVariant,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
-class _MessageTemplatesScreenState extends ConsumerState<MessageTemplatesScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+/// Editor card for a single template type
+class _TemplateEditor extends ConsumerStatefulWidget {
+  final TemplateType type;
+
+  const _TemplateEditor({required this.type});
+
+  @override
+  ConsumerState<_TemplateEditor> createState() => _TemplateEditorState();
+}
+
+class _TemplateEditorState extends ConsumerState<_TemplateEditor> {
+  late TextEditingController _controller;
+  bool _isEditing = false;
+  bool _isSaving = false;
+  bool _hasChanges = false;
+  String _originalBody = '';
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _controller = TextEditingController();
+    _controller.addListener(_onTextChanged);
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
+    _controller.removeListener(_onTextChanged);
+    _controller.dispose();
     super.dispose();
+  }
+
+  void _onTextChanged() {
+    final hasChanges = _controller.text != _originalBody;
+    if (hasChanges != _hasChanges) {
+      setState(() => _hasChanges = hasChanges);
+    }
+  }
+
+  String _getTypeLabel() {
+    return switch (widget.type) {
+      TemplateType.invoice => 'Invoice',
+      TemplateType.receipt => 'Receipt',
+      TemplateType.reminder => 'Reminder',
+    };
+  }
+
+  IconData _getTypeIcon() {
+    return switch (widget.type) {
+      TemplateType.invoice => Icons.description_outlined,
+      TemplateType.receipt => Icons.receipt_outlined,
+      TemplateType.reminder => Icons.notifications_outlined,
+    };
+  }
+
+  Color _getTypeColor() {
+    return switch (widget.type) {
+      TemplateType.invoice => Colors.blue,
+      TemplateType.receipt => Colors.green,
+      TemplateType.reminder => Colors.orange,
+    };
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Message Templates'),
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: 'Invoice'),
-            Tab(text: 'Receipt'),
-            Tab(text: 'Reminder'),
-          ],
-        ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: const [
-          _TemplateList(type: TemplateType.invoice),
-          _TemplateList(type: TemplateType.receipt),
-          _TemplateList(type: TemplateType.reminder),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddTemplateDialog(context),
-        icon: const Icon(Icons.add),
-        label: const Text('New Template'),
-      ),
-    );
-  }
-
-  void _showAddTemplateDialog(BuildContext context) {
-    final type = TemplateType.values[_tabController.index];
-    showDialog(
-      context: context,
-      builder: (context) => _TemplateDialog(
-        templateType: type,
-        onSave: (name, body, isDefault) async {
-          final repo = ref.read(billingRepositoryProvider);
-          await repo.createMessageTemplate(
-            templateType: type,
-            name: name,
-            body: body,
-            isDefault: isDefault,
-          );
-          ref.invalidate(messageTemplatesProvider);
-          ref.invalidate(messageTemplatesByTypeProvider(type));
-          if (context.mounted) Navigator.pop(context);
-        },
-      ),
-    );
-  }
-}
-
-/// List of templates for a specific type.
-class _TemplateList extends ConsumerWidget {
-  final TemplateType type;
-
-  const _TemplateList({required this.type});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final templatesAsync = ref.watch(messageTemplatesByTypeProvider(type));
-
-    return templatesAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => Center(child: Text('Error: $e')),
-      data: (templates) {
-        if (templates.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.message_outlined,
-                  size: 64,
-                  color: Colors.grey.shade300,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'No ${type.name} templates yet',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: AppColors.onSurfaceVariant,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Tap + to create one',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-          );
-        }
-
-        return ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: templates.length,
-          itemBuilder: (context, index) {
-            final template = templates[index];
-            return _TemplateCard(template: template, type: type);
-          },
-        );
-      },
-    );
-  }
-}
-
-/// Card displaying a single template.
-class _TemplateCard extends ConsumerWidget {
-  final MessageTemplate template;
-  final TemplateType type;
-
-  const _TemplateCard({required this.template, required this.type});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final templateAsync = ref.watch(defaultTemplateProvider(widget.type));
+    final typeColor = _getTypeColor();
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: InkWell(
-        onTap: () => _showEditDialog(context, ref),
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      template.name,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: Colors.grey.shade300),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Header
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: typeColor.withValues(alpha: 0.08),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(16),
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: typeColor.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  if (template.isDefault)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        'DEFAULT',
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: AppColors.primary,
+                  child: Icon(_getTypeIcon(), color: typeColor, size: 24),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${_getTypeLabel()} Template',
+                        style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ),
-                  PopupMenuButton<String>(
-                    onSelected: (value) {
-                      if (value == 'edit') {
-                        _showEditDialog(context, ref);
-                      } else if (value == 'delete') {
-                        _confirmDelete(context, ref);
-                      } else if (value == 'default') {
-                        _setAsDefault(ref);
-                      }
-                    },
-                    itemBuilder: (context) => [
-                      const PopupMenuItem(
-                        value: 'edit',
-                        child: ListTile(
-                          leading: Icon(Icons.edit),
-                          title: Text('Edit'),
-                          contentPadding: EdgeInsets.zero,
-                        ),
-                      ),
-                      if (!template.isDefault)
-                        const PopupMenuItem(
-                          value: 'default',
-                          child: ListTile(
-                            leading: Icon(Icons.star),
-                            title: Text('Set as Default'),
-                            contentPadding: EdgeInsets.zero,
-                          ),
-                        ),
-                      const PopupMenuItem(
-                        value: 'delete',
-                        child: ListTile(
-                          leading: Icon(Icons.delete, color: Colors.red),
-                          title: Text(
-                            'Delete',
-                            style: TextStyle(color: Colors.red),
-                          ),
-                          contentPadding: EdgeInsets.zero,
+                      Text(
+                        'Used when sharing ${_getTypeLabel().toLowerCase()}s',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: AppColors.onSurfaceVariant,
                         ),
                       ),
                     ],
                   ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceVariant,
-                  borderRadius: BorderRadius.circular(8),
                 ),
-                child: Text(
-                  template.body.length > 150
-                      ? '${template.body.substring(0, 150)}...'
-                      : template.body,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    fontFamily: 'monospace',
-                    color: AppColors.onSurfaceVariant,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Created: ${_formatDate(template.createdAt)}',
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: AppColors.onSurfaceVariant,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
+
+          // Content
+          templateAsync.when(
+            loading: () => const Padding(
+              padding: EdgeInsets.all(32),
+              child: Center(child: CircularProgressIndicator()),
+            ),
+            error: (e, _) => Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text('Error: $e'),
+            ),
+            data: (template) {
+              // Initialize controller with template body
+              if (!_isEditing && template != null) {
+                _controller.text = template.body;
+                _originalBody = template.body;
+              }
+
+              return Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    if (_isEditing) ...[
+                      // Edit mode
+                      TextFormField(
+                        controller: _controller,
+                        decoration: InputDecoration(
+                          labelText: 'Message Body',
+                          alignLabelWithHint: true,
+                          helperText:
+                              'Placeholders: {tenantName}, {landlordName}, {amount}, {billType}, {period}, {dueDate}',
+                          helperMaxLines: 2,
+                        ),
+                        maxLines: 8,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontFamily: 'monospace',
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // Action buttons
+                      Row(
+                        children: [
+                          // Reset button
+                          TextButton.icon(
+                            onPressed: _hasChanges ? _resetToOriginal : null,
+                            icon: const Icon(Icons.undo, size: 18),
+                            label: const Text('Discard'),
+                          ),
+                          const Spacer(),
+                          // Cancel button
+                          TextButton(
+                            onPressed: () {
+                              setState(() {
+                                _isEditing = false;
+                                _controller.text = _originalBody;
+                              });
+                            },
+                            child: const Text('Cancel'),
+                          ),
+                          const SizedBox(width: 8),
+                          // Save button
+                          ElevatedButton.icon(
+                            onPressed: _isSaving || !_hasChanges
+                                ? null
+                                : _saveTemplate,
+                            icon: _isSaving
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Icon(Icons.check, size: 18),
+                            label: const Text('Save'),
+                          ),
+                        ],
+                      ),
+                    ] else ...[
+                      // Preview mode
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceVariant.withValues(
+                            alpha: 0.5,
+                          ),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          template?.body ??
+                              TemplateService.getDefaultBody(widget.type),
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            fontFamily: 'monospace',
+                            color: AppColors.onSurfaceVariant,
+                          ),
+                          maxLines: 6,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      // Action buttons
+                      Row(
+                        children: [
+                          // Reset to default button
+                          TextButton.icon(
+                            onPressed: () =>
+                                _confirmResetToDefault(template?.body),
+                            icon: const Icon(Icons.restart_alt, size: 18),
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.orange,
+                            ),
+                            label: const Text('Reset to Default'),
+                          ),
+                          const Spacer(),
+                          // Edit button
+                          ElevatedButton.icon(
+                            onPressed: () {
+                              setState(() {
+                                _isEditing = true;
+                                _controller.text =
+                                    template?.body ??
+                                    TemplateService.getDefaultBody(widget.type);
+                                _originalBody = _controller.text;
+                              });
+                            },
+                            icon: const Icon(Icons.edit_outlined, size: 18),
+                            label: const Text('Edit'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
 
-  void _showEditDialog(BuildContext context, WidgetRef ref) {
-    showDialog(
-      context: context,
-      builder: (context) => _TemplateDialog(
-        templateType: type,
-        existingTemplate: template,
-        onSave: (name, body, isDefault) async {
-          final repo = ref.read(billingRepositoryProvider);
-          await repo.updateMessageTemplate(
-            id: template.id,
-            name: name,
-            body: body,
-            isDefault: isDefault,
-          );
-          ref.invalidate(messageTemplatesProvider);
-          ref.invalidate(messageTemplatesByTypeProvider(type));
-          if (context.mounted) Navigator.pop(context);
-        },
-      ),
-    );
+  void _resetToOriginal() {
+    setState(() {
+      _controller.text = _originalBody;
+    });
   }
 
-  void _confirmDelete(BuildContext context, WidgetRef ref) {
+  void _confirmResetToDefault(String? currentBody) {
+    final defaultBody = TemplateService.getDefaultBody(widget.type);
+    if (currentBody == defaultBody) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Template is already at default')),
+      );
+      return;
+    }
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Template'),
-        content: Text('Are you sure you want to delete "${template.name}"?'),
+        title: const Text('Reset to Default'),
+        content: const Text(
+          'This will replace your current template with the original default template. '
+          'This action cannot be undone.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text('Cancel'),
           ),
-          TextButton(
+          ElevatedButton(
             onPressed: () async {
-              final repo = ref.read(billingRepositoryProvider);
-              await repo.deleteMessageTemplate(template.id);
-              ref.invalidate(messageTemplatesProvider);
-              ref.invalidate(messageTemplatesByTypeProvider(type));
-              if (context.mounted) Navigator.pop(context);
+              Navigator.pop(context);
+              await _resetToDefault();
             },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Delete'),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+            child: const Text('Reset'),
           ),
         ],
       ),
     );
   }
 
-  void _setAsDefault(WidgetRef ref) async {
-    final repo = ref.read(billingRepositoryProvider);
-    await repo.updateMessageTemplate(id: template.id, isDefault: true);
-    ref.invalidate(messageTemplatesProvider);
-    ref.invalidate(messageTemplatesByTypeProvider(type));
-  }
-
-  String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year}';
-  }
-}
-
-/// Dialog for creating/editing templates.
-class _TemplateDialog extends StatefulWidget {
-  final TemplateType templateType;
-  final MessageTemplate? existingTemplate;
-  final Future<void> Function(String name, String body, bool isDefault) onSave;
-
-  const _TemplateDialog({
-    required this.templateType,
-    this.existingTemplate,
-    required this.onSave,
-  });
-
-  @override
-  State<_TemplateDialog> createState() => _TemplateDialogState();
-}
-
-class _TemplateDialogState extends State<_TemplateDialog> {
-  final _formKey = GlobalKey<FormState>();
-  late TextEditingController _nameController;
-  late TextEditingController _bodyController;
-  late bool _isDefault;
-  bool _isLoading = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _nameController = TextEditingController(
-      text: widget.existingTemplate?.name ?? '',
-    );
-    _bodyController = TextEditingController(
-      text: widget.existingTemplate?.body ?? _getDefaultBody(),
-    );
-    _isDefault = widget.existingTemplate?.isDefault ?? false;
-  }
-
-  String _getDefaultBody() {
-    switch (widget.templateType) {
-      case TemplateType.invoice:
-        return '''Dear {tenantName},
-
-Your invoice is ready!
-
-Type: {billType}
-Period: {period}
-Amount: ₹{amount}
-Due Date: {dueDate}
-
-Please pay at your earliest convenience.
-
-Thank you,
-{landlordName}''';
-      case TemplateType.receipt:
-        return '''Dear {tenantName},
-
-Payment Received!
-
-Amount: ₹{amount}
-Mode: {paymentMode}
-
-Bill: {billType} - {period}
-Status: Paid
-
-Thank you,
-{landlordName}''';
-      case TemplateType.reminder:
-        return '''Dear {tenantName},
-
-This is a reminder for your pending bill.
-
-Type: {billType}
-Period: {period}
-Pending: ₹{amount}
-Due Date: {dueDate}
-
-Please make the payment soon.
-
-Thank you,
-{landlordName}''';
+  Future<void> _resetToDefault() async {
+    setState(() => _isSaving = true);
+    try {
+      final templateService = ref.read(templateServiceProvider);
+      await templateService.resetToDefault(widget.type);
+      ref.invalidate(defaultTemplateProvider(widget.type));
+      ref.invalidate(messageTemplatesProvider);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Template reset to default')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
     }
   }
 
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _bodyController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final isEditing = widget.existingTemplate != null;
-
-    return Dialog(
-      child: Container(
-        constraints: const BoxConstraints(maxWidth: 500),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Header
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(16),
-                  ),
-                ),
-                child: Text(
-                  isEditing
-                      ? 'Edit Template'
-                      : 'New ${widget.templateType.name.toUpperCase()} Template',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                ),
-              ),
-
-              // Form
-              Flexible(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      TextFormField(
-                        controller: _nameController,
-                        decoration: const InputDecoration(
-                          labelText: 'Template Name',
-                          hintText: 'e.g., Standard Invoice',
-                        ),
-                        validator: (v) =>
-                            v == null || v.isEmpty ? 'Name is required' : null,
-                      ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: _bodyController,
-                        decoration: const InputDecoration(
-                          labelText: 'Message Body',
-                          alignLabelWithHint: true,
-                        ),
-                        maxLines: 10,
-                        validator: (v) =>
-                            v == null || v.isEmpty ? 'Body is required' : null,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Available placeholders: {tenantName}, {landlordName}, {billType}, '
-                        '{period}, {amount}, {dueDate}, {billNumber}, {roomNumber}, {paymentMode}',
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: AppColors.onSurfaceVariant,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      CheckboxListTile(
-                        value: _isDefault,
-                        onChanged: (v) =>
-                            setState(() => _isDefault = v ?? false),
-                        title: const Text('Set as default template'),
-                        contentPadding: EdgeInsets.zero,
-                        controlAffinity: ListTileControlAffinity.leading,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Actions
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('Cancel'),
-                    ),
-                    const SizedBox(width: 8),
-                    ElevatedButton(
-                      onPressed: _isLoading ? null : _save,
-                      child: _isLoading
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : Text(
-                              isEditing ? 'Save Changes' : 'Create Template',
-                            ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _save() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    setState(() => _isLoading = true);
+  Future<void> _saveTemplate() async {
+    setState(() => _isSaving = true);
     try {
-      await widget.onSave(
-        _nameController.text,
-        _bodyController.text,
-        _isDefault,
+      final repo = ref.read(billingRepositoryProvider);
+      final template = await ref.read(
+        defaultTemplateProvider(widget.type).future,
       );
+
+      if (template != null) {
+        await repo.updateMessageTemplate(
+          id: template.id,
+          body: _controller.text,
+        );
+      }
+
+      ref.invalidate(defaultTemplateProvider(widget.type));
+      ref.invalidate(messageTemplatesProvider);
+
+      if (mounted) {
+        setState(() {
+          _isEditing = false;
+          _originalBody = _controller.text;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Template saved successfully')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
     } finally {
-      if (mounted) setState(() => _isLoading = false);
+      if (mounted) setState(() => _isSaving = false);
     }
   }
 }

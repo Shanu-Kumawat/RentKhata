@@ -1,0 +1,228 @@
+/// Share bottom sheet widget for consistent share UX.
+library;
+
+import 'package:flutter/material.dart';
+import '../../core/theme/app_colors.dart';
+
+/// Type of content being shared.
+enum ShareContentType { invoice, receipt }
+
+/// Bottom sheet with share options: Message (recommended) and PDF.
+class ShareBottomSheet extends StatelessWidget {
+  final ShareContentType contentType;
+  final VoidCallback onShareAsMessage;
+  final VoidCallback onShareAsPdf;
+
+  const ShareBottomSheet({
+    super.key,
+    required this.contentType,
+    required this.onShareAsMessage,
+    required this.onShareAsPdf,
+  });
+
+  /// Show the share bottom sheet.
+  static Future<void> show({
+    required BuildContext context,
+    required ShareContentType contentType,
+    required VoidCallback onShareAsMessage,
+    required VoidCallback onShareAsPdf,
+  }) {
+    return showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => ShareBottomSheet(
+        contentType: contentType,
+        onShareAsMessage: () {
+          Navigator.pop(context);
+          onShareAsMessage();
+        },
+        onShareAsPdf: () {
+          Navigator.pop(context);
+          onShareAsPdf();
+        },
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final contentLabel = contentType == ShareContentType.invoice
+        ? 'Invoice'
+        : 'Receipt';
+
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(Icons.share_outlined, color: AppColors.primary),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Share $contentLabel',
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        'Choose how you want to share',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: AppColors.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+
+            // Send as Message (Recommended)
+            _ShareOption(
+              icon: Icons.message_outlined,
+              title: 'Send as Message',
+              subtitle: 'Quick text message with payment details',
+              isRecommended: true,
+              onTap: onShareAsMessage,
+            ),
+            const SizedBox(height: 12),
+
+            // Share PDF
+            _ShareOption(
+              icon: Icons.picture_as_pdf_outlined,
+              title: 'Share PDF',
+              subtitle: 'Formal document for records',
+              isRecommended: false,
+              onTap: onShareAsPdf,
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ShareOption extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final bool isRecommended;
+  final VoidCallback onTap;
+
+  const _ShareOption({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.isRecommended,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Card(
+      elevation: isRecommended ? 2 : 0,
+      color: isRecommended ? AppColors.primary.withValues(alpha: 0.05) : null,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(
+          color: isRecommended
+              ? AppColors.primary.withValues(alpha: 0.3)
+              : Colors.grey.shade300,
+        ),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: isRecommended
+                      ? AppColors.primary.withValues(alpha: 0.1)
+                      : Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  icon,
+                  color: isRecommended
+                      ? AppColors.primary
+                      : AppColors.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          title,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        if (isRecommended) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              'Recommended',
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: AppColors.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right, color: AppColors.onSurfaceVariant),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

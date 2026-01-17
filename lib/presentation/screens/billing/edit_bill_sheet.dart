@@ -35,8 +35,8 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
   /// Whether this bill has any payments
   bool get _hasPayments => widget.bill.paidAmount > 0;
 
-  /// Whether amount can be edited
-  bool get _canEditAmount => !_hasPayments;
+  /// Whether amount can be edited (always true, but restricted for partial bills)
+  bool get _canEditAmount => true;
 
   /// Minimum allowed amount (must be >= paid amount)
   double get _minimumAmount => widget.bill.paidAmount;
@@ -184,7 +184,7 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            'This bill has received payments. Some fields cannot be modified.',
+                            'This bill has received payments. Amount can only be increased. It cannot be less than paid amount.',
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: Colors.orange.shade900,
                             ),
@@ -234,7 +234,7 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
                     labelText: 'Bill Amount (₹) *',
                     prefixIcon: const Icon(Icons.currency_rupee),
                     helperText: _hasPayments
-                        ? 'Cannot edit: payments received'
+                        ? 'Min amount: ${formatCurrency(widget.bill.paidAmount)}'
                         : null,
                   ),
                   keyboardType: TextInputType.number,

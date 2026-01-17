@@ -4,7 +4,6 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../application/providers/repository_providers.dart';
-import '../../../application/providers/billing_providers.dart';
 import '../../../core/utils/validators.dart';
 import '../../../domain/entities/room.dart';
 
@@ -13,11 +12,7 @@ class AddRoomSheet extends ConsumerStatefulWidget {
   final int propertyId;
   final Room? existingRoom; // null for add, non-null for edit
 
-  const AddRoomSheet({
-    super.key,
-    required this.propertyId,
-    this.existingRoom,
-  });
+  const AddRoomSheet({super.key, required this.propertyId, this.existingRoom});
 
   @override
   ConsumerState<AddRoomSheet> createState() => _AddRoomSheetState();
@@ -27,8 +22,7 @@ class _AddRoomSheetState extends ConsumerState<AddRoomSheet> {
   final _formKey = GlobalKey<FormState>();
   final _roomNumberController = TextEditingController();
   final _rentController = TextEditingController();
-  final _electricityRateController = TextEditingController();
-  bool _hasElectricityMeter = false;
+  bool _hasElectricityMeter = true; // Default to true
   bool _isLoading = false;
 
   bool get isEditing => widget.existingRoom != null;
@@ -41,22 +35,13 @@ class _AddRoomSheetState extends ConsumerState<AddRoomSheet> {
       _roomNumberController.text = room.roomNumber;
       _rentController.text = room.baseRent.toString();
       _hasElectricityMeter = room.hasElectricityMeter;
-      _electricityRateController.text = room.currentElectricityRate.toString();
-    } else {
-      _loadDefaultRate();
     }
-  }
-
-  Future<void> _loadDefaultRate() async {
-    final rate = await ref.read(currentElectricityRateProvider.future);
-    _electricityRateController.text = rate.toString();
   }
 
   @override
   void dispose() {
     _roomNumberController.dispose();
     _rentController.dispose();
-    _electricityRateController.dispose();
     super.dispose();
   }
 
@@ -67,15 +52,14 @@ class _AddRoomSheetState extends ConsumerState<AddRoomSheet> {
 
     try {
       final repo = ref.read(propertyRepositoryProvider);
-      
+
       if (isEditing) {
         await repo.updateRoom(
           widget.existingRoom!.copyWith(
             roomNumber: _roomNumberController.text.trim(),
             baseRent: double.tryParse(_rentController.text) ?? 0,
             hasElectricityMeter: _hasElectricityMeter,
-            currentElectricityRate:
-                double.tryParse(_electricityRateController.text) ?? 7.0,
+            // Keep existing rate, don't modify it here
           ),
         );
       } else {
@@ -84,8 +68,6 @@ class _AddRoomSheetState extends ConsumerState<AddRoomSheet> {
           roomNumber: _roomNumberController.text.trim(),
           baseRent: double.tryParse(_rentController.text) ?? 0,
           hasElectricityMeter: _hasElectricityMeter,
-          currentElectricityRate:
-              double.tryParse(_electricityRateController.text) ?? 7.0,
         );
       }
 
@@ -97,9 +79,9 @@ class _AddRoomSheetState extends ConsumerState<AddRoomSheet> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -127,8 +109,8 @@ class _AddRoomSheetState extends ConsumerState<AddRoomSheet> {
                   Text(
                     isEditing ? 'Edit Room' : 'Add Room',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   IconButton(
                     icon: const Icon(Icons.close),
@@ -163,7 +145,6 @@ class _AddRoomSheetState extends ConsumerState<AddRoomSheet> {
               ),
               const SizedBox(height: 16),
 
-              // Electricity meter toggle
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 title: const Text('Has Electricity Meter'),
@@ -171,20 +152,6 @@ class _AddRoomSheetState extends ConsumerState<AddRoomSheet> {
                 value: _hasElectricityMeter,
                 onChanged: (v) => setState(() => _hasElectricityMeter = v),
               ),
-
-              // Electricity rate (shown if meter enabled)
-              if (_hasElectricityMeter) ...[
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: _electricityRateController,
-                  decoration: const InputDecoration(
-                    labelText: 'Electricity Rate (₹/unit)',
-                    hintText: 'e.g., 7',
-                    prefixIcon: Icon(Icons.bolt_outlined),
-                  ),
-                  keyboardType: TextInputType.number,
-                ),
-              ],
               const SizedBox(height: 24),
 
               // Save button
