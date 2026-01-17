@@ -470,6 +470,132 @@ class _BillProviderElement extends AutoDisposeFutureProviderElement<Bill?>
   int get id => (origin as BillProvider).id;
 }
 
+String _$billByIdHash() => r'7e268cdfa9f749d52361c0e317416414204868e5';
+
+/// Get a bill by ID with auto-refresh (watches occupancy stream for updates).
+///
+/// Copied from [billById].
+@ProviderFor(billById)
+const billByIdProvider = BillByIdFamily();
+
+/// Get a bill by ID with auto-refresh (watches occupancy stream for updates).
+///
+/// Copied from [billById].
+class BillByIdFamily extends Family<AsyncValue<Bill?>> {
+  /// Get a bill by ID with auto-refresh (watches occupancy stream for updates).
+  ///
+  /// Copied from [billById].
+  const BillByIdFamily();
+
+  /// Get a bill by ID with auto-refresh (watches occupancy stream for updates).
+  ///
+  /// Copied from [billById].
+  BillByIdProvider call(int id) {
+    return BillByIdProvider(id);
+  }
+
+  @override
+  BillByIdProvider getProviderOverride(covariant BillByIdProvider provider) {
+    return call(provider.id);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'billByIdProvider';
+}
+
+/// Get a bill by ID with auto-refresh (watches occupancy stream for updates).
+///
+/// Copied from [billById].
+class BillByIdProvider extends AutoDisposeFutureProvider<Bill?> {
+  /// Get a bill by ID with auto-refresh (watches occupancy stream for updates).
+  ///
+  /// Copied from [billById].
+  BillByIdProvider(int id)
+    : this._internal(
+        (ref) => billById(ref as BillByIdRef, id),
+        from: billByIdProvider,
+        name: r'billByIdProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$billByIdHash,
+        dependencies: BillByIdFamily._dependencies,
+        allTransitiveDependencies: BillByIdFamily._allTransitiveDependencies,
+        id: id,
+      );
+
+  BillByIdProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.id,
+  }) : super.internal();
+
+  final int id;
+
+  @override
+  Override overrideWith(FutureOr<Bill?> Function(BillByIdRef provider) create) {
+    return ProviderOverride(
+      origin: this,
+      override: BillByIdProvider._internal(
+        (ref) => create(ref as BillByIdRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        id: id,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<Bill?> createElement() {
+    return _BillByIdProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is BillByIdProvider && other.id == id;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, id.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin BillByIdRef on AutoDisposeFutureProviderRef<Bill?> {
+  /// The parameter `id` of this provider.
+  int get id;
+}
+
+class _BillByIdProviderElement extends AutoDisposeFutureProviderElement<Bill?>
+    with BillByIdRef {
+  _BillByIdProviderElement(super.provider);
+
+  @override
+  int get id => (origin as BillByIdProvider).id;
+}
+
 String _$lastElectricityBillHash() =>
     r'81a83d5b42a33e02548d0ba95f9a8fc38fb5a574';
 
@@ -918,5 +1044,163 @@ final currentElectricityRateProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CurrentElectricityRateRef = AutoDisposeFutureProviderRef<double>;
+String _$messageTemplatesHash() => r'e933e4f476b52842aab87e83fbb0cb4c3d94edd2';
+
+/// Get all message templates.
+///
+/// Copied from [messageTemplates].
+@ProviderFor(messageTemplates)
+final messageTemplatesProvider =
+    AutoDisposeFutureProvider<List<MessageTemplate>>.internal(
+      messageTemplates,
+      name: r'messageTemplatesProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$messageTemplatesHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef MessageTemplatesRef =
+    AutoDisposeFutureProviderRef<List<MessageTemplate>>;
+String _$messageTemplatesByTypeHash() =>
+    r'79b0d219c550f9ade5c64456085366209137ecf2';
+
+/// Get message templates by type.
+///
+/// Copied from [messageTemplatesByType].
+@ProviderFor(messageTemplatesByType)
+const messageTemplatesByTypeProvider = MessageTemplatesByTypeFamily();
+
+/// Get message templates by type.
+///
+/// Copied from [messageTemplatesByType].
+class MessageTemplatesByTypeFamily
+    extends Family<AsyncValue<List<MessageTemplate>>> {
+  /// Get message templates by type.
+  ///
+  /// Copied from [messageTemplatesByType].
+  const MessageTemplatesByTypeFamily();
+
+  /// Get message templates by type.
+  ///
+  /// Copied from [messageTemplatesByType].
+  MessageTemplatesByTypeProvider call(TemplateType type) {
+    return MessageTemplatesByTypeProvider(type);
+  }
+
+  @override
+  MessageTemplatesByTypeProvider getProviderOverride(
+    covariant MessageTemplatesByTypeProvider provider,
+  ) {
+    return call(provider.type);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'messageTemplatesByTypeProvider';
+}
+
+/// Get message templates by type.
+///
+/// Copied from [messageTemplatesByType].
+class MessageTemplatesByTypeProvider
+    extends AutoDisposeFutureProvider<List<MessageTemplate>> {
+  /// Get message templates by type.
+  ///
+  /// Copied from [messageTemplatesByType].
+  MessageTemplatesByTypeProvider(TemplateType type)
+    : this._internal(
+        (ref) => messageTemplatesByType(ref as MessageTemplatesByTypeRef, type),
+        from: messageTemplatesByTypeProvider,
+        name: r'messageTemplatesByTypeProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$messageTemplatesByTypeHash,
+        dependencies: MessageTemplatesByTypeFamily._dependencies,
+        allTransitiveDependencies:
+            MessageTemplatesByTypeFamily._allTransitiveDependencies,
+        type: type,
+      );
+
+  MessageTemplatesByTypeProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.type,
+  }) : super.internal();
+
+  final TemplateType type;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<MessageTemplate>> Function(MessageTemplatesByTypeRef provider)
+    create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: MessageTemplatesByTypeProvider._internal(
+        (ref) => create(ref as MessageTemplatesByTypeRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        type: type,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<MessageTemplate>> createElement() {
+    return _MessageTemplatesByTypeProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is MessageTemplatesByTypeProvider && other.type == type;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, type.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin MessageTemplatesByTypeRef
+    on AutoDisposeFutureProviderRef<List<MessageTemplate>> {
+  /// The parameter `type` of this provider.
+  TemplateType get type;
+}
+
+class _MessageTemplatesByTypeProviderElement
+    extends AutoDisposeFutureProviderElement<List<MessageTemplate>>
+    with MessageTemplatesByTypeRef {
+  _MessageTemplatesByTypeProviderElement(super.provider);
+
+  @override
+  TemplateType get type => (origin as MessageTemplatesByTypeProvider).type;
+}
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

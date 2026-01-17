@@ -13,6 +13,10 @@ _$BillImpl _$$BillImplFromJson(Map<String, dynamic> json) => _$BillImpl(
   billingMonth: (json['billingMonth'] as num).toInt(),
   billingYear: (json['billingYear'] as num).toInt(),
   amount: (json['amount'] as num).toDouble(),
+  billNumber: json['billNumber'] as String?,
+  status:
+      $enumDecodeNullable(_$BillStatusEnumMap, json['status']) ??
+      BillStatus.draft,
   electricityPrevReading: (json['electricityPrevReading'] as num?)?.toDouble(),
   electricityCurrReading: (json['electricityCurrReading'] as num?)?.toDouble(),
   electricityRateAtBilling: (json['electricityRateAtBilling'] as num?)
@@ -45,6 +49,8 @@ Map<String, dynamic> _$$BillImplToJson(_$BillImpl instance) =>
       'billingMonth': instance.billingMonth,
       'billingYear': instance.billingYear,
       'amount': instance.amount,
+      'billNumber': instance.billNumber,
+      'status': _$BillStatusEnumMap[instance.status]!,
       'electricityPrevReading': instance.electricityPrevReading,
       'electricityCurrReading': instance.electricityCurrReading,
       'electricityRateAtBilling': instance.electricityRateAtBilling,
@@ -67,6 +73,14 @@ const _$BillTypeEnumMap = {
   BillType.electricity: 'electricity',
   BillType.water: 'water',
   BillType.maintenance: 'maintenance',
-  BillType.rentPlusElectricity: 'rentPlusElectricity',
   BillType.other: 'other',
+};
+
+const _$BillStatusEnumMap = {
+  BillStatus.draft: 'draft',
+  BillStatus.sent: 'sent',
+  BillStatus.partial: 'partial',
+  BillStatus.paid: 'paid',
+  BillStatus.overdue: 'overdue',
+  BillStatus.voided: 'voided',
 };

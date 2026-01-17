@@ -43,18 +43,22 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
   final _prevReadingController = TextEditingController();
   final _currReadingController = TextEditingController();
   final _notesController = TextEditingController();
+  final _electricityRateController = TextEditingController();
 
   BillType _selectedBillType = BillType.rent;
   int _billingMonth = DateTime.now().month;
   int _billingYear = DateTime.now().year;
   bool _isLoading = false;
   double _electricityCharges = 0;
+  double _electricityRate = 0;
   File? _meterPhoto;
 
   @override
   void initState() {
     super.initState();
     _amountController.text = widget.agreedRent.toStringAsFixed(0);
+    _electricityRate = widget.electricityRate;
+    _electricityRateController.text = widget.electricityRate.toStringAsFixed(2);
     _loadLastReading();
   }
 
@@ -76,6 +80,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
     _prevReadingController.dispose();
     _currReadingController.dispose();
     _notesController.dispose();
+    _electricityRateController.dispose();
     super.dispose();
   }
 
@@ -83,9 +88,12 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
     if (_selectedBillType == BillType.rent) {
       _amountController.text = widget.agreedRent.toStringAsFixed(0);
     } else if (_selectedBillType == BillType.electricity) {
+      // For electricity, amount will be calculated from meter readings
+      _amountController.text = '0';
       _calculateElectricityCharges();
-    } else if (_selectedBillType == BillType.rentPlusElectricity) {
-      _calculateCombinedBill();
+    } else {
+      // For water, maintenance, other: default to 0, user enters amount
+      _amountController.text = '0';
     }
   }
 
@@ -93,10 +101,15 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
     final prev = double.tryParse(_prevReadingController.text) ?? 0;
     final curr = double.tryParse(_currReadingController.text) ?? 0;
     final units = curr - prev;
+    _electricityRate =
+        double.tryParse(_electricityRateController.text) ??
+        widget.electricityRate;
 
     if (units > 0) {
-      _electricityCharges = units * widget.electricityRate;
+      _electricityCharges = units * _electricityRate;
       _amountController.text = _electricityCharges.toStringAsFixed(0);
+    } else {
+      _electricityCharges = 0;
     }
     setState(() {});
   }
@@ -132,21 +145,6 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
     }
   }
 
-  void _calculateCombinedBill() {
-    final prev = double.tryParse(_prevReadingController.text) ?? 0;
-    final curr = double.tryParse(_currReadingController.text) ?? 0;
-    final units = curr - prev;
-
-    if (units > 0) {
-      _electricityCharges = units * widget.electricityRate;
-    } else {
-      _electricityCharges = 0;
-    }
-    final total = widget.agreedRent + _electricityCharges;
-    _amountController.text = total.toStringAsFixed(0);
-    setState(() {});
-  }
-
   Future<void> _saveBill() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -175,7 +173,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
             ? double.tryParse(_currReadingController.text)
             : null,
         electricityRateAtBilling: _selectedBillType == BillType.electricity
-            ? widget.electricityRate
+            ? _electricityRate
             : null,
         electricityCharges: _selectedBillType == BillType.electricity
             ? _electricityCharges
@@ -329,61 +327,153 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                   const SizedBox(height: 24),
 
                   // Electricity readings (if applicable)
-                  if ((_selectedBillType == BillType.electricity ||
-                          _selectedBillType == BillType.rentPlusElectricity) &&
+                  if (_selectedBillType == BillType.electricity &&
                       widget.hasElectricityMeter) ...[
-                    Text(
-                      'Meter Readings',
-                      style: Theme.of(context).textTheme.titleSmall,
+                    // Meter Readings Card
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(Icons.speed, color: Colors.amber.shade600),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Meter Readings',
+                                  style: Theme.of(context).textTheme.titleSmall
+                                      ?.copyWith(fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            // Meter reading inputs
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _MeterReadingInput(
+                                    label: 'Previous',
+                                    controller: _prevReadingController,
+                                    onChanged: (_) =>
+                                        _calculateElectricityCharges(),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                  ),
+                                  child: Icon(
+                                    Icons.arrow_forward,
+                                    color: Colors.grey.shade400,
+                                  ),
+                                ),
+                                Expanded(
+                                  child: _MeterReadingInput(
+                                    label: 'Current',
+                                    controller: _currReadingController,
+                                    onChanged: (_) =>
+                                        _calculateElectricityCharges(),
+                                    validator: (v) => validatePositiveNumber(
+                                      v,
+                                      'Current reading',
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            // Electricity rate (editable)
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.bolt,
+                                  color: Colors.orange,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Rate per unit:',
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                                const SizedBox(width: 8),
+                                SizedBox(
+                                  width: 80,
+                                  child: TextFormField(
+                                    controller: _electricityRateController,
+                                    decoration: const InputDecoration(
+                                      prefixText: '₹ ',
+                                      contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 8,
+                                      ),
+                                      isDense: true,
+                                    ),
+                                    keyboardType:
+                                        const TextInputType.numberWithOptions(
+                                          decimal: true,
+                                        ),
+                                    onChanged: (_) =>
+                                        _calculateElectricityCharges(),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextFormField(
-                            controller: _prevReadingController,
-                            decoration: const InputDecoration(
-                              labelText: 'Previous',
-                              prefixIcon: Icon(Icons.arrow_back),
-                            ),
-                            keyboardType: TextInputType.number,
-                            onChanged: (_) => _calculateElectricityCharges(),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: TextFormField(
-                            controller: _currReadingController,
-                            decoration: const InputDecoration(
-                              labelText: 'Current',
-                              prefixIcon: Icon(Icons.arrow_forward),
-                            ),
-                            keyboardType: TextInputType.number,
-                            validator: (v) =>
-                                validatePositiveNumber(v, 'Current reading'),
-                            onChanged: (_) => _calculateElectricityCharges(),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
+
+                    // Calculation Summary
                     if (_electricityCharges > 0)
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: AppColors.info.withValues(alpha: 0.1),
+                          gradient: LinearGradient(
+                            colors: [
+                              AppColors.primary.withValues(alpha: 0.1),
+                              AppColors.primary.withValues(alpha: 0.05),
+                            ],
+                          ),
                           borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: AppColors.primary.withValues(alpha: 0.2),
+                          ),
                         ),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              '${(double.tryParse(_currReadingController.text) ?? 0) - (double.tryParse(_prevReadingController.text) ?? 0)} units @ ${formatCurrency(widget.electricityRate)}/unit',
-                              style: Theme.of(context).textTheme.bodySmall,
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Electricity Calculation',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelSmall
+                                        ?.copyWith(
+                                          color: AppColors.primary,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '${((double.tryParse(_currReadingController.text) ?? 0) - (double.tryParse(_prevReadingController.text) ?? 0)).toStringAsFixed(0)} units × ${formatCurrency(_electricityRate)}',
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.bodyMedium,
+                                  ),
+                                ],
+                              ),
                             ),
                             Text(
                               formatCurrency(_electricityCharges),
-                              style: Theme.of(context).textTheme.titleSmall
+                              style: Theme.of(context).textTheme.titleLarge
                                   ?.copyWith(
                                     fontWeight: FontWeight.bold,
                                     color: AppColors.primary,
@@ -392,24 +482,30 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                           ],
                         ),
                       ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
 
-                    // Meter Photo Section
+                    // Meter Photo Section (Fully clickable)
                     Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Row(
-                          children: [
-                            GestureDetector(
-                              onTap: _pickMeterPhoto,
-                              child: Container(
-                                width: 60,
-                                height: 60,
+                      clipBehavior: Clip.antiAlias,
+                      child: InkWell(
+                        onTap: _pickMeterPhoto,
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 64,
+                                height: 64,
                                 decoration: BoxDecoration(
-                                  color: Colors.grey.shade200,
+                                  color: _meterPhoto != null
+                                      ? null
+                                      : Colors.grey.shade100,
                                   borderRadius: BorderRadius.circular(8),
                                   border: Border.all(
-                                    color: Colors.grey.shade300,
+                                    color: _meterPhoto != null
+                                        ? AppColors.success
+                                        : Colors.grey.shade300,
+                                    width: _meterPhoto != null ? 2 : 1,
                                   ),
                                   image: _meterPhoto != null
                                       ? DecorationImage(
@@ -419,51 +515,76 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                                       : null,
                                 ),
                                 child: _meterPhoto == null
-                                    ? const Icon(
+                                    ? Icon(
                                         Icons.add_a_photo_outlined,
-                                        color: Colors.grey,
+                                        color: Colors.grey.shade400,
+                                        size: 28,
                                       )
                                     : null,
                               ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    _meterPhoto != null
-                                        ? 'Meter Photo Added'
-                                        : 'Meter Photo (Optional)',
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.titleSmall,
-                                  ),
-                                  Text(
-                                    _meterPhoto != null
-                                        ? 'Tap to change or remove'
-                                        : 'Tap to add photo of meter reading',
-                                    style: Theme.of(context).textTheme.bodySmall
-                                        ?.copyWith(color: Colors.grey),
-                                  ),
-                                ],
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          _meterPhoto != null
+                                              ? Icons.check_circle
+                                              : Icons.camera_alt_outlined,
+                                          size: 18,
+                                          color: _meterPhoto != null
+                                              ? AppColors.success
+                                              : AppColors.onSurfaceVariant,
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          _meterPhoto != null
+                                              ? 'Meter Photo Added'
+                                              : 'Add Meter Photo',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleSmall
+                                              ?.copyWith(
+                                                color: _meterPhoto != null
+                                                    ? AppColors.success
+                                                    : null,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      _meterPhoto != null
+                                          ? 'Tap to change photo'
+                                          : 'Optional - helps with verification',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            color: AppColors.onSurfaceVariant,
+                                          ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            if (_meterPhoto != null)
-                              IconButton(
-                                onPressed: () =>
-                                    setState(() => _meterPhoto = null),
-                                icon: const Icon(
-                                  Icons.close,
+                              if (_meterPhoto != null)
+                                IconButton(
+                                  onPressed: () =>
+                                      setState(() => _meterPhoto = null),
+                                  icon: const Icon(Icons.close),
+                                  color: Colors.grey,
+                                  tooltip: 'Remove photo',
+                                )
+                              else
+                                const Icon(
+                                  Icons.chevron_right,
                                   color: Colors.grey,
                                 ),
-                              )
-                            else
-                              IconButton(
-                                onPressed: _pickMeterPhoto,
-                                icon: const Icon(Icons.camera_alt_outlined),
-                              ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -515,6 +636,65 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+/// Styled meter reading input box.
+class _MeterReadingInput extends StatelessWidget {
+  final String label;
+  final TextEditingController controller;
+  final ValueChanged<String>? onChanged;
+  final FormFieldValidator<String>? validator;
+
+  const _MeterReadingInput({
+    required this.label,
+    required this.controller,
+    this.onChanged,
+    this.validator,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceVariant,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      child: Column(
+        children: [
+          Text(
+            label,
+            style: Theme.of(
+              context,
+            ).textTheme.labelSmall?.copyWith(color: AppColors.onSurfaceVariant),
+          ),
+          const SizedBox(height: 4),
+          TextFormField(
+            controller: controller,
+            decoration: const InputDecoration(
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.zero,
+              isDense: true,
+            ),
+            keyboardType: TextInputType.number,
+            textAlign: TextAlign.center,
+            style: Theme.of(
+              context,
+            ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+            onChanged: onChanged,
+            validator: validator,
+          ),
+          Text(
+            'units',
+            style: Theme.of(
+              context,
+            ).textTheme.labelSmall?.copyWith(color: AppColors.onSurfaceVariant),
+          ),
+        ],
       ),
     );
   }

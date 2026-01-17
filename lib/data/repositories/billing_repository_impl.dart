@@ -3,6 +3,7 @@ library;
 
 import 'package:drift/drift.dart';
 import '../../domain/entities/bill.dart';
+import '../../domain/entities/message_template.dart';
 import '../../domain/entities/payment.dart';
 import '../../domain/repositories/billing_repository.dart';
 import '../database/app_database.dart';
@@ -11,6 +12,7 @@ import '../database/daos/tenant_dao.dart';
 import '../database/daos/property_dao.dart';
 import '../database/tables/bill_table.dart' as db;
 import '../database/tables/payment_table.dart' as db;
+import '../database/tables/message_template_table.dart' as db;
 
 /// Implementation of [BillingRepository] using Drift database.
 class BillingRepositoryImpl implements BillingRepository {
@@ -31,8 +33,6 @@ class BillingRepositoryImpl implements BillingRepository {
         return BillType.water;
       case db.BillType.maintenance:
         return BillType.maintenance;
-      case db.BillType.rentPlusElectricity:
-        return BillType.rentPlusElectricity;
       case db.BillType.other:
         return BillType.other;
     }
@@ -49,10 +49,44 @@ class BillingRepositoryImpl implements BillingRepository {
         return db.BillType.water;
       case BillType.maintenance:
         return db.BillType.maintenance;
-      case BillType.rentPlusElectricity:
-        return db.BillType.rentPlusElectricity;
       case BillType.other:
         return db.BillType.other;
+    }
+  }
+
+  /// Convert bill status from database to domain
+  BillStatus _billStatusToDomain(db.BillStatus status) {
+    switch (status) {
+      case db.BillStatus.draft:
+        return BillStatus.draft;
+      case db.BillStatus.sent:
+        return BillStatus.sent;
+      case db.BillStatus.partial:
+        return BillStatus.partial;
+      case db.BillStatus.paid:
+        return BillStatus.paid;
+      case db.BillStatus.overdue:
+        return BillStatus.overdue;
+      case db.BillStatus.voided:
+        return BillStatus.voided;
+    }
+  }
+
+  /// Convert bill status from domain to database
+  db.BillStatus _billStatusToDb(BillStatus status) {
+    switch (status) {
+      case BillStatus.draft:
+        return db.BillStatus.draft;
+      case BillStatus.sent:
+        return db.BillStatus.sent;
+      case BillStatus.partial:
+        return db.BillStatus.partial;
+      case BillStatus.paid:
+        return db.BillStatus.paid;
+      case BillStatus.overdue:
+        return db.BillStatus.overdue;
+      case BillStatus.voided:
+        return db.BillStatus.voided;
     }
   }
 
@@ -120,6 +154,8 @@ class BillingRepositoryImpl implements BillingRepository {
       billingMonth: entity.billingMonth,
       billingYear: entity.billingYear,
       amount: entity.amount,
+      billNumber: entity.billNumber,
+      status: _billStatusToDomain(entity.status),
       electricityPrevReading: entity.electricityPrevReading,
       electricityCurrReading: entity.electricityCurrReading,
       electricityRateAtBilling: entity.electricityRateAtBilling,
@@ -230,6 +266,8 @@ class BillingRepositoryImpl implements BillingRepository {
     final entity = BillEntity(
       id: bill.id,
       occupancyId: bill.occupancyId,
+      billNumber: bill.billNumber,
+      status: _billStatusToDb(bill.status),
       billType: _billTypeToDb(bill.billType),
       billingMonth: bill.billingMonth,
       billingYear: bill.billingYear,
@@ -355,5 +393,91 @@ class BillingRepositoryImpl implements BillingRepository {
       effectiveFrom: Value(effectiveFrom),
     );
     return _billingDao.insertElectricityRate(rateEntry);
+  }
+
+  // ========== Message Template Operations ==========
+
+  /// Get all message templates
+  Future<List<MessageTemplate>> getAllMessageTemplates() async {
+    final entities = await _billingDao.getAllMessageTemplates();
+    return entities.map(_messageTemplateToDomain).toList();
+  }
+
+  /// Get templates by type
+  Future<List<MessageTemplate>> getTemplatesByType(TemplateType type) async {
+    final dbType = _templateTypeToDb(type);
+    final entities = await _billingDao.getTemplatesByType(dbType);
+    return entities.map(_messageTemplateToDomain).toList();
+  }
+
+  /// Get default template for type
+  Future<MessageTemplate?> getDefaultTemplate(TemplateType type) async {
+    final dbType = _templateTypeToDb(type);
+    final entity = await _billingDao.getDefaultTemplate(dbType);
+    return entity != null ? _messageTemplateToDomain(entity) : null;
+  }
+
+  /// Create a message template
+  Future<int> createMessageTemplate({
+    required TemplateType templateType,
+    required String name,
+    required String body,
+    bool isDefault = false,
+  }) async {
+    final template = MessageTemplatesCompanion(
+      templateType: Value(_templateTypeToDb(templateType)),
+      name: Value(name),
+      body: Value(body),
+      isDefault: Value(isDefault),
+    );
+    return _billingDao.insertMessageTemplate(template);
+  }
+
+  /// Update a message template
+  Future<bool> updateMessageTemplate({
+    required int id,
+    String? name,
+    String? body,
+    bool? isDefault,
+  }) async {
+    final template = MessageTemplatesCompanion(
+      name: name != null ? Value(name) : const Value.absent(),
+      body: body != null ? Value(body) : const Value.absent(),
+      isDefault: isDefault != null ? Value(isDefault) : const Value.absent(),
+    );
+    return _billingDao.updateMessageTemplate(id, template);
+  }
+
+  /// Delete a message template
+  Future<int> deleteMessageTemplate(int id) async {
+    return _billingDao.deleteMessageTemplate(id);
+  }
+
+  // Helper methods for MessageTemplate
+  MessageTemplate _messageTemplateToDomain(MessageTemplateEntity entity) {
+    return MessageTemplate(
+      id: entity.id,
+      templateType: _templateTypeToDomain(entity.templateType),
+      name: entity.name,
+      body: entity.body,
+      isDefault: entity.isDefault,
+      createdAt: entity.createdAt,
+    );
+  }
+
+  TemplateType _templateTypeToDomain(db.TemplateType type) {
+    return switch (type) {
+      db.TemplateType.invoice => TemplateType.invoice,
+      db.TemplateType.receipt => TemplateType.receipt,
+      db.TemplateType.reminder => TemplateType.reminder,
+    };
+  }
+
+  db.TemplateType _templateTypeToDb(TemplateType type) {
+    return switch (type) {
+      TemplateType.invoice => db.TemplateType.invoice,
+      TemplateType.receipt => db.TemplateType.receipt,
+      TemplateType.reminder => db.TemplateType.reminder,
+    };
   }
 }

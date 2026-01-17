@@ -662,8 +662,6 @@ class _BillCard extends ConsumerWidget {
         return 'Water';
       case BillType.maintenance:
         return 'Maintenance';
-      case BillType.rentPlusElectricity:
-        return 'Rent + Elec';
       case BillType.other:
         return 'Other';
     }

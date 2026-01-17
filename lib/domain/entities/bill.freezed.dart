@@ -26,7 +26,10 @@ mixin _$Bill {
   BillType get billType => throw _privateConstructorUsedError;
   int get billingMonth => throw _privateConstructorUsedError;
   int get billingYear => throw _privateConstructorUsedError;
-  double get amount => throw _privateConstructorUsedError;
+  double get amount =>
+      throw _privateConstructorUsedError; // Bill number (format: INV-YYYYMM-XXXX)
+  String? get billNumber => throw _privateConstructorUsedError; // Bill status
+  BillStatus get status => throw _privateConstructorUsedError;
   double? get electricityPrevReading => throw _privateConstructorUsedError;
   double? get electricityCurrReading => throw _privateConstructorUsedError;
   double? get electricityRateAtBilling => throw _privateConstructorUsedError;
@@ -66,6 +69,8 @@ abstract class $BillCopyWith<$Res> {
     int billingMonth,
     int billingYear,
     double amount,
+    String? billNumber,
+    BillStatus status,
     double? electricityPrevReading,
     double? electricityCurrReading,
     double? electricityRateAtBilling,
@@ -105,6 +110,8 @@ class _$BillCopyWithImpl<$Res, $Val extends Bill>
     Object? billingMonth = null,
     Object? billingYear = null,
     Object? amount = null,
+    Object? billNumber = freezed,
+    Object? status = null,
     Object? electricityPrevReading = freezed,
     Object? electricityCurrReading = freezed,
     Object? electricityRateAtBilling = freezed,
@@ -147,6 +154,14 @@ class _$BillCopyWithImpl<$Res, $Val extends Bill>
                 ? _value.amount
                 : amount // ignore: cast_nullable_to_non_nullable
                       as double,
+            billNumber: freezed == billNumber
+                ? _value.billNumber
+                : billNumber // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            status: null == status
+                ? _value.status
+                : status // ignore: cast_nullable_to_non_nullable
+                      as BillStatus,
             electricityPrevReading: freezed == electricityPrevReading
                 ? _value.electricityPrevReading
                 : electricityPrevReading // ignore: cast_nullable_to_non_nullable
@@ -228,6 +243,8 @@ abstract class _$$BillImplCopyWith<$Res> implements $BillCopyWith<$Res> {
     int billingMonth,
     int billingYear,
     double amount,
+    String? billNumber,
+    BillStatus status,
     double? electricityPrevReading,
     double? electricityCurrReading,
     double? electricityRateAtBilling,
@@ -264,6 +281,8 @@ class __$$BillImplCopyWithImpl<$Res>
     Object? billingMonth = null,
     Object? billingYear = null,
     Object? amount = null,
+    Object? billNumber = freezed,
+    Object? status = null,
     Object? electricityPrevReading = freezed,
     Object? electricityCurrReading = freezed,
     Object? electricityRateAtBilling = freezed,
@@ -306,6 +325,14 @@ class __$$BillImplCopyWithImpl<$Res>
             ? _value.amount
             : amount // ignore: cast_nullable_to_non_nullable
                   as double,
+        billNumber: freezed == billNumber
+            ? _value.billNumber
+            : billNumber // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        status: null == status
+            ? _value.status
+            : status // ignore: cast_nullable_to_non_nullable
+                  as BillStatus,
         electricityPrevReading: freezed == electricityPrevReading
             ? _value.electricityPrevReading
             : electricityPrevReading // ignore: cast_nullable_to_non_nullable
@@ -381,6 +408,8 @@ class _$BillImpl extends _Bill {
     required this.billingMonth,
     required this.billingYear,
     required this.amount,
+    this.billNumber,
+    this.status = BillStatus.draft,
     this.electricityPrevReading,
     this.electricityCurrReading,
     this.electricityRateAtBilling,
@@ -413,6 +442,13 @@ class _$BillImpl extends _Bill {
   final int billingYear;
   @override
   final double amount;
+  // Bill number (format: INV-YYYYMM-XXXX)
+  @override
+  final String? billNumber;
+  // Bill status
+  @override
+  @JsonKey()
+  final BillStatus status;
   @override
   final double? electricityPrevReading;
   @override
@@ -450,7 +486,7 @@ class _$BillImpl extends _Bill {
 
   @override
   String toString() {
-    return 'Bill(id: $id, occupancyId: $occupancyId, billType: $billType, billingMonth: $billingMonth, billingYear: $billingYear, amount: $amount, electricityPrevReading: $electricityPrevReading, electricityCurrReading: $electricityCurrReading, electricityRateAtBilling: $electricityRateAtBilling, electricityCharges: $electricityCharges, meterPhotoPath: $meterPhotoPath, notes: $notes, createdAt: $createdAt, dueDate: $dueDate, periodStartDate: $periodStartDate, periodEndDate: $periodEndDate, paidAmount: $paidAmount, pendingAmount: $pendingAmount, roomNumber: $roomNumber, tenantName: $tenantName, propertyName: $propertyName)';
+    return 'Bill(id: $id, occupancyId: $occupancyId, billType: $billType, billingMonth: $billingMonth, billingYear: $billingYear, amount: $amount, billNumber: $billNumber, status: $status, electricityPrevReading: $electricityPrevReading, electricityCurrReading: $electricityCurrReading, electricityRateAtBilling: $electricityRateAtBilling, electricityCharges: $electricityCharges, meterPhotoPath: $meterPhotoPath, notes: $notes, createdAt: $createdAt, dueDate: $dueDate, periodStartDate: $periodStartDate, periodEndDate: $periodEndDate, paidAmount: $paidAmount, pendingAmount: $pendingAmount, roomNumber: $roomNumber, tenantName: $tenantName, propertyName: $propertyName)';
   }
 
   @override
@@ -468,6 +504,9 @@ class _$BillImpl extends _Bill {
             (identical(other.billingYear, billingYear) ||
                 other.billingYear == billingYear) &&
             (identical(other.amount, amount) || other.amount == amount) &&
+            (identical(other.billNumber, billNumber) ||
+                other.billNumber == billNumber) &&
+            (identical(other.status, status) || other.status == status) &&
             (identical(other.electricityPrevReading, electricityPrevReading) ||
                 other.electricityPrevReading == electricityPrevReading) &&
             (identical(other.electricityCurrReading, electricityCurrReading) ||
@@ -511,6 +550,8 @@ class _$BillImpl extends _Bill {
     billingMonth,
     billingYear,
     amount,
+    billNumber,
+    status,
     electricityPrevReading,
     electricityCurrReading,
     electricityRateAtBilling,
@@ -550,6 +591,8 @@ abstract class _Bill extends Bill {
     required final int billingMonth,
     required final int billingYear,
     required final double amount,
+    final String? billNumber,
+    final BillStatus status,
     final double? electricityPrevReading,
     final double? electricityCurrReading,
     final double? electricityRateAtBilling,
@@ -581,7 +624,11 @@ abstract class _Bill extends Bill {
   @override
   int get billingYear;
   @override
-  double get amount;
+  double get amount; // Bill number (format: INV-YYYYMM-XXXX)
+  @override
+  String? get billNumber; // Bill status
+  @override
+  BillStatus get status;
   @override
   double? get electricityPrevReading;
   @override

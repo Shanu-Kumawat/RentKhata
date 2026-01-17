@@ -4086,6 +4086,27 @@ class $BillsTable extends Bills with TableInfo<$BillsTable, BillEntity> {
       'REFERENCES occupancies (id)',
     ),
   );
+  static const VerificationMeta _billNumberMeta = const VerificationMeta(
+    'billNumber',
+  );
+  @override
+  late final GeneratedColumn<String> billNumber = GeneratedColumn<String>(
+    'bill_number',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<BillStatus, String> status =
+      GeneratedColumn<String>(
+        'status',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: Constant(BillStatus.draft.name),
+      ).withConverter<BillStatus>($BillsTable.$converterstatus);
   @override
   late final GeneratedColumnWithTypeConverter<BillType, String> billType =
       GeneratedColumn<String>(
@@ -4241,6 +4262,8 @@ class $BillsTable extends Bills with TableInfo<$BillsTable, BillEntity> {
   List<GeneratedColumn> get $columns => [
     id,
     occupancyId,
+    billNumber,
+    status,
     billType,
     billingMonth,
     billingYear,
@@ -4281,6 +4304,12 @@ class $BillsTable extends Bills with TableInfo<$BillsTable, BillEntity> {
       );
     } else if (isInserting) {
       context.missing(_occupancyIdMeta);
+    }
+    if (data.containsKey('bill_number')) {
+      context.handle(
+        _billNumberMeta,
+        billNumber.isAcceptableOrUnknown(data['bill_number']!, _billNumberMeta),
+      );
     }
     if (data.containsKey('billing_month')) {
       context.handle(
@@ -4410,6 +4439,16 @@ class $BillsTable extends Bills with TableInfo<$BillsTable, BillEntity> {
         DriftSqlType.int,
         data['${effectivePrefix}occupancy_id'],
       )!,
+      billNumber: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}bill_number'],
+      ),
+      status: $BillsTable.$converterstatus.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}status'],
+        )!,
+      ),
       billType: $BillsTable.$converterbillType.fromSql(
         attachedDatabase.typeMapping.read(
           DriftSqlType.string,
@@ -4476,6 +4515,8 @@ class $BillsTable extends Bills with TableInfo<$BillsTable, BillEntity> {
     return $BillsTable(attachedDatabase, alias);
   }
 
+  static JsonTypeConverter2<BillStatus, String, String> $converterstatus =
+      const EnumNameConverter<BillStatus>(BillStatus.values);
   static JsonTypeConverter2<BillType, String, String> $converterbillType =
       const EnumNameConverter<BillType>(BillType.values);
 }
@@ -4486,6 +4527,12 @@ class BillEntity extends DataClass implements Insertable<BillEntity> {
 
   /// Foreign key to occupancy
   final int occupancyId;
+
+  /// Auto-generated bill number (format: INV-YYYYMM-XXXX)
+  final String? billNumber;
+
+  /// Bill status for workflow
+  final BillStatus status;
 
   /// Type of bill
   final BillType billType;
@@ -4531,6 +4578,8 @@ class BillEntity extends DataClass implements Insertable<BillEntity> {
   const BillEntity({
     required this.id,
     required this.occupancyId,
+    this.billNumber,
+    required this.status,
     required this.billType,
     required this.billingMonth,
     required this.billingYear,
@@ -4551,6 +4600,14 @@ class BillEntity extends DataClass implements Insertable<BillEntity> {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['occupancy_id'] = Variable<int>(occupancyId);
+    if (!nullToAbsent || billNumber != null) {
+      map['bill_number'] = Variable<String>(billNumber);
+    }
+    {
+      map['status'] = Variable<String>(
+        $BillsTable.$converterstatus.toSql(status),
+      );
+    }
     {
       map['bill_type'] = Variable<String>(
         $BillsTable.$converterbillType.toSql(billType),
@@ -4600,6 +4657,10 @@ class BillEntity extends DataClass implements Insertable<BillEntity> {
     return BillsCompanion(
       id: Value(id),
       occupancyId: Value(occupancyId),
+      billNumber: billNumber == null && nullToAbsent
+          ? const Value.absent()
+          : Value(billNumber),
+      status: Value(status),
       billType: Value(billType),
       billingMonth: Value(billingMonth),
       billingYear: Value(billingYear),
@@ -4643,6 +4704,10 @@ class BillEntity extends DataClass implements Insertable<BillEntity> {
     return BillEntity(
       id: serializer.fromJson<int>(json['id']),
       occupancyId: serializer.fromJson<int>(json['occupancyId']),
+      billNumber: serializer.fromJson<String?>(json['billNumber']),
+      status: $BillsTable.$converterstatus.fromJson(
+        serializer.fromJson<String>(json['status']),
+      ),
       billType: $BillsTable.$converterbillType.fromJson(
         serializer.fromJson<String>(json['billType']),
       ),
@@ -4675,6 +4740,10 @@ class BillEntity extends DataClass implements Insertable<BillEntity> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'occupancyId': serializer.toJson<int>(occupancyId),
+      'billNumber': serializer.toJson<String?>(billNumber),
+      'status': serializer.toJson<String>(
+        $BillsTable.$converterstatus.toJson(status),
+      ),
       'billType': serializer.toJson<String>(
         $BillsTable.$converterbillType.toJson(billType),
       ),
@@ -4703,6 +4772,8 @@ class BillEntity extends DataClass implements Insertable<BillEntity> {
   BillEntity copyWith({
     int? id,
     int? occupancyId,
+    Value<String?> billNumber = const Value.absent(),
+    BillStatus? status,
     BillType? billType,
     int? billingMonth,
     int? billingYear,
@@ -4720,6 +4791,8 @@ class BillEntity extends DataClass implements Insertable<BillEntity> {
   }) => BillEntity(
     id: id ?? this.id,
     occupancyId: occupancyId ?? this.occupancyId,
+    billNumber: billNumber.present ? billNumber.value : this.billNumber,
+    status: status ?? this.status,
     billType: billType ?? this.billType,
     billingMonth: billingMonth ?? this.billingMonth,
     billingYear: billingYear ?? this.billingYear,
@@ -4755,6 +4828,10 @@ class BillEntity extends DataClass implements Insertable<BillEntity> {
       occupancyId: data.occupancyId.present
           ? data.occupancyId.value
           : this.occupancyId,
+      billNumber: data.billNumber.present
+          ? data.billNumber.value
+          : this.billNumber,
+      status: data.status.present ? data.status.value : this.status,
       billType: data.billType.present ? data.billType.value : this.billType,
       billingMonth: data.billingMonth.present
           ? data.billingMonth.value
@@ -4795,6 +4872,8 @@ class BillEntity extends DataClass implements Insertable<BillEntity> {
     return (StringBuffer('BillEntity(')
           ..write('id: $id, ')
           ..write('occupancyId: $occupancyId, ')
+          ..write('billNumber: $billNumber, ')
+          ..write('status: $status, ')
           ..write('billType: $billType, ')
           ..write('billingMonth: $billingMonth, ')
           ..write('billingYear: $billingYear, ')
@@ -4817,6 +4896,8 @@ class BillEntity extends DataClass implements Insertable<BillEntity> {
   int get hashCode => Object.hash(
     id,
     occupancyId,
+    billNumber,
+    status,
     billType,
     billingMonth,
     billingYear,
@@ -4838,6 +4919,8 @@ class BillEntity extends DataClass implements Insertable<BillEntity> {
       (other is BillEntity &&
           other.id == this.id &&
           other.occupancyId == this.occupancyId &&
+          other.billNumber == this.billNumber &&
+          other.status == this.status &&
           other.billType == this.billType &&
           other.billingMonth == this.billingMonth &&
           other.billingYear == this.billingYear &&
@@ -4857,6 +4940,8 @@ class BillEntity extends DataClass implements Insertable<BillEntity> {
 class BillsCompanion extends UpdateCompanion<BillEntity> {
   final Value<int> id;
   final Value<int> occupancyId;
+  final Value<String?> billNumber;
+  final Value<BillStatus> status;
   final Value<BillType> billType;
   final Value<int> billingMonth;
   final Value<int> billingYear;
@@ -4874,6 +4959,8 @@ class BillsCompanion extends UpdateCompanion<BillEntity> {
   const BillsCompanion({
     this.id = const Value.absent(),
     this.occupancyId = const Value.absent(),
+    this.billNumber = const Value.absent(),
+    this.status = const Value.absent(),
     this.billType = const Value.absent(),
     this.billingMonth = const Value.absent(),
     this.billingYear = const Value.absent(),
@@ -4892,6 +4979,8 @@ class BillsCompanion extends UpdateCompanion<BillEntity> {
   BillsCompanion.insert({
     this.id = const Value.absent(),
     required int occupancyId,
+    this.billNumber = const Value.absent(),
+    this.status = const Value.absent(),
     required BillType billType,
     required int billingMonth,
     required int billingYear,
@@ -4914,6 +5003,8 @@ class BillsCompanion extends UpdateCompanion<BillEntity> {
   static Insertable<BillEntity> custom({
     Expression<int>? id,
     Expression<int>? occupancyId,
+    Expression<String>? billNumber,
+    Expression<String>? status,
     Expression<String>? billType,
     Expression<int>? billingMonth,
     Expression<int>? billingYear,
@@ -4932,6 +5023,8 @@ class BillsCompanion extends UpdateCompanion<BillEntity> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (occupancyId != null) 'occupancy_id': occupancyId,
+      if (billNumber != null) 'bill_number': billNumber,
+      if (status != null) 'status': status,
       if (billType != null) 'bill_type': billType,
       if (billingMonth != null) 'billing_month': billingMonth,
       if (billingYear != null) 'billing_year': billingYear,
@@ -4955,6 +5048,8 @@ class BillsCompanion extends UpdateCompanion<BillEntity> {
   BillsCompanion copyWith({
     Value<int>? id,
     Value<int>? occupancyId,
+    Value<String?>? billNumber,
+    Value<BillStatus>? status,
     Value<BillType>? billType,
     Value<int>? billingMonth,
     Value<int>? billingYear,
@@ -4973,6 +5068,8 @@ class BillsCompanion extends UpdateCompanion<BillEntity> {
     return BillsCompanion(
       id: id ?? this.id,
       occupancyId: occupancyId ?? this.occupancyId,
+      billNumber: billNumber ?? this.billNumber,
+      status: status ?? this.status,
       billType: billType ?? this.billType,
       billingMonth: billingMonth ?? this.billingMonth,
       billingYear: billingYear ?? this.billingYear,
@@ -5001,6 +5098,14 @@ class BillsCompanion extends UpdateCompanion<BillEntity> {
     }
     if (occupancyId.present) {
       map['occupancy_id'] = Variable<int>(occupancyId.value);
+    }
+    if (billNumber.present) {
+      map['bill_number'] = Variable<String>(billNumber.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(
+        $BillsTable.$converterstatus.toSql(status.value),
+      );
     }
     if (billType.present) {
       map['bill_type'] = Variable<String>(
@@ -5060,6 +5165,8 @@ class BillsCompanion extends UpdateCompanion<BillEntity> {
     return (StringBuffer('BillsCompanion(')
           ..write('id: $id, ')
           ..write('occupancyId: $occupancyId, ')
+          ..write('billNumber: $billNumber, ')
+          ..write('status: $status, ')
           ..write('billType: $billType, ')
           ..write('billingMonth: $billingMonth, ')
           ..write('billingYear: $billingYear, ')
@@ -5149,6 +5256,40 @@ class $PaymentsTable extends Payments
     requiredDuringInsert: false,
     defaultValue: currentDateAndTime,
   );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _originalAmountMeta = const VerificationMeta(
+    'originalAmount',
+  );
+  @override
+  late final GeneratedColumn<String> originalAmount = GeneratedColumn<String>(
+    'original_amount',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -5157,6 +5298,9 @@ class $PaymentsTable extends Payments
     paymentMode,
     notes,
     paymentDate,
+    createdAt,
+    updatedAt,
+    originalAmount,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -5204,6 +5348,27 @@ class $PaymentsTable extends Payments
         ),
       );
     }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    if (data.containsKey('original_amount')) {
+      context.handle(
+        _originalAmountMeta,
+        originalAmount.isAcceptableOrUnknown(
+          data['original_amount']!,
+          _originalAmountMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -5239,6 +5404,18 @@ class $PaymentsTable extends Payments
         DriftSqlType.dateTime,
         data['${effectivePrefix}payment_date'],
       )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      ),
+      originalAmount: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}original_amount'],
+      ),
     );
   }
 
@@ -5269,6 +5446,15 @@ class PaymentEntity extends DataClass implements Insertable<PaymentEntity> {
 
   /// Payment date
   final DateTime paymentDate;
+
+  /// Created timestamp (for audit)
+  final DateTime createdAt;
+
+  /// Last updated timestamp (null if never edited)
+  final DateTime? updatedAt;
+
+  /// Original amount before edit (for audit trail, JSON string)
+  final String? originalAmount;
   const PaymentEntity({
     required this.id,
     required this.billId,
@@ -5276,6 +5462,9 @@ class PaymentEntity extends DataClass implements Insertable<PaymentEntity> {
     required this.paymentMode,
     this.notes,
     required this.paymentDate,
+    required this.createdAt,
+    this.updatedAt,
+    this.originalAmount,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -5292,6 +5481,13 @@ class PaymentEntity extends DataClass implements Insertable<PaymentEntity> {
       map['notes'] = Variable<String>(notes);
     }
     map['payment_date'] = Variable<DateTime>(paymentDate);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    if (!nullToAbsent || updatedAt != null) {
+      map['updated_at'] = Variable<DateTime>(updatedAt);
+    }
+    if (!nullToAbsent || originalAmount != null) {
+      map['original_amount'] = Variable<String>(originalAmount);
+    }
     return map;
   }
 
@@ -5305,6 +5501,13 @@ class PaymentEntity extends DataClass implements Insertable<PaymentEntity> {
           ? const Value.absent()
           : Value(notes),
       paymentDate: Value(paymentDate),
+      createdAt: Value(createdAt),
+      updatedAt: updatedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(updatedAt),
+      originalAmount: originalAmount == null && nullToAbsent
+          ? const Value.absent()
+          : Value(originalAmount),
     );
   }
 
@@ -5322,6 +5525,9 @@ class PaymentEntity extends DataClass implements Insertable<PaymentEntity> {
       ),
       notes: serializer.fromJson<String?>(json['notes']),
       paymentDate: serializer.fromJson<DateTime>(json['paymentDate']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime?>(json['updatedAt']),
+      originalAmount: serializer.fromJson<String?>(json['originalAmount']),
     );
   }
   @override
@@ -5336,6 +5542,9 @@ class PaymentEntity extends DataClass implements Insertable<PaymentEntity> {
       ),
       'notes': serializer.toJson<String?>(notes),
       'paymentDate': serializer.toJson<DateTime>(paymentDate),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime?>(updatedAt),
+      'originalAmount': serializer.toJson<String?>(originalAmount),
     };
   }
 
@@ -5346,6 +5555,9 @@ class PaymentEntity extends DataClass implements Insertable<PaymentEntity> {
     PaymentMode? paymentMode,
     Value<String?> notes = const Value.absent(),
     DateTime? paymentDate,
+    DateTime? createdAt,
+    Value<DateTime?> updatedAt = const Value.absent(),
+    Value<String?> originalAmount = const Value.absent(),
   }) => PaymentEntity(
     id: id ?? this.id,
     billId: billId ?? this.billId,
@@ -5353,6 +5565,11 @@ class PaymentEntity extends DataClass implements Insertable<PaymentEntity> {
     paymentMode: paymentMode ?? this.paymentMode,
     notes: notes.present ? notes.value : this.notes,
     paymentDate: paymentDate ?? this.paymentDate,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
+    originalAmount: originalAmount.present
+        ? originalAmount.value
+        : this.originalAmount,
   );
   PaymentEntity copyWithCompanion(PaymentsCompanion data) {
     return PaymentEntity(
@@ -5366,6 +5583,11 @@ class PaymentEntity extends DataClass implements Insertable<PaymentEntity> {
       paymentDate: data.paymentDate.present
           ? data.paymentDate.value
           : this.paymentDate,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      originalAmount: data.originalAmount.present
+          ? data.originalAmount.value
+          : this.originalAmount,
     );
   }
 
@@ -5377,14 +5599,26 @@ class PaymentEntity extends DataClass implements Insertable<PaymentEntity> {
           ..write('amount: $amount, ')
           ..write('paymentMode: $paymentMode, ')
           ..write('notes: $notes, ')
-          ..write('paymentDate: $paymentDate')
+          ..write('paymentDate: $paymentDate, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('originalAmount: $originalAmount')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, billId, amount, paymentMode, notes, paymentDate);
+  int get hashCode => Object.hash(
+    id,
+    billId,
+    amount,
+    paymentMode,
+    notes,
+    paymentDate,
+    createdAt,
+    updatedAt,
+    originalAmount,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -5394,7 +5628,10 @@ class PaymentEntity extends DataClass implements Insertable<PaymentEntity> {
           other.amount == this.amount &&
           other.paymentMode == this.paymentMode &&
           other.notes == this.notes &&
-          other.paymentDate == this.paymentDate);
+          other.paymentDate == this.paymentDate &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.originalAmount == this.originalAmount);
 }
 
 class PaymentsCompanion extends UpdateCompanion<PaymentEntity> {
@@ -5404,6 +5641,9 @@ class PaymentsCompanion extends UpdateCompanion<PaymentEntity> {
   final Value<PaymentMode> paymentMode;
   final Value<String?> notes;
   final Value<DateTime> paymentDate;
+  final Value<DateTime> createdAt;
+  final Value<DateTime?> updatedAt;
+  final Value<String?> originalAmount;
   const PaymentsCompanion({
     this.id = const Value.absent(),
     this.billId = const Value.absent(),
@@ -5411,6 +5651,9 @@ class PaymentsCompanion extends UpdateCompanion<PaymentEntity> {
     this.paymentMode = const Value.absent(),
     this.notes = const Value.absent(),
     this.paymentDate = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.originalAmount = const Value.absent(),
   });
   PaymentsCompanion.insert({
     this.id = const Value.absent(),
@@ -5419,6 +5662,9 @@ class PaymentsCompanion extends UpdateCompanion<PaymentEntity> {
     required PaymentMode paymentMode,
     this.notes = const Value.absent(),
     this.paymentDate = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.originalAmount = const Value.absent(),
   }) : billId = Value(billId),
        amount = Value(amount),
        paymentMode = Value(paymentMode);
@@ -5429,6 +5675,9 @@ class PaymentsCompanion extends UpdateCompanion<PaymentEntity> {
     Expression<String>? paymentMode,
     Expression<String>? notes,
     Expression<DateTime>? paymentDate,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<String>? originalAmount,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -5437,6 +5686,9 @@ class PaymentsCompanion extends UpdateCompanion<PaymentEntity> {
       if (paymentMode != null) 'payment_mode': paymentMode,
       if (notes != null) 'notes': notes,
       if (paymentDate != null) 'payment_date': paymentDate,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (originalAmount != null) 'original_amount': originalAmount,
     });
   }
 
@@ -5447,6 +5699,9 @@ class PaymentsCompanion extends UpdateCompanion<PaymentEntity> {
     Value<PaymentMode>? paymentMode,
     Value<String?>? notes,
     Value<DateTime>? paymentDate,
+    Value<DateTime>? createdAt,
+    Value<DateTime?>? updatedAt,
+    Value<String?>? originalAmount,
   }) {
     return PaymentsCompanion(
       id: id ?? this.id,
@@ -5455,6 +5710,9 @@ class PaymentsCompanion extends UpdateCompanion<PaymentEntity> {
       paymentMode: paymentMode ?? this.paymentMode,
       notes: notes ?? this.notes,
       paymentDate: paymentDate ?? this.paymentDate,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      originalAmount: originalAmount ?? this.originalAmount,
     );
   }
 
@@ -5481,6 +5739,15 @@ class PaymentsCompanion extends UpdateCompanion<PaymentEntity> {
     if (paymentDate.present) {
       map['payment_date'] = Variable<DateTime>(paymentDate.value);
     }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (originalAmount.present) {
+      map['original_amount'] = Variable<String>(originalAmount.value);
+    }
     return map;
   }
 
@@ -5492,7 +5759,10 @@ class PaymentsCompanion extends UpdateCompanion<PaymentEntity> {
           ..write('amount: $amount, ')
           ..write('paymentMode: $paymentMode, ')
           ..write('notes: $notes, ')
-          ..write('paymentDate: $paymentDate')
+          ..write('paymentDate: $paymentDate, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('originalAmount: $originalAmount')
           ..write(')'))
         .toString();
   }
@@ -8228,6 +8498,1384 @@ class NotificationSettingsCompanion
   }
 }
 
+class $AuditLogsTable extends AuditLogs
+    with TableInfo<$AuditLogsTable, AuditLogEntity> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AuditLogsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<AuditEntityType, String>
+  entityType = GeneratedColumn<String>(
+    'entity_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  ).withConverter<AuditEntityType>($AuditLogsTable.$converterentityType);
+  static const VerificationMeta _entityIdMeta = const VerificationMeta(
+    'entityId',
+  );
+  @override
+  late final GeneratedColumn<int> entityId = GeneratedColumn<int>(
+    'entity_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<AuditAction, String> action =
+      GeneratedColumn<String>(
+        'action',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<AuditAction>($AuditLogsTable.$converteraction);
+  static const VerificationMeta _fieldNameMeta = const VerificationMeta(
+    'fieldName',
+  );
+  @override
+  late final GeneratedColumn<String> fieldName = GeneratedColumn<String>(
+    'field_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _oldValueMeta = const VerificationMeta(
+    'oldValue',
+  );
+  @override
+  late final GeneratedColumn<String> oldValue = GeneratedColumn<String>(
+    'old_value',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _newValueMeta = const VerificationMeta(
+    'newValue',
+  );
+  @override
+  late final GeneratedColumn<String> newValue = GeneratedColumn<String>(
+    'new_value',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+    'notes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    entityType,
+    entityId,
+    action,
+    fieldName,
+    oldValue,
+    newValue,
+    notes,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'audit_logs';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AuditLogEntity> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('entity_id')) {
+      context.handle(
+        _entityIdMeta,
+        entityId.isAcceptableOrUnknown(data['entity_id']!, _entityIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_entityIdMeta);
+    }
+    if (data.containsKey('field_name')) {
+      context.handle(
+        _fieldNameMeta,
+        fieldName.isAcceptableOrUnknown(data['field_name']!, _fieldNameMeta),
+      );
+    }
+    if (data.containsKey('old_value')) {
+      context.handle(
+        _oldValueMeta,
+        oldValue.isAcceptableOrUnknown(data['old_value']!, _oldValueMeta),
+      );
+    }
+    if (data.containsKey('new_value')) {
+      context.handle(
+        _newValueMeta,
+        newValue.isAcceptableOrUnknown(data['new_value']!, _newValueMeta),
+      );
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+        _notesMeta,
+        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AuditLogEntity map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AuditLogEntity(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      entityType: $AuditLogsTable.$converterentityType.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}entity_type'],
+        )!,
+      ),
+      entityId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}entity_id'],
+      )!,
+      action: $AuditLogsTable.$converteraction.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}action'],
+        )!,
+      ),
+      fieldName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}field_name'],
+      ),
+      oldValue: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}old_value'],
+      ),
+      newValue: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}new_value'],
+      ),
+      notes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notes'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $AuditLogsTable createAlias(String alias) {
+    return $AuditLogsTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<AuditEntityType, String, String>
+  $converterentityType = const EnumNameConverter<AuditEntityType>(
+    AuditEntityType.values,
+  );
+  static JsonTypeConverter2<AuditAction, String, String> $converteraction =
+      const EnumNameConverter<AuditAction>(AuditAction.values);
+}
+
+class AuditLogEntity extends DataClass implements Insertable<AuditLogEntity> {
+  /// Primary key
+  final int id;
+
+  /// Type of entity audited
+  final AuditEntityType entityType;
+
+  /// ID of the entity
+  final int entityId;
+
+  /// Action performed
+  final AuditAction action;
+
+  /// Field that changed (null for create/delete)
+  final String? fieldName;
+
+  /// Previous value (JSON stringified)
+  final String? oldValue;
+
+  /// New value (JSON stringified)
+  final String? newValue;
+
+  /// Additional context/notes
+  final String? notes;
+
+  /// Timestamp
+  final DateTime createdAt;
+  const AuditLogEntity({
+    required this.id,
+    required this.entityType,
+    required this.entityId,
+    required this.action,
+    this.fieldName,
+    this.oldValue,
+    this.newValue,
+    this.notes,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    {
+      map['entity_type'] = Variable<String>(
+        $AuditLogsTable.$converterentityType.toSql(entityType),
+      );
+    }
+    map['entity_id'] = Variable<int>(entityId);
+    {
+      map['action'] = Variable<String>(
+        $AuditLogsTable.$converteraction.toSql(action),
+      );
+    }
+    if (!nullToAbsent || fieldName != null) {
+      map['field_name'] = Variable<String>(fieldName);
+    }
+    if (!nullToAbsent || oldValue != null) {
+      map['old_value'] = Variable<String>(oldValue);
+    }
+    if (!nullToAbsent || newValue != null) {
+      map['new_value'] = Variable<String>(newValue);
+    }
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  AuditLogsCompanion toCompanion(bool nullToAbsent) {
+    return AuditLogsCompanion(
+      id: Value(id),
+      entityType: Value(entityType),
+      entityId: Value(entityId),
+      action: Value(action),
+      fieldName: fieldName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(fieldName),
+      oldValue: oldValue == null && nullToAbsent
+          ? const Value.absent()
+          : Value(oldValue),
+      newValue: newValue == null && nullToAbsent
+          ? const Value.absent()
+          : Value(newValue),
+      notes: notes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notes),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory AuditLogEntity.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AuditLogEntity(
+      id: serializer.fromJson<int>(json['id']),
+      entityType: $AuditLogsTable.$converterentityType.fromJson(
+        serializer.fromJson<String>(json['entityType']),
+      ),
+      entityId: serializer.fromJson<int>(json['entityId']),
+      action: $AuditLogsTable.$converteraction.fromJson(
+        serializer.fromJson<String>(json['action']),
+      ),
+      fieldName: serializer.fromJson<String?>(json['fieldName']),
+      oldValue: serializer.fromJson<String?>(json['oldValue']),
+      newValue: serializer.fromJson<String?>(json['newValue']),
+      notes: serializer.fromJson<String?>(json['notes']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'entityType': serializer.toJson<String>(
+        $AuditLogsTable.$converterentityType.toJson(entityType),
+      ),
+      'entityId': serializer.toJson<int>(entityId),
+      'action': serializer.toJson<String>(
+        $AuditLogsTable.$converteraction.toJson(action),
+      ),
+      'fieldName': serializer.toJson<String?>(fieldName),
+      'oldValue': serializer.toJson<String?>(oldValue),
+      'newValue': serializer.toJson<String?>(newValue),
+      'notes': serializer.toJson<String?>(notes),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  AuditLogEntity copyWith({
+    int? id,
+    AuditEntityType? entityType,
+    int? entityId,
+    AuditAction? action,
+    Value<String?> fieldName = const Value.absent(),
+    Value<String?> oldValue = const Value.absent(),
+    Value<String?> newValue = const Value.absent(),
+    Value<String?> notes = const Value.absent(),
+    DateTime? createdAt,
+  }) => AuditLogEntity(
+    id: id ?? this.id,
+    entityType: entityType ?? this.entityType,
+    entityId: entityId ?? this.entityId,
+    action: action ?? this.action,
+    fieldName: fieldName.present ? fieldName.value : this.fieldName,
+    oldValue: oldValue.present ? oldValue.value : this.oldValue,
+    newValue: newValue.present ? newValue.value : this.newValue,
+    notes: notes.present ? notes.value : this.notes,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  AuditLogEntity copyWithCompanion(AuditLogsCompanion data) {
+    return AuditLogEntity(
+      id: data.id.present ? data.id.value : this.id,
+      entityType: data.entityType.present
+          ? data.entityType.value
+          : this.entityType,
+      entityId: data.entityId.present ? data.entityId.value : this.entityId,
+      action: data.action.present ? data.action.value : this.action,
+      fieldName: data.fieldName.present ? data.fieldName.value : this.fieldName,
+      oldValue: data.oldValue.present ? data.oldValue.value : this.oldValue,
+      newValue: data.newValue.present ? data.newValue.value : this.newValue,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AuditLogEntity(')
+          ..write('id: $id, ')
+          ..write('entityType: $entityType, ')
+          ..write('entityId: $entityId, ')
+          ..write('action: $action, ')
+          ..write('fieldName: $fieldName, ')
+          ..write('oldValue: $oldValue, ')
+          ..write('newValue: $newValue, ')
+          ..write('notes: $notes, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    entityType,
+    entityId,
+    action,
+    fieldName,
+    oldValue,
+    newValue,
+    notes,
+    createdAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AuditLogEntity &&
+          other.id == this.id &&
+          other.entityType == this.entityType &&
+          other.entityId == this.entityId &&
+          other.action == this.action &&
+          other.fieldName == this.fieldName &&
+          other.oldValue == this.oldValue &&
+          other.newValue == this.newValue &&
+          other.notes == this.notes &&
+          other.createdAt == this.createdAt);
+}
+
+class AuditLogsCompanion extends UpdateCompanion<AuditLogEntity> {
+  final Value<int> id;
+  final Value<AuditEntityType> entityType;
+  final Value<int> entityId;
+  final Value<AuditAction> action;
+  final Value<String?> fieldName;
+  final Value<String?> oldValue;
+  final Value<String?> newValue;
+  final Value<String?> notes;
+  final Value<DateTime> createdAt;
+  const AuditLogsCompanion({
+    this.id = const Value.absent(),
+    this.entityType = const Value.absent(),
+    this.entityId = const Value.absent(),
+    this.action = const Value.absent(),
+    this.fieldName = const Value.absent(),
+    this.oldValue = const Value.absent(),
+    this.newValue = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  AuditLogsCompanion.insert({
+    this.id = const Value.absent(),
+    required AuditEntityType entityType,
+    required int entityId,
+    required AuditAction action,
+    this.fieldName = const Value.absent(),
+    this.oldValue = const Value.absent(),
+    this.newValue = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  }) : entityType = Value(entityType),
+       entityId = Value(entityId),
+       action = Value(action);
+  static Insertable<AuditLogEntity> custom({
+    Expression<int>? id,
+    Expression<String>? entityType,
+    Expression<int>? entityId,
+    Expression<String>? action,
+    Expression<String>? fieldName,
+    Expression<String>? oldValue,
+    Expression<String>? newValue,
+    Expression<String>? notes,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (entityType != null) 'entity_type': entityType,
+      if (entityId != null) 'entity_id': entityId,
+      if (action != null) 'action': action,
+      if (fieldName != null) 'field_name': fieldName,
+      if (oldValue != null) 'old_value': oldValue,
+      if (newValue != null) 'new_value': newValue,
+      if (notes != null) 'notes': notes,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  AuditLogsCompanion copyWith({
+    Value<int>? id,
+    Value<AuditEntityType>? entityType,
+    Value<int>? entityId,
+    Value<AuditAction>? action,
+    Value<String?>? fieldName,
+    Value<String?>? oldValue,
+    Value<String?>? newValue,
+    Value<String?>? notes,
+    Value<DateTime>? createdAt,
+  }) {
+    return AuditLogsCompanion(
+      id: id ?? this.id,
+      entityType: entityType ?? this.entityType,
+      entityId: entityId ?? this.entityId,
+      action: action ?? this.action,
+      fieldName: fieldName ?? this.fieldName,
+      oldValue: oldValue ?? this.oldValue,
+      newValue: newValue ?? this.newValue,
+      notes: notes ?? this.notes,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (entityType.present) {
+      map['entity_type'] = Variable<String>(
+        $AuditLogsTable.$converterentityType.toSql(entityType.value),
+      );
+    }
+    if (entityId.present) {
+      map['entity_id'] = Variable<int>(entityId.value);
+    }
+    if (action.present) {
+      map['action'] = Variable<String>(
+        $AuditLogsTable.$converteraction.toSql(action.value),
+      );
+    }
+    if (fieldName.present) {
+      map['field_name'] = Variable<String>(fieldName.value);
+    }
+    if (oldValue.present) {
+      map['old_value'] = Variable<String>(oldValue.value);
+    }
+    if (newValue.present) {
+      map['new_value'] = Variable<String>(newValue.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AuditLogsCompanion(')
+          ..write('id: $id, ')
+          ..write('entityType: $entityType, ')
+          ..write('entityId: $entityId, ')
+          ..write('action: $action, ')
+          ..write('fieldName: $fieldName, ')
+          ..write('oldValue: $oldValue, ')
+          ..write('newValue: $newValue, ')
+          ..write('notes: $notes, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $MessageTemplatesTable extends MessageTemplates
+    with TableInfo<$MessageTemplatesTable, MessageTemplateEntity> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MessageTemplatesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<TemplateType, String>
+  templateType = GeneratedColumn<String>(
+    'template_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  ).withConverter<TemplateType>($MessageTemplatesTable.$convertertemplateType);
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _bodyMeta = const VerificationMeta('body');
+  @override
+  late final GeneratedColumn<String> body = GeneratedColumn<String>(
+    'body',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _isDefaultMeta = const VerificationMeta(
+    'isDefault',
+  );
+  @override
+  late final GeneratedColumn<bool> isDefault = GeneratedColumn<bool>(
+    'is_default',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_default" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    templateType,
+    name,
+    body,
+    isDefault,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'message_templates';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<MessageTemplateEntity> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('body')) {
+      context.handle(
+        _bodyMeta,
+        body.isAcceptableOrUnknown(data['body']!, _bodyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_bodyMeta);
+    }
+    if (data.containsKey('is_default')) {
+      context.handle(
+        _isDefaultMeta,
+        isDefault.isAcceptableOrUnknown(data['is_default']!, _isDefaultMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  MessageTemplateEntity map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MessageTemplateEntity(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      templateType: $MessageTemplatesTable.$convertertemplateType.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}template_type'],
+        )!,
+      ),
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      body: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}body'],
+      )!,
+      isDefault: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_default'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $MessageTemplatesTable createAlias(String alias) {
+    return $MessageTemplatesTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<TemplateType, String, String>
+  $convertertemplateType = const EnumNameConverter<TemplateType>(
+    TemplateType.values,
+  );
+}
+
+class MessageTemplateEntity extends DataClass
+    implements Insertable<MessageTemplateEntity> {
+  /// Primary key
+  final int id;
+
+  /// Template type
+  final TemplateType templateType;
+
+  /// Template name (user-defined)
+  final String name;
+
+  /// Template body with placeholders
+  /// Supported placeholders:
+  /// {tenantName}, {landlordName}, {billType}, {period},
+  /// {amount}, {dueDate}, {billNumber}, {roomNumber}, {propertyName}
+  final String body;
+
+  /// Is this the default template?
+  final bool isDefault;
+
+  /// Created timestamp
+  final DateTime createdAt;
+  const MessageTemplateEntity({
+    required this.id,
+    required this.templateType,
+    required this.name,
+    required this.body,
+    required this.isDefault,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    {
+      map['template_type'] = Variable<String>(
+        $MessageTemplatesTable.$convertertemplateType.toSql(templateType),
+      );
+    }
+    map['name'] = Variable<String>(name);
+    map['body'] = Variable<String>(body);
+    map['is_default'] = Variable<bool>(isDefault);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  MessageTemplatesCompanion toCompanion(bool nullToAbsent) {
+    return MessageTemplatesCompanion(
+      id: Value(id),
+      templateType: Value(templateType),
+      name: Value(name),
+      body: Value(body),
+      isDefault: Value(isDefault),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory MessageTemplateEntity.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MessageTemplateEntity(
+      id: serializer.fromJson<int>(json['id']),
+      templateType: $MessageTemplatesTable.$convertertemplateType.fromJson(
+        serializer.fromJson<String>(json['templateType']),
+      ),
+      name: serializer.fromJson<String>(json['name']),
+      body: serializer.fromJson<String>(json['body']),
+      isDefault: serializer.fromJson<bool>(json['isDefault']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'templateType': serializer.toJson<String>(
+        $MessageTemplatesTable.$convertertemplateType.toJson(templateType),
+      ),
+      'name': serializer.toJson<String>(name),
+      'body': serializer.toJson<String>(body),
+      'isDefault': serializer.toJson<bool>(isDefault),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  MessageTemplateEntity copyWith({
+    int? id,
+    TemplateType? templateType,
+    String? name,
+    String? body,
+    bool? isDefault,
+    DateTime? createdAt,
+  }) => MessageTemplateEntity(
+    id: id ?? this.id,
+    templateType: templateType ?? this.templateType,
+    name: name ?? this.name,
+    body: body ?? this.body,
+    isDefault: isDefault ?? this.isDefault,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  MessageTemplateEntity copyWithCompanion(MessageTemplatesCompanion data) {
+    return MessageTemplateEntity(
+      id: data.id.present ? data.id.value : this.id,
+      templateType: data.templateType.present
+          ? data.templateType.value
+          : this.templateType,
+      name: data.name.present ? data.name.value : this.name,
+      body: data.body.present ? data.body.value : this.body,
+      isDefault: data.isDefault.present ? data.isDefault.value : this.isDefault,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MessageTemplateEntity(')
+          ..write('id: $id, ')
+          ..write('templateType: $templateType, ')
+          ..write('name: $name, ')
+          ..write('body: $body, ')
+          ..write('isDefault: $isDefault, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, templateType, name, body, isDefault, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MessageTemplateEntity &&
+          other.id == this.id &&
+          other.templateType == this.templateType &&
+          other.name == this.name &&
+          other.body == this.body &&
+          other.isDefault == this.isDefault &&
+          other.createdAt == this.createdAt);
+}
+
+class MessageTemplatesCompanion extends UpdateCompanion<MessageTemplateEntity> {
+  final Value<int> id;
+  final Value<TemplateType> templateType;
+  final Value<String> name;
+  final Value<String> body;
+  final Value<bool> isDefault;
+  final Value<DateTime> createdAt;
+  const MessageTemplatesCompanion({
+    this.id = const Value.absent(),
+    this.templateType = const Value.absent(),
+    this.name = const Value.absent(),
+    this.body = const Value.absent(),
+    this.isDefault = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  MessageTemplatesCompanion.insert({
+    this.id = const Value.absent(),
+    required TemplateType templateType,
+    required String name,
+    required String body,
+    this.isDefault = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  }) : templateType = Value(templateType),
+       name = Value(name),
+       body = Value(body);
+  static Insertable<MessageTemplateEntity> custom({
+    Expression<int>? id,
+    Expression<String>? templateType,
+    Expression<String>? name,
+    Expression<String>? body,
+    Expression<bool>? isDefault,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (templateType != null) 'template_type': templateType,
+      if (name != null) 'name': name,
+      if (body != null) 'body': body,
+      if (isDefault != null) 'is_default': isDefault,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  MessageTemplatesCompanion copyWith({
+    Value<int>? id,
+    Value<TemplateType>? templateType,
+    Value<String>? name,
+    Value<String>? body,
+    Value<bool>? isDefault,
+    Value<DateTime>? createdAt,
+  }) {
+    return MessageTemplatesCompanion(
+      id: id ?? this.id,
+      templateType: templateType ?? this.templateType,
+      name: name ?? this.name,
+      body: body ?? this.body,
+      isDefault: isDefault ?? this.isDefault,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (templateType.present) {
+      map['template_type'] = Variable<String>(
+        $MessageTemplatesTable.$convertertemplateType.toSql(templateType.value),
+      );
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (body.present) {
+      map['body'] = Variable<String>(body.value);
+    }
+    if (isDefault.present) {
+      map['is_default'] = Variable<bool>(isDefault.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MessageTemplatesCompanion(')
+          ..write('id: $id, ')
+          ..write('templateType: $templateType, ')
+          ..write('name: $name, ')
+          ..write('body: $body, ')
+          ..write('isDefault: $isDefault, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $BillSettingsTable extends BillSettings
+    with TableInfo<$BillSettingsTable, BillSettingsEntity> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $BillSettingsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _billNumberPrefixMeta = const VerificationMeta(
+    'billNumberPrefix',
+  );
+  @override
+  late final GeneratedColumn<String> billNumberPrefix = GeneratedColumn<String>(
+    'bill_number_prefix',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('INV'),
+  );
+  static const VerificationMeta _dueDateOffsetDaysMeta = const VerificationMeta(
+    'dueDateOffsetDays',
+  );
+  @override
+  late final GeneratedColumn<int> dueDateOffsetDays = GeneratedColumn<int>(
+    'due_date_offset_days',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(10),
+  );
+  static const VerificationMeta _autoRemindersMeta = const VerificationMeta(
+    'autoReminders',
+  );
+  @override
+  late final GeneratedColumn<bool> autoReminders = GeneratedColumn<bool>(
+    'auto_reminders',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("auto_reminders" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    billNumberPrefix,
+    dueDateOffsetDays,
+    autoReminders,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'bill_settings';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<BillSettingsEntity> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('bill_number_prefix')) {
+      context.handle(
+        _billNumberPrefixMeta,
+        billNumberPrefix.isAcceptableOrUnknown(
+          data['bill_number_prefix']!,
+          _billNumberPrefixMeta,
+        ),
+      );
+    }
+    if (data.containsKey('due_date_offset_days')) {
+      context.handle(
+        _dueDateOffsetDaysMeta,
+        dueDateOffsetDays.isAcceptableOrUnknown(
+          data['due_date_offset_days']!,
+          _dueDateOffsetDaysMeta,
+        ),
+      );
+    }
+    if (data.containsKey('auto_reminders')) {
+      context.handle(
+        _autoRemindersMeta,
+        autoReminders.isAcceptableOrUnknown(
+          data['auto_reminders']!,
+          _autoRemindersMeta,
+        ),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  BillSettingsEntity map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return BillSettingsEntity(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      billNumberPrefix: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}bill_number_prefix'],
+      )!,
+      dueDateOffsetDays: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}due_date_offset_days'],
+      )!,
+      autoReminders: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}auto_reminders'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $BillSettingsTable createAlias(String alias) {
+    return $BillSettingsTable(attachedDatabase, alias);
+  }
+}
+
+class BillSettingsEntity extends DataClass
+    implements Insertable<BillSettingsEntity> {
+  /// Primary key
+  final int id;
+
+  /// Bill number prefix (default: INV)
+  final String billNumberPrefix;
+
+  /// Days after period start for due date (default: 10)
+  final int dueDateOffsetDays;
+
+  /// Auto-generate reminders for overdue bills
+  final bool autoReminders;
+
+  /// Last updated timestamp
+  final DateTime updatedAt;
+  const BillSettingsEntity({
+    required this.id,
+    required this.billNumberPrefix,
+    required this.dueDateOffsetDays,
+    required this.autoReminders,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['bill_number_prefix'] = Variable<String>(billNumberPrefix);
+    map['due_date_offset_days'] = Variable<int>(dueDateOffsetDays);
+    map['auto_reminders'] = Variable<bool>(autoReminders);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  BillSettingsCompanion toCompanion(bool nullToAbsent) {
+    return BillSettingsCompanion(
+      id: Value(id),
+      billNumberPrefix: Value(billNumberPrefix),
+      dueDateOffsetDays: Value(dueDateOffsetDays),
+      autoReminders: Value(autoReminders),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory BillSettingsEntity.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return BillSettingsEntity(
+      id: serializer.fromJson<int>(json['id']),
+      billNumberPrefix: serializer.fromJson<String>(json['billNumberPrefix']),
+      dueDateOffsetDays: serializer.fromJson<int>(json['dueDateOffsetDays']),
+      autoReminders: serializer.fromJson<bool>(json['autoReminders']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'billNumberPrefix': serializer.toJson<String>(billNumberPrefix),
+      'dueDateOffsetDays': serializer.toJson<int>(dueDateOffsetDays),
+      'autoReminders': serializer.toJson<bool>(autoReminders),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  BillSettingsEntity copyWith({
+    int? id,
+    String? billNumberPrefix,
+    int? dueDateOffsetDays,
+    bool? autoReminders,
+    DateTime? updatedAt,
+  }) => BillSettingsEntity(
+    id: id ?? this.id,
+    billNumberPrefix: billNumberPrefix ?? this.billNumberPrefix,
+    dueDateOffsetDays: dueDateOffsetDays ?? this.dueDateOffsetDays,
+    autoReminders: autoReminders ?? this.autoReminders,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  BillSettingsEntity copyWithCompanion(BillSettingsCompanion data) {
+    return BillSettingsEntity(
+      id: data.id.present ? data.id.value : this.id,
+      billNumberPrefix: data.billNumberPrefix.present
+          ? data.billNumberPrefix.value
+          : this.billNumberPrefix,
+      dueDateOffsetDays: data.dueDateOffsetDays.present
+          ? data.dueDateOffsetDays.value
+          : this.dueDateOffsetDays,
+      autoReminders: data.autoReminders.present
+          ? data.autoReminders.value
+          : this.autoReminders,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BillSettingsEntity(')
+          ..write('id: $id, ')
+          ..write('billNumberPrefix: $billNumberPrefix, ')
+          ..write('dueDateOffsetDays: $dueDateOffsetDays, ')
+          ..write('autoReminders: $autoReminders, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    billNumberPrefix,
+    dueDateOffsetDays,
+    autoReminders,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is BillSettingsEntity &&
+          other.id == this.id &&
+          other.billNumberPrefix == this.billNumberPrefix &&
+          other.dueDateOffsetDays == this.dueDateOffsetDays &&
+          other.autoReminders == this.autoReminders &&
+          other.updatedAt == this.updatedAt);
+}
+
+class BillSettingsCompanion extends UpdateCompanion<BillSettingsEntity> {
+  final Value<int> id;
+  final Value<String> billNumberPrefix;
+  final Value<int> dueDateOffsetDays;
+  final Value<bool> autoReminders;
+  final Value<DateTime> updatedAt;
+  const BillSettingsCompanion({
+    this.id = const Value.absent(),
+    this.billNumberPrefix = const Value.absent(),
+    this.dueDateOffsetDays = const Value.absent(),
+    this.autoReminders = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  BillSettingsCompanion.insert({
+    this.id = const Value.absent(),
+    this.billNumberPrefix = const Value.absent(),
+    this.dueDateOffsetDays = const Value.absent(),
+    this.autoReminders = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  static Insertable<BillSettingsEntity> custom({
+    Expression<int>? id,
+    Expression<String>? billNumberPrefix,
+    Expression<int>? dueDateOffsetDays,
+    Expression<bool>? autoReminders,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (billNumberPrefix != null) 'bill_number_prefix': billNumberPrefix,
+      if (dueDateOffsetDays != null) 'due_date_offset_days': dueDateOffsetDays,
+      if (autoReminders != null) 'auto_reminders': autoReminders,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  BillSettingsCompanion copyWith({
+    Value<int>? id,
+    Value<String>? billNumberPrefix,
+    Value<int>? dueDateOffsetDays,
+    Value<bool>? autoReminders,
+    Value<DateTime>? updatedAt,
+  }) {
+    return BillSettingsCompanion(
+      id: id ?? this.id,
+      billNumberPrefix: billNumberPrefix ?? this.billNumberPrefix,
+      dueDateOffsetDays: dueDateOffsetDays ?? this.dueDateOffsetDays,
+      autoReminders: autoReminders ?? this.autoReminders,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (billNumberPrefix.present) {
+      map['bill_number_prefix'] = Variable<String>(billNumberPrefix.value);
+    }
+    if (dueDateOffsetDays.present) {
+      map['due_date_offset_days'] = Variable<int>(dueDateOffsetDays.value);
+    }
+    if (autoReminders.present) {
+      map['auto_reminders'] = Variable<bool>(autoReminders.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BillSettingsCompanion(')
+          ..write('id: $id, ')
+          ..write('billNumberPrefix: $billNumberPrefix, ')
+          ..write('dueDateOffsetDays: $dueDateOffsetDays, ')
+          ..write('autoReminders: $autoReminders, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -8251,6 +9899,11 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   );
   late final $NotificationSettingsTable notificationSettings =
       $NotificationSettingsTable(this);
+  late final $AuditLogsTable auditLogs = $AuditLogsTable(this);
+  late final $MessageTemplatesTable messageTemplates = $MessageTemplatesTable(
+    this,
+  );
+  late final $BillSettingsTable billSettings = $BillSettingsTable(this);
   late final LandlordDao landlordDao = LandlordDao(this as AppDatabase);
   late final PropertyDao propertyDao = PropertyDao(this as AppDatabase);
   late final TenantDao tenantDao = TenantDao(this as AppDatabase);
@@ -8274,6 +9927,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     meterPhotos,
     autoBillSettings,
     notificationSettings,
+    auditLogs,
+    messageTemplates,
+    billSettings,
   ];
 }
 
@@ -11360,6 +13016,8 @@ typedef $$BillsTableCreateCompanionBuilder =
     BillsCompanion Function({
       Value<int> id,
       required int occupancyId,
+      Value<String?> billNumber,
+      Value<BillStatus> status,
       required BillType billType,
       required int billingMonth,
       required int billingYear,
@@ -11379,6 +13037,8 @@ typedef $$BillsTableUpdateCompanionBuilder =
     BillsCompanion Function({
       Value<int> id,
       Value<int> occupancyId,
+      Value<String?> billNumber,
+      Value<BillStatus> status,
       Value<BillType> billType,
       Value<int> billingMonth,
       Value<int> billingYear,
@@ -11467,6 +13127,17 @@ class $$BillsTableFilterComposer extends Composer<_$AppDatabase, $BillsTable> {
     column: $table.id,
     builder: (column) => ColumnFilters(column),
   );
+
+  ColumnFilters<String> get billNumber => $composableBuilder(
+    column: $table.billNumber,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<BillStatus, BillStatus, String> get status =>
+      $composableBuilder(
+        column: $table.status,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
 
   ColumnWithTypeConverterFilters<BillType, BillType, String> get billType =>
       $composableBuilder(
@@ -11627,6 +13298,16 @@ class $$BillsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get billNumber => $composableBuilder(
+    column: $table.billNumber,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get billType => $composableBuilder(
     column: $table.billType,
     builder: (column) => ColumnOrderings(column),
@@ -11732,6 +13413,14 @@ class $$BillsTableAnnotationComposer
   });
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get billNumber => $composableBuilder(
+    column: $table.billNumber,
+    builder: (column) => column,
+  );
+
+  GeneratedColumnWithTypeConverter<BillStatus, String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
 
   GeneratedColumnWithTypeConverter<BillType, String> get billType =>
       $composableBuilder(column: $table.billType, builder: (column) => column);
@@ -11901,6 +13590,8 @@ class $$BillsTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<int> occupancyId = const Value.absent(),
+                Value<String?> billNumber = const Value.absent(),
+                Value<BillStatus> status = const Value.absent(),
                 Value<BillType> billType = const Value.absent(),
                 Value<int> billingMonth = const Value.absent(),
                 Value<int> billingYear = const Value.absent(),
@@ -11918,6 +13609,8 @@ class $$BillsTableTableManager
               }) => BillsCompanion(
                 id: id,
                 occupancyId: occupancyId,
+                billNumber: billNumber,
+                status: status,
                 billType: billType,
                 billingMonth: billingMonth,
                 billingYear: billingYear,
@@ -11937,6 +13630,8 @@ class $$BillsTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 required int occupancyId,
+                Value<String?> billNumber = const Value.absent(),
+                Value<BillStatus> status = const Value.absent(),
                 required BillType billType,
                 required int billingMonth,
                 required int billingYear,
@@ -11954,6 +13649,8 @@ class $$BillsTableTableManager
               }) => BillsCompanion.insert(
                 id: id,
                 occupancyId: occupancyId,
+                billNumber: billNumber,
+                status: status,
                 billType: billType,
                 billingMonth: billingMonth,
                 billingYear: billingYear,
@@ -12097,6 +13794,9 @@ typedef $$PaymentsTableCreateCompanionBuilder =
       required PaymentMode paymentMode,
       Value<String?> notes,
       Value<DateTime> paymentDate,
+      Value<DateTime> createdAt,
+      Value<DateTime?> updatedAt,
+      Value<String?> originalAmount,
     });
 typedef $$PaymentsTableUpdateCompanionBuilder =
     PaymentsCompanion Function({
@@ -12106,6 +13806,9 @@ typedef $$PaymentsTableUpdateCompanionBuilder =
       Value<PaymentMode> paymentMode,
       Value<String?> notes,
       Value<DateTime> paymentDate,
+      Value<DateTime> createdAt,
+      Value<DateTime?> updatedAt,
+      Value<String?> originalAmount,
     });
 
 final class $$PaymentsTableReferences
@@ -12163,6 +13866,21 @@ class $$PaymentsTableFilterComposer
 
   ColumnFilters<DateTime> get paymentDate => $composableBuilder(
     column: $table.paymentDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get originalAmount => $composableBuilder(
+    column: $table.originalAmount,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -12224,6 +13942,21 @@ class $$PaymentsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get originalAmount => $composableBuilder(
+    column: $table.originalAmount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$BillsTableOrderingComposer get billId {
     final $$BillsTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -12274,6 +14007,17 @@ class $$PaymentsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get paymentDate => $composableBuilder(
     column: $table.paymentDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get originalAmount => $composableBuilder(
+    column: $table.originalAmount,
     builder: (column) => column,
   );
 
@@ -12335,6 +14079,9 @@ class $$PaymentsTableTableManager
                 Value<PaymentMode> paymentMode = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
                 Value<DateTime> paymentDate = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime?> updatedAt = const Value.absent(),
+                Value<String?> originalAmount = const Value.absent(),
               }) => PaymentsCompanion(
                 id: id,
                 billId: billId,
@@ -12342,6 +14089,9 @@ class $$PaymentsTableTableManager
                 paymentMode: paymentMode,
                 notes: notes,
                 paymentDate: paymentDate,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                originalAmount: originalAmount,
               ),
           createCompanionCallback:
               ({
@@ -12351,6 +14101,9 @@ class $$PaymentsTableTableManager
                 required PaymentMode paymentMode,
                 Value<String?> notes = const Value.absent(),
                 Value<DateTime> paymentDate = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime?> updatedAt = const Value.absent(),
+                Value<String?> originalAmount = const Value.absent(),
               }) => PaymentsCompanion.insert(
                 id: id,
                 billId: billId,
@@ -12358,6 +14111,9 @@ class $$PaymentsTableTableManager
                 paymentMode: paymentMode,
                 notes: notes,
                 paymentDate: paymentDate,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                originalAmount: originalAmount,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -14325,6 +16081,712 @@ typedef $$NotificationSettingsTableProcessedTableManager =
       NotificationSettingEntity,
       PrefetchHooks Function()
     >;
+typedef $$AuditLogsTableCreateCompanionBuilder =
+    AuditLogsCompanion Function({
+      Value<int> id,
+      required AuditEntityType entityType,
+      required int entityId,
+      required AuditAction action,
+      Value<String?> fieldName,
+      Value<String?> oldValue,
+      Value<String?> newValue,
+      Value<String?> notes,
+      Value<DateTime> createdAt,
+    });
+typedef $$AuditLogsTableUpdateCompanionBuilder =
+    AuditLogsCompanion Function({
+      Value<int> id,
+      Value<AuditEntityType> entityType,
+      Value<int> entityId,
+      Value<AuditAction> action,
+      Value<String?> fieldName,
+      Value<String?> oldValue,
+      Value<String?> newValue,
+      Value<String?> notes,
+      Value<DateTime> createdAt,
+    });
+
+class $$AuditLogsTableFilterComposer
+    extends Composer<_$AppDatabase, $AuditLogsTable> {
+  $$AuditLogsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<AuditEntityType, AuditEntityType, String>
+  get entityType => $composableBuilder(
+    column: $table.entityType,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<int> get entityId => $composableBuilder(
+    column: $table.entityId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<AuditAction, AuditAction, String> get action =>
+      $composableBuilder(
+        column: $table.action,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<String> get fieldName => $composableBuilder(
+    column: $table.fieldName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get oldValue => $composableBuilder(
+    column: $table.oldValue,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get newValue => $composableBuilder(
+    column: $table.newValue,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$AuditLogsTableOrderingComposer
+    extends Composer<_$AppDatabase, $AuditLogsTable> {
+  $$AuditLogsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get entityType => $composableBuilder(
+    column: $table.entityType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get entityId => $composableBuilder(
+    column: $table.entityId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get action => $composableBuilder(
+    column: $table.action,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get fieldName => $composableBuilder(
+    column: $table.fieldName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get oldValue => $composableBuilder(
+    column: $table.oldValue,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get newValue => $composableBuilder(
+    column: $table.newValue,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$AuditLogsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AuditLogsTable> {
+  $$AuditLogsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<AuditEntityType, String> get entityType =>
+      $composableBuilder(
+        column: $table.entityType,
+        builder: (column) => column,
+      );
+
+  GeneratedColumn<int> get entityId =>
+      $composableBuilder(column: $table.entityId, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<AuditAction, String> get action =>
+      $composableBuilder(column: $table.action, builder: (column) => column);
+
+  GeneratedColumn<String> get fieldName =>
+      $composableBuilder(column: $table.fieldName, builder: (column) => column);
+
+  GeneratedColumn<String> get oldValue =>
+      $composableBuilder(column: $table.oldValue, builder: (column) => column);
+
+  GeneratedColumn<String> get newValue =>
+      $composableBuilder(column: $table.newValue, builder: (column) => column);
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$AuditLogsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AuditLogsTable,
+          AuditLogEntity,
+          $$AuditLogsTableFilterComposer,
+          $$AuditLogsTableOrderingComposer,
+          $$AuditLogsTableAnnotationComposer,
+          $$AuditLogsTableCreateCompanionBuilder,
+          $$AuditLogsTableUpdateCompanionBuilder,
+          (
+            AuditLogEntity,
+            BaseReferences<_$AppDatabase, $AuditLogsTable, AuditLogEntity>,
+          ),
+          AuditLogEntity,
+          PrefetchHooks Function()
+        > {
+  $$AuditLogsTableTableManager(_$AppDatabase db, $AuditLogsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AuditLogsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AuditLogsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AuditLogsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<AuditEntityType> entityType = const Value.absent(),
+                Value<int> entityId = const Value.absent(),
+                Value<AuditAction> action = const Value.absent(),
+                Value<String?> fieldName = const Value.absent(),
+                Value<String?> oldValue = const Value.absent(),
+                Value<String?> newValue = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => AuditLogsCompanion(
+                id: id,
+                entityType: entityType,
+                entityId: entityId,
+                action: action,
+                fieldName: fieldName,
+                oldValue: oldValue,
+                newValue: newValue,
+                notes: notes,
+                createdAt: createdAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required AuditEntityType entityType,
+                required int entityId,
+                required AuditAction action,
+                Value<String?> fieldName = const Value.absent(),
+                Value<String?> oldValue = const Value.absent(),
+                Value<String?> newValue = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => AuditLogsCompanion.insert(
+                id: id,
+                entityType: entityType,
+                entityId: entityId,
+                action: action,
+                fieldName: fieldName,
+                oldValue: oldValue,
+                newValue: newValue,
+                notes: notes,
+                createdAt: createdAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$AuditLogsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AuditLogsTable,
+      AuditLogEntity,
+      $$AuditLogsTableFilterComposer,
+      $$AuditLogsTableOrderingComposer,
+      $$AuditLogsTableAnnotationComposer,
+      $$AuditLogsTableCreateCompanionBuilder,
+      $$AuditLogsTableUpdateCompanionBuilder,
+      (
+        AuditLogEntity,
+        BaseReferences<_$AppDatabase, $AuditLogsTable, AuditLogEntity>,
+      ),
+      AuditLogEntity,
+      PrefetchHooks Function()
+    >;
+typedef $$MessageTemplatesTableCreateCompanionBuilder =
+    MessageTemplatesCompanion Function({
+      Value<int> id,
+      required TemplateType templateType,
+      required String name,
+      required String body,
+      Value<bool> isDefault,
+      Value<DateTime> createdAt,
+    });
+typedef $$MessageTemplatesTableUpdateCompanionBuilder =
+    MessageTemplatesCompanion Function({
+      Value<int> id,
+      Value<TemplateType> templateType,
+      Value<String> name,
+      Value<String> body,
+      Value<bool> isDefault,
+      Value<DateTime> createdAt,
+    });
+
+class $$MessageTemplatesTableFilterComposer
+    extends Composer<_$AppDatabase, $MessageTemplatesTable> {
+  $$MessageTemplatesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<TemplateType, TemplateType, String>
+  get templateType => $composableBuilder(
+    column: $table.templateType,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get body => $composableBuilder(
+    column: $table.body,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isDefault => $composableBuilder(
+    column: $table.isDefault,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$MessageTemplatesTableOrderingComposer
+    extends Composer<_$AppDatabase, $MessageTemplatesTable> {
+  $$MessageTemplatesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get templateType => $composableBuilder(
+    column: $table.templateType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get body => $composableBuilder(
+    column: $table.body,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isDefault => $composableBuilder(
+    column: $table.isDefault,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$MessageTemplatesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MessageTemplatesTable> {
+  $$MessageTemplatesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<TemplateType, String> get templateType =>
+      $composableBuilder(
+        column: $table.templateType,
+        builder: (column) => column,
+      );
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get body =>
+      $composableBuilder(column: $table.body, builder: (column) => column);
+
+  GeneratedColumn<bool> get isDefault =>
+      $composableBuilder(column: $table.isDefault, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$MessageTemplatesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $MessageTemplatesTable,
+          MessageTemplateEntity,
+          $$MessageTemplatesTableFilterComposer,
+          $$MessageTemplatesTableOrderingComposer,
+          $$MessageTemplatesTableAnnotationComposer,
+          $$MessageTemplatesTableCreateCompanionBuilder,
+          $$MessageTemplatesTableUpdateCompanionBuilder,
+          (
+            MessageTemplateEntity,
+            BaseReferences<
+              _$AppDatabase,
+              $MessageTemplatesTable,
+              MessageTemplateEntity
+            >,
+          ),
+          MessageTemplateEntity,
+          PrefetchHooks Function()
+        > {
+  $$MessageTemplatesTableTableManager(
+    _$AppDatabase db,
+    $MessageTemplatesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MessageTemplatesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$MessageTemplatesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$MessageTemplatesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<TemplateType> templateType = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> body = const Value.absent(),
+                Value<bool> isDefault = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => MessageTemplatesCompanion(
+                id: id,
+                templateType: templateType,
+                name: name,
+                body: body,
+                isDefault: isDefault,
+                createdAt: createdAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required TemplateType templateType,
+                required String name,
+                required String body,
+                Value<bool> isDefault = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => MessageTemplatesCompanion.insert(
+                id: id,
+                templateType: templateType,
+                name: name,
+                body: body,
+                isDefault: isDefault,
+                createdAt: createdAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$MessageTemplatesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $MessageTemplatesTable,
+      MessageTemplateEntity,
+      $$MessageTemplatesTableFilterComposer,
+      $$MessageTemplatesTableOrderingComposer,
+      $$MessageTemplatesTableAnnotationComposer,
+      $$MessageTemplatesTableCreateCompanionBuilder,
+      $$MessageTemplatesTableUpdateCompanionBuilder,
+      (
+        MessageTemplateEntity,
+        BaseReferences<
+          _$AppDatabase,
+          $MessageTemplatesTable,
+          MessageTemplateEntity
+        >,
+      ),
+      MessageTemplateEntity,
+      PrefetchHooks Function()
+    >;
+typedef $$BillSettingsTableCreateCompanionBuilder =
+    BillSettingsCompanion Function({
+      Value<int> id,
+      Value<String> billNumberPrefix,
+      Value<int> dueDateOffsetDays,
+      Value<bool> autoReminders,
+      Value<DateTime> updatedAt,
+    });
+typedef $$BillSettingsTableUpdateCompanionBuilder =
+    BillSettingsCompanion Function({
+      Value<int> id,
+      Value<String> billNumberPrefix,
+      Value<int> dueDateOffsetDays,
+      Value<bool> autoReminders,
+      Value<DateTime> updatedAt,
+    });
+
+class $$BillSettingsTableFilterComposer
+    extends Composer<_$AppDatabase, $BillSettingsTable> {
+  $$BillSettingsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get billNumberPrefix => $composableBuilder(
+    column: $table.billNumberPrefix,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get dueDateOffsetDays => $composableBuilder(
+    column: $table.dueDateOffsetDays,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get autoReminders => $composableBuilder(
+    column: $table.autoReminders,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$BillSettingsTableOrderingComposer
+    extends Composer<_$AppDatabase, $BillSettingsTable> {
+  $$BillSettingsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get billNumberPrefix => $composableBuilder(
+    column: $table.billNumberPrefix,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get dueDateOffsetDays => $composableBuilder(
+    column: $table.dueDateOffsetDays,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get autoReminders => $composableBuilder(
+    column: $table.autoReminders,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$BillSettingsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $BillSettingsTable> {
+  $$BillSettingsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get billNumberPrefix => $composableBuilder(
+    column: $table.billNumberPrefix,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get dueDateOffsetDays => $composableBuilder(
+    column: $table.dueDateOffsetDays,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get autoReminders => $composableBuilder(
+    column: $table.autoReminders,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$BillSettingsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $BillSettingsTable,
+          BillSettingsEntity,
+          $$BillSettingsTableFilterComposer,
+          $$BillSettingsTableOrderingComposer,
+          $$BillSettingsTableAnnotationComposer,
+          $$BillSettingsTableCreateCompanionBuilder,
+          $$BillSettingsTableUpdateCompanionBuilder,
+          (
+            BillSettingsEntity,
+            BaseReferences<
+              _$AppDatabase,
+              $BillSettingsTable,
+              BillSettingsEntity
+            >,
+          ),
+          BillSettingsEntity,
+          PrefetchHooks Function()
+        > {
+  $$BillSettingsTableTableManager(_$AppDatabase db, $BillSettingsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$BillSettingsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$BillSettingsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$BillSettingsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> billNumberPrefix = const Value.absent(),
+                Value<int> dueDateOffsetDays = const Value.absent(),
+                Value<bool> autoReminders = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => BillSettingsCompanion(
+                id: id,
+                billNumberPrefix: billNumberPrefix,
+                dueDateOffsetDays: dueDateOffsetDays,
+                autoReminders: autoReminders,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> billNumberPrefix = const Value.absent(),
+                Value<int> dueDateOffsetDays = const Value.absent(),
+                Value<bool> autoReminders = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => BillSettingsCompanion.insert(
+                id: id,
+                billNumberPrefix: billNumberPrefix,
+                dueDateOffsetDays: dueDateOffsetDays,
+                autoReminders: autoReminders,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$BillSettingsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $BillSettingsTable,
+      BillSettingsEntity,
+      $$BillSettingsTableFilterComposer,
+      $$BillSettingsTableOrderingComposer,
+      $$BillSettingsTableAnnotationComposer,
+      $$BillSettingsTableCreateCompanionBuilder,
+      $$BillSettingsTableUpdateCompanionBuilder,
+      (
+        BillSettingsEntity,
+        BaseReferences<_$AppDatabase, $BillSettingsTable, BillSettingsEntity>,
+      ),
+      BillSettingsEntity,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -14357,4 +16819,10 @@ class $AppDatabaseManager {
       $$AutoBillSettingsTableTableManager(_db, _db.autoBillSettings);
   $$NotificationSettingsTableTableManager get notificationSettings =>
       $$NotificationSettingsTableTableManager(_db, _db.notificationSettings);
+  $$AuditLogsTableTableManager get auditLogs =>
+      $$AuditLogsTableTableManager(_db, _db.auditLogs);
+  $$MessageTemplatesTableTableManager get messageTemplates =>
+      $$MessageTemplatesTableTableManager(_db, _db.messageTemplates);
+  $$BillSettingsTableTableManager get billSettings =>
+      $$BillSettingsTableTableManager(_db, _db.billSettings);
 }

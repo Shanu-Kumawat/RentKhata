@@ -4,6 +4,7 @@ library;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../domain/entities/bill.dart';
+import '../../domain/entities/message_template.dart';
 import '../../domain/entities/payment.dart';
 import 'repository_providers.dart';
 
@@ -53,6 +54,19 @@ Future<Bill?> bill(Ref ref, int id) {
   return repo.getBillById(id);
 }
 
+/// Get a bill by ID with auto-refresh (watches occupancy stream for updates).
+@riverpod
+Future<Bill?> billById(Ref ref, int id) async {
+  // Get the bill first to know its occupancy
+  final repo = ref.watch(billingRepositoryProvider);
+  final bill = await repo.getBillById(id);
+  if (bill != null) {
+    // Watch the occupancy bills stream to auto-refresh
+    ref.watch(billsForOccupancyStreamProvider(bill.occupancyId));
+  }
+  return repo.getBillById(id);
+}
+
 /// Get last electricity bill for auto-fill.
 @riverpod
 Future<Bill?> lastElectricityBill(Ref ref, int occupancyId) {
@@ -90,4 +104,21 @@ Future<List<Bill>> unpaidBills(Ref ref) {
 Future<double> currentElectricityRate(Ref ref) {
   final repo = ref.watch(billingRepositoryProvider);
   return repo.getCurrentElectricityRate();
+}
+
+/// Get all message templates.
+@riverpod
+Future<List<MessageTemplate>> messageTemplates(Ref ref) async {
+  final repo = ref.read(billingRepositoryProvider);
+  return repo.getAllMessageTemplates();
+}
+
+/// Get message templates by type.
+@riverpod
+Future<List<MessageTemplate>> messageTemplatesByType(
+  Ref ref,
+  TemplateType type,
+) async {
+  final repo = ref.read(billingRepositoryProvider);
+  return repo.getTemplatesByType(type);
 }

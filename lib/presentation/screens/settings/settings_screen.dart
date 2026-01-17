@@ -11,6 +11,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../services/local_notification_service.dart';
 import 'edit_profile_screen.dart';
 import 'electricity_rates_screen.dart';
+import 'message_templates_screen.dart';
 
 /// Settings screen.
 class SettingsScreen extends ConsumerWidget {
@@ -60,6 +61,17 @@ class SettingsScreen extends ConsumerWidget {
                   context,
                   MaterialPageRoute(
                     builder: (_) => const ElectricityRatesScreen(),
+                  ),
+                ),
+              ),
+              _SettingsTile(
+                icon: Icons.message_outlined,
+                title: 'Message Templates',
+                subtitle: 'Customize invoice and receipt messages',
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const MessageTemplatesScreen(),
                   ),
                 ),
               ),

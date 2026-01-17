@@ -4,6 +4,9 @@ library;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
 import 'dart:io';
+import '../domain/entities/bill.dart';
+import '../domain/entities/payment.dart';
+import 'upi_qr_service.dart';
 
 /// Service for sharing content via WhatsApp and other apps.
 class ShareService {
@@ -63,6 +66,162 @@ class ShareService {
     await Share.share(text, subject: subject);
   }
 
+  /// Share invoice to WhatsApp with optional UPI link.
+  Future<bool> shareInvoiceToWhatsApp({
+    required Bill bill,
+    required String landlordName,
+    String? landlordUpi,
+    String? tenantPhone,
+  }) async {
+    final message = generateInvoiceMessage(
+      bill: bill,
+      landlordName: landlordName,
+      landlordUpi: landlordUpi,
+    );
+
+    return shareToWhatsApp(message: message, phoneNumber: tenantPhone);
+  }
+
+  /// Share payment receipt to WhatsApp.
+  Future<bool> shareReceiptToWhatsApp({
+    required Bill bill,
+    required Payment payment,
+    required String landlordName,
+    String? tenantPhone,
+  }) async {
+    final message = generateReceiptMessage(
+      bill: bill,
+      payment: payment,
+      landlordName: landlordName,
+    );
+
+    return shareToWhatsApp(message: message, phoneNumber: tenantPhone);
+  }
+
+  /// Generate invoice message from bill.
+  static String generateInvoiceMessage({
+    required Bill bill,
+    required String landlordName,
+    String? landlordUpi,
+  }) {
+    final tenantName = bill.tenantName ?? 'Tenant';
+    final dueDate = bill.dueDate;
+    final dueDateStr = dueDate != null
+        ? '${dueDate.day}/${dueDate.month}/${dueDate.year}'
+        : 'N/A';
+
+    final billTypeLabel = _getBillTypeLabel(bill.billType);
+
+    final buffer = StringBuffer();
+    buffer.writeln('Dear $tenantName,');
+    buffer.writeln();
+    buffer.writeln('📋 *INVOICE*');
+    if (bill.billNumber != null) {
+      buffer.writeln('Invoice #: ${bill.billNumber}');
+    }
+    buffer.writeln();
+    buffer.writeln('*Bill Details:*');
+    buffer.writeln('Type: $billTypeLabel');
+    buffer.writeln('Period: ${bill.billingPeriod}');
+    if (bill.roomNumber != null) {
+      buffer.writeln('Room: ${bill.roomNumber}');
+    }
+    buffer.writeln();
+
+    // Electricity details
+    if (bill.billType == BillType.electricity &&
+        bill.electricityPrevReading != null &&
+        bill.electricityCurrReading != null) {
+      final units = bill.electricityCurrReading! - bill.electricityPrevReading!;
+      buffer.writeln('*Meter Readings:*');
+      buffer.writeln(
+        'Previous: ${bill.electricityPrevReading!.toStringAsFixed(0)} units',
+      );
+      buffer.writeln(
+        'Current: ${bill.electricityCurrReading!.toStringAsFixed(0)} units',
+      );
+      buffer.writeln('Units Used: ${units.toStringAsFixed(0)} units');
+      if (bill.electricityRateAtBilling != null) {
+        buffer.writeln(
+          'Rate: ₹${bill.electricityRateAtBilling!.toStringAsFixed(2)}/unit',
+        );
+      }
+      buffer.writeln();
+    }
+
+    buffer.writeln('*Amount:*');
+    buffer.writeln('Total: ₹${bill.amount.toStringAsFixed(0)}');
+    if (bill.paidAmount > 0) {
+      buffer.writeln('Paid: ₹${bill.paidAmount.toStringAsFixed(0)}');
+      buffer.writeln('*Pending: ₹${bill.pendingAmount.toStringAsFixed(0)}*');
+    }
+    buffer.writeln('Due Date: $dueDateStr');
+    buffer.writeln();
+
+    // UPI payment link
+    if (landlordUpi != null &&
+        landlordUpi.isNotEmpty &&
+        bill.pendingAmount > 0) {
+      final upiLink = UpiQrService.generateUpiLink(
+        upiId: landlordUpi,
+        payeeName: landlordName,
+        amount: bill.pendingAmount,
+        transactionNote: '${bill.billType.name} - ${bill.billingPeriod}',
+      );
+      buffer.writeln('📱 *Pay via UPI:*');
+      buffer.writeln(upiLink);
+      buffer.writeln();
+    }
+
+    buffer.writeln('Thank you,');
+    buffer.writeln(landlordName);
+
+    return buffer.toString().trim();
+  }
+
+  /// Generate receipt message from payment.
+  static String generateReceiptMessage({
+    required Bill bill,
+    required Payment payment,
+    required String landlordName,
+  }) {
+    final tenantName = bill.tenantName ?? 'Tenant';
+    final paymentDateStr =
+        '${payment.paymentDate.day}/${payment.paymentDate.month}/${payment.paymentDate.year}';
+    final billTypeLabel = _getBillTypeLabel(bill.billType);
+
+    final buffer = StringBuffer();
+    buffer.writeln('Dear $tenantName,');
+    buffer.writeln();
+    buffer.writeln('✅ *PAYMENT RECEIVED*');
+    buffer.writeln();
+    buffer.writeln('*Payment Details:*');
+    buffer.writeln('Amount: ₹${payment.amount.toStringAsFixed(0)}');
+    buffer.writeln('Mode: ${_getPaymentModeLabel(payment.paymentMode)}');
+    buffer.writeln('Date: $paymentDateStr');
+    buffer.writeln();
+    buffer.writeln('*Bill Details:*');
+    buffer.writeln('Type: $billTypeLabel');
+    buffer.writeln('Period: ${bill.billingPeriod}');
+    if (bill.billNumber != null) {
+      buffer.writeln('Invoice #: ${bill.billNumber}');
+    }
+    buffer.writeln();
+    buffer.writeln('*Bill Status:*');
+    buffer.writeln('Total Bill: ₹${bill.amount.toStringAsFixed(0)}');
+    buffer.writeln('Total Paid: ₹${bill.paidAmount.toStringAsFixed(0)}');
+    if (bill.pendingAmount > 0) {
+      buffer.writeln('*Remaining: ₹${bill.pendingAmount.toStringAsFixed(0)}*');
+    } else {
+      buffer.writeln('*Status: FULLY PAID ✅*');
+    }
+    buffer.writeln();
+    buffer.writeln('Thank you for your payment!');
+    buffer.writeln(landlordName);
+
+    return buffer.toString().trim();
+  }
+
   /// Generate bill reminder message.
   static String billReminderMessage({
     required String tenantName,
@@ -89,7 +248,7 @@ $landlordName
         .trim();
   }
 
-  /// Generate payment receipt message.
+  /// Generate payment receipt message (legacy method).
   static String paymentReceiptMessage({
     required String tenantName,
     required String billType,
@@ -116,5 +275,25 @@ Thank you for your payment.
 $landlordName
 '''
         .trim();
+  }
+
+  static String _getBillTypeLabel(BillType type) {
+    return switch (type) {
+      BillType.rent => 'Monthly Rent',
+      BillType.electricity => 'Electricity Bill',
+      BillType.water => 'Water Bill',
+      BillType.maintenance => 'Maintenance',
+      BillType.other => 'Other Charges',
+    };
+  }
+
+  static String _getPaymentModeLabel(PaymentMode mode) {
+    return switch (mode) {
+      PaymentMode.cash => 'Cash',
+      PaymentMode.upi => 'UPI',
+      PaymentMode.bankTransfer => 'Bank Transfer',
+      PaymentMode.cheque => 'Cheque',
+      PaymentMode.other => 'Other',
+    };
   }
 }

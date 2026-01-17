@@ -5,13 +5,7 @@ import 'package:drift/drift.dart';
 import 'bill_table.dart';
 
 /// Payment modes enumeration
-enum PaymentMode {
-  cash,
-  upi,
-  bankTransfer,
-  cheque,
-  other,
-}
+enum PaymentMode { cash, upi, bankTransfer, cheque, other }
 
 /// Table for storing payments.
 /// Multiple payments can be made against a single bill (partial payments).
@@ -33,5 +27,15 @@ class Payments extends Table {
   TextColumn get notes => text().nullable()();
 
   /// Payment date
-  DateTimeColumn get paymentDate => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get paymentDate =>
+      dateTime().withDefault(currentDateAndTime)();
+
+  /// Created timestamp (for audit)
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  /// Last updated timestamp (null if never edited)
+  DateTimeColumn get updatedAt => dateTime().nullable()();
+
+  /// Original amount before edit (for audit trail, JSON string)
+  TextColumn get originalAmount => text().nullable()();
 }

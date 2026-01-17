@@ -2,6 +2,7 @@
 library;
 
 import '../entities/bill.dart';
+import '../entities/message_template.dart';
 import '../entities/payment.dart';
 
 /// Abstract repository for billing operations.
@@ -101,4 +102,34 @@ abstract class BillingRepository {
 
   /// Add new electricity rate
   Future<int> addElectricityRate(double rate, DateTime effectiveFrom);
+
+  // ========== Message Template Operations ==========
+
+  /// Get all message templates
+  Future<List<MessageTemplate>> getAllMessageTemplates();
+
+  /// Get templates by type
+  Future<List<MessageTemplate>> getTemplatesByType(TemplateType type);
+
+  /// Get default template for type
+  Future<MessageTemplate?> getDefaultTemplate(TemplateType type);
+
+  /// Create a message template
+  Future<int> createMessageTemplate({
+    required TemplateType templateType,
+    required String name,
+    required String body,
+    bool isDefault,
+  });
+
+  /// Update a message template
+  Future<bool> updateMessageTemplate({
+    required int id,
+    String? name,
+    String? body,
+    bool? isDefault,
+  });
+
+  /// Delete a message template
+  Future<int> deleteMessageTemplate(int id);
 }

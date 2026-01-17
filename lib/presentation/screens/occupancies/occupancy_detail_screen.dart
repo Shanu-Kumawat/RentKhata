@@ -595,8 +595,6 @@ class _BillCard extends StatelessWidget {
         return 'Water';
       case BillType.maintenance:
         return 'Maint';
-      case BillType.rentPlusElectricity:
-        return 'Rent+Elec';
       case BillType.other:
         return 'Other';
     }

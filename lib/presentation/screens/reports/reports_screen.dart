@@ -445,8 +445,6 @@ class _BillCard extends ConsumerWidget {
         return Icons.water_drop_outlined;
       case BillType.maintenance:
         return Icons.build_outlined;
-      case BillType.rentPlusElectricity:
-        return Icons.home_work_outlined;
       case BillType.other:
         return Icons.receipt_long_outlined;
     }
@@ -462,8 +460,6 @@ class _BillCard extends ConsumerWidget {
         return Colors.blue;
       case BillType.maintenance:
         return Colors.orange;
-      case BillType.rentPlusElectricity:
-        return Colors.purple;
       case BillType.other:
         return AppColors.secondary;
     }

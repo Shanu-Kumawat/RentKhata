@@ -7,6 +7,8 @@ import '../tables/bill_table.dart';
 import '../tables/payment_table.dart';
 import '../tables/electricity_rate_table.dart';
 import '../tables/meter_photo_table.dart';
+import '../tables/audit_log_table.dart';
+import '../tables/message_template_table.dart';
 
 part 'billing_dao.g.dart';
 
@@ -201,5 +203,201 @@ class BillingDao extends DatabaseAccessor<AppDatabase> with _$BillingDaoMixin {
   Future<int> countMeterPhotosForBill(int billId) async {
     final photos = await getMeterPhotosForBill(billId);
     return photos.length;
+  }
+
+  // ========== Bill Number Generation ==========
+
+  /// Generate next bill number for given month/year.
+  /// Format: INV-YYYYMM-XXXX (sequential per month)
+  Future<String> generateBillNumber(int month, int year) async {
+    // Default prefix, can be made configurable from bill settings
+    const prefix = 'INV';
+    final monthStr = month.toString().padLeft(2, '0');
+    final billPrefix = '$prefix-$year$monthStr-';
+
+    // Query max existing number for this prefix
+    final existingBills =
+        await (select(bills)
+              ..where((b) => b.billNumber.like('$billPrefix%'))
+              ..orderBy([(b) => OrderingTerm.desc(b.billNumber)])
+              ..limit(1))
+            .get();
+
+    int nextSeq = 1;
+    if (existingBills.isNotEmpty) {
+      final lastNumber = existingBills.first.billNumber;
+      if (lastNumber != null && lastNumber.startsWith(billPrefix)) {
+        final seqPart = lastNumber.substring(billPrefix.length);
+        nextSeq = (int.tryParse(seqPart) ?? 0) + 1;
+      }
+    }
+
+    return '$billPrefix${nextSeq.toString().padLeft(4, '0')}';
+  }
+
+  // ========== Duplicate Prevention ==========
+
+  /// Check if a bill already exists for the given occupancy, type, and period.
+  /// Returns the existing bill if found, null otherwise.
+  Future<BillEntity?> checkDuplicateBill({
+    required int occupancyId,
+    required BillType billType,
+    required int billingMonth,
+    required int billingYear,
+  }) async {
+    return (select(bills)
+          ..where(
+            (b) =>
+                b.occupancyId.equals(occupancyId) &
+                b.billType.equals(billType.name) &
+                b.billingMonth.equals(billingMonth) &
+                b.billingYear.equals(billingYear) &
+                b.status.isNotIn([BillStatus.voided.name]),
+          )
+          ..limit(1))
+        .getSingleOrNull();
+  }
+
+  // ========== Bill Status Updates ==========
+
+  /// Update bill status
+  Future<bool> updateBillStatus(int billId, BillStatus status) async {
+    return await (update(bills)..where((b) => b.id.equals(billId))).write(
+          BillsCompanion(status: Value(status)),
+        ) >
+        0;
+  }
+
+  /// Recalculate and update bill status based on payments
+  Future<void> recalculateBillStatus(int billId) async {
+    final bill = await getBillById(billId);
+    if (bill == null) return;
+
+    final paidAmount = await getTotalPaidForBill(billId);
+    BillStatus newStatus;
+
+    if (paidAmount >= bill.amount) {
+      newStatus = BillStatus.paid;
+    } else if (paidAmount > 0) {
+      newStatus = BillStatus.partial;
+    } else if (bill.dueDate != null && DateTime.now().isAfter(bill.dueDate!)) {
+      newStatus = BillStatus.overdue;
+    } else {
+      newStatus = bill.status == BillStatus.sent
+          ? BillStatus.sent
+          : BillStatus.draft;
+    }
+
+    if (newStatus != bill.status) {
+      await updateBillStatus(billId, newStatus);
+    }
+  }
+
+  // ========== Audit Log Operations ==========
+
+  /// Insert an audit log entry
+  Future<int> insertAuditLog({
+    required AuditEntityType entityType,
+    required int entityId,
+    required AuditAction action,
+    String? fieldName,
+    String? oldValue,
+    String? newValue,
+    String? notes,
+  }) async {
+    return into(db.auditLogs).insert(
+      AuditLogsCompanion.insert(
+        entityType: entityType,
+        entityId: entityId,
+        action: action,
+        fieldName: Value(fieldName),
+        oldValue: Value(oldValue),
+        newValue: Value(newValue),
+        notes: Value(notes),
+      ),
+    );
+  }
+
+  /// Get audit logs for an entity
+  Future<List<AuditLogEntity>> getAuditLogsForEntity({
+    required AuditEntityType entityType,
+    required int entityId,
+  }) async {
+    return (select(db.auditLogs)
+          ..where(
+            (a) =>
+                a.entityType.equals(entityType.name) &
+                a.entityId.equals(entityId),
+          )
+          ..orderBy([(a) => OrderingTerm.desc(a.createdAt)]))
+        .get();
+  }
+
+  // ========== Bill Settings Operations ==========
+
+  /// Get bill settings (singleton row)
+  Future<BillSettingsEntity?> getBillSettings() async {
+    return (select(db.billSettings)..limit(1)).getSingleOrNull();
+  }
+
+  /// Update bill settings
+  Future<bool> updateBillSettings(BillSettingsCompanion settings) async {
+    // Ensure there's a row
+    final existing = await getBillSettings();
+    if (existing == null) {
+      await into(db.billSettings).insert(BillSettingsCompanion.insert());
+    }
+
+    return await (update(
+          db.billSettings,
+        )).write(settings.copyWith(updatedAt: Value(DateTime.now()))) >
+        0;
+  }
+
+  // ========== Message Template Operations ==========
+
+  /// Get all message templates
+  Future<List<MessageTemplateEntity>> getAllMessageTemplates() async {
+    return select(db.messageTemplates).get();
+  }
+
+  /// Get templates by type
+  Future<List<MessageTemplateEntity>> getTemplatesByType(
+    TemplateType type,
+  ) async {
+    return (select(
+      db.messageTemplates,
+    )..where((t) => t.templateType.equals(type.name))).get();
+  }
+
+  /// Get default template for type
+  Future<MessageTemplateEntity?> getDefaultTemplate(TemplateType type) async {
+    return (select(db.messageTemplates)
+          ..where(
+            (t) => t.templateType.equals(type.name) & t.isDefault.equals(true),
+          )
+          ..limit(1))
+        .getSingleOrNull();
+  }
+
+  /// Insert message template
+  Future<int> insertMessageTemplate(MessageTemplatesCompanion template) async {
+    return into(db.messageTemplates).insert(template);
+  }
+
+  /// Update message template
+  Future<bool> updateMessageTemplate(
+    int id,
+    MessageTemplatesCompanion template,
+  ) async {
+    return await (update(
+          db.messageTemplates,
+        )..where((t) => t.id.equals(id))).write(template) >
+        0;
+  }
+
+  /// Delete message template
+  Future<int> deleteMessageTemplate(int id) async {
+    return (delete(db.messageTemplates)..where((t) => t.id.equals(id))).go();
   }
 }

@@ -22,6 +22,9 @@ import 'tables/deposit_transaction_table.dart';
 import 'tables/meter_photo_table.dart';
 import 'tables/auto_bill_setting_table.dart';
 import 'tables/notification_setting_table.dart';
+import 'tables/audit_log_table.dart';
+import 'tables/message_template_table.dart';
+import 'tables/bill_settings_table.dart';
 import '../../domain/entities/occupancy.dart';
 
 // DAOs
@@ -49,6 +52,9 @@ part 'app_database.g.dart';
     MeterPhotos,
     AutoBillSettings,
     NotificationSettings,
+    AuditLogs,
+    MessageTemplates,
+    BillSettings,
   ],
   daos: [LandlordDao, PropertyDao, TenantDao, BillingDao],
 )
@@ -59,7 +65,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration {
@@ -176,6 +182,89 @@ class AppDatabase extends _$AppDatabase {
           await m.addColumn(occupancies, occupancies.deductionReason);
           await m.addColumn(occupancies, occupancies.settlementNotes);
           await m.addColumn(occupancies, occupancies.isSettled);
+        }
+        if (from < 6) {
+          // Create new billing system tables
+          await m.createTable(auditLogs);
+          await m.createTable(messageTemplates);
+          await m.createTable(billSettings);
+
+          // Add new columns to bills
+          await m.addColumn(bills, bills.billNumber);
+          await m.addColumn(bills, bills.status);
+
+          // Add new columns to payments for audit
+          await m.addColumn(payments, payments.createdAt);
+          await m.addColumn(payments, payments.updatedAt);
+          await m.addColumn(payments, payments.originalAmount);
+
+          // Insert default bill settings
+          await into(billSettings).insert(BillSettingsCompanion.insert());
+
+          // Insert default message templates
+          await into(messageTemplates).insert(
+            MessageTemplatesCompanion.insert(
+              templateType: TemplateType.invoice,
+              name: 'Default Invoice',
+              body: '''Dear {tenantName},
+
+Your {billType} bill for {period} is ready.
+
+Bill #: {billNumber}
+Amount: ₹{amount}
+Due Date: {dueDate}
+
+Please make the payment at your earliest convenience.
+
+Thank you,
+{landlordName}''',
+              isDefault: const Value(true),
+            ),
+          );
+
+          await into(messageTemplates).insert(
+            MessageTemplatesCompanion.insert(
+              templateType: TemplateType.receipt,
+              name: 'Default Receipt',
+              body: '''Dear {tenantName},
+
+Payment Received!
+
+Bill: {billType} - {period}
+Amount: ₹{amount}
+Payment Mode: {paymentMode}
+
+Thank you for your payment.
+
+{landlordName}''',
+              isDefault: const Value(true),
+            ),
+          );
+
+          // Generate bill numbers for existing bills
+          await customStatement('''
+            UPDATE bills 
+            SET bill_number = 'INV-' || 
+              substr('0000' || billing_year, -4) || 
+              substr('00' || billing_month, -2) || '-' ||
+              substr('0000' || id, -4),
+            status = CASE 
+              WHEN id IN (
+                SELECT b.id FROM bills b
+                LEFT JOIN payments p ON p.bill_id = b.id
+                GROUP BY b.id
+                HAVING COALESCE(SUM(p.amount), 0) >= b.amount
+              ) THEN 'paid'
+              WHEN id IN (
+                SELECT b.id FROM bills b
+                LEFT JOIN payments p ON p.bill_id = b.id
+                GROUP BY b.id
+                HAVING COALESCE(SUM(p.amount), 0) > 0
+              ) THEN 'partial'
+              ELSE 'draft'
+            END
+            WHERE bill_number IS NULL
+          ''');
         }
       },
     );

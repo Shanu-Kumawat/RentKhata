@@ -4,14 +4,18 @@ library;
 import 'package:drift/drift.dart';
 import 'occupancy_table.dart';
 
-/// Bill types enumeration
-enum BillType {
-  rent,
-  electricity,
-  water,
-  maintenance,
-  rentPlusElectricity,
-  other,
+/// Bill types enumeration.
+/// Note: rentPlusElectricity was deprecated in v6 - use separate bills instead.
+enum BillType { rent, electricity, water, maintenance, other }
+
+/// Bill status for workflow tracking.
+enum BillStatus {
+  draft, // Just created, fully editable
+  sent, // Invoice shared to tenant
+  partial, // Has partial payments
+  paid, // Fully paid
+  overdue, // Past due date, not fully paid
+  voided, // Cancelled/voided (renamed from void_ for Dart compatibility)
 }
 
 /// Table for storing bills.
@@ -22,6 +26,13 @@ class Bills extends Table {
 
   /// Foreign key to occupancy
   IntColumn get occupancyId => integer().references(Occupancies, #id)();
+
+  /// Auto-generated bill number (format: INV-YYYYMM-XXXX)
+  TextColumn get billNumber => text().nullable()();
+
+  /// Bill status for workflow
+  TextColumn get status =>
+      textEnum<BillStatus>().withDefault(Constant(BillStatus.draft.name))();
 
   /// Type of bill
   TextColumn get billType => textEnum<BillType>()();

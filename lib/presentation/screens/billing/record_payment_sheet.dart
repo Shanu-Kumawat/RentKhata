@@ -11,6 +11,7 @@ import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/validators.dart';
 import '../../../domain/entities/bill.dart';
 import '../../../domain/entities/payment.dart';
+import 'receipt_dialog.dart';
 
 /// Bottom sheet to record a payment.
 class RecordPaymentSheet extends ConsumerStatefulWidget {
@@ -24,9 +25,9 @@ class RecordPaymentSheet extends ConsumerStatefulWidget {
 
 class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
   final _formKey = GlobalKey<FormState>();
-  final _amountController = TextEditingController();
-  final _notesController = TextEditingController();
-  
+  late final TextEditingController _amountController; // Changed to late final
+  late final TextEditingController _notesController; // Changed to late final
+
   PaymentMode _paymentMode = PaymentMode.cash;
   DateTime _paymentDate = DateTime.now();
   bool _isLoading = false;
@@ -35,7 +36,11 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
   void initState() {
     super.initState();
     // Pre-fill with pending amount
-    _amountController.text = widget.bill.pendingAmount.toStringAsFixed(0);
+    _amountController = TextEditingController(
+      // Initialized in initState
+      text: widget.bill.pendingAmount.toStringAsFixed(0),
+    );
+    _notesController = TextEditingController(); // Initialized in initState
   }
 
   @override
@@ -46,14 +51,16 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
   }
 
   Future<void> _selectPaymentDate() async {
-    final date = await showDatePicker(
+    final picked = await showDatePicker(
+      // Changed variable name to 'picked'
       context: context,
       initialDate: _paymentDate,
       firstDate: DateTime(2020),
       lastDate: DateTime.now(),
     );
-    if (date != null) {
-      setState(() => _paymentDate = date);
+    if (picked != null) {
+      // Changed variable name to 'picked'
+      setState(() => _paymentDate = picked);
     }
   }
 
@@ -87,19 +94,50 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
       if (mounted) {
         // Invalidate providers to refresh UI
         ref.invalidate(billsForOccupancyProvider(widget.bill.occupancyId));
-        ref.invalidate(billsForOccupancyStreamProvider(widget.bill.occupancyId));
+        ref.invalidate(
+          billsForOccupancyStreamProvider(widget.bill.occupancyId),
+        );
         ref.invalidate(unpaidBillsProvider);
         ref.invalidate(dashboardSummaryProvider);
+
+        // Get landlord name for receipt
+        final landlord = await ref.read(landlordProvider.future);
+        final landlordName = landlord?.name;
+
+        // Create updated bill with new payment amounts for receipt
+        final updatedBill = widget.bill.copyWith(
+          paidAmount: widget.bill.paidAmount + amount,
+          pendingAmount: widget.bill.pendingAmount - amount,
+          status: (widget.bill.pendingAmount - amount) <= 0
+              ? BillStatus.paid
+              : BillStatus.partial,
+        );
+
+        // Create a payment object for the receipt
+        final payment = Payment(
+          id: 0,
+          billId: widget.bill.id,
+          amount: amount,
+          paymentMode: _paymentMode,
+          notes: _notesController.text.isEmpty ? null : _notesController.text,
+          paymentDate: _paymentDate,
+        );
+
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Payment recorded')),
+
+        // Show receipt dialog with landlord name
+        await ReceiptDialog.show(
+          context: context,
+          bill: updatedBill,
+          latestPayment: payment,
+          landlordName: landlordName, // Added landlordName
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -127,8 +165,8 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
                   Text(
                     'Record Payment',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   IconButton(
                     icon: const Icon(Icons.close),
@@ -157,7 +195,8 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
                         ),
                         Text(
                           'Pending: ${formatCurrency(widget.bill.pendingAmount)}',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(
                                 color: AppColors.moneyPending,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -167,8 +206,8 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
                     Text(
                       'of ${formatCurrency(widget.bill.amount)}',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.onSurfaceVariant,
-                          ),
+                        color: AppColors.onSurfaceVariant,
+                      ),
                     ),
                   ],
                 ),

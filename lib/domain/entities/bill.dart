@@ -7,13 +7,17 @@ part 'bill.freezed.dart';
 part 'bill.g.dart';
 
 /// Bill type enumeration.
-enum BillType {
-  rent,
-  electricity,
-  water,
-  maintenance,
-  rentPlusElectricity,
-  other,
+/// Note: rentPlusElectricity was deprecated in v6 - use separate bills instead.
+enum BillType { rent, electricity, water, maintenance, other }
+
+/// Bill status for workflow tracking.
+enum BillStatus {
+  draft, // Just created, fully editable
+  sent, // Invoice shared to tenant
+  partial, // Has partial payments
+  paid, // Fully paid
+  overdue, // Past due date, not fully paid
+  voided, // Cancelled/voided
 }
 
 /// Represents a bill for a tenant.
@@ -28,6 +32,10 @@ class Bill with _$Bill {
     required int billingMonth,
     required int billingYear,
     required double amount,
+    // Bill number (format: INV-YYYYMM-XXXX)
+    String? billNumber,
+    // Bill status
+    @Default(BillStatus.draft) BillStatus status,
     double? electricityPrevReading,
     double? electricityCurrReading,
     double? electricityRateAtBilling,
@@ -50,11 +58,26 @@ class Bill with _$Bill {
   factory Bill.fromJson(Map<String, dynamic> json) => _$BillFromJson(json);
 
   /// Check if bill is fully paid
-  bool get isFullyPaid => pendingAmount <= 0;
+  bool get isFullyPaid => pendingAmount <= 0 || status == BillStatus.paid;
 
   /// Check if bill is overdue
   bool get isOverdue =>
       !isFullyPaid && dueDate != null && DateTime.now().isAfter(dueDate!);
+
+  /// Check if bill can be edited
+  bool get canEdit =>
+      status != BillStatus.paid &&
+      status != BillStatus.voided &&
+      paidAmount == 0;
+
+  /// Check if bill amount can be edited (more restrictive)
+  bool get canEditAmount => status == BillStatus.draft && paidAmount == 0;
+
+  /// Check if bill can be deleted
+  bool get canDelete => paidAmount == 0 && status != BillStatus.voided;
+
+  /// Check if bill can record payments
+  bool get canRecordPayment => !isFullyPaid && status != BillStatus.voided;
 
   /// Get billing period as readable string
   String get billingPeriod {

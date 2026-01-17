@@ -7,7 +7,6 @@ import 'package:go_router/go_router.dart';
 import '../../../application/providers/property_providers.dart';
 import '../../../application/providers/tenant_providers.dart';
 import '../../../application/providers/billing_providers.dart';
-import '../../../application/providers/dashboard_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../domain/entities/room.dart';
@@ -15,7 +14,7 @@ import '../../../domain/entities/occupancy.dart';
 import '../../../domain/entities/bill.dart';
 import '../billing/create_bill_sheet.dart';
 import '../billing/record_payment_sheet.dart';
-import '../../widgets/upi_qr_widget.dart';
+import '../billing/bill_detail_screen.dart';
 import 'move_in_sheet.dart';
 import 'add_room_screen.dart';
 import 'move_out_screen.dart';
@@ -60,7 +59,6 @@ class _RoomDetailContent extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final occupancyAsync = ref.watch(occupancyForRoomProvider(room.id));
-    final landlordAsync = ref.watch(landlordProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -92,37 +90,14 @@ class _RoomDetailContent extends ConsumerWidget {
                 ),
                 const SizedBox(height: 16),
 
-                // Actions
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () => _showCreateBill(context, occupancy),
-                        icon: const Icon(Icons.receipt_long_outlined),
-                        label: const Text('Create Bill'),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: landlordAsync.when(
-                        data: (landlord) => FilledButton.icon(
-                          onPressed: () => _showUpiQr(
-                            context,
-                            landlord?.name ?? 'Landlord',
-                            landlord?.upiId,
-                            occupancy.agreedRent,
-                          ),
-                          icon: const Icon(Icons.qr_code),
-                          label: const Text('Collect Rent'),
-                        ),
-                        loading: () => const FilledButton(
-                          onPressed: null,
-                          child: CircularProgressIndicator(),
-                        ),
-                        error: (_, __) => const SizedBox(),
-                      ),
-                    ),
-                  ],
+                // Actions - Create Bill button (full width)
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: () => _showCreateBill(context, occupancy),
+                    icon: const Icon(Icons.receipt_long_outlined),
+                    label: const Text('Create Bill'),
+                  ),
                 ),
                 const SizedBox(height: 24),
 
@@ -163,21 +138,6 @@ class _RoomDetailContent extends ConsumerWidget {
         hasElectricityMeter: room.hasElectricityMeter,
         electricityRate: room.currentElectricityRate,
       ),
-    );
-  }
-
-  void _showUpiQr(
-    BuildContext context,
-    String payeeName,
-    String? upiId,
-    double amount,
-  ) {
-    UpiQrDialog.show(
-      context,
-      payeeName: payeeName,
-      upiId: upiId,
-      amount: amount,
-      transactionNote: 'Rent for Room ${room.roomNumber}',
     );
   }
 
@@ -543,7 +503,7 @@ class _BillTile extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
-        onTap: () => _showRecordPayment(context),
+        onTap: () => _viewBillDetails(context),
         leading: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
@@ -559,23 +519,56 @@ class _BillTile extends StatelessWidget {
           '${bill.billType.name.toUpperCase()} - ${bill.billingPeriod}',
           style: const TextStyle(fontWeight: FontWeight.w600),
         ),
-        subtitle: Text(
-          bill.isFullyPaid
-              ? 'Paid'
-              : 'Pending: ${formatCurrency(bill.pendingAmount)}',
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              bill.isFullyPaid
+                  ? 'Paid'
+                  : 'Pending: ${formatCurrency(bill.pendingAmount)}',
+            ),
+            if (bill.billNumber != null)
+              Text(
+                bill.billNumber!,
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: AppColors.onSurfaceVariant,
+                ),
+              ),
+          ],
         ),
-        trailing: Text(
-          formatCurrency(bill.amount),
-          style: Theme.of(
-            context,
-          ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              formatCurrency(bill.amount),
+              style: Theme.of(
+                context,
+              ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            if (!bill.isFullyPaid) ...[
+              const SizedBox(width: 4),
+              IconButton(
+                icon: const Icon(Icons.payment, size: 20),
+                tooltip: 'Record Payment',
+                onPressed: () => _showRecordPayment(context),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+              ),
+            ],
+          ],
         ),
       ),
     );
   }
 
+  void _viewBillDetails(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => BillDetailScreen(bill: bill)),
+    );
+  }
+
   void _showRecordPayment(BuildContext context) {
-    if (bill.isFullyPaid) return;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
