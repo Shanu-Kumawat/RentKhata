@@ -154,154 +154,156 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
         padding: const EdgeInsets.all(24),
         child: Form(
           key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Record Payment',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-
-              // Bill summary
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceVariant,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${widget.bill.billType.name.toUpperCase()} - ${widget.bill.billingPeriod}',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                        Text(
-                          'Pending: ${formatCurrency(widget.bill.pendingAmount)}',
-                          style: Theme.of(context).textTheme.titleMedium
-                              ?.copyWith(
-                                color: AppColors.moneyPending,
-                                fontWeight: FontWeight.bold,
-                              ),
-                        ),
-                      ],
-                    ),
                     Text(
-                      'of ${formatCurrency(widget.bill.amount)}',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.onSurfaceVariant,
+                      'Record Payment',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
                       ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () => Navigator.pop(context),
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(height: 24),
+                const SizedBox(height: 8),
 
-              // Amount
-              TextFormField(
-                controller: _amountController,
-                decoration: const InputDecoration(
-                  labelText: 'Payment Amount (₹) *',
-                  prefixIcon: Icon(Icons.currency_rupee),
-                ),
-                keyboardType: TextInputType.number,
-                validator: (v) => validatePositiveNumber(v, 'Amount'),
-              ),
-              const SizedBox(height: 16),
-
-              // Payment mode
-              Text(
-                'Payment Mode',
-                style: Theme.of(context).textTheme.titleSmall,
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                children: PaymentMode.values.map((mode) {
-                  final isSelected = _paymentMode == mode;
-                  IconData icon;
-                  switch (mode) {
-                    case PaymentMode.cash:
-                      icon = Icons.money;
-                    case PaymentMode.upi:
-                      icon = Icons.qr_code;
-                    case PaymentMode.bankTransfer:
-                      icon = Icons.account_balance;
-                    case PaymentMode.cheque:
-                      icon = Icons.edit_note;
-                    case PaymentMode.other:
-                      icon = Icons.more_horiz;
-                  }
-                  return ChoiceChip(
-                    avatar: Icon(icon, size: 18),
-                    label: Text(mode.name.toUpperCase()),
-                    selected: isSelected,
-                    onSelected: (_) => setState(() => _paymentMode = mode),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 16),
-
-              // Payment date
-              InkWell(
-                onTap: _selectPaymentDate,
-                child: InputDecorator(
-                  decoration: const InputDecoration(
-                    labelText: 'Payment Date',
-                    prefixIcon: Icon(Icons.calendar_today_outlined),
+                // Bill summary
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceVariant,
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Text(
-                    '${_paymentDate.day}/${_paymentDate.month}/${_paymentDate.year}',
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Notes
-              TextFormField(
-                controller: _notesController,
-                decoration: const InputDecoration(
-                  labelText: 'Notes (optional)',
-                  prefixIcon: Icon(Icons.note_outlined),
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Save button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _recordPayment,
-                  child: _isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${widget.bill.billType.name.toUpperCase()} - ${widget.bill.billingPeriod}',
+                            style: Theme.of(context).textTheme.bodyMedium,
                           ),
-                        )
-                      : const Text('Record Payment'),
+                          Text(
+                            'Pending: ${formatCurrency(widget.bill.pendingAmount)}',
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(
+                                  color: AppColors.moneyPending,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        'of ${formatCurrency(widget.bill.amount)}',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 24),
+
+                // Amount
+                TextFormField(
+                  controller: _amountController,
+                  decoration: const InputDecoration(
+                    labelText: 'Payment Amount (₹) *',
+                    prefixIcon: Icon(Icons.currency_rupee),
+                  ),
+                  keyboardType: TextInputType.number,
+                  validator: (v) => validatePositiveNumber(v, 'Amount'),
+                ),
+                const SizedBox(height: 16),
+
+                // Payment mode
+                Text(
+                  'Payment Mode',
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  children: PaymentMode.values.map((mode) {
+                    final isSelected = _paymentMode == mode;
+                    IconData icon;
+                    switch (mode) {
+                      case PaymentMode.cash:
+                        icon = Icons.money;
+                      case PaymentMode.upi:
+                        icon = Icons.qr_code;
+                      case PaymentMode.bankTransfer:
+                        icon = Icons.account_balance;
+                      case PaymentMode.cheque:
+                        icon = Icons.edit_note;
+                      case PaymentMode.other:
+                        icon = Icons.more_horiz;
+                    }
+                    return ChoiceChip(
+                      avatar: Icon(icon, size: 18),
+                      label: Text(mode.name.toUpperCase()),
+                      selected: isSelected,
+                      onSelected: (_) => setState(() => _paymentMode = mode),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 16),
+
+                // Payment date
+                InkWell(
+                  onTap: _selectPaymentDate,
+                  child: InputDecorator(
+                    decoration: const InputDecoration(
+                      labelText: 'Payment Date',
+                      prefixIcon: Icon(Icons.calendar_today_outlined),
+                    ),
+                    child: Text(
+                      '${_paymentDate.day}/${_paymentDate.month}/${_paymentDate.year}',
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Notes
+                TextFormField(
+                  controller: _notesController,
+                  decoration: const InputDecoration(
+                    labelText: 'Notes (optional)',
+                    prefixIcon: Icon(Icons.note_outlined),
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Save button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _isLoading ? null : _recordPayment,
+                    child: _isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text('Record Payment'),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

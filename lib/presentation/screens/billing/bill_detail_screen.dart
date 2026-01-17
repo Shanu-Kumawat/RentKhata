@@ -230,11 +230,10 @@ class _BillDetailContent extends ConsumerWidget {
                   if (bill.canRecordPayment) ...[
                     // Unpaid/Partial: Share Invoice (secondary)
                     Expanded(
-                      child: OutlinedButton.icon(
+                      child: OutlinedButton(
                         onPressed: () =>
                             _shareInvoice(context, landlordName, landlordUpi),
-                        icon: const Icon(Icons.share_outlined),
-                        label: const Text('Share'),
+                        child: const Text('Share'),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -252,11 +251,10 @@ class _BillDetailContent extends ConsumerWidget {
                   ] else ...[
                     // Paid: Save Invoice PDF (secondary)
                     Expanded(
-                      child: OutlinedButton.icon(
+                      child: OutlinedButton(
                         onPressed: () =>
                             _savePdf(context, landlordName, landlordUpi),
-                        icon: const Icon(Icons.save_alt_outlined),
-                        label: const Text('Save PDF'),
+                        child: const Text('Save'),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -267,7 +265,7 @@ class _BillDetailContent extends ConsumerWidget {
                         onPressed: () =>
                             _shareInvoice(context, landlordName, landlordUpi),
                         icon: const Icon(Icons.share),
-                        label: const Text('Share Invoice'),
+                        label: const Text('Share'),
                       ),
                     ),
                   ],

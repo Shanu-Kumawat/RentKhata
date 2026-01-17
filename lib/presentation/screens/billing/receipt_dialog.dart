@@ -46,147 +46,158 @@ class ReceiptDialog extends StatelessWidget {
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Success header
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: isFullyPaid
-                    ? [AppColors.success, const Color(0xFF059669)]
-                    : [AppColors.primary, AppColors.primaryDark],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 400),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Success header
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: isFullyPaid
+                      ? [AppColors.success, const Color(0xFF059669)]
+                      : [AppColors.primary, AppColors.primaryDark],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(20),
+                ),
               ),
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(20),
-              ),
-            ),
-            child: Column(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    shape: BoxShape.circle,
+              child: Stack(
+                children: [
+                  Column(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          isFullyPaid ? Icons.check_circle : Icons.receipt_long,
+                          color: Colors.white,
+                          size: 48,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        isFullyPaid ? 'Payment Complete!' : 'Payment Recorded',
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        isFullyPaid
+                            ? 'Bill has been fully paid'
+                            : 'Partial payment recorded',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ],
                   ),
-                  child: Icon(
-                    isFullyPaid ? Icons.check_circle : Icons.receipt_long,
-                    color: Colors.white,
-                    size: 48,
+                  // Close button in top-right corner
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(Icons.close, color: Colors.white),
+                      tooltip: 'Close',
+                    ),
                   ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  isFullyPaid ? 'Payment Complete!' : 'Payment Recorded',
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  isFullyPaid
-                      ? 'Bill has been fully paid'
-                      : 'Partial payment recorded',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: Colors.white70,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Receipt details
-          Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              children: [
-                // Bill info
-                if (bill.billNumber != null)
-                  _ReceiptRow(label: 'Invoice', value: bill.billNumber!),
-                _ReceiptRow(
-                  label: 'Type',
-                  value: _getBillTypeLabel(bill.billType),
-                ),
-                _ReceiptRow(label: 'Period', value: bill.billingPeriod),
-                if (bill.roomNumber != null)
-                  _ReceiptRow(label: 'Room', value: 'Room ${bill.roomNumber}'),
-
-                const Divider(height: 24),
-
-                // Payment info
-                if (latestPayment != null) ...[
-                  _ReceiptRow(
-                    label: 'Payment Amount',
-                    value: formatCurrency(latestPayment!.amount),
-                    isHighlighted: true,
-                  ),
-                  _ReceiptRow(
-                    label: 'Payment Mode',
-                    value: _getPaymentModeLabel(latestPayment!.paymentMode),
-                  ),
-                  _ReceiptRow(
-                    label: 'Date',
-                    value: _formatDate(latestPayment!.paymentDate),
-                  ),
-                  const Divider(height: 24),
                 ],
-
-                // Summary
-                _ReceiptRow(
-                  label: 'Bill Total',
-                  value: formatCurrency(bill.amount),
-                ),
-                _ReceiptRow(
-                  label: 'Paid',
-                  value: formatCurrency(bill.paidAmount),
-                  valueColor: AppColors.success,
-                ),
-                if (bill.pendingAmount > 0)
-                  _ReceiptRow(
-                    label: 'Balance',
-                    value: formatCurrency(bill.pendingAmount),
-                    valueColor: AppColors.moneyPending,
-                    isHighlighted: true,
-                  ),
-
-                const SizedBox(height: 24),
-
-                // Actions
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text('Close'),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () => _saveReceipt(context),
-                        icon: const Icon(Icons.save_alt, size: 18),
-                        label: const Text('Save'),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () => _shareReceipt(context),
-                        icon: const Icon(Icons.share, size: 18),
-                        label: const Text('Share'),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+              ),
             ),
-          ),
-        ],
+
+            // Receipt details
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                children: [
+                  // Bill info
+                  if (bill.billNumber != null)
+                    _ReceiptRow(label: 'Invoice', value: bill.billNumber!),
+                  _ReceiptRow(
+                    label: 'Type',
+                    value: _getBillTypeLabel(bill.billType),
+                  ),
+                  _ReceiptRow(label: 'Period', value: bill.billingPeriod),
+                  if (bill.roomNumber != null)
+                    _ReceiptRow(
+                      label: 'Room',
+                      value: 'Room ${bill.roomNumber}',
+                    ),
+
+                  const Divider(height: 24),
+
+                  // Payment info
+                  if (latestPayment != null) ...[
+                    _ReceiptRow(
+                      label: 'Payment Amount',
+                      value: formatCurrency(latestPayment!.amount),
+                      isHighlighted: true,
+                    ),
+                    _ReceiptRow(
+                      label: 'Payment Mode',
+                      value: _getPaymentModeLabel(latestPayment!.paymentMode),
+                    ),
+                    _ReceiptRow(
+                      label: 'Date',
+                      value: _formatDate(latestPayment!.paymentDate),
+                    ),
+                    const Divider(height: 24),
+                  ],
+
+                  // Summary
+                  _ReceiptRow(
+                    label: 'Bill Total',
+                    value: formatCurrency(bill.amount),
+                  ),
+                  _ReceiptRow(
+                    label: 'Paid',
+                    value: formatCurrency(bill.paidAmount),
+                    valueColor: AppColors.success,
+                  ),
+                  if (bill.pendingAmount > 0)
+                    _ReceiptRow(
+                      label: 'Balance',
+                      value: formatCurrency(bill.pendingAmount),
+                      valueColor: AppColors.moneyPending,
+                      isHighlighted: true,
+                    ),
+
+                  const SizedBox(height: 24),
+
+                  // Actions - only Save and Share
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => _saveReceipt(context),
+                          child: const Text('Save'),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () => _shareReceipt(context),
+                          child: const Text('Share'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
