@@ -184,15 +184,35 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
         dueDate: calculatedDueDate,
       );
 
+      // Update global electricity rate if it was changed
+      if (_selectedBillType == BillType.electricity &&
+          _electricityRate != widget.electricityRate) {
+        await repo.addElectricityRate(_electricityRate, DateTime.now());
+        ref.invalidate(currentElectricityRateProvider);
+      }
+
       if (mounted) {
         // Invalidate providers to refresh UI
         ref.invalidate(billsForOccupancyProvider(widget.occupancyId));
         ref.invalidate(unpaidBillsProvider);
         ref.invalidate(dashboardSummaryProvider);
         Navigator.pop(context);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Bill created')));
+
+        // Show appropriate message
+        if (_selectedBillType == BillType.electricity &&
+            _electricityRate != widget.electricityRate) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Bill created. Global rate updated to ₹${_electricityRate.toStringAsFixed(2)}/unit',
+              ),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Bill created')));
+        }
       }
     } catch (e) {
       if (mounted) {

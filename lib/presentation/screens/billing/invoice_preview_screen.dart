@@ -60,7 +60,7 @@ class InvoicePreviewScreen extends ConsumerWidget {
               // Close button - icon only to prevent text wrapping
               IconButton.outlined(
                 onPressed: () => Navigator.pop(context),
-                icon: const Icon(Icons.close),
+                icon: Icon(Icons.close, color: AppColors.primary),
                 tooltip: 'Close',
               ),
               const SizedBox(width: 12),
@@ -218,7 +218,7 @@ class _InvoiceCard extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: AppColors.surfaceVariant,
+                        color: Colors.grey.shade100,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Column(
@@ -228,11 +228,16 @@ class _InvoiceCard extends StatelessWidget {
                             children: [
                               Text(
                                 'Previous Reading',
-                                style: theme.textTheme.bodySmall,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: Colors.grey.shade700,
+                                ),
                               ),
                               Text(
                                 '${bill.electricityPrevReading!.toStringAsFixed(0)} units',
-                                style: theme.textTheme.bodyMedium,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: Colors.black87,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ],
                           ),
@@ -242,11 +247,16 @@ class _InvoiceCard extends StatelessWidget {
                             children: [
                               Text(
                                 'Current Reading',
-                                style: theme.textTheme.bodySmall,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: Colors.grey.shade700,
+                                ),
                               ),
                               Text(
                                 '${bill.electricityCurrReading!.toStringAsFixed(0)} units',
-                                style: theme.textTheme.bodyMedium,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: Colors.black87,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ],
                           ),
@@ -257,13 +267,18 @@ class _InvoiceCard extends StatelessWidget {
                               Text(
                                 'Units Consumed',
                                 style: theme.textTheme.bodySmall?.copyWith(
+                                  color: Colors.grey.shade900,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
-                              Text(
-                                '${(bill.electricityCurrReading! - bill.electricityPrevReading!).toStringAsFixed(0)} units @ ${formatCurrency(bill.electricityRateAtBilling ?? 0)}/unit',
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  fontWeight: FontWeight.w600,
+                              Flexible(
+                                child: Text(
+                                  '${(bill.electricityCurrReading! - bill.electricityPrevReading!).toStringAsFixed(0)} units @ ${formatCurrency(bill.electricityRateAtBilling ?? 0)}/unit',
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: Colors.black87,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  textAlign: TextAlign.end,
                                 ),
                               ),
                             ],

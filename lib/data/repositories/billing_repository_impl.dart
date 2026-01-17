@@ -242,8 +242,16 @@ class BillingRepositoryImpl implements BillingRepository {
     DateTime? periodStartDate,
     DateTime? periodEndDate,
   }) async {
+    // Generate bill number
+    final billNumber = await _billingDao.generateBillNumber(
+      billingMonth,
+      billingYear,
+    );
+
     final bill = BillsCompanion(
       occupancyId: Value(occupancyId),
+      billNumber: Value(billNumber),
+      status: Value(db.BillStatus.draft),
       billType: Value(_billTypeToDb(billType)),
       billingMonth: Value(billingMonth),
       billingYear: Value(billingYear),
