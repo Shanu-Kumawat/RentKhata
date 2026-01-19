@@ -84,5 +84,65 @@ final landlordProvider = AutoDisposeFutureProvider<Landlord?>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef LandlordRef = AutoDisposeFutureProviderRef<Landlord?>;
+String _$filteredFinancialsHash() =>
+    r'a1732ab3d1a5dc5336c76d84981a8ece321f18c9';
+
+/// Provides financial summary filtered by month.
+///
+/// Copied from [filteredFinancials].
+@ProviderFor(filteredFinancials)
+final filteredFinancialsProvider =
+    AutoDisposeFutureProvider<FilteredFinancialSummary>.internal(
+      filteredFinancials,
+      name: r'filteredFinancialsProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$filteredFinancialsHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef FilteredFinancialsRef =
+    AutoDisposeFutureProviderRef<FilteredFinancialSummary>;
+String _$roomStatusListHash() => r'8692e56ac0362c254b76b30c2c265b62dd0ca843';
+
+/// Provides list of rooms with their status.
+///
+/// Copied from [roomStatusList].
+@ProviderFor(roomStatusList)
+final roomStatusListProvider =
+    AutoDisposeFutureProvider<List<RoomStatusItem>>.internal(
+      roomStatusList,
+      name: r'roomStatusListProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$roomStatusListHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef RoomStatusListRef = AutoDisposeFutureProviderRef<List<RoomStatusItem>>;
+String _$dashboardMonthHash() => r'6612d9fae09ac81b7a4a7bef1046e19052f80e72';
+
+/// Selected dashboard month.
+///
+/// Copied from [DashboardMonth].
+@ProviderFor(DashboardMonth)
+final dashboardMonthProvider =
+    AutoDisposeNotifierProvider<DashboardMonth, DateTime>.internal(
+      DashboardMonth.new,
+      name: r'dashboardMonthProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$dashboardMonthHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+typedef _$DashboardMonth = AutoDisposeNotifier<DateTime>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

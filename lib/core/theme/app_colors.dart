@@ -16,10 +16,16 @@ class AppColors {
   static const Color secondaryDark = Color(0xFF059669); // Emerald 600
 
   // Semantic colors
+  // Semantic colors
   static const Color success = Color(0xFF22C55E); // Green 500
   static const Color warning = Color(0xFFF59E0B); // Amber 500
   static const Color error = Color(0xFFEF4444); // Red 500
   static const Color info = Color(0xFF3B82F6); // Blue 500
+
+  // High contrast semantic colors (for text on light backgrounds)
+  static const Color successText = Color(0xFF15803D); // Green 700
+  static const Color warningText = Color(0xFFB45309); // Amber 700
+  static const Color errorText = Color(0xFFB91C1C); // Red 700
 
   // Neutral palette
   static const Color background = Color(0xFFF8FAFC); // Slate 50
