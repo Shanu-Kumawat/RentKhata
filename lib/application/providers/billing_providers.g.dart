@@ -6,7 +6,7 @@ part of 'billing_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$billSettingsHash() => r'ca62637efc72f3e9f803537809004c145209f95b';
+String _$billSettingsHash() => r'f00830007dc951d3d9fe879a44042eba5589a713';
 
 /// Get bill settings from database.
 /// Returns cached settings, auto-refreshes from stream.
@@ -28,7 +28,7 @@ final billSettingsProvider =
 // ignore: unused_element
 typedef BillSettingsRef = AutoDisposeFutureProviderRef<BillSettingsEntity>;
 String _$billSettingsStreamHash() =>
-    r'41cdd7c69239c402126957acebca9b8a12968a10';
+    r'1ac773edb02561a62b2fa6d7330b640b1ace84ae';
 
 /// Stream bill settings for auto-refresh.
 ///

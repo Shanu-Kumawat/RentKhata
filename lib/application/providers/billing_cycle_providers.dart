@@ -110,75 +110,251 @@ Future<BillingCycle> nextBillingCycleFor(Ref ref, int occupancyId) async {
   return BillingCycleService.getCurrentCycle(occupancy.moveInDate);
 }
 
-/// Get billing attention status for a single occupancy.
+/// Get the next billing cycle for a specific bill type.
 ///
-/// Returns null if the occupancy is up-to-date (no attention needed).
+/// Each bill type has its own cycle progression. For example:
+/// - Rent might be on cycle 5 (advance payment)
+/// - Electricity might be on cycle 2 (behind on bills)
+///
+/// This allows independent tracking per bill type.
 @riverpod
-Future<BillingAttentionItem?> billingStatusFor(Ref ref, int occupancyId) async {
+Future<BillingCycle> nextBillingCycleForBillType(
+  Ref ref,
+  int occupancyId,
+  BillType billType,
+) async {
+  final billingRepo = ref.watch(billingRepositoryProvider);
+
+  // Get the occupancy to find move-in date
+  final occupancy = await ref.watch(occupancyProvider(occupancyId).future);
+  if (occupancy == null) {
+    // Fallback: return a cycle starting today
+    final now = DateTime.now();
+    return BillingCycle(start: now, end: now.add(const Duration(days: 30)));
+  }
+
+  // Get all bills of this type for this occupancy
+  final allBills = await billingRepo.getBillsForOccupancy(occupancyId);
+  final typeBills = allBills.where((b) => b.billType == billType).toList();
+
+  // If no bills of this type exist, return cycle 0 (first cycle from move-in)
+  if (typeBills.isEmpty) {
+    return BillingCycleService.getCycleByNumber(occupancy.moveInDate, 0);
+  }
+
+  // Build a set of billed period start dates for quick lookup
+  final billedPeriodStarts = <DateTime>{};
+  for (final bill in typeBills) {
+    if (bill.periodStartDate != null) {
+      billedPeriodStarts.add(
+        DateTime(
+          bill.periodStartDate!.year,
+          bill.periodStartDate!.month,
+          bill.periodStartDate!.day,
+        ),
+      );
+    }
+  }
+
+  // Iterate through cycles from 0 until we find one without a bill
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day);
+
+  for (int cycleNum = 0; cycleNum < 100; cycleNum++) {
+    final cycle = BillingCycleService.getCycleByNumber(
+      occupancy.moveInDate,
+      cycleNum,
+    );
+
+    // Normalize cycle start for comparison
+    final cycleStartNormalized = DateTime(
+      cycle.start.year,
+      cycle.start.month,
+      cycle.start.day,
+    );
+
+    // Check if this cycle has a bill of this type
+    if (!billedPeriodStarts.contains(cycleStartNormalized)) {
+      // No bill for this cycle - this is the one that needs a bill
+      return cycle;
+    }
+
+    // If we've gone past current date, stop looking
+    if (cycle.end.isAfter(today)) {
+      continue;
+    }
+  }
+
+  // Fallback: return current cycle
+  return BillingCycleService.getCurrentCycle(occupancy.moveInDate);
+}
+
+/// Get ALL unbilled cycles for a specific bill type up to current date.
+///
+/// Returns a list of ALL cycles that are missing bills, allowing the
+/// attention list to show multiple overdue cycles per bill type.
+@riverpod
+Future<List<BillingCycle>> allUnbilledCyclesForBillType(
+  Ref ref,
+  int occupancyId,
+  BillType billType,
+) async {
+  final billingRepo = ref.watch(billingRepositoryProvider);
+
+  // Get the occupancy to find move-in date
+  final occupancy = await ref.watch(occupancyProvider(occupancyId).future);
+  if (occupancy == null) {
+    return [];
+  }
+
+  // Get all bills of this type for this occupancy
+  final allBills = await billingRepo.getBillsForOccupancy(occupancyId);
+  final typeBills = allBills.where((b) => b.billType == billType).toList();
+
+  // Build a set of billed period start dates for quick lookup
+  final billedPeriodStarts = <DateTime>{};
+  for (final bill in typeBills) {
+    if (bill.periodStartDate != null) {
+      billedPeriodStarts.add(
+        DateTime(
+          bill.periodStartDate!.year,
+          bill.periodStartDate!.month,
+          bill.periodStartDate!.day,
+        ),
+      );
+    }
+  }
+
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day);
+  final List<BillingCycle> unbilledCycles = [];
+
+  // Iterate through cycles from 0 until we reach cycles ending after today
+  for (int cycleNum = 0; cycleNum < 100; cycleNum++) {
+    final cycle = BillingCycleService.getCycleByNumber(
+      occupancy.moveInDate,
+      cycleNum,
+    );
+
+    // Stop if this cycle ends far in the future (more than 30 days from today)
+    // This prevents showing too many future cycles
+    if (cycle.end.isAfter(today.add(const Duration(days: 30)))) {
+      break;
+    }
+
+    // Normalize cycle start for comparison
+    final cycleStartNormalized = DateTime(
+      cycle.start.year,
+      cycle.start.month,
+      cycle.start.day,
+    );
+
+    // If this cycle doesn't have a bill, add it to unbilled list
+    if (!billedPeriodStarts.contains(cycleStartNormalized)) {
+      unbilledCycles.add(cycle);
+    }
+  }
+
+  return unbilledCycles;
+}
+
+/// Get billing attention items for a single occupancy.
+///
+/// Returns a list of attention items - one for EACH unbilled cycle that:
+/// - Has anniversary billing enabled in settings
+/// - Has a cycle needing attention (due soon or overdue)
+@riverpod
+Future<List<BillingAttentionItem>> billingStatusFor(
+  Ref ref,
+  int occupancyId,
+) async {
   final config = await ref.watch(billingAttentionConfigProvider.future);
+  final settings = await ref.watch(billSettingsProvider.future);
   final tenantRepo = ref.watch(tenantRepositoryProvider);
   final propertyRepo = ref.watch(propertyRepositoryProvider);
 
   // Get occupancy details
   final occupancy = await ref.watch(occupancyProvider(occupancyId).future);
   if (occupancy == null || !occupancy.isActive) {
-    return null;
+    return [];
   }
 
   // Get room and property info
   final room = await propertyRepo.getRoomById(occupancy.roomId);
-  if (room == null) return null;
+  if (room == null) return [];
 
   final property = await propertyRepo.getPropertyById(room.propertyId);
 
   // Get tenant info
   final tenant = await tenantRepo.getTenantById(occupancy.tenantId);
-  if (tenant == null) return null;
+  if (tenant == null) return [];
 
-  // Get the next billing cycle that needs a bill
-  final nextCycle = await ref.watch(
-    nextBillingCycleForProvider(occupancyId).future,
-  );
+  // Check which bill types have anniversary enabled
+  final enabledBillTypes = <BillType>[];
+  if (settings.rentUsesAnniversary) enabledBillTypes.add(BillType.rent);
+  if (settings.electricityUsesAnniversary) {
+    enabledBillTypes.add(BillType.electricity);
+  }
+  if (settings.waterUsesAnniversary) enabledBillTypes.add(BillType.water);
+  if (settings.maintenanceUsesAnniversary) {
+    enabledBillTypes.add(BillType.maintenance);
+  }
+  if (settings.otherUsesAnniversary) enabledBillTypes.add(BillType.other);
 
-  // Calculate days until cycle end
+  final List<BillingAttentionItem> attentionItems = [];
   final now = DateTime.now();
   final today = DateTime(now.year, now.month, now.day);
-  final daysUntilEnd = nextCycle.end.difference(today).inDays;
 
-  // Determine status based on days until cycle end
-  BillingCycleStatus status;
-  if (daysUntilEnd < 0) {
-    status = BillingCycleStatus.overdue;
-  } else if (daysUntilEnd <= config.dueSoonThresholdDays) {
-    status = BillingCycleStatus.dueSoon;
-  } else {
-    status = BillingCycleStatus.upToDate;
+  // Check each enabled bill type
+  for (final billType in enabledBillTypes) {
+    // Get ALL unbilled cycles for this bill type
+    final unbilledCycles = await ref.watch(
+      allUnbilledCyclesForBillTypeProvider(occupancyId, billType).future,
+    );
+
+    // Add an attention item for each unbilled cycle that needs attention
+    for (final cycle in unbilledCycles) {
+      // Calculate days until cycle end
+      final daysUntilEnd = cycle.end.difference(today).inDays;
+
+      // Determine status based on days until cycle end
+      BillingCycleStatus status;
+      if (daysUntilEnd < 0) {
+        status = BillingCycleStatus.overdue;
+      } else if (daysUntilEnd <= config.dueSoonThresholdDays) {
+        status = BillingCycleStatus.dueSoon;
+      } else {
+        status = BillingCycleStatus.upToDate;
+      }
+
+      // Only add items that need attention
+      if (status != BillingCycleStatus.upToDate) {
+        attentionItems.add(
+          BillingAttentionItem(
+            occupancyId: occupancyId,
+            roomId: room.id,
+            roomNumber: room.roomNumber,
+            tenantName: tenant.name,
+            cycleStart: cycle.start,
+            cycleEnd: cycle.end,
+            status: status,
+            billType: billType,
+            daysUntilCycleEnd: daysUntilEnd,
+            agreedRent: occupancy.agreedRent,
+            propertyName: property?.name,
+          ),
+        );
+      }
+    }
   }
 
-  // Only return items that need attention
-  if (status == BillingCycleStatus.upToDate) {
-    return null;
-  }
-
-  return BillingAttentionItem(
-    occupancyId: occupancyId,
-    roomId: room.id,
-    roomNumber: room.roomNumber,
-    tenantName: tenant.name,
-    cycleStart: nextCycle.start,
-    cycleEnd: nextCycle.end,
-    status: status,
-    daysUntilCycleEnd: daysUntilEnd,
-    agreedRent: occupancy.agreedRent,
-    propertyName: property?.name,
-  );
+  return attentionItems;
 }
 
 /// Get all occupancies that need billing attention.
 ///
-/// Returns a list of occupancies where:
-/// - Cycle is ending within the "due soon" threshold, OR
-/// - Cycle has already ended (overdue)
+/// Returns a list of attention items across all occupancies and bill types.
+/// Each item represents a specific bill type for an occupancy that needs attention.
 ///
 /// Sorted by urgency (overdue first, then by days until due).
 @riverpod
@@ -195,12 +371,11 @@ Future<List<BillingAttentionItem>> billingAttentionList(Ref ref) async {
   final List<BillingAttentionItem> attentionItems = [];
 
   for (final occupancy in activeOccupancies) {
-    final status = await ref.watch(
+    // billingStatusFor now returns a list of items (one per bill type)
+    final items = await ref.watch(
       billingStatusForProvider(occupancy.id).future,
     );
-    if (status != null) {
-      attentionItems.add(status);
-    }
+    attentionItems.addAll(items);
   }
 
   // Sort: overdue first, then by days until due (ascending)

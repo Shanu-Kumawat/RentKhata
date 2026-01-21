@@ -16,6 +16,7 @@ _$BillingAttentionItemImpl _$$BillingAttentionItemImplFromJson(
   cycleStart: DateTime.parse(json['cycleStart'] as String),
   cycleEnd: DateTime.parse(json['cycleEnd'] as String),
   status: $enumDecode(_$BillingCycleStatusEnumMap, json['status']),
+  billType: $enumDecode(_$BillTypeEnumMap, json['billType']),
   daysUntilCycleEnd: (json['daysUntilCycleEnd'] as num).toInt(),
   agreedRent: (json['agreedRent'] as num).toDouble(),
   propertyName: json['propertyName'] as String?,
@@ -31,6 +32,7 @@ Map<String, dynamic> _$$BillingAttentionItemImplToJson(
   'cycleStart': instance.cycleStart.toIso8601String(),
   'cycleEnd': instance.cycleEnd.toIso8601String(),
   'status': _$BillingCycleStatusEnumMap[instance.status]!,
+  'billType': _$BillTypeEnumMap[instance.billType]!,
   'daysUntilCycleEnd': instance.daysUntilCycleEnd,
   'agreedRent': instance.agreedRent,
   'propertyName': instance.propertyName,
@@ -40,4 +42,12 @@ const _$BillingCycleStatusEnumMap = {
   BillingCycleStatus.upToDate: 'upToDate',
   BillingCycleStatus.dueSoon: 'dueSoon',
   BillingCycleStatus.overdue: 'overdue',
+};
+
+const _$BillTypeEnumMap = {
+  BillType.rent: 'rent',
+  BillType.electricity: 'electricity',
+  BillType.water: 'water',
+  BillType.maintenance: 'maintenance',
+  BillType.other: 'other',
 };

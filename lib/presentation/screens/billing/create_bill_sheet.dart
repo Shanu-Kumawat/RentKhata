@@ -37,6 +37,9 @@ class CreateBillSheet extends ConsumerStatefulWidget {
   /// Tenant's move-in date for cycle calculations
   final DateTime? moveInDate;
 
+  /// Optional: Pre-select bill type
+  final BillType? initialBillType;
+
   const CreateBillSheet({
     super.key,
     required this.occupancyId,
@@ -48,6 +51,7 @@ class CreateBillSheet extends ConsumerStatefulWidget {
     this.suggestedPeriodStart,
     this.suggestedPeriodEnd,
     this.moveInDate,
+    this.initialBillType,
   });
 
   @override
@@ -81,6 +85,11 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
     _amountController.text = widget.agreedRent.toStringAsFixed(0);
     _electricityRate = widget.electricityRate;
     _electricityRateController.text = widget.electricityRate.toStringAsFixed(2);
+
+    // Pre-select bill type if provided
+    if (widget.initialBillType != null) {
+      _selectedBillType = widget.initialBillType!;
+    }
 
     // Pre-select month/year from suggested cycle dates if provided
     if (widget.suggestedPeriodStart != null) {
@@ -165,10 +174,6 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
   /// Builds the billing period section - shows anniversary-based dates if enabled,
   /// or month/year picker for bill types without anniversary
   Widget _buildBillingPeriodSection(BuildContext context, List<String> months) {
-    final hasAnniversaryDates =
-        widget.suggestedPeriodStart != null &&
-        widget.suggestedPeriodEnd != null;
-
     // Watch bill settings to reactively update UI when anniversary settings change
     final settingsAsync = ref.watch(billSettingsProvider);
 
@@ -185,14 +190,220 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
           BillType.other => settings.otherUsesAnniversary,
         };
 
-        // For bill types with anniversary enabled and valid dates, show anniversary card
-        if (usesAnniversary && hasAnniversaryDates) {
-          return _buildAnniversaryPeriodDisplay(context);
+        if (!usesAnniversary || widget.moveInDate == null) {
+          // Bill type doesn't use anniversary billing
+          return _buildMonthYearPicker(context, months);
         }
 
-        // Otherwise show month/year picker
-        return _buildMonthYearPicker(context, months);
+        // Fetch the correct cycle for this bill type
+        final cycleAsync = ref.watch(
+          nextBillingCycleForBillTypeProvider(
+            widget.occupancyId,
+            _selectedBillType,
+          ),
+        );
+
+        return cycleAsync.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (_, __) => _buildMonthYearPicker(context, months),
+          data: (cycle) {
+            // Use the fetched cycle as the base, but respect user navigation
+            final effectiveStart = _currentPeriodStart ?? cycle.start;
+            final effectiveEnd = _currentPeriodEnd ?? cycle.end;
+
+            // Update internal state if not already set (initial load)
+            if (_currentPeriodStart == null) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) {
+                  setState(() {
+                    _currentPeriodStart = cycle.start;
+                    _currentPeriodEnd = cycle.end;
+                    // Calculate cycle number using static method
+                    _currentCycleNumber = BillingCycleService.getCycleNumber(
+                      widget.moveInDate!,
+                      cycle.start,
+                    );
+                  });
+                }
+              });
+            }
+
+            return _buildAnniversaryPeriodDisplayWithCycle(
+              context,
+              effectiveStart,
+              effectiveEnd,
+            );
+          },
+        );
       },
+    );
+  }
+
+  /// Displays the anniversary-based billing period with navigation
+  /// Uses provided cycle dates
+  Widget _buildAnniversaryPeriodDisplayWithCycle(
+    BuildContext context,
+    DateTime start,
+    DateTime end,
+  ) {
+    final theme = Theme.of(context);
+
+    // Determine if this is a past/future cycle for UI hints
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final isFutureCycle = start.isAfter(today);
+    final isPastCycle = end.isBefore(today);
+    final canNavigate = widget.moveInDate != null;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isFutureCycle
+            ? AppColors.warning.withValues(alpha: 0.1)
+            : theme.colorScheme.primaryContainer.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isFutureCycle
+              ? AppColors.warning.withValues(alpha: 0.3)
+              : theme.colorScheme.primary.withValues(alpha: 0.3),
+        ),
+      ),
+      child: Column(
+        children: [
+          // Header with "Anniversary" badge
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.cake_outlined,
+                      size: 14,
+                      color: theme.colorScheme.primary,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Anniversary',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (isPastCycle) ...[
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.error.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    'Overdue',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: AppColors.error,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ] else if (isFutureCycle) ...[
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.warning.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    'Advance',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: AppColors.warning,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ] else ...[
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    'Current',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: theme.colorScheme.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // Date range display with navigation
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (canNavigate && _currentCycleNumber > 0)
+                IconButton(
+                  onPressed: _goToPreviousCycle,
+                  icon: const Icon(Icons.chevron_left),
+                  tooltip: 'Previous cycle',
+                )
+              else
+                const SizedBox(width: 48),
+              Expanded(
+                child: Text(
+                  '${_formatShortDate(start)} - ${_formatShortDate(end)}',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              if (canNavigate)
+                IconButton(
+                  onPressed: _goToNextCycle,
+                  icon: const Icon(Icons.chevron_right),
+                  tooltip: 'Next cycle',
+                )
+              else
+                const SizedBox(width: 48),
+            ],
+          ),
+
+          // Year indicator
+          Text(
+            start.year == end.year
+                ? '${start.year}'
+                : '${start.year} - ${end.year}',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
+      ),
     );
   }
 

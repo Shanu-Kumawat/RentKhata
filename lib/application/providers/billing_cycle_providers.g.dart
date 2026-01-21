@@ -367,32 +367,411 @@ class _NextBillingCycleForProviderElement
   int get occupancyId => (origin as NextBillingCycleForProvider).occupancyId;
 }
 
-String _$billingStatusForHash() => r'795619c96efb1a713d081359a7e9bf85cb397a15';
+String _$nextBillingCycleForBillTypeHash() =>
+    r'e477c367632d3c44fb70a0da06d41ee4c3e8fe52';
 
-/// Get billing attention status for a single occupancy.
+/// Get the next billing cycle for a specific bill type.
 ///
-/// Returns null if the occupancy is up-to-date (no attention needed).
+/// Each bill type has its own cycle progression. For example:
+/// - Rent might be on cycle 5 (advance payment)
+/// - Electricity might be on cycle 2 (behind on bills)
+///
+/// This allows independent tracking per bill type.
+///
+/// Copied from [nextBillingCycleForBillType].
+@ProviderFor(nextBillingCycleForBillType)
+const nextBillingCycleForBillTypeProvider = NextBillingCycleForBillTypeFamily();
+
+/// Get the next billing cycle for a specific bill type.
+///
+/// Each bill type has its own cycle progression. For example:
+/// - Rent might be on cycle 5 (advance payment)
+/// - Electricity might be on cycle 2 (behind on bills)
+///
+/// This allows independent tracking per bill type.
+///
+/// Copied from [nextBillingCycleForBillType].
+class NextBillingCycleForBillTypeFamily
+    extends Family<AsyncValue<BillingCycle>> {
+  /// Get the next billing cycle for a specific bill type.
+  ///
+  /// Each bill type has its own cycle progression. For example:
+  /// - Rent might be on cycle 5 (advance payment)
+  /// - Electricity might be on cycle 2 (behind on bills)
+  ///
+  /// This allows independent tracking per bill type.
+  ///
+  /// Copied from [nextBillingCycleForBillType].
+  const NextBillingCycleForBillTypeFamily();
+
+  /// Get the next billing cycle for a specific bill type.
+  ///
+  /// Each bill type has its own cycle progression. For example:
+  /// - Rent might be on cycle 5 (advance payment)
+  /// - Electricity might be on cycle 2 (behind on bills)
+  ///
+  /// This allows independent tracking per bill type.
+  ///
+  /// Copied from [nextBillingCycleForBillType].
+  NextBillingCycleForBillTypeProvider call(int occupancyId, BillType billType) {
+    return NextBillingCycleForBillTypeProvider(occupancyId, billType);
+  }
+
+  @override
+  NextBillingCycleForBillTypeProvider getProviderOverride(
+    covariant NextBillingCycleForBillTypeProvider provider,
+  ) {
+    return call(provider.occupancyId, provider.billType);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'nextBillingCycleForBillTypeProvider';
+}
+
+/// Get the next billing cycle for a specific bill type.
+///
+/// Each bill type has its own cycle progression. For example:
+/// - Rent might be on cycle 5 (advance payment)
+/// - Electricity might be on cycle 2 (behind on bills)
+///
+/// This allows independent tracking per bill type.
+///
+/// Copied from [nextBillingCycleForBillType].
+class NextBillingCycleForBillTypeProvider
+    extends AutoDisposeFutureProvider<BillingCycle> {
+  /// Get the next billing cycle for a specific bill type.
+  ///
+  /// Each bill type has its own cycle progression. For example:
+  /// - Rent might be on cycle 5 (advance payment)
+  /// - Electricity might be on cycle 2 (behind on bills)
+  ///
+  /// This allows independent tracking per bill type.
+  ///
+  /// Copied from [nextBillingCycleForBillType].
+  NextBillingCycleForBillTypeProvider(int occupancyId, BillType billType)
+    : this._internal(
+        (ref) => nextBillingCycleForBillType(
+          ref as NextBillingCycleForBillTypeRef,
+          occupancyId,
+          billType,
+        ),
+        from: nextBillingCycleForBillTypeProvider,
+        name: r'nextBillingCycleForBillTypeProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$nextBillingCycleForBillTypeHash,
+        dependencies: NextBillingCycleForBillTypeFamily._dependencies,
+        allTransitiveDependencies:
+            NextBillingCycleForBillTypeFamily._allTransitiveDependencies,
+        occupancyId: occupancyId,
+        billType: billType,
+      );
+
+  NextBillingCycleForBillTypeProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.occupancyId,
+    required this.billType,
+  }) : super.internal();
+
+  final int occupancyId;
+  final BillType billType;
+
+  @override
+  Override overrideWith(
+    FutureOr<BillingCycle> Function(NextBillingCycleForBillTypeRef provider)
+    create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: NextBillingCycleForBillTypeProvider._internal(
+        (ref) => create(ref as NextBillingCycleForBillTypeRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        occupancyId: occupancyId,
+        billType: billType,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<BillingCycle> createElement() {
+    return _NextBillingCycleForBillTypeProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is NextBillingCycleForBillTypeProvider &&
+        other.occupancyId == occupancyId &&
+        other.billType == billType;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, occupancyId.hashCode);
+    hash = _SystemHash.combine(hash, billType.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin NextBillingCycleForBillTypeRef
+    on AutoDisposeFutureProviderRef<BillingCycle> {
+  /// The parameter `occupancyId` of this provider.
+  int get occupancyId;
+
+  /// The parameter `billType` of this provider.
+  BillType get billType;
+}
+
+class _NextBillingCycleForBillTypeProviderElement
+    extends AutoDisposeFutureProviderElement<BillingCycle>
+    with NextBillingCycleForBillTypeRef {
+  _NextBillingCycleForBillTypeProviderElement(super.provider);
+
+  @override
+  int get occupancyId =>
+      (origin as NextBillingCycleForBillTypeProvider).occupancyId;
+  @override
+  BillType get billType =>
+      (origin as NextBillingCycleForBillTypeProvider).billType;
+}
+
+String _$allUnbilledCyclesForBillTypeHash() =>
+    r'33e303c8fe85869d0980ef42d86ee40d861680fe';
+
+/// Get ALL unbilled cycles for a specific bill type up to current date.
+///
+/// Returns a list of ALL cycles that are missing bills, allowing the
+/// attention list to show multiple overdue cycles per bill type.
+///
+/// Copied from [allUnbilledCyclesForBillType].
+@ProviderFor(allUnbilledCyclesForBillType)
+const allUnbilledCyclesForBillTypeProvider =
+    AllUnbilledCyclesForBillTypeFamily();
+
+/// Get ALL unbilled cycles for a specific bill type up to current date.
+///
+/// Returns a list of ALL cycles that are missing bills, allowing the
+/// attention list to show multiple overdue cycles per bill type.
+///
+/// Copied from [allUnbilledCyclesForBillType].
+class AllUnbilledCyclesForBillTypeFamily
+    extends Family<AsyncValue<List<BillingCycle>>> {
+  /// Get ALL unbilled cycles for a specific bill type up to current date.
+  ///
+  /// Returns a list of ALL cycles that are missing bills, allowing the
+  /// attention list to show multiple overdue cycles per bill type.
+  ///
+  /// Copied from [allUnbilledCyclesForBillType].
+  const AllUnbilledCyclesForBillTypeFamily();
+
+  /// Get ALL unbilled cycles for a specific bill type up to current date.
+  ///
+  /// Returns a list of ALL cycles that are missing bills, allowing the
+  /// attention list to show multiple overdue cycles per bill type.
+  ///
+  /// Copied from [allUnbilledCyclesForBillType].
+  AllUnbilledCyclesForBillTypeProvider call(
+    int occupancyId,
+    BillType billType,
+  ) {
+    return AllUnbilledCyclesForBillTypeProvider(occupancyId, billType);
+  }
+
+  @override
+  AllUnbilledCyclesForBillTypeProvider getProviderOverride(
+    covariant AllUnbilledCyclesForBillTypeProvider provider,
+  ) {
+    return call(provider.occupancyId, provider.billType);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'allUnbilledCyclesForBillTypeProvider';
+}
+
+/// Get ALL unbilled cycles for a specific bill type up to current date.
+///
+/// Returns a list of ALL cycles that are missing bills, allowing the
+/// attention list to show multiple overdue cycles per bill type.
+///
+/// Copied from [allUnbilledCyclesForBillType].
+class AllUnbilledCyclesForBillTypeProvider
+    extends AutoDisposeFutureProvider<List<BillingCycle>> {
+  /// Get ALL unbilled cycles for a specific bill type up to current date.
+  ///
+  /// Returns a list of ALL cycles that are missing bills, allowing the
+  /// attention list to show multiple overdue cycles per bill type.
+  ///
+  /// Copied from [allUnbilledCyclesForBillType].
+  AllUnbilledCyclesForBillTypeProvider(int occupancyId, BillType billType)
+    : this._internal(
+        (ref) => allUnbilledCyclesForBillType(
+          ref as AllUnbilledCyclesForBillTypeRef,
+          occupancyId,
+          billType,
+        ),
+        from: allUnbilledCyclesForBillTypeProvider,
+        name: r'allUnbilledCyclesForBillTypeProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$allUnbilledCyclesForBillTypeHash,
+        dependencies: AllUnbilledCyclesForBillTypeFamily._dependencies,
+        allTransitiveDependencies:
+            AllUnbilledCyclesForBillTypeFamily._allTransitiveDependencies,
+        occupancyId: occupancyId,
+        billType: billType,
+      );
+
+  AllUnbilledCyclesForBillTypeProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.occupancyId,
+    required this.billType,
+  }) : super.internal();
+
+  final int occupancyId;
+  final BillType billType;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<BillingCycle>> Function(
+      AllUnbilledCyclesForBillTypeRef provider,
+    )
+    create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: AllUnbilledCyclesForBillTypeProvider._internal(
+        (ref) => create(ref as AllUnbilledCyclesForBillTypeRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        occupancyId: occupancyId,
+        billType: billType,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<BillingCycle>> createElement() {
+    return _AllUnbilledCyclesForBillTypeProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is AllUnbilledCyclesForBillTypeProvider &&
+        other.occupancyId == occupancyId &&
+        other.billType == billType;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, occupancyId.hashCode);
+    hash = _SystemHash.combine(hash, billType.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin AllUnbilledCyclesForBillTypeRef
+    on AutoDisposeFutureProviderRef<List<BillingCycle>> {
+  /// The parameter `occupancyId` of this provider.
+  int get occupancyId;
+
+  /// The parameter `billType` of this provider.
+  BillType get billType;
+}
+
+class _AllUnbilledCyclesForBillTypeProviderElement
+    extends AutoDisposeFutureProviderElement<List<BillingCycle>>
+    with AllUnbilledCyclesForBillTypeRef {
+  _AllUnbilledCyclesForBillTypeProviderElement(super.provider);
+
+  @override
+  int get occupancyId =>
+      (origin as AllUnbilledCyclesForBillTypeProvider).occupancyId;
+  @override
+  BillType get billType =>
+      (origin as AllUnbilledCyclesForBillTypeProvider).billType;
+}
+
+String _$billingStatusForHash() => r'49946e1721b2a360499c87e7bbc6589c00fcfb12';
+
+/// Get billing attention items for a single occupancy.
+///
+/// Returns a list of attention items - one for EACH unbilled cycle that:
+/// - Has anniversary billing enabled in settings
+/// - Has a cycle needing attention (due soon or overdue)
 ///
 /// Copied from [billingStatusFor].
 @ProviderFor(billingStatusFor)
 const billingStatusForProvider = BillingStatusForFamily();
 
-/// Get billing attention status for a single occupancy.
+/// Get billing attention items for a single occupancy.
 ///
-/// Returns null if the occupancy is up-to-date (no attention needed).
+/// Returns a list of attention items - one for EACH unbilled cycle that:
+/// - Has anniversary billing enabled in settings
+/// - Has a cycle needing attention (due soon or overdue)
 ///
 /// Copied from [billingStatusFor].
-class BillingStatusForFamily extends Family<AsyncValue<BillingAttentionItem?>> {
-  /// Get billing attention status for a single occupancy.
+class BillingStatusForFamily
+    extends Family<AsyncValue<List<BillingAttentionItem>>> {
+  /// Get billing attention items for a single occupancy.
   ///
-  /// Returns null if the occupancy is up-to-date (no attention needed).
+  /// Returns a list of attention items - one for EACH unbilled cycle that:
+  /// - Has anniversary billing enabled in settings
+  /// - Has a cycle needing attention (due soon or overdue)
   ///
   /// Copied from [billingStatusFor].
   const BillingStatusForFamily();
 
-  /// Get billing attention status for a single occupancy.
+  /// Get billing attention items for a single occupancy.
   ///
-  /// Returns null if the occupancy is up-to-date (no attention needed).
+  /// Returns a list of attention items - one for EACH unbilled cycle that:
+  /// - Has anniversary billing enabled in settings
+  /// - Has a cycle needing attention (due soon or overdue)
   ///
   /// Copied from [billingStatusFor].
   BillingStatusForProvider call(int occupancyId) {
@@ -421,16 +800,20 @@ class BillingStatusForFamily extends Family<AsyncValue<BillingAttentionItem?>> {
   String? get name => r'billingStatusForProvider';
 }
 
-/// Get billing attention status for a single occupancy.
+/// Get billing attention items for a single occupancy.
 ///
-/// Returns null if the occupancy is up-to-date (no attention needed).
+/// Returns a list of attention items - one for EACH unbilled cycle that:
+/// - Has anniversary billing enabled in settings
+/// - Has a cycle needing attention (due soon or overdue)
 ///
 /// Copied from [billingStatusFor].
 class BillingStatusForProvider
-    extends AutoDisposeFutureProvider<BillingAttentionItem?> {
-  /// Get billing attention status for a single occupancy.
+    extends AutoDisposeFutureProvider<List<BillingAttentionItem>> {
+  /// Get billing attention items for a single occupancy.
   ///
-  /// Returns null if the occupancy is up-to-date (no attention needed).
+  /// Returns a list of attention items - one for EACH unbilled cycle that:
+  /// - Has anniversary billing enabled in settings
+  /// - Has a cycle needing attention (due soon or overdue)
   ///
   /// Copied from [billingStatusFor].
   BillingStatusForProvider(int occupancyId)
@@ -461,7 +844,7 @@ class BillingStatusForProvider
 
   @override
   Override overrideWith(
-    FutureOr<BillingAttentionItem?> Function(BillingStatusForRef provider)
+    FutureOr<List<BillingAttentionItem>> Function(BillingStatusForRef provider)
     create,
   ) {
     return ProviderOverride(
@@ -479,7 +862,7 @@ class BillingStatusForProvider
   }
 
   @override
-  AutoDisposeFutureProviderElement<BillingAttentionItem?> createElement() {
+  AutoDisposeFutureProviderElement<List<BillingAttentionItem>> createElement() {
     return _BillingStatusForProviderElement(this);
   }
 
@@ -501,13 +884,13 @@ class BillingStatusForProvider
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 mixin BillingStatusForRef
-    on AutoDisposeFutureProviderRef<BillingAttentionItem?> {
+    on AutoDisposeFutureProviderRef<List<BillingAttentionItem>> {
   /// The parameter `occupancyId` of this provider.
   int get occupancyId;
 }
 
 class _BillingStatusForProviderElement
-    extends AutoDisposeFutureProviderElement<BillingAttentionItem?>
+    extends AutoDisposeFutureProviderElement<List<BillingAttentionItem>>
     with BillingStatusForRef {
   _BillingStatusForProviderElement(super.provider);
 
@@ -516,13 +899,12 @@ class _BillingStatusForProviderElement
 }
 
 String _$billingAttentionListHash() =>
-    r'1ebc703e71bb429923c3ba74c1c2480913ba4869';
+    r'6d83d592bf275772040c5b978351536c0c14d7f9';
 
 /// Get all occupancies that need billing attention.
 ///
-/// Returns a list of occupancies where:
-/// - Cycle is ending within the "due soon" threshold, OR
-/// - Cycle has already ended (overdue)
+/// Returns a list of attention items across all occupancies and bill types.
+/// Each item represents a specific bill type for an occupancy that needs attention.
 ///
 /// Sorted by urgency (overdue first, then by days until due).
 ///

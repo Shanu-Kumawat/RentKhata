@@ -10,6 +10,7 @@ import '../../../application/providers/dashboard_providers.dart';
 import '../../../application/providers/billing_providers.dart';
 import '../../../application/providers/billing_cycle_providers.dart';
 import '../../../domain/entities/billing_status.dart';
+import '../../../domain/entities/bill.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
 
@@ -566,6 +567,22 @@ class _BillingAttentionTile extends StatelessWidget {
 
   const _BillingAttentionTile({required this.item});
 
+  String _billTypeLabel(BillType type) => switch (type) {
+    BillType.rent => 'Rent',
+    BillType.electricity => 'Elec',
+    BillType.water => 'Water',
+    BillType.maintenance => 'Maint',
+    BillType.other => 'Other',
+  };
+
+  Color _billTypeColor(BillType type) => switch (type) {
+    BillType.rent => AppColors.primary,
+    BillType.electricity => AppColors.warning,
+    BillType.water => Colors.blue,
+    BillType.maintenance => Colors.green,
+    BillType.other => Colors.grey,
+  };
+
   @override
   Widget build(BuildContext context) {
     final isOverdue = item.status == BillingCycleStatus.overdue;
@@ -573,24 +590,46 @@ class _BillingAttentionTile extends StatelessWidget {
     final statusTextColor = isOverdue
         ? AppColors.errorText
         : AppColors.warningText;
+    final billColor = _billTypeColor(item.billType);
 
     return ListTile(
       visualDensity: VisualDensity.compact,
       onTap: () {
-        // Navigate to room detail with cycle dates for bill creation
+        // Navigate to room detail with cycle dates and bill type for bill creation
         context.push(
           '/rooms/${item.roomId}?createBill=true'
           '&cycleStart=${item.cycleStart.toIso8601String()}'
-          '&cycleEnd=${item.cycleEnd.toIso8601String()}',
+          '&cycleEnd=${item.cycleEnd.toIso8601String()}'
+          '&billType=${item.billType.name}',
         );
       },
       leading: Container(
-        width: 8,
-        height: 8,
-        decoration: BoxDecoration(color: statusColor, shape: BoxShape.circle),
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        decoration: BoxDecoration(
+          color: billColor.withValues(alpha: 0.15),
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(color: billColor.withValues(alpha: 0.3)),
+        ),
+        child: Text(
+          _billTypeLabel(item.billType),
+          style: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+            color: billColor,
+          ),
+        ),
       ),
       title: Row(
         children: [
+          Container(
+            width: 6,
+            height: 6,
+            margin: const EdgeInsets.only(right: 6),
+            decoration: BoxDecoration(
+              color: statusColor,
+              shape: BoxShape.circle,
+            ),
+          ),
           Expanded(
             child: Text(
               'Room ${item.roomNumber} - ${item.tenantName}',
@@ -613,7 +652,8 @@ class _BillingAttentionTile extends StatelessWidget {
           context.push(
             '/rooms/${item.roomId}?createBill=true'
             '&cycleStart=${item.cycleStart.toIso8601String()}'
-            '&cycleEnd=${item.cycleEnd.toIso8601String()}',
+            '&cycleEnd=${item.cycleEnd.toIso8601String()}'
+            '&billType=${item.billType.name}',
           );
         },
         style: OutlinedButton.styleFrom(

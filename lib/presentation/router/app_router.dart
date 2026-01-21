@@ -4,6 +4,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../domain/entities/bill.dart';
 import '../screens/onboarding/splash_screen.dart';
 import '../screens/onboarding/welcome_screen.dart';
 import '../screens/onboarding/profile_setup_screen.dart';
@@ -81,6 +82,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           final createBill = state.uri.queryParameters['createBill'] == 'true';
           final cycleStartStr = state.uri.queryParameters['cycleStart'];
           final cycleEndStr = state.uri.queryParameters['cycleEnd'];
+          final billTypeStr = state.uri.queryParameters['billType'];
 
           DateTime? cycleStart;
           DateTime? cycleEnd;
@@ -91,11 +93,20 @@ final routerProvider = Provider<GoRouter>((ref) {
             cycleEnd = DateTime.tryParse(cycleEndStr);
           }
 
+          // Parse bill type from query parameter
+          BillType? billType;
+          if (billTypeStr != null) {
+            billType = BillType.values
+                .where((e) => e.name == billTypeStr)
+                .firstOrNull;
+          }
+
           return RoomDetailScreen(
             roomId: id,
             createBill: createBill,
             cycleStart: cycleStart,
             cycleEnd: cycleEnd,
+            billType: billType,
           );
         },
       ),

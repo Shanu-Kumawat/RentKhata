@@ -29,6 +29,9 @@ mixin _$BillingAttentionItem {
   DateTime get cycleEnd => throw _privateConstructorUsedError;
   BillingCycleStatus get status => throw _privateConstructorUsedError;
 
+  /// The bill type that needs attention
+  BillType get billType => throw _privateConstructorUsedError;
+
   /// Days until cycle ends. Negative values mean cycle is overdue.
   int get daysUntilCycleEnd => throw _privateConstructorUsedError;
 
@@ -63,6 +66,7 @@ abstract class $BillingAttentionItemCopyWith<$Res> {
     DateTime cycleStart,
     DateTime cycleEnd,
     BillingCycleStatus status,
+    BillType billType,
     int daysUntilCycleEnd,
     double agreedRent,
     String? propertyName,
@@ -94,6 +98,7 @@ class _$BillingAttentionItemCopyWithImpl<
     Object? cycleStart = null,
     Object? cycleEnd = null,
     Object? status = null,
+    Object? billType = null,
     Object? daysUntilCycleEnd = null,
     Object? agreedRent = null,
     Object? propertyName = freezed,
@@ -128,6 +133,10 @@ class _$BillingAttentionItemCopyWithImpl<
                 ? _value.status
                 : status // ignore: cast_nullable_to_non_nullable
                       as BillingCycleStatus,
+            billType: null == billType
+                ? _value.billType
+                : billType // ignore: cast_nullable_to_non_nullable
+                      as BillType,
             daysUntilCycleEnd: null == daysUntilCycleEnd
                 ? _value.daysUntilCycleEnd
                 : daysUntilCycleEnd // ignore: cast_nullable_to_non_nullable
@@ -163,6 +172,7 @@ abstract class _$$BillingAttentionItemImplCopyWith<$Res>
     DateTime cycleStart,
     DateTime cycleEnd,
     BillingCycleStatus status,
+    BillType billType,
     int daysUntilCycleEnd,
     double agreedRent,
     String? propertyName,
@@ -190,6 +200,7 @@ class __$$BillingAttentionItemImplCopyWithImpl<$Res>
     Object? cycleStart = null,
     Object? cycleEnd = null,
     Object? status = null,
+    Object? billType = null,
     Object? daysUntilCycleEnd = null,
     Object? agreedRent = null,
     Object? propertyName = freezed,
@@ -224,6 +235,10 @@ class __$$BillingAttentionItemImplCopyWithImpl<$Res>
             ? _value.status
             : status // ignore: cast_nullable_to_non_nullable
                   as BillingCycleStatus,
+        billType: null == billType
+            ? _value.billType
+            : billType // ignore: cast_nullable_to_non_nullable
+                  as BillType,
         daysUntilCycleEnd: null == daysUntilCycleEnd
             ? _value.daysUntilCycleEnd
             : daysUntilCycleEnd // ignore: cast_nullable_to_non_nullable
@@ -252,6 +267,7 @@ class _$BillingAttentionItemImpl extends _BillingAttentionItem {
     required this.cycleStart,
     required this.cycleEnd,
     required this.status,
+    required this.billType,
     required this.daysUntilCycleEnd,
     required this.agreedRent,
     this.propertyName,
@@ -275,6 +291,10 @@ class _$BillingAttentionItemImpl extends _BillingAttentionItem {
   @override
   final BillingCycleStatus status;
 
+  /// The bill type that needs attention
+  @override
+  final BillType billType;
+
   /// Days until cycle ends. Negative values mean cycle is overdue.
   @override
   final int daysUntilCycleEnd;
@@ -289,7 +309,7 @@ class _$BillingAttentionItemImpl extends _BillingAttentionItem {
 
   @override
   String toString() {
-    return 'BillingAttentionItem(occupancyId: $occupancyId, roomId: $roomId, roomNumber: $roomNumber, tenantName: $tenantName, cycleStart: $cycleStart, cycleEnd: $cycleEnd, status: $status, daysUntilCycleEnd: $daysUntilCycleEnd, agreedRent: $agreedRent, propertyName: $propertyName)';
+    return 'BillingAttentionItem(occupancyId: $occupancyId, roomId: $roomId, roomNumber: $roomNumber, tenantName: $tenantName, cycleStart: $cycleStart, cycleEnd: $cycleEnd, status: $status, billType: $billType, daysUntilCycleEnd: $daysUntilCycleEnd, agreedRent: $agreedRent, propertyName: $propertyName)';
   }
 
   @override
@@ -309,6 +329,8 @@ class _$BillingAttentionItemImpl extends _BillingAttentionItem {
             (identical(other.cycleEnd, cycleEnd) ||
                 other.cycleEnd == cycleEnd) &&
             (identical(other.status, status) || other.status == status) &&
+            (identical(other.billType, billType) ||
+                other.billType == billType) &&
             (identical(other.daysUntilCycleEnd, daysUntilCycleEnd) ||
                 other.daysUntilCycleEnd == daysUntilCycleEnd) &&
             (identical(other.agreedRent, agreedRent) ||
@@ -328,6 +350,7 @@ class _$BillingAttentionItemImpl extends _BillingAttentionItem {
     cycleStart,
     cycleEnd,
     status,
+    billType,
     daysUntilCycleEnd,
     agreedRent,
     propertyName,
@@ -360,6 +383,7 @@ abstract class _BillingAttentionItem extends BillingAttentionItem {
     required final DateTime cycleStart,
     required final DateTime cycleEnd,
     required final BillingCycleStatus status,
+    required final BillType billType,
     required final int daysUntilCycleEnd,
     required final double agreedRent,
     final String? propertyName,
@@ -383,6 +407,10 @@ abstract class _BillingAttentionItem extends BillingAttentionItem {
   DateTime get cycleEnd;
   @override
   BillingCycleStatus get status;
+
+  /// The bill type that needs attention
+  @override
+  BillType get billType;
 
   /// Days until cycle ends. Negative values mean cycle is overdue.
   @override

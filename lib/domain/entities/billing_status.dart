@@ -2,6 +2,7 @@
 library;
 
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'bill.dart';
 
 part 'billing_status.freezed.dart';
 part 'billing_status.g.dart';
@@ -23,10 +24,10 @@ enum BillingCycleStatus {
   overdue,
 }
 
-/// Represents an occupancy that needs billing attention.
+/// Represents a bill type that needs attention for an occupancy.
 ///
 /// Used by the Dashboard's "Attention Needed" section to show
-/// which tenants need bills created.
+/// which tenants need bills created and for which bill types.
 @freezed
 class BillingAttentionItem with _$BillingAttentionItem {
   const BillingAttentionItem._();
@@ -39,6 +40,9 @@ class BillingAttentionItem with _$BillingAttentionItem {
     required DateTime cycleStart,
     required DateTime cycleEnd,
     required BillingCycleStatus status,
+
+    /// The bill type that needs attention
+    required BillType billType,
 
     /// Days until cycle ends. Negative values mean cycle is overdue.
     required int daysUntilCycleEnd,

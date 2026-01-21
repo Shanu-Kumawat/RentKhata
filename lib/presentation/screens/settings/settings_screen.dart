@@ -546,7 +546,9 @@ class _BillingCycleSettingsSheetState
     final theme = Theme.of(context);
     final settingsAsync = ref.watch(billSettingsProvider);
 
+    // Use skipLoadingOnRefresh to prevent flicker when updating settings
     return settingsAsync.when(
+      skipLoadingOnRefresh: true,
       loading: () => const SizedBox(
         height: 200,
         child: Center(child: CircularProgressIndicator()),

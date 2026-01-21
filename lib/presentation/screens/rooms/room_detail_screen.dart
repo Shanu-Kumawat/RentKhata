@@ -35,12 +35,16 @@ class RoomDetailScreen extends ConsumerWidget {
   /// Optional: Pre-fill cycle end date for anniversary-based billing
   final DateTime? cycleEnd;
 
+  /// Optional: Pre-select bill type for bill creation
+  final BillType? billType;
+
   const RoomDetailScreen({
     super.key,
     required this.roomId,
     this.createBill = false,
     this.cycleStart,
     this.cycleEnd,
+    this.billType,
   });
 
   @override
@@ -60,6 +64,7 @@ class RoomDetailScreen extends ConsumerWidget {
           autoCreateBill: createBill,
           cycleStart: cycleStart,
           cycleEnd: cycleEnd,
+          billType: billType,
         );
       },
       loading: () => Scaffold(
@@ -79,12 +84,14 @@ class _RoomDetailContent extends ConsumerStatefulWidget {
   final bool autoCreateBill;
   final DateTime? cycleStart;
   final DateTime? cycleEnd;
+  final BillType? billType;
 
   const _RoomDetailContent({
     required this.room,
     this.autoCreateBill = false,
     this.cycleStart,
     this.cycleEnd,
+    this.billType,
   });
 
   @override
@@ -107,6 +114,7 @@ class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
             occupancy,
             cycleStart: widget.cycleStart,
             cycleEnd: widget.cycleEnd,
+            billType: widget.billType,
           );
         }
       });
@@ -194,6 +202,7 @@ class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
     Occupancy occupancy, {
     DateTime? cycleStart,
     DateTime? cycleEnd,
+    BillType? billType,
   }) async {
     // Calculate anniversary-based cycle dates if not provided
     DateTime effectiveCycleStart;
@@ -258,6 +267,7 @@ class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
         suggestedPeriodStart: effectiveCycleStart,
         suggestedPeriodEnd: effectiveCycleEnd,
         moveInDate: occupancy.moveInDate,
+        initialBillType: billType,
       ),
     );
   }
