@@ -3242,6 +3242,18 @@ class $OccupanciesTable extends Occupancies
     ),
     defaultValue: const Constant(false),
   );
+  static const VerificationMeta _billingStartDateMeta = const VerificationMeta(
+    'billingStartDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> billingStartDate =
+      GeneratedColumn<DateTime>(
+        'billing_start_date',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -3260,6 +3272,7 @@ class $OccupanciesTable extends Occupancies
     deductionReason,
     settlementNotes,
     isSettled,
+    billingStartDate,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -3395,6 +3408,15 @@ class $OccupanciesTable extends Occupancies
         isSettled.isAcceptableOrUnknown(data['is_settled']!, _isSettledMeta),
       );
     }
+    if (data.containsKey('billing_start_date')) {
+      context.handle(
+        _billingStartDateMeta,
+        billingStartDate.isAcceptableOrUnknown(
+          data['billing_start_date']!,
+          _billingStartDateMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -3470,6 +3492,10 @@ class $OccupanciesTable extends Occupancies
         DriftSqlType.bool,
         data['${effectivePrefix}is_settled'],
       )!,
+      billingStartDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}billing_start_date'],
+      ),
     );
   }
 
@@ -3532,6 +3558,11 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
 
   /// Whether the occupancy is fully settled (deposit returned/forfeited)
   final bool isSettled;
+
+  /// Date from which billing cycles should start.
+  /// If null, defaults to moveInDate for backwards compatibility.
+  /// Allows landlords to add existing tenants without backfilling past bills.
+  final DateTime? billingStartDate;
   const OccupancyEntity({
     required this.id,
     required this.roomId,
@@ -3549,6 +3580,7 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
     this.deductionReason,
     this.settlementNotes,
     required this.isSettled,
+    this.billingStartDate,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -3585,6 +3617,9 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
       map['settlement_notes'] = Variable<String>(settlementNotes);
     }
     map['is_settled'] = Variable<bool>(isSettled);
+    if (!nullToAbsent || billingStartDate != null) {
+      map['billing_start_date'] = Variable<DateTime>(billingStartDate);
+    }
     return map;
   }
 
@@ -3618,6 +3653,9 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
           ? const Value.absent()
           : Value(settlementNotes),
       isSettled: Value(isSettled),
+      billingStartDate: billingStartDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(billingStartDate),
     );
   }
 
@@ -3651,6 +3689,9 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
       deductionReason: serializer.fromJson<String?>(json['deductionReason']),
       settlementNotes: serializer.fromJson<String?>(json['settlementNotes']),
       isSettled: serializer.fromJson<bool>(json['isSettled']),
+      billingStartDate: serializer.fromJson<DateTime?>(
+        json['billingStartDate'],
+      ),
     );
   }
   @override
@@ -3677,6 +3718,7 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
       'deductionReason': serializer.toJson<String?>(deductionReason),
       'settlementNotes': serializer.toJson<String?>(settlementNotes),
       'isSettled': serializer.toJson<bool>(isSettled),
+      'billingStartDate': serializer.toJson<DateTime?>(billingStartDate),
     };
   }
 
@@ -3697,6 +3739,7 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
     Value<String?> deductionReason = const Value.absent(),
     Value<String?> settlementNotes = const Value.absent(),
     bool? isSettled,
+    Value<DateTime?> billingStartDate = const Value.absent(),
   }) => OccupancyEntity(
     id: id ?? this.id,
     roomId: roomId ?? this.roomId,
@@ -3724,6 +3767,9 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
         ? settlementNotes.value
         : this.settlementNotes,
     isSettled: isSettled ?? this.isSettled,
+    billingStartDate: billingStartDate.present
+        ? billingStartDate.value
+        : this.billingStartDate,
   );
   OccupancyEntity copyWithCompanion(OccupanciesCompanion data) {
     return OccupancyEntity(
@@ -3765,6 +3811,9 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
           ? data.settlementNotes.value
           : this.settlementNotes,
       isSettled: data.isSettled.present ? data.isSettled.value : this.isSettled,
+      billingStartDate: data.billingStartDate.present
+          ? data.billingStartDate.value
+          : this.billingStartDate,
     );
   }
 
@@ -3786,7 +3835,8 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
           ..write('deductionAmount: $deductionAmount, ')
           ..write('deductionReason: $deductionReason, ')
           ..write('settlementNotes: $settlementNotes, ')
-          ..write('isSettled: $isSettled')
+          ..write('isSettled: $isSettled, ')
+          ..write('billingStartDate: $billingStartDate')
           ..write(')'))
         .toString();
   }
@@ -3809,6 +3859,7 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
     deductionReason,
     settlementNotes,
     isSettled,
+    billingStartDate,
   );
   @override
   bool operator ==(Object other) =>
@@ -3829,7 +3880,8 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
           other.deductionAmount == this.deductionAmount &&
           other.deductionReason == this.deductionReason &&
           other.settlementNotes == this.settlementNotes &&
-          other.isSettled == this.isSettled);
+          other.isSettled == this.isSettled &&
+          other.billingStartDate == this.billingStartDate);
 }
 
 class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
@@ -3849,6 +3901,7 @@ class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
   final Value<String?> deductionReason;
   final Value<String?> settlementNotes;
   final Value<bool> isSettled;
+  final Value<DateTime?> billingStartDate;
   const OccupanciesCompanion({
     this.id = const Value.absent(),
     this.roomId = const Value.absent(),
@@ -3866,6 +3919,7 @@ class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
     this.deductionReason = const Value.absent(),
     this.settlementNotes = const Value.absent(),
     this.isSettled = const Value.absent(),
+    this.billingStartDate = const Value.absent(),
   });
   OccupanciesCompanion.insert({
     this.id = const Value.absent(),
@@ -3884,6 +3938,7 @@ class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
     this.deductionReason = const Value.absent(),
     this.settlementNotes = const Value.absent(),
     this.isSettled = const Value.absent(),
+    this.billingStartDate = const Value.absent(),
   }) : roomId = Value(roomId),
        tenantId = Value(tenantId),
        moveInDate = Value(moveInDate),
@@ -3905,6 +3960,7 @@ class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
     Expression<String>? deductionReason,
     Expression<String>? settlementNotes,
     Expression<bool>? isSettled,
+    Expression<DateTime>? billingStartDate,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -3926,6 +3982,7 @@ class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
       if (deductionReason != null) 'deduction_reason': deductionReason,
       if (settlementNotes != null) 'settlement_notes': settlementNotes,
       if (isSettled != null) 'is_settled': isSettled,
+      if (billingStartDate != null) 'billing_start_date': billingStartDate,
     });
   }
 
@@ -3946,6 +4003,7 @@ class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
     Value<String?>? deductionReason,
     Value<String?>? settlementNotes,
     Value<bool>? isSettled,
+    Value<DateTime?>? billingStartDate,
   }) {
     return OccupanciesCompanion(
       id: id ?? this.id,
@@ -3965,6 +4023,7 @@ class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
       deductionReason: deductionReason ?? this.deductionReason,
       settlementNotes: settlementNotes ?? this.settlementNotes,
       isSettled: isSettled ?? this.isSettled,
+      billingStartDate: billingStartDate ?? this.billingStartDate,
     );
   }
 
@@ -4027,6 +4086,9 @@ class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
     if (isSettled.present) {
       map['is_settled'] = Variable<bool>(isSettled.value);
     }
+    if (billingStartDate.present) {
+      map['billing_start_date'] = Variable<DateTime>(billingStartDate.value);
+    }
     return map;
   }
 
@@ -4048,7 +4110,8 @@ class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
           ..write('deductionAmount: $deductionAmount, ')
           ..write('deductionReason: $deductionReason, ')
           ..write('settlementNotes: $settlementNotes, ')
-          ..write('isSettled: $isSettled')
+          ..write('isSettled: $isSettled, ')
+          ..write('billingStartDate: $billingStartDate')
           ..write(')'))
         .toString();
   }
@@ -12457,6 +12520,7 @@ typedef $$OccupanciesTableCreateCompanionBuilder =
       Value<String?> deductionReason,
       Value<String?> settlementNotes,
       Value<bool> isSettled,
+      Value<DateTime?> billingStartDate,
     });
 typedef $$OccupanciesTableUpdateCompanionBuilder =
     OccupanciesCompanion Function({
@@ -12476,6 +12540,7 @@ typedef $$OccupanciesTableUpdateCompanionBuilder =
       Value<String?> deductionReason,
       Value<String?> settlementNotes,
       Value<bool> isSettled,
+      Value<DateTime?> billingStartDate,
     });
 
 final class $$OccupanciesTableReferences
@@ -12664,6 +12729,11 @@ class $$OccupanciesTableFilterComposer
 
   ColumnFilters<bool> get isSettled => $composableBuilder(
     column: $table.isSettled,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get billingStartDate => $composableBuilder(
+    column: $table.billingStartDate,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -12868,6 +12938,11 @@ class $$OccupanciesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<DateTime> get billingStartDate => $composableBuilder(
+    column: $table.billingStartDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$RoomsTableOrderingComposer get roomId {
     final $$RoomsTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -12988,6 +13063,11 @@ class $$OccupanciesTableAnnotationComposer
 
   GeneratedColumn<bool> get isSettled =>
       $composableBuilder(column: $table.isSettled, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get billingStartDate => $composableBuilder(
+    column: $table.billingStartDate,
+    builder: (column) => column,
+  );
 
   $$RoomsTableAnnotationComposer get roomId {
     final $$RoomsTableAnnotationComposer composer = $composerBuilder(
@@ -13162,6 +13242,7 @@ class $$OccupanciesTableTableManager
                 Value<String?> deductionReason = const Value.absent(),
                 Value<String?> settlementNotes = const Value.absent(),
                 Value<bool> isSettled = const Value.absent(),
+                Value<DateTime?> billingStartDate = const Value.absent(),
               }) => OccupanciesCompanion(
                 id: id,
                 roomId: roomId,
@@ -13179,6 +13260,7 @@ class $$OccupanciesTableTableManager
                 deductionReason: deductionReason,
                 settlementNotes: settlementNotes,
                 isSettled: isSettled,
+                billingStartDate: billingStartDate,
               ),
           createCompanionCallback:
               ({
@@ -13198,6 +13280,7 @@ class $$OccupanciesTableTableManager
                 Value<String?> deductionReason = const Value.absent(),
                 Value<String?> settlementNotes = const Value.absent(),
                 Value<bool> isSettled = const Value.absent(),
+                Value<DateTime?> billingStartDate = const Value.absent(),
               }) => OccupanciesCompanion.insert(
                 id: id,
                 roomId: roomId,
@@ -13215,6 +13298,7 @@ class $$OccupanciesTableTableManager
                 deductionReason: deductionReason,
                 settlementNotes: settlementNotes,
                 isSettled: isSettled,
+                billingStartDate: billingStartDate,
               ),
           withReferenceMapper: (p0) => p0
               .map(

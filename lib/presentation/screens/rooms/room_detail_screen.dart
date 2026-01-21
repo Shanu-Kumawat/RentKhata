@@ -266,7 +266,7 @@ class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
         electricityRate: widget.room.currentElectricityRate,
         suggestedPeriodStart: effectiveCycleStart,
         suggestedPeriodEnd: effectiveCycleEnd,
-        moveInDate: occupancy.moveInDate,
+        billingStartDate: occupancy.effectiveBillingStartDate,
         initialBillType: billType,
       ),
     );

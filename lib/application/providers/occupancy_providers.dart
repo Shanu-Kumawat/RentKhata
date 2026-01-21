@@ -59,6 +59,7 @@ Future<Occupancy?> occupancy(Ref ref, int occupancyId) async {
     depositReceivedDate: entity.depositReceivedDate,
     depositReturnedDate: entity.depositReturnedDate,
     depositReturnedAmount: entity.depositReturnedAmount,
+    billingStartDate: entity.billingStartDate,
     roomNumber: room?.roomNumber,
     tenantName: tenant?.name,
     propertyName: propertyName,

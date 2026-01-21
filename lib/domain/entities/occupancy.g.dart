@@ -33,6 +33,9 @@ _$OccupancyImpl _$$OccupancyImplFromJson(Map<String, dynamic> json) =>
       deductionReason: json['deductionReason'] as String?,
       settlementNotes: json['settlementNotes'] as String?,
       isSettled: json['isSettled'] as bool? ?? false,
+      billingStartDate: json['billingStartDate'] == null
+          ? null
+          : DateTime.parse(json['billingStartDate'] as String),
       roomNumber: json['roomNumber'] as String?,
       tenantName: json['tenantName'] as String?,
       propertyName: json['propertyName'] as String?,
@@ -56,6 +59,7 @@ Map<String, dynamic> _$$OccupancyImplToJson(_$OccupancyImpl instance) =>
       'deductionReason': instance.deductionReason,
       'settlementNotes': instance.settlementNotes,
       'isSettled': instance.isSettled,
+      'billingStartDate': instance.billingStartDate?.toIso8601String(),
       'roomNumber': instance.roomNumber,
       'tenantName': instance.tenantName,
       'propertyName': instance.propertyName,

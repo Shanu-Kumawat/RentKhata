@@ -96,6 +96,7 @@ abstract class TenantRepository {
     required DateTime moveInDate,
     required double agreedRent,
     double securityDeposit = 0.0,
+    DateTime? billingStartDate,
   });
 
   /// End an occupancy (move tenant out)

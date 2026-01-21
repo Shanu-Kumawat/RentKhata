@@ -30,7 +30,9 @@ Future<BillingAttentionConfig> billingAttentionConfig(Ref ref) async {
 /// occupancy's move-in date using anniversary-based logic.
 @riverpod
 BillingCycle currentBillingCycle(Ref ref, Occupancy occupancy) {
-  return BillingCycleService.getCurrentCycle(occupancy.moveInDate);
+  return BillingCycleService.getCurrentCycle(
+    occupancy.effectiveBillingStartDate,
+  );
 }
 
 /// Get the next billing cycle that needs a bill.
@@ -57,7 +59,10 @@ Future<BillingCycle> nextBillingCycleFor(Ref ref, int occupancyId) async {
 
   // If no rent bills exist, return cycle 0 (first cycle from move-in)
   if (rentBills.isEmpty) {
-    return BillingCycleService.getCycleByNumber(occupancy.moveInDate, 0);
+    return BillingCycleService.getCycleByNumber(
+      occupancy.effectiveBillingStartDate,
+      0,
+    );
   }
 
   // Build a set of billed period start dates for quick lookup
@@ -81,7 +86,7 @@ Future<BillingCycle> nextBillingCycleFor(Ref ref, int occupancyId) async {
 
   for (int cycleNum = 0; cycleNum < 100; cycleNum++) {
     final cycle = BillingCycleService.getCycleByNumber(
-      occupancy.moveInDate,
+      occupancy.effectiveBillingStartDate,
       cycleNum,
     );
 
@@ -107,7 +112,9 @@ Future<BillingCycle> nextBillingCycleFor(Ref ref, int occupancyId) async {
   }
 
   // Fallback: return current cycle
-  return BillingCycleService.getCurrentCycle(occupancy.moveInDate);
+  return BillingCycleService.getCurrentCycle(
+    occupancy.effectiveBillingStartDate,
+  );
 }
 
 /// Get the next billing cycle for a specific bill type.
@@ -139,7 +146,10 @@ Future<BillingCycle> nextBillingCycleForBillType(
 
   // If no bills of this type exist, return cycle 0 (first cycle from move-in)
   if (typeBills.isEmpty) {
-    return BillingCycleService.getCycleByNumber(occupancy.moveInDate, 0);
+    return BillingCycleService.getCycleByNumber(
+      occupancy.effectiveBillingStartDate,
+      0,
+    );
   }
 
   // Build a set of billed period start dates for quick lookup
@@ -162,7 +172,7 @@ Future<BillingCycle> nextBillingCycleForBillType(
 
   for (int cycleNum = 0; cycleNum < 100; cycleNum++) {
     final cycle = BillingCycleService.getCycleByNumber(
-      occupancy.moveInDate,
+      occupancy.effectiveBillingStartDate,
       cycleNum,
     );
 
@@ -186,7 +196,9 @@ Future<BillingCycle> nextBillingCycleForBillType(
   }
 
   // Fallback: return current cycle
-  return BillingCycleService.getCurrentCycle(occupancy.moveInDate);
+  return BillingCycleService.getCurrentCycle(
+    occupancy.effectiveBillingStartDate,
+  );
 }
 
 /// Get ALL unbilled cycles for a specific bill type up to current date.
@@ -232,7 +244,7 @@ Future<List<BillingCycle>> allUnbilledCyclesForBillType(
   // Iterate through cycles from 0 until we reach cycles ending after today
   for (int cycleNum = 0; cycleNum < 100; cycleNum++) {
     final cycle = BillingCycleService.getCycleByNumber(
-      occupancy.moveInDate,
+      occupancy.effectiveBillingStartDate,
       cycleNum,
     );
 

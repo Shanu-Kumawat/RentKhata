@@ -36,6 +36,8 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
   final _depositController = TextEditingController();
 
   DateTime _moveInDate = DateTime.now();
+  DateTime? _billingStartDate; // null means use smart default
+  bool _useSeparateBillingDate = false; // User chose to customize
   Tenant? _selectedTenant;
   bool _isLoading = false;
   bool _createNewTenant = false;
@@ -110,7 +112,41 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
       lastDate: DateTime.now().add(const Duration(days: 30)),
     );
     if (date != null) {
-      setState(() => _moveInDate = date);
+      setState(() {
+        _moveInDate = date;
+        // Auto-update billing start based on smart default
+        _billingStartDate = _calculateSmartBillingStart(date);
+      });
+    }
+  }
+
+  /// Smart default: if move-in > 2 months ago, start billing this month
+  DateTime _calculateSmartBillingStart(DateTime moveIn) {
+    final now = DateTime.now();
+    final twoMonthsAgo = DateTime(now.year, now.month - 2, now.day);
+
+    if (moveIn.isBefore(twoMonthsAgo)) {
+      // Old tenant - start billing from current month
+      return DateTime(now.year, now.month, moveIn.day.clamp(1, 28));
+    } else {
+      // Recent move-in - use move-in date
+      return moveIn;
+    }
+  }
+
+  Future<void> _selectBillingStartDate() async {
+    final date = await showDatePicker(
+      context: context,
+      initialDate:
+          _billingStartDate ?? _calculateSmartBillingStart(_moveInDate),
+      firstDate: _moveInDate,
+      lastDate: DateTime.now().add(const Duration(days: 30)),
+    );
+    if (date != null) {
+      setState(() {
+        _billingStartDate = date;
+        _useSeparateBillingDate = true;
+      });
     }
   }
 
@@ -185,6 +221,8 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
       }
 
       // Create occupancy first - family members now link to occupancy, not tenant
+      final effectiveBillingStart =
+          _billingStartDate ?? _calculateSmartBillingStart(_moveInDate);
       final occupancyId = await tenantRepo.createOccupancy(
         roomId: widget.roomId,
         tenantId: tenantId,
@@ -192,6 +230,7 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
         agreedRent:
             double.tryParse(_rentController.text) ?? widget.room.baseRent,
         securityDeposit: double.tryParse(_depositController.text) ?? 0,
+        billingStartDate: effectiveBillingStart,
       );
 
       // Add family members to this occupancy
@@ -1081,6 +1120,12 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
   }
 
   Widget _buildMoveInDetails() {
+    final effectiveBillingStart =
+        _billingStartDate ?? _calculateSmartBillingStart(_moveInDate);
+    final isOldMoveIn = _moveInDate.isBefore(
+      DateTime.now().subtract(const Duration(days: 60)),
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1118,6 +1163,72 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
           ),
         ),
         const SizedBox(height: 16),
+
+        // Billing Start Date (shown with smart default info)
+        InkWell(
+          onTap: _selectBillingStartDate,
+          child: InputDecorator(
+            decoration: InputDecoration(
+              labelText: 'Start Billing From',
+              prefixIcon: const Icon(Icons.receipt_long_outlined),
+              helperText: 'Bills before this date will not be tracked',
+              helperMaxLines: 2,
+              suffixIcon: isOldMoveIn && !_useSeparateBillingDate
+                  ? Container(
+                      margin: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.info.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        'Auto',
+                        style: Theme.of(
+                          context,
+                        ).textTheme.labelSmall?.copyWith(color: AppColors.info),
+                      ),
+                    )
+                  : null,
+            ),
+            child: Text(
+              '${effectiveBillingStart.day}/${effectiveBillingStart.month}/${effectiveBillingStart.year}',
+            ),
+          ),
+        ),
+        if (isOldMoveIn && !_useSeparateBillingDate)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.info.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.lightbulb_outline,
+                    size: 18,
+                    color: AppColors.info,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Older move-in detected. Billing starts from this month.',
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodySmall?.copyWith(color: AppColors.info),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        const SizedBox(height: 16),
+
         TextFormField(
           controller: _rentController,
           decoration: InputDecoration(

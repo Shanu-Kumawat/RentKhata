@@ -65,7 +65,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration {
@@ -340,6 +340,10 @@ Thank you for your payment.
             billSettings.maintenanceUsesAnniversary,
           );
           await m.addColumn(billSettings, billSettings.otherUsesAnniversary);
+        }
+        if (from < 8) {
+          // Add billingStartDate to occupancies for existing tenant support
+          await m.addColumn(occupancies, occupancies.billingStartDate);
         }
       },
     );

@@ -60,4 +60,9 @@ class Occupancies extends Table {
 
   /// Whether the occupancy is fully settled (deposit returned/forfeited)
   BoolColumn get isSettled => boolean().withDefault(const Constant(false))();
+
+  /// Date from which billing cycles should start.
+  /// If null, defaults to moveInDate for backwards compatibility.
+  /// Allows landlords to add existing tenants without backfilling past bills.
+  DateTimeColumn get billingStartDate => dateTime().nullable()();
 }

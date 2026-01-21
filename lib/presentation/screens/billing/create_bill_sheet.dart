@@ -34,8 +34,8 @@ class CreateBillSheet extends ConsumerStatefulWidget {
   /// Optional: Pre-fill period end from anniversary-based billing cycle
   final DateTime? suggestedPeriodEnd;
 
-  /// Tenant's move-in date for cycle calculations
-  final DateTime? moveInDate;
+  /// Billing start date for cycle calculations (use effectiveBillingStartDate from occupancy)
+  final DateTime? billingStartDate;
 
   /// Optional: Pre-select bill type
   final BillType? initialBillType;
@@ -50,7 +50,7 @@ class CreateBillSheet extends ConsumerStatefulWidget {
     required this.electricityRate,
     this.suggestedPeriodStart,
     this.suggestedPeriodEnd,
-    this.moveInDate,
+    this.billingStartDate,
     this.initialBillType,
   });
 
@@ -102,9 +102,10 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
     _currentPeriodEnd = widget.suggestedPeriodEnd;
 
     // Calculate cycle number if move-in date provided
-    if (widget.moveInDate != null && widget.suggestedPeriodStart != null) {
+    if (widget.billingStartDate != null &&
+        widget.suggestedPeriodStart != null) {
       _currentCycleNumber = BillingCycleService.getCycleNumber(
-        widget.moveInDate!,
+        widget.billingStartDate!,
         widget.suggestedPeriodStart!,
       );
     }
@@ -190,7 +191,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
           BillType.other => settings.otherUsesAnniversary,
         };
 
-        if (!usesAnniversary || widget.moveInDate == null) {
+        if (!usesAnniversary || widget.billingStartDate == null) {
           // Bill type doesn't use anniversary billing
           return _buildMonthYearPicker(context, months);
         }
@@ -220,7 +221,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                     _currentPeriodEnd = cycle.end;
                     // Calculate cycle number using static method
                     _currentCycleNumber = BillingCycleService.getCycleNumber(
-                      widget.moveInDate!,
+                      widget.billingStartDate!,
                       cycle.start,
                     );
                   });
@@ -253,7 +254,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
     final today = DateTime(now.year, now.month, now.day);
     final isFutureCycle = start.isAfter(today);
     final isPastCycle = end.isBefore(today);
-    final canNavigate = widget.moveInDate != null;
+    final canNavigate = widget.billingStartDate != null;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -418,7 +419,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
     final today = DateTime(now.year, now.month, now.day);
     final isFutureCycle = start.isAfter(today);
     final isPastCycle = end.isBefore(today);
-    final canNavigate = widget.moveInDate != null;
+    final canNavigate = widget.billingStartDate != null;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -616,12 +617,12 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
   }
 
   void _goToPreviousCycle() {
-    if (widget.moveInDate == null || _currentCycleNumber <= 0) return;
+    if (widget.billingStartDate == null || _currentCycleNumber <= 0) return;
 
     setState(() {
       _currentCycleNumber--;
       final cycle = BillingCycleService.getCycleByNumber(
-        widget.moveInDate!,
+        widget.billingStartDate!,
         _currentCycleNumber,
       );
       _currentPeriodStart = cycle.start;
@@ -632,12 +633,12 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
   }
 
   void _goToNextCycle() {
-    if (widget.moveInDate == null) return;
+    if (widget.billingStartDate == null) return;
 
     setState(() {
       _currentCycleNumber++;
       final cycle = BillingCycleService.getCycleByNumber(
-        widget.moveInDate!,
+        widget.billingStartDate!,
         _currentCycleNumber,
       );
       _currentPeriodStart = cycle.start;
@@ -983,7 +984,13 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                         label: Text(type.name.toUpperCase()),
                         selected: isSelected,
                         onSelected: (_) {
-                          setState(() => _selectedBillType = type);
+                          setState(() {
+                            _selectedBillType = type;
+                            // Reset cycle state so new cycle is fetched for new bill type
+                            _currentPeriodStart = null;
+                            _currentPeriodEnd = null;
+                            _currentCycleNumber = 0;
+                          });
                           _updateAmount();
                         },
                       );

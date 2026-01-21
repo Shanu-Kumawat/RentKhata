@@ -38,6 +38,8 @@ mixin _$Occupancy {
   String? get deductionReason => throw _privateConstructorUsedError;
   String? get settlementNotes => throw _privateConstructorUsedError;
   bool get isSettled =>
+      throw _privateConstructorUsedError; // Billing start date - if null, uses moveInDate
+  DateTime? get billingStartDate =>
       throw _privateConstructorUsedError; // Denormalized fields
   String? get roomNumber => throw _privateConstructorUsedError;
   String? get tenantName => throw _privateConstructorUsedError;
@@ -75,6 +77,7 @@ abstract class $OccupancyCopyWith<$Res> {
     String? deductionReason,
     String? settlementNotes,
     bool isSettled,
+    DateTime? billingStartDate,
     String? roomNumber,
     String? tenantName,
     String? propertyName,
@@ -112,6 +115,7 @@ class _$OccupancyCopyWithImpl<$Res, $Val extends Occupancy>
     Object? deductionReason = freezed,
     Object? settlementNotes = freezed,
     Object? isSettled = null,
+    Object? billingStartDate = freezed,
     Object? roomNumber = freezed,
     Object? tenantName = freezed,
     Object? propertyName = freezed,
@@ -182,6 +186,10 @@ class _$OccupancyCopyWithImpl<$Res, $Val extends Occupancy>
                 ? _value.isSettled
                 : isSettled // ignore: cast_nullable_to_non_nullable
                       as bool,
+            billingStartDate: freezed == billingStartDate
+                ? _value.billingStartDate
+                : billingStartDate // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
             roomNumber: freezed == roomNumber
                 ? _value.roomNumber
                 : roomNumber // ignore: cast_nullable_to_non_nullable
@@ -226,6 +234,7 @@ abstract class _$$OccupancyImplCopyWith<$Res>
     String? deductionReason,
     String? settlementNotes,
     bool isSettled,
+    DateTime? billingStartDate,
     String? roomNumber,
     String? tenantName,
     String? propertyName,
@@ -262,6 +271,7 @@ class __$$OccupancyImplCopyWithImpl<$Res>
     Object? deductionReason = freezed,
     Object? settlementNotes = freezed,
     Object? isSettled = null,
+    Object? billingStartDate = freezed,
     Object? roomNumber = freezed,
     Object? tenantName = freezed,
     Object? propertyName = freezed,
@@ -332,6 +342,10 @@ class __$$OccupancyImplCopyWithImpl<$Res>
             ? _value.isSettled
             : isSettled // ignore: cast_nullable_to_non_nullable
                   as bool,
+        billingStartDate: freezed == billingStartDate
+            ? _value.billingStartDate
+            : billingStartDate // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
         roomNumber: freezed == roomNumber
             ? _value.roomNumber
             : roomNumber // ignore: cast_nullable_to_non_nullable
@@ -351,7 +365,7 @@ class __$$OccupancyImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$OccupancyImpl implements _Occupancy {
+class _$OccupancyImpl extends _Occupancy {
   const _$OccupancyImpl({
     required this.id,
     required this.roomId,
@@ -369,10 +383,11 @@ class _$OccupancyImpl implements _Occupancy {
     this.deductionReason,
     this.settlementNotes,
     this.isSettled = false,
+    this.billingStartDate,
     this.roomNumber,
     this.tenantName,
     this.propertyName,
-  });
+  }) : super._();
 
   factory _$OccupancyImpl.fromJson(Map<String, dynamic> json) =>
       _$$OccupancyImplFromJson(json);
@@ -416,6 +431,9 @@ class _$OccupancyImpl implements _Occupancy {
   @override
   @JsonKey()
   final bool isSettled;
+  // Billing start date - if null, uses moveInDate
+  @override
+  final DateTime? billingStartDate;
   // Denormalized fields
   @override
   final String? roomNumber;
@@ -426,7 +444,7 @@ class _$OccupancyImpl implements _Occupancy {
 
   @override
   String toString() {
-    return 'Occupancy(id: $id, roomId: $roomId, tenantId: $tenantId, moveInDate: $moveInDate, moveOutDate: $moveOutDate, agreedRent: $agreedRent, securityDeposit: $securityDeposit, isActive: $isActive, depositStatus: $depositStatus, depositReceivedDate: $depositReceivedDate, depositReturnedDate: $depositReturnedDate, depositReturnedAmount: $depositReturnedAmount, deductionAmount: $deductionAmount, deductionReason: $deductionReason, settlementNotes: $settlementNotes, isSettled: $isSettled, roomNumber: $roomNumber, tenantName: $tenantName, propertyName: $propertyName)';
+    return 'Occupancy(id: $id, roomId: $roomId, tenantId: $tenantId, moveInDate: $moveInDate, moveOutDate: $moveOutDate, agreedRent: $agreedRent, securityDeposit: $securityDeposit, isActive: $isActive, depositStatus: $depositStatus, depositReceivedDate: $depositReceivedDate, depositReturnedDate: $depositReturnedDate, depositReturnedAmount: $depositReturnedAmount, deductionAmount: $deductionAmount, deductionReason: $deductionReason, settlementNotes: $settlementNotes, isSettled: $isSettled, billingStartDate: $billingStartDate, roomNumber: $roomNumber, tenantName: $tenantName, propertyName: $propertyName)';
   }
 
   @override
@@ -464,6 +482,8 @@ class _$OccupancyImpl implements _Occupancy {
                 other.settlementNotes == settlementNotes) &&
             (identical(other.isSettled, isSettled) ||
                 other.isSettled == isSettled) &&
+            (identical(other.billingStartDate, billingStartDate) ||
+                other.billingStartDate == billingStartDate) &&
             (identical(other.roomNumber, roomNumber) ||
                 other.roomNumber == roomNumber) &&
             (identical(other.tenantName, tenantName) ||
@@ -492,6 +512,7 @@ class _$OccupancyImpl implements _Occupancy {
     deductionReason,
     settlementNotes,
     isSettled,
+    billingStartDate,
     roomNumber,
     tenantName,
     propertyName,
@@ -511,7 +532,7 @@ class _$OccupancyImpl implements _Occupancy {
   }
 }
 
-abstract class _Occupancy implements Occupancy {
+abstract class _Occupancy extends Occupancy {
   const factory _Occupancy({
     required final int id,
     required final int roomId,
@@ -529,10 +550,12 @@ abstract class _Occupancy implements Occupancy {
     final String? deductionReason,
     final String? settlementNotes,
     final bool isSettled,
+    final DateTime? billingStartDate,
     final String? roomNumber,
     final String? tenantName,
     final String? propertyName,
   }) = _$OccupancyImpl;
+  const _Occupancy._() : super._();
 
   factory _Occupancy.fromJson(Map<String, dynamic> json) =
       _$OccupancyImpl.fromJson;
@@ -568,7 +591,9 @@ abstract class _Occupancy implements Occupancy {
   @override
   String? get settlementNotes;
   @override
-  bool get isSettled; // Denormalized fields
+  bool get isSettled; // Billing start date - if null, uses moveInDate
+  @override
+  DateTime? get billingStartDate; // Denormalized fields
   @override
   String? get roomNumber;
   @override

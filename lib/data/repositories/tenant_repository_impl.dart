@@ -96,6 +96,8 @@ class TenantRepositoryImpl implements TenantRepository {
       deductionReason: entity.deductionReason,
       settlementNotes: entity.settlementNotes,
       isSettled: entity.isSettled,
+      // Billing start date
+      billingStartDate: entity.billingStartDate,
       roomNumber: room?.roomNumber,
       tenantName: tenant?.name,
       propertyName: propertyName,
@@ -303,6 +305,7 @@ class TenantRepositoryImpl implements TenantRepository {
     required DateTime moveInDate,
     required double agreedRent,
     double securityDeposit = 0.0,
+    DateTime? billingStartDate,
   }) async {
     final occupancy = OccupanciesCompanion(
       roomId: Value(roomId),
@@ -311,6 +314,7 @@ class TenantRepositoryImpl implements TenantRepository {
       agreedRent: Value(agreedRent),
       securityDeposit: Value(securityDeposit),
       isActive: const Value(true),
+      billingStartDate: Value(billingStartDate),
     );
     return _tenantDao.insertOccupancy(occupancy);
   }
