@@ -270,7 +270,7 @@ class _SettingsTile extends StatelessWidget {
   }
 }
 
-/// Notification settings sheet
+/// Notification settings sheet with granular controls
 class _NotificationSettingsSheet extends ConsumerStatefulWidget {
   const _NotificationSettingsSheet();
 
@@ -281,74 +281,239 @@ class _NotificationSettingsSheet extends ConsumerStatefulWidget {
 
 class _NotificationSettingsSheetState
     extends ConsumerState<_NotificationSettingsSheet> {
-  bool _dueSoon = true;
-  bool _overdue = true;
-  int _daysBefore = 3;
+  // Billing reminders
+  bool _cycleEndingSoon = true;
+  bool _billDueSoon = true;
+  bool _monthlySummary = true;
+  int _cycleReminderDays = 3;
+  int _dueSoonDays = 3;
+
+  // Payment notifications
+  bool _paymentReceived = true;
+  bool _billFullyPaid = true;
+
+  // Overdue escalation
+  bool _overdue1Day = true;
+  bool _overdue3Days = true;
+  bool _overdue7Days = true;
+  bool _overdue14Days = true;
+
+  // General settings
+  int _notificationHour = 9;
+  bool _quietHoursEnabled = false;
+  int _quietStart = 22;
+  int _quietEnd = 7;
+
   bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Notification Settings',
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 24),
-          SwitchListTile(
-            title: const Text('Due Soon Reminders'),
-            subtitle: Text('Notify $_daysBefore days before due date'),
-            value: _dueSoon,
-            onChanged: (v) => setState(() => _dueSoon = v),
-          ),
-          if (_dueSoon)
-            Padding(
-              padding: const EdgeInsets.only(left: 16),
-              child: Slider(
-                value: _daysBefore.toDouble(),
-                min: 1,
-                max: 7,
-                divisions: 6,
-                label: '$_daysBefore days',
-                onChanged: (v) => setState(() => _daysBefore = v.round()),
+    return DraggableScrollableSheet(
+      initialChildSize: 0.85,
+      minChildSize: 0.5,
+      maxChildSize: 0.95,
+      expand: false,
+      builder: (context, scrollController) => SingleChildScrollView(
+        controller: scrollController,
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Notification Settings',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // Billing Reminders Section
+            _buildSectionHeader(
+              icon: Icons.calendar_today_outlined,
+              title: 'Billing Reminders',
+              color: AppColors.primary,
+            ),
+            _buildToggleWithSlider(
+              title: 'Billing cycle ending',
+              subtitle: 'Remind $_cycleReminderDays days before cycle ends',
+              value: _cycleEndingSoon,
+              onChanged: (v) => setState(() => _cycleEndingSoon = v),
+              sliderValue: _cycleReminderDays.toDouble(),
+              sliderMin: 1,
+              sliderMax: 7,
+              onSliderChanged: (v) =>
+                  setState(() => _cycleReminderDays = v.round()),
+            ),
+            _buildToggleWithSlider(
+              title: 'Bill due soon',
+              subtitle: 'Remind $_dueSoonDays days before due date',
+              value: _billDueSoon,
+              onChanged: (v) => setState(() => _billDueSoon = v),
+              sliderValue: _dueSoonDays.toDouble(),
+              sliderMin: 1,
+              sliderMax: 7,
+              onSliderChanged: (v) => setState(() => _dueSoonDays = v.round()),
+            ),
+            _buildSimpleToggle(
+              title: 'Monthly summary',
+              subtitle: 'Collection status on 1st of each month',
+              value: _monthlySummary,
+              onChanged: (v) => setState(() => _monthlySummary = v),
+            ),
+            const Divider(height: 32),
+
+            // Payment Notifications Section
+            _buildSectionHeader(
+              icon: Icons.payment_outlined,
+              title: 'Payment Notifications',
+              color: AppColors.success,
+            ),
+            _buildSimpleToggle(
+              title: 'Payment received',
+              subtitle: 'Confirm when payment is recorded',
+              value: _paymentReceived,
+              onChanged: (v) => setState(() => _paymentReceived = v),
+            ),
+            _buildSimpleToggle(
+              title: 'Bill fully paid',
+              subtitle: 'Celebrate when bill is fully paid',
+              value: _billFullyPaid,
+              onChanged: (v) => setState(() => _billFullyPaid = v),
+            ),
+            const Divider(height: 32),
+
+            // Overdue Escalation Section
+            _buildSectionHeader(
+              icon: Icons.warning_amber_outlined,
+              title: 'Overdue Follow-ups',
+              color: AppColors.error,
+            ),
+            _buildSimpleToggle(
+              title: '1 day overdue',
+              subtitle: 'First reminder after due date',
+              value: _overdue1Day,
+              onChanged: (v) => setState(() => _overdue1Day = v),
+            ),
+            _buildSimpleToggle(
+              title: '3 days overdue',
+              subtitle: 'Second reminder',
+              value: _overdue3Days,
+              onChanged: (v) => setState(() => _overdue3Days = v),
+            ),
+            _buildSimpleToggle(
+              title: '1 week overdue',
+              subtitle: 'Weekly reminder',
+              value: _overdue7Days,
+              onChanged: (v) => setState(() => _overdue7Days = v),
+            ),
+            _buildSimpleToggle(
+              title: '2 weeks overdue',
+              subtitle: 'Critical - urgent attention needed',
+              value: _overdue14Days,
+              onChanged: (v) => setState(() => _overdue14Days = v),
+            ),
+            const Divider(height: 32),
+
+            // General Settings Section
+            _buildSectionHeader(
+              icon: Icons.settings_outlined,
+              title: 'General',
+              color: AppColors.onSurfaceVariant,
+            ),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: const Text('Notification time'),
+              subtitle: Text(_formatHour(_notificationHour)),
+              trailing: DropdownButton<int>(
+                value: _notificationHour,
+                underline: const SizedBox(),
+                items: [7, 8, 9, 10, 11, 12]
+                    .map(
+                      (h) => DropdownMenuItem(
+                        value: h,
+                        child: Text(_formatHour(h)),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (v) {
+                  if (v != null) setState(() => _notificationHour = v);
+                },
               ),
             ),
-          SwitchListTile(
-            title: const Text('Overdue Reminders'),
-            subtitle: const Text('Notify when bills are past due'),
-            value: _overdue,
-            onChanged: (v) => setState(() => _overdue = v),
-          ),
-          const SizedBox(height: 24),
-          if (kDebugMode)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  icon: const Icon(Icons.notifications_active),
-                  label: const Text('Send Test Notification'),
-                  onPressed: _isLoading ? null : _sendTestNotification,
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: const Text('Quiet hours'),
+              subtitle: _quietHoursEnabled
+                  ? Text(
+                      '${_formatHour(_quietStart)} - ${_formatHour(_quietEnd)}',
+                    )
+                  : const Text('Not enabled'),
+              value: _quietHoursEnabled,
+              onChanged: (v) => setState(() => _quietHoursEnabled = v),
+            ),
+            const SizedBox(height: 24),
+
+            // Test button (debug only)
+            if (kDebugMode)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    icon: const Icon(Icons.notifications_active),
+                    label: const Text('Send Test Notification'),
+                    onPressed: _isLoading ? null : _sendTestNotification,
+                  ),
                 ),
               ),
+
+            // Save button
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: _isLoading ? null : _saveAndSchedule,
+                child: _isLoading
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Text('Save Settings'),
+              ),
             ),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton(
-              onPressed: _isLoading ? null : _saveAndSchedule,
-              child: _isLoading
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Text('Save & Schedule Reminders'),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader({
+    required IconData icon,
+    required String title,
+    required Color color,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: color),
+          const SizedBox(width: 8),
+          Text(
+            title,
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: color,
             ),
           ),
         ],
@@ -356,14 +521,68 @@ class _NotificationSettingsSheetState
     );
   }
 
+  Widget _buildSimpleToggle({
+    required String title,
+    required String subtitle,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
+    return SwitchListTile(
+      contentPadding: EdgeInsets.zero,
+      title: Text(title),
+      subtitle: Text(subtitle),
+      value: value,
+      onChanged: onChanged,
+    );
+  }
+
+  Widget _buildToggleWithSlider({
+    required String title,
+    required String subtitle,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+    required double sliderValue,
+    required double sliderMin,
+    required double sliderMax,
+    required ValueChanged<double> onSliderChanged,
+  }) {
+    return Column(
+      children: [
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text(title),
+          subtitle: Text(subtitle),
+          value: value,
+          onChanged: onChanged,
+        ),
+        if (value)
+          Padding(
+            padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
+            child: Slider(
+              value: sliderValue,
+              min: sliderMin,
+              max: sliderMax,
+              divisions: (sliderMax - sliderMin).round(),
+              label: '${sliderValue.round()} days',
+              onChanged: onSliderChanged,
+            ),
+          ),
+      ],
+    );
+  }
+
+  String _formatHour(int hour) {
+    if (hour == 0) return '12:00 AM';
+    if (hour < 12) return '$hour:00 AM';
+    if (hour == 12) return '12:00 PM';
+    return '${hour - 12}:00 PM';
+  }
+
   Future<void> _saveAndSchedule() async {
     setState(() => _isLoading = true);
 
     try {
-      // Import notification service
       final notificationService = LocalNotificationService();
-
-      // Request permission first
       final granted = await notificationService.requestPermission();
       if (!granted) {
         if (mounted) {
@@ -378,23 +597,25 @@ class _NotificationSettingsSheetState
       // Cancel all existing notifications first
       await notificationService.cancelAll();
 
-      // Get all unpaid bills
+      // Get all unpaid bills and schedule based on settings
       final bills = await ref.read(unpaidBillsProvider.future);
       int scheduledCount = 0;
 
       for (final bill in bills) {
+        if (bill.dueDate == null) continue;
+
         // Schedule due soon reminder
-        if (_dueSoon && bill.dueDate != null) {
+        if (_billDueSoon) {
           await notificationService.scheduleDueBillReminder(
             bill: bill,
-            daysBefore: _daysBefore,
+            daysBefore: _dueSoonDays,
           );
           scheduledCount++;
         }
 
-        // Schedule overdue reminder
-        if (_overdue && bill.dueDate != null) {
-          await notificationService.scheduleOverdueReminder(bill: bill);
+        // Schedule overdue escalation
+        if (_overdue1Day || _overdue3Days || _overdue7Days || _overdue14Days) {
+          await notificationService.scheduleOverdueEscalation(bill: bill);
         }
       }
 
@@ -404,7 +625,7 @@ class _NotificationSettingsSheetState
           SnackBar(
             content: Text(
               scheduledCount > 0
-                  ? 'Scheduled reminders for $scheduledCount bill(s)!'
+                  ? 'Settings saved! Reminders scheduled for $scheduledCount bill(s)'
                   : 'Settings saved. No pending bills to schedule.',
             ),
           ),
@@ -428,14 +649,13 @@ class _NotificationSettingsSheetState
       final notificationService = LocalNotificationService();
       await notificationService.initialize();
 
-      // Request permission first
       final granted = await notificationService.requestPermission();
       if (!granted) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text(
-                'Notification permission denied. Please enable in Settings.',
+                'Notification permission denied. Enable in Settings.',
               ),
             ),
           );
@@ -444,7 +664,6 @@ class _NotificationSettingsSheetState
         return;
       }
 
-      // Show immediate test notification
       await notificationService.showNotification(
         id: 12345,
         title: '🔔 Test Notification',
@@ -454,11 +673,7 @@ class _NotificationSettingsSheetState
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Test notification sent! Check your notification tray.',
-            ),
-          ),
+          const SnackBar(content: Text('Test notification sent!')),
         );
       }
     } catch (e) {

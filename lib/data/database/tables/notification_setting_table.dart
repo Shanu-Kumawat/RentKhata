@@ -3,8 +3,24 @@ library;
 
 import 'package:drift/drift.dart';
 
-/// Notification types
+/// Notification types organized by category.
 enum NotificationType {
+  // Billing reminders
+  cycleEndingSoon,
+  billDueSoon,
+  monthlySummary,
+
+  // Payment notifications
+  paymentReceived,
+  billFullyPaid,
+
+  // Overdue escalation
+  overdue1Day,
+  overdue3Days,
+  overdue7Days,
+  overdue14Days,
+
+  // Legacy (kept for backwards compatibility)
   dueSoon,
   overdue,
   rentCollectionDay,
@@ -32,4 +48,7 @@ class NotificationSettings extends Table {
 
   /// Quiet hours end (0-23)
   IntColumn get quietHoursEnd => integer().nullable()();
+
+  /// Preferred notification time (hour, 0-23)
+  IntColumn get notificationHour => integer().withDefault(const Constant(9))();
 }

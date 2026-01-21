@@ -8182,6 +8182,18 @@ class $NotificationSettingsTable extends NotificationSettings
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _notificationHourMeta = const VerificationMeta(
+    'notificationHour',
+  );
+  @override
+  late final GeneratedColumn<int> notificationHour = GeneratedColumn<int>(
+    'notification_hour',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(9),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -8190,6 +8202,7 @@ class $NotificationSettingsTable extends NotificationSettings
     daysBefore,
     quietHoursStart,
     quietHoursEnd,
+    notificationHour,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -8236,6 +8249,15 @@ class $NotificationSettingsTable extends NotificationSettings
         ),
       );
     }
+    if (data.containsKey('notification_hour')) {
+      context.handle(
+        _notificationHourMeta,
+        notificationHour.isAcceptableOrUnknown(
+          data['notification_hour']!,
+          _notificationHourMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -8275,6 +8297,10 @@ class $NotificationSettingsTable extends NotificationSettings
         DriftSqlType.int,
         data['${effectivePrefix}quiet_hours_end'],
       ),
+      notificationHour: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}notification_hour'],
+      )!,
     );
   }
 
@@ -8308,6 +8334,9 @@ class NotificationSettingEntity extends DataClass
 
   /// Quiet hours end (0-23)
   final int? quietHoursEnd;
+
+  /// Preferred notification time (hour, 0-23)
+  final int notificationHour;
   const NotificationSettingEntity({
     required this.id,
     required this.notificationType,
@@ -8315,6 +8344,7 @@ class NotificationSettingEntity extends DataClass
     required this.daysBefore,
     this.quietHoursStart,
     this.quietHoursEnd,
+    required this.notificationHour,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -8335,6 +8365,7 @@ class NotificationSettingEntity extends DataClass
     if (!nullToAbsent || quietHoursEnd != null) {
       map['quiet_hours_end'] = Variable<int>(quietHoursEnd);
     }
+    map['notification_hour'] = Variable<int>(notificationHour);
     return map;
   }
 
@@ -8350,6 +8381,7 @@ class NotificationSettingEntity extends DataClass
       quietHoursEnd: quietHoursEnd == null && nullToAbsent
           ? const Value.absent()
           : Value(quietHoursEnd),
+      notificationHour: Value(notificationHour),
     );
   }
 
@@ -8366,6 +8398,7 @@ class NotificationSettingEntity extends DataClass
       daysBefore: serializer.fromJson<int>(json['daysBefore']),
       quietHoursStart: serializer.fromJson<int?>(json['quietHoursStart']),
       quietHoursEnd: serializer.fromJson<int?>(json['quietHoursEnd']),
+      notificationHour: serializer.fromJson<int>(json['notificationHour']),
     );
   }
   @override
@@ -8382,6 +8415,7 @@ class NotificationSettingEntity extends DataClass
       'daysBefore': serializer.toJson<int>(daysBefore),
       'quietHoursStart': serializer.toJson<int?>(quietHoursStart),
       'quietHoursEnd': serializer.toJson<int?>(quietHoursEnd),
+      'notificationHour': serializer.toJson<int>(notificationHour),
     };
   }
 
@@ -8392,6 +8426,7 @@ class NotificationSettingEntity extends DataClass
     int? daysBefore,
     Value<int?> quietHoursStart = const Value.absent(),
     Value<int?> quietHoursEnd = const Value.absent(),
+    int? notificationHour,
   }) => NotificationSettingEntity(
     id: id ?? this.id,
     notificationType: notificationType ?? this.notificationType,
@@ -8403,6 +8438,7 @@ class NotificationSettingEntity extends DataClass
     quietHoursEnd: quietHoursEnd.present
         ? quietHoursEnd.value
         : this.quietHoursEnd,
+    notificationHour: notificationHour ?? this.notificationHour,
   );
   NotificationSettingEntity copyWithCompanion(
     NotificationSettingsCompanion data,
@@ -8422,6 +8458,9 @@ class NotificationSettingEntity extends DataClass
       quietHoursEnd: data.quietHoursEnd.present
           ? data.quietHoursEnd.value
           : this.quietHoursEnd,
+      notificationHour: data.notificationHour.present
+          ? data.notificationHour.value
+          : this.notificationHour,
     );
   }
 
@@ -8433,7 +8472,8 @@ class NotificationSettingEntity extends DataClass
           ..write('enabled: $enabled, ')
           ..write('daysBefore: $daysBefore, ')
           ..write('quietHoursStart: $quietHoursStart, ')
-          ..write('quietHoursEnd: $quietHoursEnd')
+          ..write('quietHoursEnd: $quietHoursEnd, ')
+          ..write('notificationHour: $notificationHour')
           ..write(')'))
         .toString();
   }
@@ -8446,6 +8486,7 @@ class NotificationSettingEntity extends DataClass
     daysBefore,
     quietHoursStart,
     quietHoursEnd,
+    notificationHour,
   );
   @override
   bool operator ==(Object other) =>
@@ -8456,7 +8497,8 @@ class NotificationSettingEntity extends DataClass
           other.enabled == this.enabled &&
           other.daysBefore == this.daysBefore &&
           other.quietHoursStart == this.quietHoursStart &&
-          other.quietHoursEnd == this.quietHoursEnd);
+          other.quietHoursEnd == this.quietHoursEnd &&
+          other.notificationHour == this.notificationHour);
 }
 
 class NotificationSettingsCompanion
@@ -8467,6 +8509,7 @@ class NotificationSettingsCompanion
   final Value<int> daysBefore;
   final Value<int?> quietHoursStart;
   final Value<int?> quietHoursEnd;
+  final Value<int> notificationHour;
   const NotificationSettingsCompanion({
     this.id = const Value.absent(),
     this.notificationType = const Value.absent(),
@@ -8474,6 +8517,7 @@ class NotificationSettingsCompanion
     this.daysBefore = const Value.absent(),
     this.quietHoursStart = const Value.absent(),
     this.quietHoursEnd = const Value.absent(),
+    this.notificationHour = const Value.absent(),
   });
   NotificationSettingsCompanion.insert({
     this.id = const Value.absent(),
@@ -8482,6 +8526,7 @@ class NotificationSettingsCompanion
     this.daysBefore = const Value.absent(),
     this.quietHoursStart = const Value.absent(),
     this.quietHoursEnd = const Value.absent(),
+    this.notificationHour = const Value.absent(),
   }) : notificationType = Value(notificationType);
   static Insertable<NotificationSettingEntity> custom({
     Expression<int>? id,
@@ -8490,6 +8535,7 @@ class NotificationSettingsCompanion
     Expression<int>? daysBefore,
     Expression<int>? quietHoursStart,
     Expression<int>? quietHoursEnd,
+    Expression<int>? notificationHour,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -8498,6 +8544,7 @@ class NotificationSettingsCompanion
       if (daysBefore != null) 'days_before': daysBefore,
       if (quietHoursStart != null) 'quiet_hours_start': quietHoursStart,
       if (quietHoursEnd != null) 'quiet_hours_end': quietHoursEnd,
+      if (notificationHour != null) 'notification_hour': notificationHour,
     });
   }
 
@@ -8508,6 +8555,7 @@ class NotificationSettingsCompanion
     Value<int>? daysBefore,
     Value<int?>? quietHoursStart,
     Value<int?>? quietHoursEnd,
+    Value<int>? notificationHour,
   }) {
     return NotificationSettingsCompanion(
       id: id ?? this.id,
@@ -8516,6 +8564,7 @@ class NotificationSettingsCompanion
       daysBefore: daysBefore ?? this.daysBefore,
       quietHoursStart: quietHoursStart ?? this.quietHoursStart,
       quietHoursEnd: quietHoursEnd ?? this.quietHoursEnd,
+      notificationHour: notificationHour ?? this.notificationHour,
     );
   }
 
@@ -8544,6 +8593,9 @@ class NotificationSettingsCompanion
     if (quietHoursEnd.present) {
       map['quiet_hours_end'] = Variable<int>(quietHoursEnd.value);
     }
+    if (notificationHour.present) {
+      map['notification_hour'] = Variable<int>(notificationHour.value);
+    }
     return map;
   }
 
@@ -8555,7 +8607,8 @@ class NotificationSettingsCompanion
           ..write('enabled: $enabled, ')
           ..write('daysBefore: $daysBefore, ')
           ..write('quietHoursStart: $quietHoursStart, ')
-          ..write('quietHoursEnd: $quietHoursEnd')
+          ..write('quietHoursEnd: $quietHoursEnd, ')
+          ..write('notificationHour: $notificationHour')
           ..write(')'))
         .toString();
   }
@@ -16303,6 +16356,7 @@ typedef $$NotificationSettingsTableCreateCompanionBuilder =
       Value<int> daysBefore,
       Value<int?> quietHoursStart,
       Value<int?> quietHoursEnd,
+      Value<int> notificationHour,
     });
 typedef $$NotificationSettingsTableUpdateCompanionBuilder =
     NotificationSettingsCompanion Function({
@@ -16312,6 +16366,7 @@ typedef $$NotificationSettingsTableUpdateCompanionBuilder =
       Value<int> daysBefore,
       Value<int?> quietHoursStart,
       Value<int?> quietHoursEnd,
+      Value<int> notificationHour,
     });
 
 class $$NotificationSettingsTableFilterComposer
@@ -16351,6 +16406,11 @@ class $$NotificationSettingsTableFilterComposer
 
   ColumnFilters<int> get quietHoursEnd => $composableBuilder(
     column: $table.quietHoursEnd,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get notificationHour => $composableBuilder(
+    column: $table.notificationHour,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -16393,6 +16453,11 @@ class $$NotificationSettingsTableOrderingComposer
     column: $table.quietHoursEnd,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<int> get notificationHour => $composableBuilder(
+    column: $table.notificationHour,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$NotificationSettingsTableAnnotationComposer
@@ -16428,6 +16493,11 @@ class $$NotificationSettingsTableAnnotationComposer
 
   GeneratedColumn<int> get quietHoursEnd => $composableBuilder(
     column: $table.quietHoursEnd,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get notificationHour => $composableBuilder(
+    column: $table.notificationHour,
     builder: (column) => column,
   );
 }
@@ -16481,6 +16551,7 @@ class $$NotificationSettingsTableTableManager
                 Value<int> daysBefore = const Value.absent(),
                 Value<int?> quietHoursStart = const Value.absent(),
                 Value<int?> quietHoursEnd = const Value.absent(),
+                Value<int> notificationHour = const Value.absent(),
               }) => NotificationSettingsCompanion(
                 id: id,
                 notificationType: notificationType,
@@ -16488,6 +16559,7 @@ class $$NotificationSettingsTableTableManager
                 daysBefore: daysBefore,
                 quietHoursStart: quietHoursStart,
                 quietHoursEnd: quietHoursEnd,
+                notificationHour: notificationHour,
               ),
           createCompanionCallback:
               ({
@@ -16497,6 +16569,7 @@ class $$NotificationSettingsTableTableManager
                 Value<int> daysBefore = const Value.absent(),
                 Value<int?> quietHoursStart = const Value.absent(),
                 Value<int?> quietHoursEnd = const Value.absent(),
+                Value<int> notificationHour = const Value.absent(),
               }) => NotificationSettingsCompanion.insert(
                 id: id,
                 notificationType: notificationType,
@@ -16504,6 +16577,7 @@ class $$NotificationSettingsTableTableManager
                 daysBefore: daysBefore,
                 quietHoursStart: quietHoursStart,
                 quietHoursEnd: quietHoursEnd,
+                notificationHour: notificationHour,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))

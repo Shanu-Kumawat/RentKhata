@@ -30,7 +30,7 @@ final billingAttentionConfigProvider =
 typedef BillingAttentionConfigRef =
     AutoDisposeFutureProviderRef<BillingAttentionConfig>;
 String _$currentBillingCycleHash() =>
-    r'000af6230983654dad6384a44c552861a7ffd50a';
+    r'36642dfe04c7594629dec705f7485792e5a66560';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -202,7 +202,7 @@ class _CurrentBillingCycleProviderElement
 }
 
 String _$nextBillingCycleForHash() =>
-    r'6fa095445f9ccd4797a5b215fe02592a68b06d8e';
+    r'68fe0e02b7143d6726fce1fde44d9ad554d7023c';
 
 /// Get the next billing cycle that needs a bill.
 ///
@@ -368,7 +368,7 @@ class _NextBillingCycleForProviderElement
 }
 
 String _$nextBillingCycleForBillTypeHash() =>
-    r'e477c367632d3c44fb70a0da06d41ee4c3e8fe52';
+    r'4f729200f4b690d58041eb41ee089f26d10ef9ab';
 
 /// Get the next billing cycle for a specific bill type.
 ///
@@ -559,7 +559,7 @@ class _NextBillingCycleForBillTypeProviderElement
 }
 
 String _$allUnbilledCyclesForBillTypeHash() =>
-    r'33e303c8fe85869d0980ef42d86ee40d861680fe';
+    r'eccca0ce1f8795124e6aa07703bc5af84fcae41d';
 
 /// Get ALL unbilled cycles for a specific bill type up to current date.
 ///
