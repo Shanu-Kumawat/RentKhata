@@ -476,7 +476,7 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
                       decoration: const InputDecoration(
                         labelText: 'Relationship *',
                       ),
-                      value: relationship,
+                      initialValue: relationship,
                       items: const [
                         DropdownMenuItem(
                           value: 'spouse',
@@ -512,7 +512,7 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
                   Expanded(
                     child: DropdownButtonFormField<String>(
                       decoration: const InputDecoration(labelText: 'Gender'),
-                      value: gender,
+                      initialValue: gender,
                       items: const [
                         DropdownMenuItem(value: 'male', child: Text('Male')),
                         DropdownMenuItem(
@@ -762,7 +762,7 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
               const SizedBox(width: 16),
               Expanded(
                 child: DropdownButtonFormField<String>(
-                  value: _selectedGender,
+                  initialValue: _selectedGender,
                   decoration: const InputDecoration(labelText: 'Gender'),
                   items: const [
                     DropdownMenuItem(value: 'male', child: Text('Male')),

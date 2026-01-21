@@ -1288,7 +1288,7 @@ class _FamilyMembersSection extends ConsumerWidget {
                       decoration: const InputDecoration(
                         labelText: 'Relationship *',
                       ),
-                      value: selectedRelationship,
+                      initialValue: selectedRelationship,
                       items: const [
                         DropdownMenuItem(
                           value: 'spouse',
@@ -1325,7 +1325,7 @@ class _FamilyMembersSection extends ConsumerWidget {
                   Expanded(
                     child: DropdownButtonFormField<String>(
                       decoration: const InputDecoration(labelText: 'Gender'),
-                      value: selectedGender,
+                      initialValue: selectedGender,
                       items: const [
                         DropdownMenuItem(value: 'male', child: Text('Male')),
                         DropdownMenuItem(

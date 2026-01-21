@@ -309,7 +309,7 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
                     const SizedBox(width: 16),
                     Expanded(
                       child: DropdownButtonFormField<String>(
-                        value: _selectedGender,
+                        initialValue: _selectedGender,
                         decoration: const InputDecoration(
                           labelText: 'Gender',
                           prefixIcon: Icon(Icons.wc_outlined),

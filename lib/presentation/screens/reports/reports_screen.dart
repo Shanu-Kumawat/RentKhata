@@ -570,7 +570,9 @@ class _BillDetailsSheet extends ConsumerWidget {
                             ),
                             _InfoRow(
                               'Units Consumed',
-                              '${((bill.electricityCurrReading ?? 0) - (bill.electricityPrevReading ?? 0)).toStringAsFixed(0)}',
+                              ((bill.electricityCurrReading ?? 0) -
+                                      (bill.electricityPrevReading ?? 0))
+                                  .toStringAsFixed(0),
                             ),
                           ],
                         ],
@@ -836,7 +838,7 @@ class _EditPaymentSheetState extends ConsumerState<_EditPaymentSheet> {
           const SizedBox(height: 16),
 
           DropdownButtonFormField<PaymentMode>(
-            value: _selectedMode,
+            initialValue: _selectedMode,
             decoration: const InputDecoration(
               labelText: 'Payment Mode',
               prefixIcon: Icon(Icons.payment),

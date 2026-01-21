@@ -566,12 +566,14 @@ class BillingRepositoryImpl implements BillingRepository {
   // ========== Message Template Operations ==========
 
   /// Get all message templates
+  @override
   Future<List<MessageTemplate>> getAllMessageTemplates() async {
     final entities = await _billingDao.getAllMessageTemplates();
     return entities.map(_messageTemplateToDomain).toList();
   }
 
   /// Get templates by type
+  @override
   Future<List<MessageTemplate>> getTemplatesByType(TemplateType type) async {
     final dbType = _templateTypeToDb(type);
     final entities = await _billingDao.getTemplatesByType(dbType);
@@ -579,6 +581,7 @@ class BillingRepositoryImpl implements BillingRepository {
   }
 
   /// Get default template for type
+  @override
   Future<MessageTemplate?> getDefaultTemplate(TemplateType type) async {
     final dbType = _templateTypeToDb(type);
     final entity = await _billingDao.getDefaultTemplate(dbType);
@@ -586,6 +589,7 @@ class BillingRepositoryImpl implements BillingRepository {
   }
 
   /// Create a message template
+  @override
   Future<int> createMessageTemplate({
     required TemplateType templateType,
     required String name,
@@ -602,6 +606,7 @@ class BillingRepositoryImpl implements BillingRepository {
   }
 
   /// Update a message template
+  @override
   Future<bool> updateMessageTemplate({
     required int id,
     String? name,
@@ -617,6 +622,7 @@ class BillingRepositoryImpl implements BillingRepository {
   }
 
   /// Delete a message template
+  @override
   Future<int> deleteMessageTemplate(int id) async {
     return _billingDao.deleteMessageTemplate(id);
   }
