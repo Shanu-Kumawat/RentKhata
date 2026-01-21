@@ -15,6 +15,7 @@ import '../../../domain/entities/room.dart';
 import '../../../domain/entities/occupancy.dart';
 import '../../../domain/entities/bill.dart';
 import '../../../services/share_service.dart';
+import '../../../services/billing_cycle_service.dart';
 import '../billing/create_bill_sheet.dart';
 import '../billing/bill_detail_screen.dart';
 import 'move_in_sheet.dart';
@@ -25,7 +26,22 @@ import 'move_out_screen.dart';
 class RoomDetailScreen extends ConsumerWidget {
   final int roomId;
 
-  const RoomDetailScreen({super.key, required this.roomId});
+  /// If true, automatically show create bill sheet on load
+  final bool createBill;
+
+  /// Optional: Pre-fill cycle start date for anniversary-based billing
+  final DateTime? cycleStart;
+
+  /// Optional: Pre-fill cycle end date for anniversary-based billing
+  final DateTime? cycleEnd;
+
+  const RoomDetailScreen({
+    super.key,
+    required this.roomId,
+    this.createBill = false,
+    this.cycleStart,
+    this.cycleEnd,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -39,7 +55,12 @@ class RoomDetailScreen extends ConsumerWidget {
             body: const Center(child: Text('Room not found')),
           );
         }
-        return _RoomDetailContent(room: room);
+        return _RoomDetailContent(
+          room: room,
+          autoCreateBill: createBill,
+          cycleStart: cycleStart,
+          cycleEnd: cycleEnd,
+        );
       },
       loading: () => Scaffold(
         appBar: AppBar(),
@@ -53,65 +74,106 @@ class RoomDetailScreen extends ConsumerWidget {
   }
 }
 
-class _RoomDetailContent extends ConsumerWidget {
+class _RoomDetailContent extends ConsumerStatefulWidget {
   final Room room;
+  final bool autoCreateBill;
+  final DateTime? cycleStart;
+  final DateTime? cycleEnd;
 
-  const _RoomDetailContent({required this.room});
+  const _RoomDetailContent({
+    required this.room,
+    this.autoCreateBill = false,
+    this.cycleStart,
+    this.cycleEnd,
+  });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final occupancyAsync = ref.watch(occupancyForRoomProvider(room.id));
+  ConsumerState<_RoomDetailContent> createState() => _RoomDetailContentState();
+}
+
+class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
+  bool _hasAutoOpenedBillSheet = false;
+
+  void _maybeAutoOpenBillSheet(Occupancy? occupancy) {
+    if (widget.autoCreateBill &&
+        !_hasAutoOpenedBillSheet &&
+        occupancy != null) {
+      _hasAutoOpenedBillSheet = true;
+      // Delay to ensure the screen is fully built
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _showCreateBill(
+            context,
+            occupancy,
+            cycleStart: widget.cycleStart,
+            cycleEnd: widget.cycleEnd,
+          );
+        }
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final occupancyAsync = ref.watch(occupancyForRoomProvider(widget.room.id));
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Room ${room.roomNumber}'),
+        title: Text('Room ${widget.room.roomNumber}'),
         actions: [
           IconButton(
             icon: const Icon(Icons.edit_outlined),
-            onPressed: () => _showEditRoom(context, room),
+            onPressed: () => _showEditRoom(context, widget.room),
           ),
         ],
       ),
       body: occupancyAsync.when(
-        data: (occupancy) => SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Room info card
-              _RoomInfoCard(room: room),
-              const SizedBox(height: 16),
+        data: (occupancy) {
+          // Auto-open bill sheet if requested via navigation
+          _maybeAutoOpenBillSheet(occupancy);
 
-              // Occupancy section
-              if (occupancy != null) ...[
-                _OccupancyCard(
-                  occupancy: occupancy,
-                  room: room,
-                  onEndOccupancy: () =>
-                      _confirmMoveOut(context, ref, occupancy),
-                ),
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Room info card
+                _RoomInfoCard(room: widget.room),
                 const SizedBox(height: 16),
 
-                // Actions - Create Bill button (full width)
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.icon(
-                    onPressed: () => _showCreateBill(context, occupancy),
-                    icon: const Icon(Icons.receipt_long_outlined),
-                    label: const Text('Create Bill'),
+                // Occupancy section
+                if (occupancy != null) ...[
+                  _OccupancyCard(
+                    occupancy: occupancy,
+                    room: widget.room,
+                    onEndOccupancy: () =>
+                        _confirmMoveOut(context, ref, occupancy),
                   ),
-                ),
-                const SizedBox(height: 24),
+                  const SizedBox(height: 16),
 
-                // Bills section
-                _BillsSection(occupancyId: occupancy.id),
-              ] else ...[
-                // Vacant room
-                _VacantRoomCard(onMoveIn: () => _showMoveIn(context, room)),
+                  // Actions - Create Bill button (full width)
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.icon(
+                      onPressed: () => _showCreateBill(context, occupancy),
+                      icon: const Icon(Icons.receipt_long_outlined),
+                      label: const Text('Create Bill'),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Bills section
+                  _BillsSection(occupancyId: occupancy.id),
+                ] else ...[
+                  // Vacant room
+                  _VacantRoomCard(
+                    onMoveIn: () => _showMoveIn(context, widget.room),
+                  ),
+                ],
               ],
-            ],
-          ),
-        ),
+            ),
+          );
+        },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, s) => Center(child: Text('Error: $e')),
       ),
@@ -127,18 +189,75 @@ class _RoomDetailContent extends ConsumerWidget {
     );
   }
 
-  void _showCreateBill(BuildContext context, Occupancy occupancy) {
+  Future<void> _showCreateBill(
+    BuildContext context,
+    Occupancy occupancy, {
+    DateTime? cycleStart,
+    DateTime? cycleEnd,
+  }) async {
+    // Calculate anniversary-based cycle dates if not provided
+    DateTime effectiveCycleStart;
+    DateTime effectiveCycleEnd;
+
+    if (cycleStart != null && cycleEnd != null) {
+      // Use provided dates (from dashboard navigation)
+      effectiveCycleStart = cycleStart;
+      effectiveCycleEnd = cycleEnd;
+    } else {
+      // Find the next cycle that doesn't have a rent bill yet
+      final billingRepo = ref.read(billingRepositoryProvider);
+      final allBills = await billingRepo.getBillsForOccupancy(occupancy.id);
+      final rentBills = allBills
+          .where((b) => b.billType == BillType.rent)
+          .toList();
+
+      if (rentBills.isEmpty) {
+        // No rent bills exist - use current cycle from move-in date
+        final currentCycle = BillingCycleService.getCurrentCycle(
+          occupancy.moveInDate,
+        );
+        effectiveCycleStart = currentCycle.start;
+        effectiveCycleEnd = currentCycle.end;
+      } else {
+        // Find the latest rent bill and get the next cycle after it
+        rentBills.sort((a, b) {
+          final aEnd =
+              a.periodEndDate ?? DateTime(a.billingYear, a.billingMonth + 1, 0);
+          final bEnd =
+              b.periodEndDate ?? DateTime(b.billingYear, b.billingMonth + 1, 0);
+          return bEnd.compareTo(aEnd);
+        });
+
+        final latestBill = rentBills.first;
+        final lastPeriodEnd =
+            latestBill.periodEndDate ??
+            DateTime(latestBill.billingYear, latestBill.billingMonth + 1, 0);
+
+        final nextCycle = BillingCycleService.getNextCycleAfter(
+          occupancy.moveInDate,
+          lastPeriodEnd,
+        );
+        effectiveCycleStart = nextCycle.start;
+        effectiveCycleEnd = nextCycle.end;
+      }
+    }
+
+    if (!mounted) return;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
       builder: (context) => CreateBillSheet(
         occupancyId: occupancy.id,
-        roomId: room.id,
-        roomNumber: room.roomNumber,
+        roomId: widget.room.id,
+        roomNumber: widget.room.roomNumber,
         agreedRent: occupancy.agreedRent,
-        hasElectricityMeter: room.hasElectricityMeter,
-        electricityRate: room.currentElectricityRate,
+        hasElectricityMeter: widget.room.hasElectricityMeter,
+        electricityRate: widget.room.currentElectricityRate,
+        suggestedPeriodStart: effectiveCycleStart,
+        suggestedPeriodEnd: effectiveCycleEnd,
+        moveInDate: occupancy.moveInDate,
       ),
     );
   }
@@ -162,7 +281,8 @@ class _RoomDetailContent extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      builder: (context) => MoveOutScreen(occupancy: occupancy, room: room),
+      builder: (context) =>
+          MoveOutScreen(occupancy: occupancy, room: widget.room),
     );
   }
 }

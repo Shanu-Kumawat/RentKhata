@@ -6,11 +6,206 @@ part of 'billing_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+String _$billSettingsHash() => r'ca62637efc72f3e9f803537809004c145209f95b';
+
+/// Get bill settings from database.
+/// Returns cached settings, auto-refreshes from stream.
+///
+/// Copied from [billSettings].
+@ProviderFor(billSettings)
+final billSettingsProvider =
+    AutoDisposeFutureProvider<BillSettingsEntity>.internal(
+      billSettings,
+      name: r'billSettingsProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$billSettingsHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef BillSettingsRef = AutoDisposeFutureProviderRef<BillSettingsEntity>;
+String _$billSettingsStreamHash() =>
+    r'41cdd7c69239c402126957acebca9b8a12968a10';
+
+/// Stream bill settings for auto-refresh.
+///
+/// Copied from [billSettingsStream].
+@ProviderFor(billSettingsStream)
+final billSettingsStreamProvider =
+    AutoDisposeStreamProvider<BillSettingsEntity?>.internal(
+      billSettingsStream,
+      name: r'billSettingsStreamProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$billSettingsStreamHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef BillSettingsStreamRef =
+    AutoDisposeStreamProviderRef<BillSettingsEntity?>;
+String _$shouldUseAnniversaryHash() =>
+    r'ebb6c0649f7e17904605d8607875ff1ecb3c6f14';
+
+/// Copied from Dart SDK
+class _SystemHash {
+  _SystemHash._();
+
+  static int combine(int hash, int value) {
+    // ignore: parameter_assignments
+    hash = 0x1fffffff & (hash + value);
+    // ignore: parameter_assignments
+    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
+    return hash ^ (hash >> 6);
+  }
+
+  static int finish(int hash) {
+    // ignore: parameter_assignments
+    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
+    // ignore: parameter_assignments
+    hash = hash ^ (hash >> 11);
+    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
+  }
+}
+
+/// Check if a bill type should use anniversary-based cycles.
+///
+/// Copied from [shouldUseAnniversary].
+@ProviderFor(shouldUseAnniversary)
+const shouldUseAnniversaryProvider = ShouldUseAnniversaryFamily();
+
+/// Check if a bill type should use anniversary-based cycles.
+///
+/// Copied from [shouldUseAnniversary].
+class ShouldUseAnniversaryFamily extends Family<AsyncValue<bool>> {
+  /// Check if a bill type should use anniversary-based cycles.
+  ///
+  /// Copied from [shouldUseAnniversary].
+  const ShouldUseAnniversaryFamily();
+
+  /// Check if a bill type should use anniversary-based cycles.
+  ///
+  /// Copied from [shouldUseAnniversary].
+  ShouldUseAnniversaryProvider call(BillType billType) {
+    return ShouldUseAnniversaryProvider(billType);
+  }
+
+  @override
+  ShouldUseAnniversaryProvider getProviderOverride(
+    covariant ShouldUseAnniversaryProvider provider,
+  ) {
+    return call(provider.billType);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'shouldUseAnniversaryProvider';
+}
+
+/// Check if a bill type should use anniversary-based cycles.
+///
+/// Copied from [shouldUseAnniversary].
+class ShouldUseAnniversaryProvider extends AutoDisposeFutureProvider<bool> {
+  /// Check if a bill type should use anniversary-based cycles.
+  ///
+  /// Copied from [shouldUseAnniversary].
+  ShouldUseAnniversaryProvider(BillType billType)
+    : this._internal(
+        (ref) => shouldUseAnniversary(ref as ShouldUseAnniversaryRef, billType),
+        from: shouldUseAnniversaryProvider,
+        name: r'shouldUseAnniversaryProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$shouldUseAnniversaryHash,
+        dependencies: ShouldUseAnniversaryFamily._dependencies,
+        allTransitiveDependencies:
+            ShouldUseAnniversaryFamily._allTransitiveDependencies,
+        billType: billType,
+      );
+
+  ShouldUseAnniversaryProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.billType,
+  }) : super.internal();
+
+  final BillType billType;
+
+  @override
+  Override overrideWith(
+    FutureOr<bool> Function(ShouldUseAnniversaryRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: ShouldUseAnniversaryProvider._internal(
+        (ref) => create(ref as ShouldUseAnniversaryRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        billType: billType,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<bool> createElement() {
+    return _ShouldUseAnniversaryProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is ShouldUseAnniversaryProvider && other.billType == billType;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, billType.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin ShouldUseAnniversaryRef on AutoDisposeFutureProviderRef<bool> {
+  /// The parameter `billType` of this provider.
+  BillType get billType;
+}
+
+class _ShouldUseAnniversaryProviderElement
+    extends AutoDisposeFutureProviderElement<bool>
+    with ShouldUseAnniversaryRef {
+  _ShouldUseAnniversaryProviderElement(super.provider);
+
+  @override
+  BillType get billType => (origin as ShouldUseAnniversaryProvider).billType;
+}
+
 String _$billsStreamHash() => r'ff0b76a409f8781ea546384d9cda27bac2e1528a';
 
-/// Watch all bills (auto-updates).
-///
-/// Copied from [billsStream].
+/// See also [billsStream].
 @ProviderFor(billsStream)
 final billsStreamProvider = AutoDisposeStreamProvider<List<Bill>>.internal(
   billsStream,
@@ -46,27 +241,6 @@ final billsProvider = AutoDisposeFutureProvider<List<Bill>>.internal(
 // ignore: unused_element
 typedef BillsRef = AutoDisposeFutureProviderRef<List<Bill>>;
 String _$billsForOccupancyHash() => r'bebfef601f937e7cb63a09d64ae58278b675f4cd';
-
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
 
 /// Get bills for an occupancy.
 /// Auto-refreshes by watching the stream.

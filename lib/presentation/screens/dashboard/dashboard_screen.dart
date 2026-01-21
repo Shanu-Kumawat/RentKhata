@@ -8,11 +8,11 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../application/providers/dashboard_providers.dart';
 import '../../../application/providers/billing_providers.dart';
+import '../../../application/providers/billing_cycle_providers.dart';
+import '../../../domain/entities/billing_status.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
-import '../../../domain/entities/bill.dart';
 
-/// Main dashboard screen showing financial overview and actionable items.
 /// Main dashboard screen showing financial overview and actionable items.
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -316,66 +316,117 @@ class _ActionRequiredSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final unpaidBillsAsync = ref.watch(unpaidBillsProvider);
+    final billingAttentionAsync = ref.watch(billingAttentionListProvider);
     final theme = Theme.of(context);
-
-    // Mock "Generate Bill" Logic
-    // In real app, check occupancy cycle end dates
-    const pendingBillGenerations = 3;
 
     return Column(
       children: [
-        // Subsection A: "Create Bills" (Proactive)
-        Card(
-          elevation: 2,
-          clipBehavior: Clip.antiAlias,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: BorderSide(color: AppColors.primary.withValues(alpha: 0.3)),
-          ),
-          child: ExpansionTile(
-            backgroundColor: Theme.of(
-              context,
-            ).colorScheme.primaryContainer.withValues(alpha: 0.1),
-            collapsedBackgroundColor: Theme.of(context).cardColor,
-            shape: const Border(), // Remove borders when expanded
-            leading: CircleAvatar(
-              backgroundColor: Theme.of(
-                context,
-              ).colorScheme.primary.withValues(alpha: 0.1),
-              child: Icon(
-                Icons.note_add_outlined,
-                color: Theme.of(context).colorScheme.primary,
+        // Subsection A: "Create Bills" (Proactive - Anniversary-Based)
+        billingAttentionAsync.when(
+          data: (attentionItems) {
+            if (attentionItems.isEmpty) {
+              return _EmptyAttentionCard();
+            }
+
+            final overdueCount = attentionItems
+                .where((i) => i.status == BillingCycleStatus.overdue)
+                .length;
+            final dueSoonCount = attentionItems
+                .where((i) => i.status == BillingCycleStatus.dueSoon)
+                .length;
+
+            // Determine card styling based on urgency
+            final hasOverdue = overdueCount > 0;
+            final borderColor = hasOverdue
+                ? AppColors.error.withValues(alpha: 0.5)
+                : AppColors.warning.withValues(alpha: 0.5);
+            final iconBgColor = hasOverdue
+                ? AppColors.error.withValues(alpha: 0.1)
+                : AppColors.warning.withValues(alpha: 0.1);
+            final iconColor = hasOverdue ? AppColors.error : AppColors.warning;
+
+            return Card(
+              elevation: 2,
+              clipBehavior: Clip.antiAlias,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: BorderSide(color: borderColor),
               ),
-            ),
-            title: Text(
-              '$pendingBillGenerations Tenants start new cycle',
-              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-            ),
-            subtitle: Text(
-              'Time to generate bills',
-              style: TextStyle(
-                fontSize: 12,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              child: ExpansionTile(
+                backgroundColor: iconBgColor,
+                collapsedBackgroundColor: Theme.of(context).cardColor,
+                shape: const Border(),
+                leading: CircleAvatar(
+                  backgroundColor: iconBgColor,
+                  child: Icon(
+                    hasOverdue
+                        ? Icons.warning_amber_rounded
+                        : Icons.schedule_outlined,
+                    color: iconColor,
+                  ),
+                ),
+                title: Text(
+                  _buildAttentionTitle(overdueCount, dueSoonCount),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
+                ),
+                subtitle: Text(
+                  hasOverdue
+                      ? 'Bills need to be created urgently'
+                      : 'Billing cycles ending soon',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                children: [
+                  ...attentionItems.map(
+                    (item) => _BillingAttentionTile(item: item),
+                  ),
+                  if (attentionItems.length > 1)
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        'Tap a tenant to create their bill',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: theme.colorScheme.onSurfaceVariant,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ),
+                ],
               ),
-            ),
-            children: [
-              _MockActionItem(text: 'Room 101 - Amit Kumar'),
-              _MockActionItem(text: 'Room 202 - Rahul Singh'),
-              _MockActionItem(text: 'Room 305 - Priya Sharma'),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextButton(
-                  onPressed: () {},
-                  child: const Text('Generate All Bills'),
+            );
+          },
+          loading: () => const Card(
+            child: Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Center(
+                child: SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
                 ),
               ),
-            ],
+            ),
+          ),
+          error: (error, _) => Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                'Error loading billing status',
+                style: TextStyle(color: theme.colorScheme.error),
+              ),
+            ),
           ),
         ),
 
         const SizedBox(height: 12),
 
-        // Subsection B: "Collect Payment" (Old Pending Bills)
+        // Subsection B: "Collect Payment" (Existing Unpaid Bills)
         unpaidBillsAsync.when(
           data: (bills) {
             if (bills.isEmpty) return const SizedBox.shrink();
@@ -383,7 +434,7 @@ class _ActionRequiredSection extends ConsumerWidget {
             final count = bills.length;
 
             return InkWell(
-              onTap: () => context.push('/reports'), // Or filter list
+              onTap: () => context.push('/reports'),
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -449,23 +500,127 @@ class _ActionRequiredSection extends ConsumerWidget {
       ],
     );
   }
+
+  String _buildAttentionTitle(int overdueCount, int dueSoonCount) {
+    if (overdueCount > 0 && dueSoonCount > 0) {
+      return '$overdueCount overdue, $dueSoonCount due soon';
+    } else if (overdueCount > 0) {
+      return '$overdueCount ${overdueCount == 1 ? 'tenant' : 'tenants'} overdue';
+    } else {
+      return '$dueSoonCount ${dueSoonCount == 1 ? 'tenant' : 'tenants'} due soon';
+    }
+  }
 }
 
-class _MockActionItem extends StatelessWidget {
-  final String text;
-  const _MockActionItem({required this.text});
+/// Card shown when no tenants need billing attention.
+class _EmptyAttentionCard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 0,
+      color: AppColors.success.withValues(alpha: 0.05),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: AppColors.success.withValues(alpha: 0.2)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            CircleAvatar(
+              backgroundColor: AppColors.success.withValues(alpha: 0.1),
+              child: const Icon(
+                Icons.check_circle_outline,
+                color: AppColors.success,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'All caught up!',
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                  ),
+                  Text(
+                    'No billing cycles ending soon',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Tile for a single billing attention item.
+class _BillingAttentionTile extends StatelessWidget {
+  final BillingAttentionItem item;
+
+  const _BillingAttentionTile({required this.item});
 
   @override
   Widget build(BuildContext context) {
+    final isOverdue = item.status == BillingCycleStatus.overdue;
+    final statusColor = isOverdue ? AppColors.error : AppColors.warning;
+    final statusTextColor = isOverdue
+        ? AppColors.errorText
+        : AppColors.warningText;
+
     return ListTile(
       visualDensity: VisualDensity.compact,
-      leading: const Icon(Icons.circle, size: 8, color: AppColors.primary),
-      title: Text(text, style: const TextStyle(fontSize: 13)),
+      onTap: () {
+        // Navigate to room detail with cycle dates for bill creation
+        context.push(
+          '/rooms/${item.roomId}?createBill=true'
+          '&cycleStart=${item.cycleStart.toIso8601String()}'
+          '&cycleEnd=${item.cycleEnd.toIso8601String()}',
+        );
+      },
+      leading: Container(
+        width: 8,
+        height: 8,
+        decoration: BoxDecoration(color: statusColor, shape: BoxShape.circle),
+      ),
+      title: Row(
+        children: [
+          Expanded(
+            child: Text(
+              'Room ${item.roomNumber} - ${item.tenantName}',
+              style: const TextStyle(fontSize: 13),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+      subtitle: Text(
+        item.cycleEndDescription,
+        style: TextStyle(
+          fontSize: 11,
+          color: statusTextColor,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
       trailing: OutlinedButton(
-        onPressed: () {},
+        onPressed: () {
+          context.push(
+            '/rooms/${item.roomId}?createBill=true'
+            '&cycleStart=${item.cycleStart.toIso8601String()}'
+            '&cycleEnd=${item.cycleEnd.toIso8601String()}',
+          );
+        },
         style: OutlinedButton.styleFrom(
           visualDensity: VisualDensity.compact,
           padding: const EdgeInsets.symmetric(horizontal: 12),
+          foregroundColor: statusColor,
+          side: BorderSide(color: statusColor.withValues(alpha: 0.5)),
         ),
         child: const Text('Create'),
       ),

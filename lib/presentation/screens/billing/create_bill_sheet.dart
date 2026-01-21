@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../../application/providers/repository_providers.dart';
 import '../../../application/providers/billing_providers.dart';
 import '../../../application/providers/dashboard_providers.dart';
+import '../../../application/providers/billing_cycle_providers.dart';
 import '../../../application/providers/database_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
@@ -15,6 +16,8 @@ import '../../../core/utils/validators.dart';
 import '../../../domain/entities/bill.dart';
 import '../../../data/database/tables/bill_table.dart' as db;
 import '../../../services/image_service.dart';
+import '../../../services/billing_cycle_service.dart';
+import '../../../services/local_notification_service.dart';
 
 /// Bottom sheet to create a new bill.
 class CreateBillSheet extends ConsumerStatefulWidget {
@@ -25,6 +28,15 @@ class CreateBillSheet extends ConsumerStatefulWidget {
   final bool hasElectricityMeter;
   final double electricityRate;
 
+  /// Optional: Pre-fill period start from anniversary-based billing cycle
+  final DateTime? suggestedPeriodStart;
+
+  /// Optional: Pre-fill period end from anniversary-based billing cycle
+  final DateTime? suggestedPeriodEnd;
+
+  /// Tenant's move-in date for cycle calculations
+  final DateTime? moveInDate;
+
   const CreateBillSheet({
     super.key,
     required this.occupancyId,
@@ -33,6 +45,9 @@ class CreateBillSheet extends ConsumerStatefulWidget {
     required this.agreedRent,
     required this.hasElectricityMeter,
     required this.electricityRate,
+    this.suggestedPeriodStart,
+    this.suggestedPeriodEnd,
+    this.moveInDate,
   });
 
   @override
@@ -55,12 +70,36 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
   double _electricityRate = 0;
   File? _meterPhoto;
 
+  // Mutable cycle state for navigation
+  DateTime? _currentPeriodStart;
+  DateTime? _currentPeriodEnd;
+  int _currentCycleNumber = 0;
+
   @override
   void initState() {
     super.initState();
     _amountController.text = widget.agreedRent.toStringAsFixed(0);
     _electricityRate = widget.electricityRate;
     _electricityRateController.text = widget.electricityRate.toStringAsFixed(2);
+
+    // Pre-select month/year from suggested cycle dates if provided
+    if (widget.suggestedPeriodStart != null) {
+      _billingMonth = widget.suggestedPeriodStart!.month;
+      _billingYear = widget.suggestedPeriodStart!.year;
+    }
+
+    // Initialize mutable cycle state
+    _currentPeriodStart = widget.suggestedPeriodStart;
+    _currentPeriodEnd = widget.suggestedPeriodEnd;
+
+    // Calculate cycle number if move-in date provided
+    if (widget.moveInDate != null && widget.suggestedPeriodStart != null) {
+      _currentCycleNumber = BillingCycleService.getCycleNumber(
+        widget.moveInDate!,
+        widget.suggestedPeriodStart!,
+      );
+    }
+
     _loadLastReading();
   }
 
@@ -102,6 +141,334 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
       'December',
     ];
     return months[month - 1];
+  }
+
+  /// Formats a date as "Jan 15" or "Feb 14"
+  String _formatShortDate(DateTime date) {
+    const shortMonths = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    return '${shortMonths[date.month - 1]} ${date.day}';
+  }
+
+  /// Builds the billing period section - shows anniversary-based dates if enabled,
+  /// or month/year picker for bill types without anniversary
+  Widget _buildBillingPeriodSection(BuildContext context, List<String> months) {
+    final hasAnniversaryDates =
+        widget.suggestedPeriodStart != null &&
+        widget.suggestedPeriodEnd != null;
+
+    // Watch bill settings to reactively update UI when anniversary settings change
+    final settingsAsync = ref.watch(billSettingsProvider);
+
+    return settingsAsync.when(
+      loading: () => _buildMonthYearPicker(context, months),
+      error: (_, __) => _buildMonthYearPicker(context, months),
+      data: (settings) {
+        // Check if the selected bill type uses anniversary billing
+        final usesAnniversary = switch (_selectedBillType) {
+          BillType.rent => settings.rentUsesAnniversary,
+          BillType.electricity => settings.electricityUsesAnniversary,
+          BillType.water => settings.waterUsesAnniversary,
+          BillType.maintenance => settings.maintenanceUsesAnniversary,
+          BillType.other => settings.otherUsesAnniversary,
+        };
+
+        // For bill types with anniversary enabled and valid dates, show anniversary card
+        if (usesAnniversary && hasAnniversaryDates) {
+          return _buildAnniversaryPeriodDisplay(context);
+        }
+
+        // Otherwise show month/year picker
+        return _buildMonthYearPicker(context, months);
+      },
+    );
+  }
+
+  /// Displays the anniversary-based billing period with navigation
+  Widget _buildAnniversaryPeriodDisplay(BuildContext context) {
+    final start = _currentPeriodStart ?? widget.suggestedPeriodStart!;
+    final end = _currentPeriodEnd ?? widget.suggestedPeriodEnd!;
+    final theme = Theme.of(context);
+
+    // Determine if this is a past/future cycle for UI hints
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final isFutureCycle = start.isAfter(today);
+    final isPastCycle = end.isBefore(today);
+    final canNavigate = widget.moveInDate != null;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isFutureCycle
+            ? AppColors.warning.withValues(alpha: 0.1)
+            : theme.colorScheme.primaryContainer.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isFutureCycle
+              ? AppColors.warning.withValues(alpha: 0.5)
+              : theme.colorScheme.primary.withValues(alpha: 0.3),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.calendar_month,
+                color: isFutureCycle
+                    ? AppColors.warning
+                    : theme.colorScheme.primary,
+                size: 20,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Billing Period',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: isFutureCycle
+                      ? AppColors.warning
+                      : theme.colorScheme.primary,
+                ),
+              ),
+              const Spacer(),
+              if (isFutureCycle)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.warning.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    'Advance',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: AppColors.warningText,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                )
+              else if (isPastCycle)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.error.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    'Overdue',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: AppColors.errorText,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                )
+              else
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    'Current',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: theme.colorScheme.primary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // Navigation row with prev/next buttons
+          Row(
+            children: [
+              // Previous cycle button
+              if (canNavigate && _currentCycleNumber > 0)
+                IconButton(
+                  onPressed: _goToPreviousCycle,
+                  icon: const Icon(Icons.chevron_left),
+                  tooltip: 'Previous cycle',
+                  style: IconButton.styleFrom(
+                    backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                  ),
+                )
+              else
+                const SizedBox(width: 48),
+
+              // Date display
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Column(
+                      children: [
+                        Text(
+                          _formatShortDate(start),
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          start.year.toString(),
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: AppColors.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: Icon(
+                        Icons.arrow_forward,
+                        color: AppColors.onSurfaceVariant,
+                        size: 20,
+                      ),
+                    ),
+                    Column(
+                      children: [
+                        Text(
+                          _formatShortDate(end),
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          end.year.toString(),
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: AppColors.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              // Next cycle button
+              if (canNavigate)
+                IconButton(
+                  onPressed: _goToNextCycle,
+                  icon: const Icon(Icons.chevron_right),
+                  tooltip: 'Next cycle (advance billing)',
+                  style: IconButton.styleFrom(
+                    backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                  ),
+                )
+              else
+                const SizedBox(width: 48),
+            ],
+          ),
+
+          const SizedBox(height: 8),
+          Center(
+            child: Text(
+              isFutureCycle
+                  ? '⚠️ Creating advance bill'
+                  : isPastCycle
+                  ? '⚠️ Creating catch-up bill for past cycle'
+                  : 'Based on tenant move-in date',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: (isFutureCycle || isPastCycle)
+                    ? AppColors.warningText
+                    : AppColors.onSurfaceVariant,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _goToPreviousCycle() {
+    if (widget.moveInDate == null || _currentCycleNumber <= 0) return;
+
+    setState(() {
+      _currentCycleNumber--;
+      final cycle = BillingCycleService.getCycleByNumber(
+        widget.moveInDate!,
+        _currentCycleNumber,
+      );
+      _currentPeriodStart = cycle.start;
+      _currentPeriodEnd = cycle.end;
+      _billingMonth = cycle.start.month;
+      _billingYear = cycle.start.year;
+    });
+  }
+
+  void _goToNextCycle() {
+    if (widget.moveInDate == null) return;
+
+    setState(() {
+      _currentCycleNumber++;
+      final cycle = BillingCycleService.getCycleByNumber(
+        widget.moveInDate!,
+        _currentCycleNumber,
+      );
+      _currentPeriodStart = cycle.start;
+      _currentPeriodEnd = cycle.end;
+      _billingMonth = cycle.start.month;
+      _billingYear = cycle.start.year;
+    });
+  }
+
+  /// Builds the traditional month/year picker for non-rent bills
+  Widget _buildMonthYearPicker(BuildContext context, List<String> months) {
+    return Row(
+      children: [
+        Expanded(
+          flex: 2,
+          child: DropdownButtonFormField<int>(
+            value: _billingMonth,
+            decoration: const InputDecoration(labelText: 'Month'),
+            items: List.generate(12, (i) {
+              return DropdownMenuItem(value: i + 1, child: Text(months[i]));
+            }),
+            onChanged: (v) => setState(() => _billingMonth = v!),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          flex: 1,
+          child: DropdownButtonFormField<int>(
+            value: _billingYear,
+            decoration: const InputDecoration(labelText: 'Year'),
+            items: List.generate(5, (i) {
+              final year = DateTime.now().year - 2 + i;
+              return DropdownMenuItem(
+                value: year,
+                child: Text(year.toString()),
+              );
+            }),
+            onChanged: (v) => setState(() => _billingYear = v!),
+          ),
+        ),
+      ],
+    );
   }
 
   void _updateAmount() {
@@ -220,12 +587,24 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
         }
       }
 
-      // Calculate period dates from month/year
-      final periodStart = DateTime(_billingYear, _billingMonth, 1);
-      // End of month: next month's 1st minus 1 day
-      final periodEnd = DateTime(_billingYear, _billingMonth + 1, 0);
-      // Due date: 10 days after period start
-      final calculatedDueDate = periodStart.add(const Duration(days: 10));
+      // Calculate period dates - use mutable cycle state (from navigation),
+      // falling back to suggested dates, then to calendar month dates
+      final periodStart =
+          _currentPeriodStart ??
+          widget.suggestedPeriodStart ??
+          DateTime(_billingYear, _billingMonth, 1);
+      final periodEnd =
+          _currentPeriodEnd ??
+          widget.suggestedPeriodEnd ??
+          DateTime(_billingYear, _billingMonth + 1, 0);
+
+      // Get configurable due date offset from settings
+      final settings = await ref.read(billSettingsProvider.future);
+      final hasAnniversaryDates =
+          _currentPeriodEnd != null || widget.suggestedPeriodEnd != null;
+      final calculatedDueDate = hasAnniversaryDates
+          ? periodEnd.add(Duration(days: settings.dueDateOffsetDays))
+          : periodStart.add(const Duration(days: 10));
 
       await repo.createBill(
         occupancyId: widget.occupancyId,
@@ -263,6 +642,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
         ref.invalidate(billsForOccupancyProvider(widget.occupancyId));
         ref.invalidate(unpaidBillsProvider);
         ref.invalidate(dashboardSummaryProvider);
+        ref.invalidate(billingAttentionListProvider); // Refresh attention list!
         Navigator.pop(context);
 
         // Show appropriate message
@@ -279,6 +659,30 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(const SnackBar(content: Text('Bill created')));
+        }
+
+        // Trigger notifications
+        final notificationService = LocalNotificationService();
+
+        // Get the created bill to schedule notifications
+        final createdBills = await repo.getBillsForOccupancy(
+          widget.occupancyId,
+        );
+        if (createdBills.isNotEmpty) {
+          final createdBill = createdBills.first; // Most recent bill
+
+          // Show confirmation notification
+          await notificationService.showBillCreatedConfirmation(
+            roomNumber: widget.roomNumber,
+            tenantName: createdBill.tenantName ?? 'Tenant',
+            amount: createdBill.amount,
+            period: createdBill.billingPeriod,
+          );
+
+          // Schedule overdue escalation reminders (3/7/14 days after due)
+          await notificationService.scheduleOverdueEscalation(
+            bill: createdBill,
+          );
         }
       }
     } catch (e) {
@@ -377,40 +781,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                   const SizedBox(height: 24),
 
                   // Billing period
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 2,
-                        child: DropdownButtonFormField<int>(
-                          initialValue: _billingMonth,
-                          decoration: const InputDecoration(labelText: 'Month'),
-                          items: List.generate(12, (i) {
-                            return DropdownMenuItem(
-                              value: i + 1,
-                              child: Text(months[i]),
-                            );
-                          }),
-                          onChanged: (v) => setState(() => _billingMonth = v!),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        flex: 1,
-                        child: DropdownButtonFormField<int>(
-                          initialValue: _billingYear,
-                          decoration: const InputDecoration(labelText: 'Year'),
-                          items: List.generate(5, (i) {
-                            final year = DateTime.now().year - 2 + i;
-                            return DropdownMenuItem(
-                              value: year,
-                              child: Text(year.toString()),
-                            );
-                          }),
-                          onChanged: (v) => setState(() => _billingYear = v!),
-                        ),
-                      ),
-                    ],
-                  ),
+                  _buildBillingPeriodSection(context, months),
                   const SizedBox(height: 24),
 
                   // Electricity readings (if applicable)

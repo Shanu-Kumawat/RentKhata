@@ -5,8 +5,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:drift/drift.dart' show Value;
 import '../../../application/providers/dashboard_providers.dart';
 import '../../../application/providers/billing_providers.dart';
+import '../../../application/providers/billing_cycle_providers.dart';
+import '../../../application/providers/database_provider.dart';
+import '../../../data/database/app_database.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../services/local_notification_service.dart';
 import 'edit_profile_screen.dart';
@@ -50,6 +54,25 @@ class SettingsScreen extends ConsumerWidget {
           const Divider(),
 
           // Settings sections
+          _SettingsSection(
+            title: 'Billing & Cycles',
+            children: [
+              _SettingsTile(
+                icon: Icons.calendar_month_outlined,
+                title: 'Anniversary Billing',
+                subtitle: 'Configure billing cycles and due dates',
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    useSafeArea: true,
+                    builder: (context) => const _BillingCycleSettingsSheet(),
+                  );
+                },
+              ),
+            ],
+          ),
+
           _SettingsSection(
             title: 'Billing',
             children: [
@@ -447,5 +470,262 @@ class _NotificationSettingsSheetState
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
+  }
+}
+
+/// Billing cycle settings sheet for configuring anniversary billing
+/// Auto-saves changes immediately without a save button
+class _BillingCycleSettingsSheet extends ConsumerStatefulWidget {
+  const _BillingCycleSettingsSheet();
+
+  @override
+  ConsumerState<_BillingCycleSettingsSheet> createState() =>
+      _BillingCycleSettingsSheetState();
+}
+
+class _BillingCycleSettingsSheetState
+    extends ConsumerState<_BillingCycleSettingsSheet> {
+  /// Save settings to database and refresh providers
+  Future<void> _updateSetting({
+    int? dueDateOffsetDays,
+    int? dueSoonThresholdDays,
+    bool? rentUsesAnniversary,
+    bool? electricityUsesAnniversary,
+    bool? waterUsesAnniversary,
+    bool? maintenanceUsesAnniversary,
+    bool? otherUsesAnniversary,
+  }) async {
+    try {
+      final db = ref.read(appDatabaseProvider);
+
+      // Build companion with only changed values
+      final companion = BillSettingsCompanion(
+        dueDateOffsetDays: dueDateOffsetDays != null
+            ? Value(dueDateOffsetDays)
+            : const Value.absent(),
+        dueSoonThresholdDays: dueSoonThresholdDays != null
+            ? Value(dueSoonThresholdDays)
+            : const Value.absent(),
+        rentUsesAnniversary: rentUsesAnniversary != null
+            ? Value(rentUsesAnniversary)
+            : const Value.absent(),
+        electricityUsesAnniversary: electricityUsesAnniversary != null
+            ? Value(electricityUsesAnniversary)
+            : const Value.absent(),
+        waterUsesAnniversary: waterUsesAnniversary != null
+            ? Value(waterUsesAnniversary)
+            : const Value.absent(),
+        maintenanceUsesAnniversary: maintenanceUsesAnniversary != null
+            ? Value(maintenanceUsesAnniversary)
+            : const Value.absent(),
+        otherUsesAnniversary: otherUsesAnniversary != null
+            ? Value(otherUsesAnniversary)
+            : const Value.absent(),
+        updatedAt: Value(DateTime.now()),
+      );
+
+      await (db.update(
+        db.billSettings,
+      )..where((t) => t.id.equals(1))).write(companion);
+
+      // Invalidate providers to refresh all dependent widgets
+      ref.invalidate(billSettingsProvider);
+      ref.invalidate(billingAttentionConfigProvider);
+      ref.invalidate(billingAttentionListProvider);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error saving: $e')));
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final settingsAsync = ref.watch(billSettingsProvider);
+
+    return settingsAsync.when(
+      loading: () => const SizedBox(
+        height: 200,
+        child: Center(child: CircularProgressIndicator()),
+      ),
+      error: (e, _) => Center(child: Text('Error: $e')),
+      data: (settings) => SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Billing Cycle Settings',
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Changes are saved automatically.',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: AppColors.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Due Date Offset
+            Text(
+              'Due Date',
+              style: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Days after billing cycle ends before bill is due.',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: AppColors.onSurfaceVariant,
+              ),
+            ),
+            Slider(
+              value: settings.dueDateOffsetDays.toDouble(),
+              min: 1,
+              max: 15,
+              divisions: 14,
+              label: '${settings.dueDateOffsetDays} days',
+              onChangeEnd: (v) => _updateSetting(dueDateOffsetDays: v.round()),
+              onChanged: (v) {}, // Required for slider to work
+            ),
+            Center(
+              child: Text(
+                'Due: ${settings.dueDateOffsetDays} days after cycle ends',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Due Soon Threshold
+            Text(
+              'Due Soon Alert',
+              style: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Show "due soon" in Attention when cycle ends within this many days.',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: AppColors.onSurfaceVariant,
+              ),
+            ),
+            Slider(
+              value: settings.dueSoonThresholdDays.toDouble(),
+              min: 1,
+              max: 10,
+              divisions: 9,
+              label: '${settings.dueSoonThresholdDays} days',
+              onChangeEnd: (v) =>
+                  _updateSetting(dueSoonThresholdDays: v.round()),
+              onChanged: (v) {},
+            ),
+            Center(
+              child: Text(
+                'Alert: ${settings.dueSoonThresholdDays} days before cycle ends',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: AppColors.warning,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Anniversary Billing Toggles
+            Text(
+              'Anniversary Billing by Bill Type',
+              style: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Enable to track billing cycles based on tenant move-in date.',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: AppColors.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 8),
+
+            _buildBillTypeToggle(
+              label: 'Rent',
+              subtitle: 'Monthly rent bills',
+              value: settings.rentUsesAnniversary,
+              onChanged: (v) => _updateSetting(rentUsesAnniversary: v),
+              icon: Icons.home_outlined,
+              color: AppColors.primary,
+            ),
+            _buildBillTypeToggle(
+              label: 'Electricity',
+              subtitle: 'Electricity meter bills',
+              value: settings.electricityUsesAnniversary,
+              onChanged: (v) => _updateSetting(electricityUsesAnniversary: v),
+              icon: Icons.bolt_outlined,
+              color: AppColors.warning,
+            ),
+            _buildBillTypeToggle(
+              label: 'Water',
+              subtitle: 'Water bills',
+              value: settings.waterUsesAnniversary,
+              onChanged: (v) => _updateSetting(waterUsesAnniversary: v),
+              icon: Icons.water_drop_outlined,
+              color: Colors.blue,
+            ),
+            _buildBillTypeToggle(
+              label: 'Maintenance',
+              subtitle: 'Maintenance charges',
+              value: settings.maintenanceUsesAnniversary,
+              onChanged: (v) => _updateSetting(maintenanceUsesAnniversary: v),
+              icon: Icons.build_outlined,
+              color: Colors.green,
+            ),
+            _buildBillTypeToggle(
+              label: 'Other',
+              subtitle: 'Other charges',
+              value: settings.otherUsesAnniversary,
+              onChanged: (v) => _updateSetting(otherUsesAnniversary: v),
+              icon: Icons.receipt_outlined,
+              color: Colors.grey,
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBillTypeToggle({
+    required String label,
+    required String subtitle,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+    required IconData icon,
+    required Color color,
+  }) {
+    return SwitchListTile(
+      title: Text(label),
+      subtitle: Text(subtitle),
+      value: value,
+      onChanged: onChanged,
+      secondary: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(icon, color: color),
+      ),
+    );
   }
 }

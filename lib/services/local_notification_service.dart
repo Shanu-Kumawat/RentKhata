@@ -243,4 +243,241 @@ class LocalNotificationService {
       payload: 'overdue',
     );
   }
+
+  // ========== Billing Cycle Reminders ==========
+
+  /// Schedule reminder for billing cycle ending soon.
+  ///
+  /// Schedules a notification [daysBefore] days before the cycle ends
+  /// to remind the landlord to create a bill.
+  Future<void> scheduleCycleEndReminder({
+    required int occupancyId,
+    required String tenantName,
+    required String roomNumber,
+    required DateTime cycleEndDate,
+    int daysBefore = 3,
+  }) async {
+    if (!_isInitialized) await initialize();
+
+    final reminderDate = cycleEndDate.subtract(Duration(days: daysBefore));
+
+    // Don't schedule if reminder date is in the past
+    if (reminderDate.isBefore(DateTime.now())) return;
+
+    // Set reminder for 9 AM
+    final scheduledTime = DateTime(
+      reminderDate.year,
+      reminderDate.month,
+      reminderDate.day,
+      9, // 9 AM
+      0,
+    );
+
+    // Format date nicely
+    final shortMonths = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    final endDateStr =
+        '${shortMonths[cycleEndDate.month - 1]} ${cycleEndDate.day}';
+
+    await scheduleNotification(
+      id: occupancyId * 100 + 50, // Unique ID for cycle reminder
+      title: '📅 Billing Cycle Ending - Room $roomNumber',
+      body:
+          '$tenantName\'s billing cycle ends on $endDateStr. Create their bill now.',
+      scheduledTime: scheduledTime,
+      payload: 'cycle:$occupancyId',
+    );
+
+    debugPrint(
+      'Scheduled cycle end reminder for occupancy $occupancyId at $scheduledTime',
+    );
+  }
+
+  /// Cancel cycle end reminder for an occupancy
+  Future<void> cancelCycleReminder(int occupancyId) async {
+    await _plugin.cancel(occupancyId * 100 + 50);
+  }
+
+  /// Schedule reminders for all occupancies with cycles ending soon
+  Future<void> scheduleAllCycleReminders({
+    required List<
+      ({
+        int occupancyId,
+        String tenantName,
+        String roomNumber,
+        DateTime cycleEndDate,
+      })
+    >
+    occupancies,
+    int daysBefore = 3,
+  }) async {
+    for (final occ in occupancies) {
+      await scheduleCycleEndReminder(
+        occupancyId: occ.occupancyId,
+        tenantName: occ.tenantName,
+        roomNumber: occ.roomNumber,
+        cycleEndDate: occ.cycleEndDate,
+        daysBefore: daysBefore,
+      );
+    }
+  }
+
+  // ========== Payment Follow-up Notifications ==========
+
+  /// Schedule escalating overdue reminders at 3, 7, and 14 days overdue.
+  ///
+  /// These help landlords follow up with tenants who haven't paid.
+  Future<void> scheduleOverdueEscalation({required Bill bill}) async {
+    if (bill.dueDate == null || bill.isFullyPaid) return;
+    if (!_isInitialized) await initialize();
+
+    final tenantName = bill.tenantName ?? 'Tenant';
+    final amount = bill.pendingAmount;
+    final roomNumber = bill.roomNumber ?? 'Room';
+
+    // 3-day overdue reminder
+    await _scheduleOverdueReminder(
+      bill: bill,
+      daysOverdue: 3,
+      title: '⏰ Payment Reminder - $roomNumber',
+      body: '$tenantName\'s ₹${amount.toStringAsFixed(0)} is 3 days overdue.',
+    );
+
+    // 7-day overdue reminder (more urgent)
+    await _scheduleOverdueReminder(
+      bill: bill,
+      daysOverdue: 7,
+      title: '⚠️ Overdue 1 Week - $roomNumber',
+      body: '₹${amount.toStringAsFixed(0)} from $tenantName is a week overdue.',
+    );
+
+    // 14-day overdue reminder (critical)
+    await _scheduleOverdueReminder(
+      bill: bill,
+      daysOverdue: 14,
+      title: '🚨 Critical: 2 Weeks Overdue - $roomNumber',
+      body:
+          '₹${amount.toStringAsFixed(0)} from $tenantName is 2 weeks overdue!',
+    );
+  }
+
+  Future<void> _scheduleOverdueReminder({
+    required Bill bill,
+    required int daysOverdue,
+    required String title,
+    required String body,
+  }) async {
+    final reminderDate = bill.dueDate!.add(Duration(days: daysOverdue));
+
+    // Don't schedule if reminder date is in the past
+    if (reminderDate.isBefore(DateTime.now())) return;
+
+    // Schedule for 10 AM
+    final scheduledTime = DateTime(
+      reminderDate.year,
+      reminderDate.month,
+      reminderDate.day,
+      10, // 10 AM
+      0,
+    );
+
+    await scheduleNotification(
+      id: bill.id * 10 + daysOverdue, // Unique ID per escalation level
+      title: title,
+      body: body,
+      scheduledTime: scheduledTime,
+      payload: 'overdue:${bill.id}',
+    );
+
+    debugPrint(
+      'Scheduled $daysOverdue-day overdue reminder for bill ${bill.id}',
+    );
+  }
+
+  /// Cancel all escalation reminders for a bill (when paid)
+  Future<void> cancelOverdueEscalation(int billId) async {
+    await _plugin.cancel(billId * 10 + 3);
+    await _plugin.cancel(billId * 10 + 7);
+    await _plugin.cancel(billId * 10 + 14);
+  }
+
+  // ========== Summary Notifications ==========
+
+  /// Show immediate summary of collection status.
+  Future<void> showCollectionSummary({
+    required int totalTenants,
+    required int paidCount,
+    required int pendingCount,
+    required double collectedAmount,
+    required double pendingAmount,
+    String? periodLabel,
+  }) async {
+    if (!_isInitialized) await initialize();
+
+    final title = '📊 ${periodLabel ?? 'Monthly'} Collection Summary';
+    final body =
+        '$paidCount/$totalTenants paid • '
+        '₹${collectedAmount.toStringAsFixed(0)} collected • '
+        '₹${pendingAmount.toStringAsFixed(0)} pending';
+
+    await showNotification(
+      id: 998, // Fixed ID for summary
+      title: title,
+      body: body,
+      payload: 'summary',
+    );
+  }
+
+  /// Show confirmation when a new bill is created.
+  Future<void> showBillCreatedConfirmation({
+    required String roomNumber,
+    required String tenantName,
+    required double amount,
+    required String period,
+  }) async {
+    if (!_isInitialized) await initialize();
+
+    await showNotification(
+      id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+      title: '✅ Bill Created - Room $roomNumber',
+      body: '₹${amount.toStringAsFixed(0)} for $tenantName ($period)',
+      payload: 'bill_created',
+    );
+  }
+
+  /// Show confirmation when a payment is recorded.
+  Future<void> showPaymentRecordedConfirmation({
+    required String roomNumber,
+    required String tenantName,
+    required double amount,
+    required bool isFullyPaid,
+  }) async {
+    if (!_isInitialized) await initialize();
+
+    final title = isFullyPaid
+        ? '✅ Bill Fully Paid - Room $roomNumber'
+        : '💰 Payment Received - Room $roomNumber';
+    final body = isFullyPaid
+        ? '$tenantName has paid in full!'
+        : '₹${amount.toStringAsFixed(0)} received from $tenantName';
+
+    await showNotification(
+      id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+      title: title,
+      body: body,
+      payload: 'payment_recorded',
+    );
+  }
 }

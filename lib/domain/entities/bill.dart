@@ -86,7 +86,8 @@ class Bill with _$Bill {
   /// Check if bill can record payments
   bool get canRecordPayment => !isFullyPaid && status != BillStatus.voided;
 
-  /// Get billing period as readable string
+  /// Get billing period as readable string.
+  /// Uses anniversary-based dates when available, falls back to month format.
   String get billingPeriod {
     const months = [
       'Jan',
@@ -102,6 +103,22 @@ class Bill with _$Bill {
       'Nov',
       'Dec',
     ];
+
+    // Use anniversary-based dates if available
+    if (periodStartDate != null && periodEndDate != null) {
+      final startMonth = months[periodStartDate!.month - 1];
+      final endMonth = months[periodEndDate!.month - 1];
+
+      // Same year: "Dec 13 - Jan 12, 2026"
+      if (periodStartDate!.year == periodEndDate!.year) {
+        return '$startMonth ${periodStartDate!.day} - $endMonth ${periodEndDate!.day}, ${periodEndDate!.year}';
+      } else {
+        // Different years: "Dec 13, 2025 - Jan 12, 2026"
+        return '$startMonth ${periodStartDate!.day}, ${periodStartDate!.year} - $endMonth ${periodEndDate!.day}, ${periodEndDate!.year}';
+      }
+    }
+
+    // Fallback to month-based format
     return '${months[billingMonth - 1]} $billingYear';
   }
 }

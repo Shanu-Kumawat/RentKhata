@@ -3,16 +3,63 @@ library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../../data/database/app_database.dart';
 import '../../domain/entities/audit_log.dart';
 import '../../domain/entities/bill.dart';
 import '../../domain/entities/message_template.dart';
 import '../../domain/entities/payment.dart';
 import '../../services/template_service.dart';
 import 'repository_providers.dart';
+import 'database_provider.dart';
 
 part 'billing_providers.g.dart';
 
-/// Watch all bills (auto-updates).
+/// Get bill settings from database.
+/// Returns cached settings, auto-refreshes from stream.
+@riverpod
+Future<BillSettingsEntity> billSettings(Ref ref) async {
+  // Watch the stream to auto-refresh
+  ref.watch(billSettingsStreamProvider);
+  final db = ref.watch(appDatabaseProvider);
+  final settings = await db.select(db.billSettings).getSingleOrNull();
+  if (settings != null) return settings;
+
+  // Return defaults if not found
+  return BillSettingsEntity(
+    id: 1,
+    billNumberPrefix: 'INV',
+    dueDateOffsetDays: 5,
+    dueSoonThresholdDays: 5,
+    autoReminders: true,
+    rentUsesAnniversary: true,
+    electricityUsesAnniversary: true,
+    waterUsesAnniversary: false,
+    maintenanceUsesAnniversary: false,
+    otherUsesAnniversary: false,
+    updatedAt: DateTime.now(),
+  );
+}
+
+/// Stream bill settings for auto-refresh.
+@riverpod
+Stream<BillSettingsEntity?> billSettingsStream(Ref ref) {
+  final db = ref.watch(appDatabaseProvider);
+  return db.select(db.billSettings).watchSingleOrNull();
+}
+
+/// Check if a bill type should use anniversary-based cycles.
+@riverpod
+Future<bool> shouldUseAnniversary(Ref ref, BillType billType) async {
+  final settings = await ref.watch(billSettingsProvider.future);
+  return switch (billType) {
+    BillType.rent => settings.rentUsesAnniversary,
+    BillType.electricity => settings.electricityUsesAnniversary,
+    BillType.water => settings.waterUsesAnniversary,
+    BillType.maintenance => settings.maintenanceUsesAnniversary,
+    BillType.other => settings.otherUsesAnniversary,
+  };
+}
+
 @riverpod
 Stream<List<Bill>> billsStream(Ref ref) {
   // There's no direct stream for all bills in repository,

@@ -65,7 +65,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration {
@@ -325,6 +325,21 @@ Thank you for your payment.
             END
             WHERE bill_number IS NULL
           ''');
+        }
+        if (from < 7) {
+          // Add new BillSettings columns for anniversary billing
+          await m.addColumn(billSettings, billSettings.dueSoonThresholdDays);
+          await m.addColumn(billSettings, billSettings.rentUsesAnniversary);
+          await m.addColumn(
+            billSettings,
+            billSettings.electricityUsesAnniversary,
+          );
+          await m.addColumn(billSettings, billSettings.waterUsesAnniversary);
+          await m.addColumn(
+            billSettings,
+            billSettings.maintenanceUsesAnniversary,
+          );
+          await m.addColumn(billSettings, billSettings.otherUsesAnniversary);
         }
       },
     );

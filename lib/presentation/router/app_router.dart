@@ -77,7 +77,26 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.roomDetail,
         builder: (context, state) {
           final id = int.parse(state.pathParameters['id']!);
-          return RoomDetailScreen(roomId: id);
+          // Parse query parameters for billing cycle integration
+          final createBill = state.uri.queryParameters['createBill'] == 'true';
+          final cycleStartStr = state.uri.queryParameters['cycleStart'];
+          final cycleEndStr = state.uri.queryParameters['cycleEnd'];
+
+          DateTime? cycleStart;
+          DateTime? cycleEnd;
+          if (cycleStartStr != null) {
+            cycleStart = DateTime.tryParse(cycleStartStr);
+          }
+          if (cycleEndStr != null) {
+            cycleEnd = DateTime.tryParse(cycleEndStr);
+          }
+
+          return RoomDetailScreen(
+            roomId: id,
+            createBill: createBill,
+            cycleStart: cycleStart,
+            cycleEnd: cycleEnd,
+          );
         },
       ),
 
