@@ -10,6 +10,9 @@ import '../../../application/providers/dashboard_providers.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/validators.dart';
 import '../../../domain/entities/bill.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import '../../../services/image_service.dart';
 
 /// Bottom sheet to edit a bill with payment-aware restrictions.
 /// - Unpaid bills: full editing allowed
@@ -31,6 +34,8 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
 
   DateTime? _dueDate;
   bool _isLoading = false;
+  File? _meterPhoto;
+  String? _existingPhotoPath;
 
   /// Whether this bill has any payments
   bool get _hasPayments => widget.bill.paidAmount > 0;
@@ -49,6 +54,7 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
     );
     _notesController = TextEditingController(text: widget.bill.notes ?? '');
     _dueDate = widget.bill.dueDate;
+    _existingPhotoPath = widget.bill.meterPhotoPath;
   }
 
   @override
@@ -56,6 +62,37 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
     _amountController.dispose();
     _notesController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickMeterPhoto() async {
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Take Photo'),
+              onTap: () => Navigator.pop(context, ImageSource.camera),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Choose from Gallery'),
+              onTap: () => Navigator.pop(context, ImageSource.gallery),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (source != null) {
+      final imageService = ImageService();
+      final photo = await imageService.pickImage(source: source);
+      if (photo != null) {
+        setState(() => _meterPhoto = photo);
+      }
+    }
   }
 
   Future<void> _selectDueDate() async {
@@ -97,6 +134,8 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
         amount: _canEditAmount ? amount : widget.bill.amount,
         notes: _notesController.text.isEmpty ? null : _notesController.text,
         dueDate: _dueDate,
+        meterPhotoPath:
+            _meterPhoto?.path ?? _existingPhotoPath, // Update photo path
         // Recalculate pending amount if amount changed
         pendingAmount: _canEditAmount
             ? amount - widget.bill.paidAmount
@@ -134,6 +173,11 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
+    // Check if there is a photo to display
+    final hasPhoto =
+        _meterPhoto != null ||
+        (_existingPhotoPath != null && _existingPhotoPath!.isNotEmpty);
 
     return Padding(
       padding: EdgeInsets.only(
@@ -227,6 +271,91 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
                   ),
                 ),
                 const SizedBox(height: 24),
+
+                // Meter Photo Section (Only for electricity bills)
+                if (widget.bill.billType == BillType.electricity) ...[
+                  Text('Meter Photo', style: theme.textTheme.titleSmall),
+                  const SizedBox(height: 8),
+                  if (hasPhoto)
+                    Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: _meterPhoto != null
+                              ? Image.file(
+                                  _meterPhoto!,
+                                  height: 150,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                )
+                              : Image.file(
+                                  File(_existingPhotoPath!),
+                                  height: 150,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (c, e, s) => Container(
+                                    height: 150,
+                                    color: Colors.grey.shade200,
+                                    child: const Center(
+                                      child: Icon(
+                                        Icons.broken_image,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                        ),
+                        Positioned(
+                          top: 8,
+                          right: 8,
+                          child: CircleAvatar(
+                            backgroundColor: Colors.black54,
+                            child: IconButton(
+                              icon: const Icon(Icons.edit, color: Colors.white),
+                              onPressed: _pickMeterPhoto,
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  else
+                    InkWell(
+                      onTap: _pickMeterPhoto,
+                      borderRadius: BorderRadius.circular(8),
+                      child: Container(
+                        height: 100,
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.surfaceContainerHighest,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: theme.colorScheme.outline,
+                            style: BorderStyle.solid,
+                          ),
+                        ),
+                        child: Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.add_a_photo_outlined,
+                                size: 32,
+                                color: theme.colorScheme.primary,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Add Meter Photo',
+                                style: TextStyle(
+                                  color: theme.colorScheme.primary,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  const SizedBox(height: 24),
+                ],
 
                 // Amount (disabled if has payments, or show min value info)
                 TextFormField(

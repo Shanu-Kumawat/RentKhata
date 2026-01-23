@@ -320,6 +320,23 @@ class BillingRepositoryImpl implements BillingRepository {
         changes.add('notes updated');
       }
 
+      // Track meter photo changes
+      if (oldBill.meterPhotoPath != bill.meterPhotoPath) {
+        if ((oldBill.meterPhotoPath == null ||
+                oldBill.meterPhotoPath!.isEmpty) &&
+            (bill.meterPhotoPath != null && bill.meterPhotoPath!.isNotEmpty)) {
+          changes.add('meter photo added');
+        } else if ((oldBill.meterPhotoPath != null &&
+                oldBill.meterPhotoPath!.isNotEmpty) &&
+            (bill.meterPhotoPath != null && bill.meterPhotoPath!.isNotEmpty)) {
+          changes.add('meter photo updated');
+        } else if ((oldBill.meterPhotoPath != null &&
+                oldBill.meterPhotoPath!.isNotEmpty) &&
+            (bill.meterPhotoPath == null || bill.meterPhotoPath!.isEmpty)) {
+          changes.add('meter photo removed');
+        }
+      }
+
       await _billingDao.insertAuditLog(
         entityType: dbAudit.AuditEntityType.bill,
         entityId: bill.id,

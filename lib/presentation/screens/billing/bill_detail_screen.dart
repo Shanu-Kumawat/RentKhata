@@ -2,6 +2,8 @@
 library;
 
 import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import '../../../services/image_service.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -721,13 +723,13 @@ class _BillInfoCard extends StatelessWidget {
 }
 
 /// Electricity details card.
-class _ElectricityDetailsCard extends StatelessWidget {
+class _ElectricityDetailsCard extends ConsumerWidget {
   final Bill bill;
 
   const _ElectricityDetailsCard({required this.bill});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final units =
         (bill.electricityCurrReading ?? 0) - (bill.electricityPrevReading ?? 0);
@@ -878,10 +880,106 @@ class _ElectricityDetailsCard extends StatelessWidget {
                 ),
               ),
             ],
+            // Add Meter Photo button (if missing and is electricity bill)
+            if ((bill.meterPhotoPath == null || bill.meterPhotoPath!.isEmpty) &&
+                bill.billType == BillType.electricity &&
+                !bill.isFullyPaid) ...[
+              const SizedBox(height: 12),
+              InkWell(
+                onTap: () => _addMeterPhoto(context, ref, bill),
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: theme.colorScheme.outline,
+                      style: BorderStyle.solid,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.add_a_photo_outlined,
+                        color: theme.colorScheme.primary,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Add Meter Photo',
+                        style: TextStyle(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),
     );
+  }
+
+  Future<void> _addMeterPhoto(
+    BuildContext context,
+    WidgetRef ref,
+    Bill bill,
+  ) async {
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Take Photo'),
+              onTap: () => Navigator.pop(context, ImageSource.camera),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Choose from Gallery'),
+              onTap: () => Navigator.pop(context, ImageSource.gallery),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (source != null && context.mounted) {
+      final imageService = ImageService();
+      final photo = await imageService.pickImage(source: source);
+
+      if (photo != null && context.mounted) {
+        try {
+          final repo = ref.read(billingRepositoryProvider);
+          final updatedBill = bill.copyWith(meterPhotoPath: photo.path);
+
+          final success = await repo.updateBill(updatedBill);
+
+          if (success && context.mounted) {
+            // Invalidate providers
+            ref.invalidate(billByIdProvider(bill.id));
+            ref.invalidate(billsForOccupancyProvider(bill.occupancyId));
+            ref.invalidate(billsForOccupancyStreamProvider(bill.occupancyId));
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Meter photo added successfully')),
+            );
+          }
+        } catch (e) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text('Error adding photo: $e')));
+          }
+        }
+      }
+    }
   }
 }
 

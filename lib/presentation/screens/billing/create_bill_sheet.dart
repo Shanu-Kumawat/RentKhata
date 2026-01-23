@@ -633,6 +633,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
         electricityCharges: _selectedBillType == BillType.electricity
             ? _electricityCharges
             : null,
+        meterPhotoPath: _meterPhoto?.path,
         notes: _notesController.text.isEmpty ? null : _notesController.text,
         periodStartDate: periodStart,
         periodEndDate: periodEnd,
