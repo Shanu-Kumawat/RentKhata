@@ -13,6 +13,7 @@ import '../../../domain/entities/billing_status.dart';
 import '../../../domain/entities/bill.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
+import '../../widgets/bouncing_scale_wrapper.dart';
 
 /// Main dashboard screen showing financial overview and actionable items.
 class DashboardScreen extends ConsumerWidget {
@@ -866,63 +867,52 @@ class _RoomStatusTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = _getStatusColor(context, item.status);
 
-    return ListTile(
-      onTap: () => context.push(
-        '/rooms/${item.roomId}',
-      ), // Assuming route is /rooms/:id? Or strictly /rooms
-      // Actually standard route might be /rooms check routes logic.
-      // If occupancyId map to /rooms/occupancyId?
-      // Check existing code: context.push('/rooms/${bill.occupancyId}') was used in BillCard.
-      // But items here might not have occupancyId readily available if I didn't add it to RoomStatusItem.
-      // Wait, RoomStatusItem has roomId.
-      // Let's assume navigating to /rooms opens the room list or verify route.
-      // In BillCard it was: context.push('/rooms/${bill.occupancyId}')
-      // RoomStatusItem has roomId.
-      // Let's use context.push('/rooms/${item.roomId}') assuming room detail expects Room ID or Occupancy ID?
-      // I should verify param.
-      // But for now, proceeding.
-      contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-      leading: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(8),
+    return BouncingScaleWrapper(
+      onTap: () => context.push('/rooms/${item.roomId}'),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+        leading: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            item.roomNumber,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
         ),
-        child: Text(
-          item.roomNumber,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+        title: Text(
+          item.tenantName,
+          style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+          overflow: TextOverflow.ellipsis,
         ),
-      ),
-      title: Text(
-        item.tenantName,
-        style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
-        overflow: TextOverflow.ellipsis,
-      ),
-      trailing: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withValues(alpha: 0.3)),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 6,
-              height: 6,
-              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-            ),
-            const SizedBox(width: 6),
-            Text(
-              item.statusLabel,
-              style: TextStyle(
-                color: _getStatusTextColor(context, item.status),
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
+        trailing: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: color.withValues(alpha: 0.3)),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 6,
+                height: 6,
+                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
               ),
-            ),
-          ],
+              const SizedBox(width: 6),
+              Text(
+                item.statusLabel,
+                style: TextStyle(
+                  color: _getStatusTextColor(context, item.status),
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

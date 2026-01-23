@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../widgets/bouncing_scale_wrapper.dart';
 import 'package:go_router/go_router.dart';
 import '../../../application/providers/dashboard_providers.dart';
 import '../../../application/providers/theme_settings_provider.dart';
@@ -33,7 +34,7 @@ class SettingsScreen extends ConsumerWidget {
         children: [
           // Profile section
           landlordAsync.when(
-            data: (landlord) => _BouncingScaleWrapper(
+            data: (landlord) => BouncingScaleWrapper(
               child: _ProfileTile(
                 name: landlord?.name ?? 'Set up profile',
                 upiId: landlord?.upiId,
@@ -63,7 +64,7 @@ class SettingsScreen extends ConsumerWidget {
             title: 'Appearance',
             children: [
               // Unified theme selector
-              _BouncingScaleWrapper(
+              BouncingScaleWrapper(
                 child: ListTile(
                   leading: Container(
                     padding: const EdgeInsets.all(8),
@@ -463,7 +464,7 @@ class _SettingsTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _BouncingScaleWrapper(
+    return BouncingScaleWrapper(
       child: ListTile(
         leading: Container(
           padding: const EdgeInsets.all(8),
@@ -484,73 +485,6 @@ class _SettingsTile extends StatelessWidget {
         ),
         onTap: onTap,
       ),
-    );
-  }
-}
-
-/// A widget that scales down slightly when pressed, providing tactile feedback.
-class _BouncingScaleWrapper extends StatefulWidget {
-  final Widget child;
-  final double scaleFactor;
-  final Duration duration;
-
-  const _BouncingScaleWrapper({
-    required this.child,
-    this.scaleFactor = 0.96,
-    this.duration = const Duration(milliseconds: 100),
-  });
-
-  @override
-  State<_BouncingScaleWrapper> createState() => _BouncingScaleWrapperState();
-}
-
-class _BouncingScaleWrapperState extends State<_BouncingScaleWrapper>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: widget.duration,
-      reverseDuration: widget.duration,
-      value: 0.0,
-      upperBound: 1.0,
-    );
-    _scaleAnimation = Tween<double>(
-      begin: 1.0,
-      end: widget.scaleFactor,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _onPointerDown(PointerDownEvent event) {
-    HapticFeedback.lightImpact();
-    _controller.forward();
-  }
-
-  void _onPointerUp(PointerUpEvent event) {
-    _controller.reverse();
-  }
-
-  void _onPointerCancel(PointerCancelEvent event) {
-    _controller.reverse();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Listener(
-      onPointerDown: _onPointerDown,
-      onPointerUp: _onPointerUp,
-      onPointerCancel: _onPointerCancel,
-      child: ScaleTransition(scale: _scaleAnimation, child: widget.child),
     );
   }
 }
