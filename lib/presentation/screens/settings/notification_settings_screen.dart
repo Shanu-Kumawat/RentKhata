@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../application/providers/billing_providers.dart';
 import '../../../application/providers/billing_cycle_providers.dart';
@@ -168,6 +169,7 @@ class _NotificationSettingsScreenState
 
   // Helper to toggle a boolean setting
   void _toggleSetting(NotificationType type, bool value) {
+    HapticFeedback.lightImpact();
     var newEnabled = Map<NotificationType, bool>.from(
       _localState.enabledSettings,
     );
@@ -177,6 +179,9 @@ class _NotificationSettingsScreenState
 
   // Helper to update days before
   void _updateDaysBefore(NotificationType type, int days) {
+    if (days != _localState.daysBeforeSettings[type]) {
+      HapticFeedback.selectionClick();
+    }
     var newDays = Map<NotificationType, int>.from(
       _localState.daysBeforeSettings,
     );
@@ -186,11 +191,13 @@ class _NotificationSettingsScreenState
 
   // Helper to update hour
   void _updateHour(int hour) {
+    HapticFeedback.lightImpact();
     _updateLocalState(_localState.copyWith(notificationHour: hour));
   }
 
   // Helper to update quiet hours
   void _updateQuietHours(bool enabled) {
+    HapticFeedback.lightImpact();
     if (enabled) {
       _updateLocalState(
         _localState.copyWith(quietHoursStart: 22, quietHoursEnd: 7),

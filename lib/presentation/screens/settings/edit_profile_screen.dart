@@ -104,12 +104,15 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               children: [
                 // Avatar
                 Center(
-                  child: ImagePickerWidget(
-                    initialImagePath: _photoPath,
-                    placeholderIcon: Icons.person,
-                    size: 100,
-                    onImageSelected: (path) =>
-                        setState(() => _photoPath = path),
+                  child: Hero(
+                    tag: 'landlord_profile_photo',
+                    child: ImagePickerWidget(
+                      initialImagePath: _photoPath,
+                      placeholderIcon: Icons.person,
+                      size: 100,
+                      onImageSelected: (path) =>
+                          setState(() => _photoPath = path),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 32),

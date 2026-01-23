@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:drift/drift.dart' show Value;
 import '../../../application/providers/billing_providers.dart';
@@ -108,16 +109,19 @@ class _BillingCycleSettingsScreenState
   }
 
   void _updateDueDateOffset(int value) {
+    if (value != _dueDateOffsetDays) HapticFeedback.selectionClick();
     setState(() => _dueDateOffsetDays = value);
     _saveChanges();
   }
 
   void _updateDueSoonThreshold(int value) {
+    if (value != _dueSoonThresholdDays) HapticFeedback.selectionClick();
     setState(() => _dueSoonThresholdDays = value);
     _saveChanges();
   }
 
   void _updateBillType(String type, bool value) {
+    HapticFeedback.lightImpact();
     setState(() {
       switch (type) {
         case 'rent':

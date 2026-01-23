@@ -3,6 +3,7 @@ library;
 
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../application/providers/dashboard_providers.dart';
@@ -26,16 +27,21 @@ class SettingsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
       body: ListView(
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
+        ),
         children: [
           // Profile section
           landlordAsync.when(
-            data: (landlord) => _ProfileTile(
-              name: landlord?.name ?? 'Set up profile',
-              upiId: landlord?.upiId,
-              photoPath: landlord?.photoPath,
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const EditProfileScreen()),
+            data: (landlord) => _BouncingScaleWrapper(
+              child: _ProfileTile(
+                name: landlord?.name ?? 'Set up profile',
+                upiId: landlord?.upiId,
+                photoPath: landlord?.photoPath,
+                onTap: () => Navigator.push(
+                  context,
+                  _createRoute(const EditProfileScreen()),
+                ),
               ),
             ),
             loading: () => const ListTile(
@@ -52,34 +58,29 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const Divider(),
 
-          // Use animate container for stagger effect if needed, but here we can just do simple delayed animations
-          // or just wrap things in build.
-          // Since I can't add packages, I will implement a wrapper that animates on mount?
-          // But stateless widgets don't mount in the same way.
-          // Simpler: Just render the list. The user asked for animations.
-          // I will use `TweenAnimationBuilder` or similar if I want simple ones.
-          // But `ListView` items don't stagger automatically.
           _AnimatedSettingsSection(
             index: 0,
             title: 'Appearance',
             children: [
               // Unified theme selector
-              ListTile(
-                leading: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.secondaryContainer,
-                    borderRadius: BorderRadius.circular(8),
+              _BouncingScaleWrapper(
+                child: ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.secondaryContainer,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      appTheme.icon,
+                      color: Theme.of(context).colorScheme.onSecondaryContainer,
+                    ),
                   ),
-                  child: Icon(
-                    appTheme.icon,
-                    color: Theme.of(context).colorScheme.onSecondaryContainer,
-                  ),
+                  title: const Text('Theme'),
+                  subtitle: Text(appTheme.displayName),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => _showThemeSheet(context, ref, appTheme),
                 ),
-                title: const Text('Theme'),
-                subtitle: Text(appTheme.displayName),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => _showThemeSheet(context, ref, appTheme),
               ),
             ],
           ),
@@ -94,9 +95,7 @@ class SettingsScreen extends ConsumerWidget {
                 subtitle: 'Configure billing cycles and due dates',
                 onTap: () => Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => const BillingCycleSettingsScreen(),
-                  ),
+                  _createRoute(const BillingCycleSettingsScreen()),
                 ),
               ),
             ],
@@ -112,9 +111,7 @@ class SettingsScreen extends ConsumerWidget {
                 subtitle: 'View and update electricity rates',
                 onTap: () => Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => const ElectricityRatesScreen(),
-                  ),
+                  _createRoute(const ElectricityRatesScreen()),
                 ),
               ),
               _SettingsTile(
@@ -123,9 +120,7 @@ class SettingsScreen extends ConsumerWidget {
                 subtitle: 'Customize invoice and receipt messages',
                 onTap: () => Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => const MessageTemplatesScreen(),
-                  ),
+                  _createRoute(const MessageTemplatesScreen()),
                 ),
               ),
             ],
@@ -141,9 +136,7 @@ class SettingsScreen extends ConsumerWidget {
                 subtitle: 'Due date and overdue reminders',
                 onTap: () => Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => const NotificationSettingsScreen(),
-                  ),
+                  _createRoute(const NotificationSettingsScreen()),
                 ),
               ),
             ],
@@ -201,6 +194,50 @@ class SettingsScreen extends ConsumerWidget {
           const SizedBox(height: 32),
         ],
       ),
+    );
+  }
+
+  Route _createRoute(Widget page) {
+    return PageRouteBuilder(
+      transitionDuration: const Duration(milliseconds: 450),
+      reverseTransitionDuration: const Duration(milliseconds: 450),
+      pageBuilder: (context, animation, secondaryAnimation) => page,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        // Shared Axis Z Transition
+        // Incoming page: Scale up + Fade in
+        final fadeIn = Tween<double>(begin: 0.0, end: 1.0).animate(
+          CurvedAnimation(parent: animation, curve: Curves.fastOutSlowIn),
+        );
+        final scaleIn = Tween<double>(begin: 0.92, end: 1.0).animate(
+          CurvedAnimation(parent: animation, curve: Curves.fastOutSlowIn),
+        );
+
+        // Outgoing page (when pushing new route): Scale down + Fade out
+        // We handle this by wrapping the CHILD in a Transition that reacts to secondaryAnimation
+        final fadeOut = Tween<double>(begin: 1.0, end: 0.0).animate(
+          CurvedAnimation(
+            parent: secondaryAnimation,
+            curve: Curves.fastOutSlowIn,
+          ),
+        );
+        final scaleOut = Tween<double>(begin: 1.0, end: 0.92).animate(
+          CurvedAnimation(
+            parent: secondaryAnimation,
+            curve: Curves.fastOutSlowIn,
+          ),
+        );
+
+        return FadeTransition(
+          opacity: fadeIn,
+          child: ScaleTransition(
+            scale: scaleIn,
+            child: FadeTransition(
+              opacity: fadeOut,
+              child: ScaleTransition(scale: scaleOut, child: child),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -295,24 +332,27 @@ class _ProfileTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      leading: CircleAvatar(
-        radius: 28,
-        backgroundColor: Theme.of(
-          context,
-        ).colorScheme.primary.withValues(alpha: 0.1),
-        backgroundImage: photoPath != null && File(photoPath!).existsSync()
-            ? FileImage(File(photoPath!))
-            : null,
-        child: photoPath == null || !File(photoPath!).existsSync()
-            ? Text(
-                name.isNotEmpty ? name[0].toUpperCase() : '?',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              )
-            : null,
+      leading: Hero(
+        tag: 'landlord_profile_photo',
+        child: CircleAvatar(
+          radius: 28,
+          backgroundColor: Theme.of(
+            context,
+          ).colorScheme.primary.withValues(alpha: 0.1),
+          backgroundImage: photoPath != null && File(photoPath!).existsSync()
+              ? FileImage(File(photoPath!))
+              : null,
+          child: photoPath == null || !File(photoPath!).existsSync()
+              ? Text(
+                  name.isNotEmpty ? name[0].toUpperCase() : '?',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                )
+              : null,
+        ),
       ),
       title: Text(name, style: const TextStyle(fontWeight: FontWeight.w600)),
       subtitle: upiId != null
@@ -423,25 +463,94 @@ class _SettingsTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.secondaryContainer,
-          borderRadius: BorderRadius.circular(8),
+    return _BouncingScaleWrapper(
+      child: ListTile(
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.secondaryContainer,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(
+            icon,
+            color: Theme.of(context).colorScheme.onSecondaryContainer,
+          ),
         ),
-        child: Icon(
-          icon,
-          color: Theme.of(context).colorScheme.onSecondaryContainer,
+        title: Text(title),
+        subtitle: Text(subtitle),
+        trailing: Icon(
+          Icons.chevron_right,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
         ),
+        onTap: onTap,
       ),
-      title: Text(title),
-      subtitle: Text(subtitle),
-      trailing: Icon(
-        Icons.chevron_right,
-        color: Theme.of(context).colorScheme.onSurfaceVariant,
-      ),
-      onTap: onTap,
+    );
+  }
+}
+
+/// A widget that scales down slightly when pressed, providing tactile feedback.
+class _BouncingScaleWrapper extends StatefulWidget {
+  final Widget child;
+  final double scaleFactor;
+  final Duration duration;
+
+  const _BouncingScaleWrapper({
+    required this.child,
+    this.scaleFactor = 0.96,
+    this.duration = const Duration(milliseconds: 100),
+  });
+
+  @override
+  State<_BouncingScaleWrapper> createState() => _BouncingScaleWrapperState();
+}
+
+class _BouncingScaleWrapperState extends State<_BouncingScaleWrapper>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: widget.duration,
+      reverseDuration: widget.duration,
+      value: 0.0,
+      upperBound: 1.0,
+    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: widget.scaleFactor,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _onPointerDown(PointerDownEvent event) {
+    HapticFeedback.lightImpact();
+    _controller.forward();
+  }
+
+  void _onPointerUp(PointerUpEvent event) {
+    _controller.reverse();
+  }
+
+  void _onPointerCancel(PointerCancelEvent event) {
+    _controller.reverse();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Listener(
+      onPointerDown: _onPointerDown,
+      onPointerUp: _onPointerUp,
+      onPointerCancel: _onPointerCancel,
+      child: ScaleTransition(scale: _scaleAnimation, child: widget.child),
     );
   }
 }
