@@ -346,4 +346,9 @@ class TenantRepositoryImpl implements TenantRepository {
     final entity = await _tenantDao.getTenantByRoom(roomId);
     return entity != null ? _tenantToDomain(entity) : null;
   }
+
+  @override
+  Future<bool> updateBillingStartDate(int occupancyId, DateTime date) {
+    return _tenantDao.updateBillingStartDate(occupancyId, date);
+  }
 }

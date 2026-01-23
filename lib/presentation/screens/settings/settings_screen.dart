@@ -10,7 +10,10 @@ import '../../../application/providers/dashboard_providers.dart';
 import '../../../application/providers/billing_providers.dart';
 import '../../../application/providers/billing_cycle_providers.dart';
 import '../../../application/providers/database_provider.dart';
+import '../../../application/providers/tenant_providers.dart';
+import '../../../application/providers/notification_settings_providers.dart';
 import '../../../data/database/app_database.dart';
+import '../../../data/database/tables/notification_setting_table.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../services/local_notification_service.dart';
 import 'edit_profile_screen.dart';
@@ -305,9 +308,57 @@ class _NotificationSettingsSheetState
   int _quietEnd = 7;
 
   bool _isLoading = false;
+  bool _hasLoadedFromDb = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFromProvider();
+  }
+
+  void _loadFromProvider() {
+    final settings = ref.read(notificationSettingsNotifierProvider);
+    if (!settings.isLoading && settings.enabledSettings.isNotEmpty) {
+      _applySettings(settings);
+    }
+  }
+
+  void _applySettings(NotificationSettingsState settings) {
+    if (_hasLoadedFromDb) return;
+    _hasLoadedFromDb = true;
+    setState(() {
+      _cycleEndingSoon = settings.isEnabled(NotificationType.cycleEndingSoon);
+      _billDueSoon = settings.isEnabled(NotificationType.billDueSoon);
+      _monthlySummary = settings.isEnabled(NotificationType.monthlySummary);
+      _cycleReminderDays = settings.getDaysBefore(
+        NotificationType.cycleEndingSoon,
+      );
+      _dueSoonDays = settings.getDaysBefore(NotificationType.billDueSoon);
+      _paymentReceived = settings.isEnabled(NotificationType.paymentReceived);
+      _billFullyPaid = settings.isEnabled(NotificationType.billFullyPaid);
+      _overdue1Day = settings.isEnabled(NotificationType.overdue1Day);
+      _overdue3Days = settings.isEnabled(NotificationType.overdue3Days);
+      _overdue7Days = settings.isEnabled(NotificationType.overdue7Days);
+      _overdue14Days = settings.isEnabled(NotificationType.overdue14Days);
+      _notificationHour = settings.notificationHour;
+      _quietHoursEnabled = settings.quietHoursStart != null;
+      _quietStart = settings.quietHoursStart ?? 22;
+      _quietEnd = settings.quietHoursEnd ?? 7;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    // Listen for changes from database loading
+    ref.listen<NotificationSettingsState>(
+      notificationSettingsNotifierProvider,
+      (previous, next) {
+        if (!next.isLoading && previous?.isLoading == true) {
+          _applySettings(next);
+        }
+      },
+    );
+
     return DraggableScrollableSheet(
       initialChildSize: 0.85,
       minChildSize: 0.5,
@@ -477,6 +528,20 @@ class _NotificationSettingsSheetState
                 ),
               ),
 
+            // Scheduled test button (debug only) - for reboot testing
+            if (kDebugMode)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    icon: const Icon(Icons.schedule),
+                    label: const Text('Schedule Test (15 min)'),
+                    onPressed: _isLoading ? null : _scheduleTestNotification,
+                  ),
+                ),
+              ),
+
             // Save button
             SizedBox(
               width: double.infinity,
@@ -594,6 +659,34 @@ class _NotificationSettingsSheetState
         return;
       }
 
+      // Save settings to database
+      final enabledSettings = <NotificationType, bool>{
+        NotificationType.cycleEndingSoon: _cycleEndingSoon,
+        NotificationType.billDueSoon: _billDueSoon,
+        NotificationType.monthlySummary: _monthlySummary,
+        NotificationType.paymentReceived: _paymentReceived,
+        NotificationType.billFullyPaid: _billFullyPaid,
+        NotificationType.overdue1Day: _overdue1Day,
+        NotificationType.overdue3Days: _overdue3Days,
+        NotificationType.overdue7Days: _overdue7Days,
+        NotificationType.overdue14Days: _overdue14Days,
+      };
+
+      final daysBeforeSettings = <NotificationType, int>{
+        NotificationType.cycleEndingSoon: _cycleReminderDays,
+        NotificationType.billDueSoon: _dueSoonDays,
+      };
+
+      await ref
+          .read(notificationSettingsNotifierProvider.notifier)
+          .saveAllSettings(
+            enabledSettings: enabledSettings,
+            daysBeforeSettings: daysBeforeSettings,
+            notificationHour: _notificationHour,
+            quietHoursStart: _quietHoursEnabled ? _quietStart : null,
+            quietHoursEnd: _quietHoursEnabled ? _quietEnd : null,
+          );
+
       // Cancel all existing notifications first
       await notificationService.cancelAll();
 
@@ -617,6 +710,36 @@ class _NotificationSettingsSheetState
         if (_overdue1Day || _overdue3Days || _overdue7Days || _overdue14Days) {
           await notificationService.scheduleOverdueEscalation(bill: bill);
         }
+      }
+
+      // Schedule cycle ending reminders if enabled
+      if (_cycleEndingSoon) {
+        final occupancies = await ref.read(activeOccupanciesProvider.future);
+        final cycleData =
+            <
+              ({
+                int occupancyId,
+                String tenantName,
+                String roomNumber,
+                DateTime cycleEndDate,
+              })
+            >[];
+
+        for (final occupancy in occupancies) {
+          final cycle = ref.read(currentBillingCycleProvider(occupancy));
+          cycleData.add((
+            occupancyId: occupancy.id,
+            tenantName: occupancy.tenantName ?? 'Tenant',
+            roomNumber: occupancy.roomNumber ?? 'Room',
+            cycleEndDate: cycle.end,
+          ));
+        }
+
+        await notificationService.scheduleAllCycleReminders(
+          occupancies: cycleData,
+          daysBefore: _cycleReminderDays,
+        );
+        scheduledCount += cycleData.length;
       }
 
       if (mounted) {
@@ -674,6 +797,63 @@ class _NotificationSettingsSheetState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Test notification sent!')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _scheduleTestNotification() async {
+    setState(() => _isLoading = true);
+
+    try {
+      final notificationService = LocalNotificationService();
+      await notificationService.initialize();
+
+      final granted = await notificationService.requestPermission();
+      if (!granted) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Notification permission denied. Enable in Settings.',
+              ),
+            ),
+          );
+        }
+        setState(() => _isLoading = false);
+        return;
+      }
+
+      // Schedule for 15 minutes from now
+      final scheduledTime = DateTime.now().add(const Duration(minutes: 15));
+
+      await notificationService.scheduleNotification(
+        id: 99999,
+        title: '⏰ Scheduled Test Notification',
+        body:
+            'This was scheduled 15 minutes ago! Notifications work even after reboot.',
+        scheduledTime: scheduledTime,
+        payload: 'scheduled_test',
+      );
+
+      if (mounted) {
+        final timeStr =
+            '${scheduledTime.hour}:${scheduledTime.minute.toString().padLeft(2, '0')}';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Notification scheduled for $timeStr. You can close the app or reboot now!',
+            ),
+            duration: const Duration(seconds: 5),
+          ),
         );
       }
     } catch (e) {

@@ -99,6 +99,9 @@ abstract class TenantRepository {
     DateTime? billingStartDate,
   });
 
+  /// Update the billing start date for an occupancy
+  Future<bool> updateBillingStartDate(int occupancyId, DateTime date);
+
   /// End an occupancy (move tenant out)
   Future<bool> endOccupancy(
     int occupancyId,

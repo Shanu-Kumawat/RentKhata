@@ -336,7 +336,7 @@ class LocalNotificationService {
 
   // ========== Payment Follow-up Notifications ==========
 
-  /// Schedule escalating overdue reminders at 3, 7, and 14 days overdue.
+  /// Schedule escalating overdue reminders at 1, 3, 7, and 14 days overdue.
   ///
   /// These help landlords follow up with tenants who haven't paid.
   Future<void> scheduleOverdueEscalation({required Bill bill}) async {
@@ -346,6 +346,14 @@ class LocalNotificationService {
     final tenantName = bill.tenantName ?? 'Tenant';
     final amount = bill.pendingAmount;
     final roomNumber = bill.roomNumber ?? 'Room';
+
+    // 1-day overdue reminder (first reminder)
+    await _scheduleOverdueReminder(
+      bill: bill,
+      daysOverdue: 1,
+      title: '📋 Payment Due - $roomNumber',
+      body: '$tenantName\'s ₹${amount.toStringAsFixed(0)} is now overdue.',
+    );
 
     // 3-day overdue reminder
     await _scheduleOverdueReminder(
@@ -408,9 +416,10 @@ class LocalNotificationService {
 
   /// Cancel all escalation reminders for a bill (when paid)
   Future<void> cancelOverdueEscalation(int billId) async {
-    await _plugin.cancel(billId * 10 + 3);
-    await _plugin.cancel(billId * 10 + 7);
-    await _plugin.cancel(billId * 10 + 14);
+    await _plugin.cancel(billId * 10 + 1); // 1-day
+    await _plugin.cancel(billId * 10 + 3); // 3-day
+    await _plugin.cancel(billId * 10 + 7); // 7-day
+    await _plugin.cancel(billId * 10 + 14); // 14-day
   }
 
   // ========== Summary Notifications ==========

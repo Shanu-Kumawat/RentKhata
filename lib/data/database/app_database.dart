@@ -65,7 +65,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 9;
 
   @override
   MigrationStrategy get migration {
@@ -344,6 +344,13 @@ Thank you for your payment.
         if (from < 8) {
           // Add billingStartDate to occupancies for existing tenant support
           await m.addColumn(occupancies, occupancies.billingStartDate);
+        }
+        if (from < 9) {
+          // Add notification_hour column to notification_settings table
+          await customStatement('''
+            ALTER TABLE notification_settings 
+            ADD COLUMN notification_hour INTEGER NOT NULL DEFAULT 9
+          ''');
         }
       },
     );

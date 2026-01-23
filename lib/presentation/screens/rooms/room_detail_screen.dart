@@ -401,7 +401,7 @@ class _RoomInfoCard extends StatelessWidget {
   }
 }
 
-class _OccupancyCard extends StatelessWidget {
+class _OccupancyCard extends ConsumerWidget {
   final Occupancy occupancy;
   final Room room;
   final VoidCallback onEndOccupancy;
@@ -413,7 +413,10 @@ class _OccupancyCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final billingStartDate = occupancy.effectiveBillingStartDate;
+    final hasSeparateBillingDate = occupancy.billingStartDate != null;
+
     return Card(
       child: InkWell(
         onTap: () => context.go('/tenants/${occupancy.tenantId}'),
@@ -489,11 +492,118 @@ class _OccupancyCard extends StatelessWidget {
                     ),
                 ],
               ),
+              const SizedBox(height: 12),
+              // Billing Start Date row
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.calendar_today_outlined,
+                              size: 16,
+                              color: AppColors.onSurfaceVariant,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Billing Start',
+                              style: Theme.of(context).textTheme.labelSmall
+                                  ?.copyWith(color: AppColors.onSurfaceVariant),
+                            ),
+                            if (!hasSeparateBillingDate) ...[
+                              const SizedBox(width: 4),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary.withValues(
+                                    alpha: 0.1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  'Same as move-in',
+                                  style: Theme.of(context).textTheme.labelSmall
+                                      ?.copyWith(
+                                        color: AppColors.primary,
+                                        fontSize: 10,
+                                      ),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '${billingStartDate.day}/${billingStartDate.month}/${billingStartDate.year}',
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                  ),
+                  TextButton.icon(
+                    onPressed: () => _editBillingStartDate(context, ref),
+                    icon: const Icon(Icons.edit_outlined, size: 16),
+                    label: const Text('Edit'),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  Future<void> _editBillingStartDate(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
+    final newDate = await showDatePicker(
+      context: context,
+      initialDate: occupancy.effectiveBillingStartDate,
+      firstDate: occupancy.moveInDate,
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+      helpText: 'Select Billing Start Date',
+    );
+
+    if (newDate != null && context.mounted) {
+      final tenantRepo = ref.read(tenantRepositoryProvider);
+      final success = await tenantRepo.updateBillingStartDate(
+        occupancy.id,
+        newDate,
+      );
+
+      if (success && context.mounted) {
+        // Invalidate occupancy provider to refresh data
+        ref.invalidate(occupancyForRoomProvider(room.id));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Billing start date updated to ${newDate.day}/${newDate.month}/${newDate.year}',
+            ),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      } else if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to update billing start date'),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
   }
 }
 

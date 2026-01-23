@@ -103,6 +103,19 @@ class TenantDao extends DatabaseAccessor<AppDatabase> with _$TenantDaoMixin {
   Future<bool> updateOccupancy(OccupancyEntity occupancy) =>
       update(occupancies).replace(occupancy);
 
+  /// Update only the billing start date for an occupancy
+  Future<bool> updateBillingStartDate(int occupancyId, DateTime date) async {
+    final occupancy = await (select(
+      occupancies,
+    )..where((o) => o.id.equals(occupancyId))).getSingleOrNull();
+
+    if (occupancy == null) return false;
+
+    return update(
+      occupancies,
+    ).replace(occupancy.copyWith(billingStartDate: Value(date)));
+  }
+
   /// End an occupancy (set move-out date and inactive)
   Future<bool> endOccupancy(
     int occupancyId,
