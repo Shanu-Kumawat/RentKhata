@@ -10,7 +10,7 @@ import '../../../application/providers/billing_providers.dart';
 import '../../../application/providers/dashboard_providers.dart';
 import '../../../application/providers/billing_cycle_providers.dart';
 import '../../../application/providers/database_provider.dart';
-import '../../../core/theme/app_colors.dart';
+
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/validators.dart';
 import '../../../domain/entities/bill.dart';
@@ -260,12 +260,12 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: isFutureCycle
-            ? AppColors.warning.withValues(alpha: 0.1)
+            ? Theme.of(context).colorScheme.error.withValues(alpha: 0.1)
             : theme.colorScheme.primaryContainer.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isFutureCycle
-              ? AppColors.warning.withValues(alpha: 0.3)
+              ? Theme.of(context).colorScheme.error.withValues(alpha: 0.3)
               : theme.colorScheme.primary.withValues(alpha: 0.3),
         ),
       ),
@@ -308,13 +308,15 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.error.withValues(alpha: 0.1),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.error.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     'Overdue',
                     style: theme.textTheme.labelSmall?.copyWith(
-                      color: AppColors.error,
+                      color: Theme.of(context).colorScheme.error,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -327,13 +329,15 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.warning.withValues(alpha: 0.1),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.error.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     'Advance',
                     style: theme.textTheme.labelSmall?.copyWith(
-                      color: AppColors.warning,
+                      color: Theme.of(context).colorScheme.error,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -751,7 +755,11 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                           Text(
                             'Room ${widget.roomNumber}',
                             style: Theme.of(context).textTheme.bodyMedium
-                                ?.copyWith(color: AppColors.onSurfaceVariant),
+                                ?.copyWith(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
+                                ),
                           ),
                         ],
                       ),
@@ -905,13 +913,19 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
-                              AppColors.primary.withValues(alpha: 0.1),
-                              AppColors.primary.withValues(alpha: 0.05),
+                              Theme.of(
+                                context,
+                              ).colorScheme.primary.withValues(alpha: 0.1),
+                              Theme.of(
+                                context,
+                              ).colorScheme.primary.withValues(alpha: 0.05),
                             ],
                           ),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: AppColors.primary.withValues(alpha: 0.2),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.primary.withValues(alpha: 0.2),
                           ),
                         ),
                         child: Row(
@@ -926,7 +940,9 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                                         .textTheme
                                         .labelSmall
                                         ?.copyWith(
-                                          color: AppColors.primary,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.primary,
                                           fontWeight: FontWeight.w600,
                                         ),
                                   ),
@@ -945,7 +961,9 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                               style: Theme.of(context).textTheme.titleLarge
                                   ?.copyWith(
                                     fontWeight: FontWeight.bold,
-                                    color: AppColors.primary,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
                                   ),
                             ),
                           ],
@@ -972,7 +990,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                                   borderRadius: BorderRadius.circular(8),
                                   border: Border.all(
                                     color: _meterPhoto != null
-                                        ? AppColors.success
+                                        ? Theme.of(context).colorScheme.tertiary
                                         : Colors.grey.shade300,
                                     width: _meterPhoto != null ? 2 : 1,
                                   ),
@@ -1004,8 +1022,12 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                                               : Icons.camera_alt_outlined,
                                           size: 18,
                                           color: _meterPhoto != null
-                                              ? AppColors.success
-                                              : AppColors.onSurfaceVariant,
+                                              ? Theme.of(
+                                                  context,
+                                                ).colorScheme.tertiary
+                                              : Theme.of(
+                                                  context,
+                                                ).colorScheme.onSurfaceVariant,
                                         ),
                                         const SizedBox(width: 6),
                                         Text(
@@ -1017,7 +1039,9 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                                               .titleSmall
                                               ?.copyWith(
                                                 color: _meterPhoto != null
-                                                    ? AppColors.success
+                                                    ? Theme.of(
+                                                        context,
+                                                      ).colorScheme.tertiary
                                                     : null,
                                                 fontWeight: FontWeight.w600,
                                               ),
@@ -1033,7 +1057,9 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                                           .textTheme
                                           .bodySmall
                                           ?.copyWith(
-                                            color: AppColors.onSurfaceVariant,
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.onSurfaceVariant,
                                           ),
                                     ),
                                   ],
@@ -1129,7 +1155,7 @@ class _MeterReadingInput extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.surfaceVariant,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.grey.shade300),
       ),
@@ -1137,9 +1163,9 @@ class _MeterReadingInput extends StatelessWidget {
         children: [
           Text(
             label,
-            style: Theme.of(
-              context,
-            ).textTheme.labelSmall?.copyWith(color: AppColors.onSurfaceVariant),
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
           const SizedBox(height: 4),
           TextFormField(
@@ -1159,9 +1185,9 @@ class _MeterReadingInput extends StatelessWidget {
           ),
           Text(
             'units',
-            style: Theme.of(
-              context,
-            ).textTheme.labelSmall?.copyWith(color: AppColors.onSurfaceVariant),
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
         ],
       ),

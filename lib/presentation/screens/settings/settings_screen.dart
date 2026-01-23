@@ -12,6 +12,7 @@ import '../../../application/providers/billing_cycle_providers.dart';
 import '../../../application/providers/database_provider.dart';
 import '../../../application/providers/tenant_providers.dart';
 import '../../../application/providers/notification_settings_providers.dart';
+import '../../../application/providers/theme_settings_provider.dart';
 import '../../../data/database/app_database.dart';
 import '../../../data/database/tables/notification_setting_table.dart';
 import '../../../core/theme/app_colors.dart';
@@ -27,6 +28,7 @@ class SettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final landlordAsync = ref.watch(landlordProvider);
+    final appTheme = ref.watch(themeSettingsProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
@@ -55,6 +57,31 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
           const Divider(),
+
+          // Appearance section
+          _SettingsSection(
+            title: 'Appearance',
+            children: [
+              // Unified theme selector
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.secondaryContainer,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    appTheme.icon,
+                    color: Theme.of(context).colorScheme.onSecondaryContainer,
+                  ),
+                ),
+                title: const Text('Theme'),
+                subtitle: Text(appTheme.displayName),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => _showThemeSheet(context, ref, appTheme),
+              ),
+            ],
+          ),
 
           // Settings sections
           _SettingsSection(
@@ -151,7 +178,7 @@ class SettingsScreen extends ConsumerWidget {
                       width: 48,
                       height: 48,
                       decoration: BoxDecoration(
-                        color: AppColors.primary,
+                        color: Theme.of(context).colorScheme.primary,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(
@@ -173,6 +200,79 @@ class SettingsScreen extends ConsumerWidget {
       ),
     );
   }
+
+  void _showThemeSheet(
+    BuildContext context,
+    WidgetRef ref,
+    AppTheme currentTheme,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 8),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.outline,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                'Choose Theme',
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(height: 8),
+            ...AppTheme.values.map(
+              (theme) => RadioListTile<AppTheme>(
+                value: theme,
+                groupValue: currentTheme,
+                activeColor: Theme.of(context).colorScheme.primary,
+                onChanged: (value) {
+                  if (value != null) {
+                    ref.read(themeSettingsProvider.notifier).setTheme(value);
+                    Navigator.pop(context);
+                  }
+                },
+                title: Text(theme.displayName),
+                subtitle: Text(theme.subtitle),
+                secondary: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: theme.previewColor,
+                    borderRadius: BorderRadius.circular(8),
+                    border: theme == AppTheme.system
+                        ? Border.all(
+                            color: Theme.of(context).colorScheme.outline,
+                          )
+                        : null,
+                  ),
+                  child: theme == AppTheme.system
+                      ? Icon(
+                          Icons.brightness_auto,
+                          size: 18,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        )
+                      : null,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _ProfileTile extends StatelessWidget {
@@ -188,22 +288,26 @@ class _ProfileTile extends StatelessWidget {
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       leading: CircleAvatar(
         radius: 28,
-        backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+        backgroundColor: Theme.of(
+          context,
+        ).colorScheme.primary.withValues(alpha: 0.1),
         child: Text(
           name.isNotEmpty ? name[0].toUpperCase() : '?',
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: AppColors.primary,
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
       ),
       title: Text(name, style: const TextStyle(fontWeight: FontWeight.w600)),
       subtitle: upiId != null
           ? Text(upiId!)
-          : const Text(
+          : Text(
               'Tap to add UPI ID',
-              style: TextStyle(color: AppColors.onSurfaceVariant),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
       trailing: const Icon(Icons.chevron_right),
       onTap: onTap,
@@ -227,7 +331,7 @@ class _SettingsSection extends StatelessWidget {
           child: Text(
             title,
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              color: AppColors.primary,
+              color: Theme.of(context).colorScheme.primary,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -257,16 +361,19 @@ class _SettingsTile extends StatelessWidget {
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: AppColors.surfaceVariant,
+          color: Theme.of(context).colorScheme.secondaryContainer,
           borderRadius: BorderRadius.circular(8),
         ),
-        child: Icon(icon, color: AppColors.onSurface),
+        child: Icon(
+          icon,
+          color: Theme.of(context).colorScheme.onSecondaryContainer,
+        ),
       ),
       title: Text(title),
       subtitle: Text(subtitle),
-      trailing: const Icon(
+      trailing: Icon(
         Icons.chevron_right,
-        color: AppColors.onSurfaceVariant,
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
       ),
       onTap: onTap,
     );
@@ -392,7 +499,7 @@ class _NotificationSettingsSheetState
             _buildSectionHeader(
               icon: Icons.calendar_today_outlined,
               title: 'Billing Reminders',
-              color: AppColors.primary,
+              color: Theme.of(context).colorScheme.primary,
             ),
             _buildToggleWithSlider(
               title: 'Billing cycle ending',
@@ -427,7 +534,7 @@ class _NotificationSettingsSheetState
             _buildSectionHeader(
               icon: Icons.payment_outlined,
               title: 'Payment Notifications',
-              color: AppColors.success,
+              color: Theme.of(context).colorScheme.primary,
             ),
             _buildSimpleToggle(
               title: 'Payment received',
@@ -447,7 +554,7 @@ class _NotificationSettingsSheetState
             _buildSectionHeader(
               icon: Icons.warning_amber_outlined,
               title: 'Overdue Follow-ups',
-              color: AppColors.error,
+              color: Theme.of(context).colorScheme.error,
             ),
             _buildSimpleToggle(
               title: '1 day overdue',
@@ -479,7 +586,7 @@ class _NotificationSettingsSheetState
             _buildSectionHeader(
               icon: Icons.settings_outlined,
               title: 'General',
-              color: AppColors.onSurfaceVariant,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
             ListTile(
               contentPadding: EdgeInsets.zero,
@@ -965,7 +1072,7 @@ class _BillingCycleSettingsSheetState
             Text(
               'Changes are saved automatically.',
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: AppColors.onSurfaceVariant,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 24),
@@ -981,7 +1088,7 @@ class _BillingCycleSettingsSheetState
             Text(
               'Days after billing cycle ends before bill is due.',
               style: theme.textTheme.bodySmall?.copyWith(
-                color: AppColors.onSurfaceVariant,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
             Slider(
@@ -997,7 +1104,7 @@ class _BillingCycleSettingsSheetState
               child: Text(
                 'Due: ${settings.dueDateOffsetDays} days after cycle ends',
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: AppColors.primary,
+                  color: Theme.of(context).colorScheme.primary,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -1015,7 +1122,7 @@ class _BillingCycleSettingsSheetState
             Text(
               'Show "due soon" in Attention when cycle ends within this many days.',
               style: theme.textTheme.bodySmall?.copyWith(
-                color: AppColors.onSurfaceVariant,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
             Slider(
@@ -1032,7 +1139,7 @@ class _BillingCycleSettingsSheetState
               child: Text(
                 'Alert: ${settings.dueSoonThresholdDays} days before cycle ends',
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: AppColors.warning,
+                  color: Theme.of(context).colorScheme.error,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -1050,7 +1157,7 @@ class _BillingCycleSettingsSheetState
             Text(
               'Enable to track billing cycles based on tenant move-in date.',
               style: theme.textTheme.bodySmall?.copyWith(
-                color: AppColors.onSurfaceVariant,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 8),
@@ -1061,7 +1168,7 @@ class _BillingCycleSettingsSheetState
               value: settings.rentUsesAnniversary,
               onChanged: (v) => _updateSetting(rentUsesAnniversary: v),
               icon: Icons.home_outlined,
-              color: AppColors.primary,
+              color: Theme.of(context).colorScheme.primary,
             ),
             _buildBillTypeToggle(
               label: 'Electricity',
@@ -1069,7 +1176,7 @@ class _BillingCycleSettingsSheetState
               value: settings.electricityUsesAnniversary,
               onChanged: (v) => _updateSetting(electricityUsesAnniversary: v),
               icon: Icons.bolt_outlined,
-              color: AppColors.warning,
+              color: Theme.of(context).colorScheme.error,
             ),
             _buildBillTypeToggle(
               label: 'Water',

@@ -7,7 +7,6 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../application/providers/tenant_providers.dart';
 
-import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/tenant.dart';
 
 /// Screen displaying all tenants with payment status.
@@ -86,13 +85,13 @@ class _TenantsScreenState extends ConsumerState<TenantsScreen> {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppColors.secondary.withValues(alpha: 0.1),
+                color: Theme.of(context).colorScheme.secondaryContainer,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.people_outline,
                 size: 64,
-                color: AppColors.secondary,
+                color: Theme.of(context).colorScheme.onSecondaryContainer,
               ),
             ),
             const SizedBox(height: 24),
@@ -108,7 +107,7 @@ class _TenantsScreenState extends ConsumerState<TenantsScreen> {
                   ? 'Tenants will appear here after you move them into a room'
                   : 'Try a different search term',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.onSurfaceVariant,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
               textAlign: TextAlign.center,
             ),
@@ -167,8 +166,8 @@ class _TenantCard extends ConsumerWidget {
                   CircleAvatar(
                     radius: 28,
                     backgroundColor: tenant.isCurrentlyOccupying
-                        ? AppColors.success.withValues(alpha: 0.1)
-                        : AppColors.onSurfaceVariant.withValues(alpha: 0.1),
+                        ? Theme.of(context).colorScheme.primaryContainer
+                        : Theme.of(context).colorScheme.surfaceContainerHighest,
                     child: Text(
                       tenant.name.isNotEmpty
                           ? tenant.name[0].toUpperCase()
@@ -177,8 +176,8 @@ class _TenantCard extends ConsumerWidget {
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: tenant.isCurrentlyOccupying
-                            ? AppColors.success
-                            : AppColors.onSurfaceVariant,
+                            ? Theme.of(context).colorScheme.onPrimaryContainer
+                            : Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ),
@@ -191,8 +190,8 @@ class _TenantCard extends ConsumerWidget {
                       height: 14,
                       decoration: BoxDecoration(
                         color: tenant.isCurrentlyOccupying
-                            ? AppColors.success
-                            : AppColors.onSurfaceVariant,
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).colorScheme.outline,
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.white, width: 2),
                       ),
@@ -223,13 +222,15 @@ class _TenantCard extends ConsumerWidget {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.success.withValues(alpha: 0.1),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.tertiaryContainer,
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.verified,
                               size: 14,
-                              color: AppColors.success,
+                              color: Theme.of(context).colorScheme.tertiary,
                             ),
                           ),
                       ],
@@ -246,10 +247,10 @@ class _TenantCard extends ConsumerWidget {
                           ),
                           decoration: BoxDecoration(
                             color: tenant.isCurrentlyOccupying
-                                ? AppColors.success.withValues(alpha: 0.1)
-                                : AppColors.onSurfaceVariant.withValues(
-                                    alpha: 0.1,
-                                  ),
+                                ? Theme.of(context).colorScheme.primaryContainer
+                                : Theme.of(
+                                    context,
+                                  ).colorScheme.surfaceContainerHighest,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Row(
@@ -267,8 +268,12 @@ class _TenantCard extends ConsumerWidget {
                                 style: Theme.of(context).textTheme.labelSmall
                                     ?.copyWith(
                                       color: tenant.isCurrentlyOccupying
-                                          ? AppColors.success
-                                          : AppColors.onSurfaceVariant,
+                                          ? Theme.of(
+                                              context,
+                                            ).colorScheme.onPrimaryContainer
+                                          : Theme.of(
+                                              context,
+                                            ).colorScheme.onSurfaceVariant,
                                       fontWeight: FontWeight.w600,
                                     ),
                               ),
@@ -284,17 +289,23 @@ class _TenantCard extends ConsumerWidget {
                         tenant.currentRoomNumber != null)
                       Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.home_outlined,
                             size: 14,
-                            color: AppColors.onSurfaceVariant,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
                           ),
                           const SizedBox(width: 4),
                           Expanded(
                             child: Text(
                               '${tenant.currentPropertyName ?? ''} - Room ${tenant.currentRoomNumber}',
                               style: Theme.of(context).textTheme.bodySmall
-                                  ?.copyWith(color: AppColors.onSurfaceVariant),
+                                  ?.copyWith(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
+                                  ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -316,10 +327,12 @@ class _TenantCard extends ConsumerWidget {
                           final dateFormat = DateFormat('MMM yyyy');
                           return Row(
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.history_outlined,
                                 size: 14,
-                                color: AppColors.onSurfaceVariant,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
                               ),
                               const SizedBox(width: 4),
                               Expanded(
@@ -327,7 +340,9 @@ class _TenantCard extends ConsumerWidget {
                                   '${lastOccupancy.propertyName ?? 'Property'} - Room ${lastOccupancy.roomNumber ?? 'N/A'} • ${dateFormat.format(lastOccupancy.moveOutDate ?? lastOccupancy.moveInDate)}',
                                   style: Theme.of(context).textTheme.bodySmall
                                       ?.copyWith(
-                                        color: AppColors.onSurfaceVariant,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurfaceVariant,
                                       ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -345,16 +360,22 @@ class _TenantCard extends ConsumerWidget {
                       const SizedBox(height: 2),
                       Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.phone_outlined,
                             size: 14,
-                            color: AppColors.onSurfaceVariant,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
                           ),
                           const SizedBox(width: 4),
                           Text(
                             tenant.phone!,
                             style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(color: AppColors.onSurfaceVariant),
+                                ?.copyWith(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
+                                ),
                           ),
                         ],
                       ),
@@ -362,9 +383,9 @@ class _TenantCard extends ConsumerWidget {
                   ],
                 ),
               ),
-              const Icon(
+              Icon(
                 Icons.chevron_right,
-                color: AppColors.onSurfaceVariant,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ],
           ),

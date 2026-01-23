@@ -9,7 +9,7 @@ import 'package:intl/intl.dart';
 import '../../../application/providers/billing_providers.dart';
 import '../../../application/providers/dashboard_providers.dart';
 import '../../../application/providers/repository_providers.dart';
-import '../../../core/theme/app_colors.dart';
+
 import '../../../core/utils/currency_formatter.dart';
 import '../../../domain/entities/audit_log.dart';
 import '../../../domain/entities/bill.dart';
@@ -174,7 +174,9 @@ class _BillDetailContent extends ConsumerWidget {
                               Text(
                                 'No payments recorded',
                                 style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: AppColors.onSurfaceVariant,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
                                 ),
                               ),
                             ],
@@ -465,6 +467,7 @@ class _StatusCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final (statusColor, statusLabel, statusIcon) = _getStatusDetails(
+      context,
       bill.status,
     );
 
@@ -495,7 +498,7 @@ class _StatusCard extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.error,
+                      color: Theme.of(context).colorScheme.error,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -520,7 +523,7 @@ class _StatusCard extends StatelessWidget {
                     _AmountColumn(
                       label: 'Total',
                       amount: bill.amount,
-                      color: AppColors.primary,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                     Container(
                       height: 40,
@@ -530,7 +533,7 @@ class _StatusCard extends StatelessWidget {
                     _AmountColumn(
                       label: 'Paid',
                       amount: bill.paidAmount,
-                      color: AppColors.success,
+                      color: Theme.of(context).colorScheme.tertiary,
                     ),
                     Container(
                       height: 40,
@@ -541,8 +544,8 @@ class _StatusCard extends StatelessWidget {
                       label: 'Pending',
                       amount: bill.pendingAmount,
                       color: bill.pendingAmount > 0
-                          ? AppColors.moneyPending
-                          : AppColors.success,
+                          ? Theme.of(context).colorScheme.error
+                          : Theme.of(context).colorScheme.tertiary,
                     ),
                   ],
                 ),
@@ -553,8 +556,8 @@ class _StatusCard extends StatelessWidget {
                     child: LinearProgressIndicator(
                       value: bill.paidAmount / bill.amount,
                       backgroundColor: Colors.grey.shade200,
-                      valueColor: const AlwaysStoppedAnimation(
-                        AppColors.success,
+                      valueColor: AlwaysStoppedAnimation(
+                        Theme.of(context).colorScheme.tertiary,
                       ),
                       minHeight: 8,
                     ),
@@ -568,13 +571,24 @@ class _StatusCard extends StatelessWidget {
     );
   }
 
-  (Color, String, IconData) _getStatusDetails(BillStatus status) {
+  (Color, String, IconData) _getStatusDetails(
+    BuildContext context,
+    BillStatus status,
+  ) {
     return switch (status) {
       BillStatus.draft => (Colors.grey, 'Draft', Icons.edit_note),
       BillStatus.sent => (Colors.blue, 'Sent', Icons.send),
       BillStatus.partial => (Colors.orange, 'Partially Paid', Icons.timelapse),
-      BillStatus.paid => (AppColors.success, 'Paid', Icons.check_circle),
-      BillStatus.overdue => (AppColors.error, 'Overdue', Icons.warning),
+      BillStatus.paid => (
+        Theme.of(context).colorScheme.tertiary,
+        'Paid',
+        Icons.check_circle,
+      ),
+      BillStatus.overdue => (
+        Theme.of(context).colorScheme.error,
+        'Overdue',
+        Icons.warning,
+      ),
       BillStatus.voided => (Colors.grey.shade600, 'Voided', Icons.cancel),
     };
   }
@@ -598,9 +612,9 @@ class _AmountColumn extends StatelessWidget {
       children: [
         Text(
           label,
-          style: Theme.of(
-            context,
-          ).textTheme.bodySmall?.copyWith(color: AppColors.onSurfaceVariant),
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
         ),
         const SizedBox(height: 4),
         Text(
@@ -655,7 +669,9 @@ class _BillInfoCard extends StatelessWidget {
                 icon: Icons.event_outlined,
                 label: 'Due Date',
                 value: _formatDate(bill.dueDate!),
-                valueColor: bill.isOverdue ? AppColors.error : null,
+                valueColor: bill.isOverdue
+                    ? Theme.of(context).colorScheme.error
+                    : null,
               ),
             if (bill.roomNumber != null)
               _InfoRow(
@@ -847,7 +863,9 @@ class _ElectricityDetailsCard extends StatelessWidget {
                             Text(
                               'Tap to view full size',
                               style: theme.textTheme.bodySmall?.copyWith(
-                                color: AppColors.onSurfaceVariant,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
                               ),
                             ),
                           ],
@@ -879,16 +897,16 @@ class _ReadingBox extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.surfaceVariant,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
         children: [
           Text(
             label,
-            style: Theme.of(
-              context,
-            ).textTheme.bodySmall?.copyWith(color: AppColors.onSurfaceVariant),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
           const SizedBox(height: 4),
           Text(
@@ -923,13 +941,17 @@ class _InfoRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         children: [
-          Icon(icon, size: 20, color: AppColors.onSurfaceVariant),
+          Icon(
+            icon,
+            size: 20,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               label,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.onSurfaceVariant,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
           ),
@@ -961,10 +983,12 @@ class _PaymentTile extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: AppColors.success.withValues(alpha: 0.1),
+          backgroundColor: Theme.of(
+            context,
+          ).colorScheme.tertiary.withValues(alpha: 0.1),
           child: Icon(
             _getPaymentModeIcon(payment.paymentMode),
-            color: AppColors.success,
+            color: Theme.of(context).colorScheme.tertiary,
             size: 20,
           ),
         ),
@@ -972,7 +996,7 @@ class _PaymentTile extends ConsumerWidget {
           formatCurrency(payment.amount),
           style: theme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
-            color: AppColors.success,
+            color: Theme.of(context).colorScheme.tertiary,
           ),
         ),
         subtitle: Text(
@@ -1137,7 +1161,7 @@ class _AuditHistorySection extends ConsumerWidget {
                   child: Text(
                     'No changes recorded',
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: AppColors.onSurfaceVariant,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
                 );
@@ -1185,7 +1209,7 @@ class _AuditLogTile extends StatelessWidget {
             Text(
               log.notes!,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: AppColors.onSurfaceVariant,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -1193,7 +1217,7 @@ class _AuditLogTile extends StatelessWidget {
           Text(
             dateFormat.format(log.createdAt),
             style: theme.textTheme.labelSmall?.copyWith(
-              color: AppColors.onSurfaceVariant,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
         ],

@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../application/providers/repository_providers.dart';
 import '../../../application/providers/billing_providers.dart';
 import '../../../application/providers/dashboard_providers.dart';
-import '../../../core/theme/app_colors.dart';
+
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/validators.dart';
 import '../../../domain/entities/bill.dart';
@@ -123,6 +123,7 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
           paymentDate: _paymentDate,
         );
 
+        if (!mounted) return;
         Navigator.pop(context);
 
         // Show receipt dialog with landlord name
@@ -181,7 +182,9 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: AppColors.surfaceVariant,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -198,7 +201,7 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
                             'Pending: ${formatCurrency(widget.bill.pendingAmount)}',
                             style: Theme.of(context).textTheme.titleMedium
                                 ?.copyWith(
-                                  color: AppColors.moneyPending,
+                                  color: Theme.of(context).colorScheme.primary,
                                   fontWeight: FontWeight.bold,
                                 ),
                           ),
@@ -207,7 +210,7 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
                       Text(
                         'of ${formatCurrency(widget.bill.amount)}',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.onSurfaceVariant,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],

@@ -34,14 +34,17 @@ class DashboardScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('RentKhata'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.assessment_outlined),
-            tooltip: 'Reports',
-            onPressed: () => context.push('/reports'),
-          ),
-          IconButton(
-            icon: const Icon(Icons.settings_outlined),
-            onPressed: () => context.push('/settings'),
+          // Prominent Reports button
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: TextButton.icon(
+              onPressed: () => context.push('/reports'),
+              icon: const Icon(Icons.assessment_outlined, size: 20),
+              label: const Text('Reports'),
+              style: TextButton.styleFrom(
+                foregroundColor: Theme.of(context).colorScheme.primary,
+              ),
+            ),
           ),
         ],
       ),
@@ -104,7 +107,7 @@ class DashboardScreen extends ConsumerWidget {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: AppColors.surfaceVariant,
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -113,12 +116,14 @@ class DashboardScreen extends ConsumerWidget {
               leading: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.home_work_outlined,
-                  color: AppColors.primary,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
               title: const Text('Add Property'),
@@ -131,12 +136,14 @@ class DashboardScreen extends ConsumerWidget {
               leading: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppColors.secondary.withValues(alpha: 0.1),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.secondary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.person_add_outlined,
-                  color: AppColors.secondary,
+                  color: Theme.of(context).colorScheme.secondary,
                 ),
               ),
               title: const Text('Add Tenant'),
@@ -149,12 +156,12 @@ class DashboardScreen extends ConsumerWidget {
               leading: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppColors.warning.withValues(alpha: 0.1),
+                  color: Theme.of(context).colorScheme.error, // Warning context
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.receipt_long_outlined,
-                  color: AppColors.warning,
+                  color: Theme.of(context).colorScheme.error,
                 ),
               ),
               title: const Text('Create Bill'),
@@ -182,131 +189,274 @@ class _CompactFinancialHeader extends ConsumerWidget {
     final filteredAsync = ref.watch(filteredFinancialsProvider);
     final selectedMonth = ref.watch(dashboardMonthProvider);
     final dateFormat = DateFormat('MMMM yyyy');
+    final theme = Theme.of(context);
 
-    return Card(
-      elevation: 0,
-      color: Theme.of(context).colorScheme.surfaceContainerLow,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Column(
-          children: [
-            // Month Selector
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Month Selector - Clean minimal design
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: Row(
+            children: [
+              Flexible(
+                child: Text(
+                  'Monthly Overview',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Container(
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surface,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: theme.colorScheme.outline),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _MonthNavButton(
+                      icon: Icons.chevron_left_rounded,
+                      onPressed: () {
+                        final newDate = DateTime(
+                          selectedMonth.year,
+                          selectedMonth.month - 1,
+                        );
+                        ref
+                            .read(dashboardMonthProvider.notifier)
+                            .setMonth(newDate);
+                      },
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Text(
+                        dateFormat.format(selectedMonth),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    _MonthNavButton(
+                      icon: Icons.chevron_right_rounded,
+                      onPressed: () {
+                        final newDate = DateTime(
+                          selectedMonth.year,
+                          selectedMonth.month + 1,
+                        );
+                        ref
+                            .read(dashboardMonthProvider.notifier)
+                            .setMonth(newDate);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+
+        // Financial Cards Row
+        filteredAsync.when(
+          data: (data) => Row(
+            children: [
+              Expanded(
+                child: _FinancialStatCard(
+                  label: 'Collected',
+                  amount: data.collected,
+                  icon: Icons.arrow_downward_rounded,
+                  accentColor: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _FinancialStatCard(
+                  label: 'Outstanding',
+                  amount: data.pending,
+                  icon: Icons.schedule_rounded,
+                  accentColor: Theme.of(context).colorScheme.error,
+                ),
+              ),
+            ],
+          ),
+          loading: () => Row(
+            children: [
+              Expanded(child: _FinancialStatCard.loading()),
+              const SizedBox(width: 12),
+              Expanded(child: _FinancialStatCard.loading()),
+            ],
+          ),
+          error: (_, __) => Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.errorContainer.withAlpha(20),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.error.withAlpha(50),
+              ),
+            ),
+            child: Row(
               children: [
-                IconButton(
-                  icon: const Icon(Icons.chevron_left),
-                  visualDensity: VisualDensity.compact,
-                  onPressed: () {
-                    final newDate = DateTime(
-                      selectedMonth.year,
-                      selectedMonth.month - 1,
-                    );
-                    ref.read(dashboardMonthProvider.notifier).setMonth(newDate);
-                  },
+                Icon(
+                  Icons.error_outline,
+                  color: Theme.of(context).colorScheme.error,
+                  size: 20,
                 ),
+                const SizedBox(width: 8),
                 Text(
-                  dateFormat.format(selectedMonth),
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.chevron_right),
-                  visualDensity: VisualDensity.compact,
-                  onPressed: () {
-                    final newDate = DateTime(
-                      selectedMonth.year,
-                      selectedMonth.month + 1,
-                    );
-                    ref.read(dashboardMonthProvider.notifier).setMonth(newDate);
-                  },
+                  'Error loading financials',
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
                 ),
               ],
             ),
-            const Divider(height: 16),
-            // Financials Row
-            filteredAsync.when(
-              data: (data) => Row(
-                children: [
-                  Expanded(
-                    child: _SimpleAmountStat(
-                      label: 'Collected',
-                      amount: data.collected,
-                      color: AppColors.successText,
-                    ),
-                  ),
-                  Container(
-                    width: 1,
-                    height: 32,
-                    color: AppColors.onSurfaceVariant.withValues(alpha: 0.2),
-                  ),
-                  Expanded(
-                    child: _SimpleAmountStat(
-                      label: 'Pending',
-                      amount: data.pending,
-                      color: AppColors.errorText,
-                      isPending: true,
-                    ),
-                  ),
-                ],
-              ),
-              loading: () => const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Center(
-                  child: SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
-                ),
-              ),
-              error: (_, __) => const Text('Error loading financials'),
-            ),
-          ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Navigation button for month selector.
+class _MonthNavButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onPressed;
+
+  const _MonthNavButton({required this.icon, required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(10),
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Icon(
+            icon,
+            size: 20,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
         ),
       ),
     );
   }
 }
 
-class _SimpleAmountStat extends StatelessWidget {
-  final String label;
-  final double amount;
-  final Color color;
-  final bool isPending;
+/// Premium financial stat card with accent border and icon.
+class _FinancialStatCard extends StatelessWidget {
+  final String? label;
+  final double? amount;
+  final IconData? icon;
+  final Color? accentColor;
+  final bool isLoading;
 
-  const _SimpleAmountStat({
-    required this.label,
-    required this.amount,
-    required this.color,
-    this.isPending = false,
-  });
+  const _FinancialStatCard({
+    required String this.label,
+    required double this.amount,
+    required IconData this.icon,
+    required Color this.accentColor,
+  }) : isLoading = false;
+
+  const _FinancialStatCard.loading()
+    : label = null,
+      amount = null,
+      icon = null,
+      accentColor = null,
+      isLoading = true;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          label.toUpperCase(),
-          style: TextStyle(
-            fontSize: 10,
-            letterSpacing: 0.5,
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-            fontWeight: FontWeight.w600,
+    final theme = Theme.of(context);
+
+    if (isLoading) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: theme.colorScheme.outline),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 60,
+              height: 12,
+              decoration: BoxDecoration(
+                color: theme.colorScheme.outline,
+                borderRadius: BorderRadius.circular(6),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              width: 100,
+              height: 24,
+              decoration: BoxDecoration(
+                color: theme.colorScheme.outline,
+                borderRadius: BorderRadius.circular(6),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: theme.colorScheme.outline),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border(left: BorderSide(color: accentColor!, width: 4)),
+          ),
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header row with label and icon
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    label!.toUpperCase(),
+                    style: TextStyle(
+                      fontSize: 11,
+                      letterSpacing: 0.8,
+                      color: theme.colorScheme.onSurface.withAlpha(150),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: accentColor!.withAlpha(25),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(icon, size: 16, color: accentColor),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              // Amount
+              Text(
+                formatCurrency(amount!),
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.onSurface,
+                ),
+              ),
+            ],
           ),
         ),
-        const SizedBox(height: 4),
-        Text(
-          formatCurrency(amount),
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
@@ -339,12 +489,16 @@ class _ActionRequiredSection extends ConsumerWidget {
             // Determine card styling based on urgency
             final hasOverdue = overdueCount > 0;
             final borderColor = hasOverdue
-                ? AppColors.error.withValues(alpha: 0.5)
-                : AppColors.warning.withValues(alpha: 0.5);
+                ? theme.colorScheme.error.withValues(alpha: 0.5)
+                : theme.colorScheme.error.withValues(
+                    alpha: 0.5,
+                  ); // Warning context
             final iconBgColor = hasOverdue
-                ? AppColors.error.withValues(alpha: 0.1)
-                : AppColors.warning.withValues(alpha: 0.1);
-            final iconColor = hasOverdue ? AppColors.error : AppColors.warning;
+                ? theme.colorScheme.error.withValues(alpha: 0.1)
+                : theme.colorScheme.error.withValues(alpha: 0.1);
+            final iconColor = hasOverdue
+                ? theme.colorScheme.error
+                : theme.colorScheme.error;
 
             return Card(
               elevation: 2,
@@ -439,19 +593,21 @@ class _ActionRequiredSection extends ConsumerWidget {
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.error.withValues(alpha: 0.05),
+                  color: theme.colorScheme.error.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: AppColors.error.withValues(alpha: 0.2),
+                    color: theme.colorScheme.error.withValues(alpha: 0.2),
                   ),
                 ),
                 child: Row(
                   children: [
                     CircleAvatar(
-                      backgroundColor: AppColors.error.withValues(alpha: 0.1),
-                      child: const Icon(
+                      backgroundColor: theme.colorScheme.error.withValues(
+                        alpha: 0.1,
+                      ),
+                      child: Icon(
                         Icons.priority_high,
-                        color: AppColors.error,
+                        color: theme.colorScheme.error,
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -519,20 +675,24 @@ class _EmptyAttentionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 0,
-      color: AppColors.success.withValues(alpha: 0.05),
+      color: Theme.of(
+        context,
+      ).colorScheme.primaryContainer.withValues(alpha: 0.3),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: AppColors.success.withValues(alpha: 0.2)),
+        side: BorderSide(
+          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+        ),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
             CircleAvatar(
-              backgroundColor: AppColors.success.withValues(alpha: 0.1),
-              child: const Icon(
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+              child: Icon(
                 Icons.check_circle_outline,
-                color: AppColors.success,
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
             const SizedBox(width: 16),
@@ -575,9 +735,9 @@ class _BillingAttentionTile extends StatelessWidget {
     BillType.other => 'Other',
   };
 
-  Color _billTypeColor(BillType type) => switch (type) {
-    BillType.rent => AppColors.primary,
-    BillType.electricity => AppColors.warning,
+  Color _billTypeColor(BuildContext context, BillType type) => switch (type) {
+    BillType.rent => Theme.of(context).colorScheme.primary,
+    BillType.electricity => Theme.of(context).colorScheme.error,
     BillType.water => Colors.blue,
     BillType.maintenance => Colors.green,
     BillType.other => Colors.grey,
@@ -586,11 +746,13 @@ class _BillingAttentionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isOverdue = item.status == BillingCycleStatus.overdue;
-    final statusColor = isOverdue ? AppColors.error : AppColors.warning;
+    final statusColor = isOverdue
+        ? Theme.of(context).colorScheme.error
+        : Theme.of(context).colorScheme.error; // Warning
     final statusTextColor = isOverdue
-        ? AppColors.errorText
-        : AppColors.warningText;
-    final billColor = _billTypeColor(item.billType);
+        ? Theme.of(context).colorScheme.error
+        : Theme.of(context).colorScheme.error;
+    final billColor = _billTypeColor(context, item.billType);
 
     return ListTile(
       visualDensity: VisualDensity.compact,
@@ -702,7 +864,7 @@ class _RoomStatusTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = _getStatusColor(item.status);
+    final color = _getStatusColor(context, item.status);
 
     return ListTile(
       onTap: () => context.push(
@@ -755,7 +917,7 @@ class _RoomStatusTile extends StatelessWidget {
             Text(
               item.statusLabel,
               style: TextStyle(
-                color: _getStatusTextColor(item.status),
+                color: _getStatusTextColor(context, item.status),
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
               ),
@@ -766,25 +928,25 @@ class _RoomStatusTile extends StatelessWidget {
     );
   }
 
-  Color _getStatusColor(RoomStatusType status) {
+  Color _getStatusColor(BuildContext context, RoomStatusType status) {
     switch (status) {
       case RoomStatusType.paid:
-        return AppColors.success;
+        return Theme.of(context).colorScheme.tertiary; // Success equivalent
       case RoomStatusType.dueSoon:
-        return AppColors.warning;
+        return Theme.of(context).colorScheme.error; // Warning equivalent
       case RoomStatusType.overdue:
-        return AppColors.error;
+        return Theme.of(context).colorScheme.error;
     }
   }
 
-  Color _getStatusTextColor(RoomStatusType status) {
+  Color _getStatusTextColor(BuildContext context, RoomStatusType status) {
     switch (status) {
       case RoomStatusType.paid:
-        return AppColors.successText;
+        return Theme.of(context).colorScheme.tertiary;
       case RoomStatusType.dueSoon:
-        return AppColors.warningText;
+        return Theme.of(context).colorScheme.error;
       case RoomStatusType.overdue:
-        return AppColors.errorText;
+        return Theme.of(context).colorScheme.error;
     }
   }
 }
@@ -792,9 +954,8 @@ class _RoomStatusTile extends StatelessWidget {
 class _SectionHeader extends StatelessWidget {
   final IconData icon;
   final String title;
-  final int? count;
 
-  const _SectionHeader({required this.icon, required this.title, this.count});
+  const _SectionHeader({required this.icon, required this.title});
 
   @override
   Widget build(BuildContext context) {

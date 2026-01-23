@@ -2,7 +2,6 @@
 library;
 
 import 'package:flutter/material.dart';
-import '../../core/theme/app_colors.dart';
 
 /// Type of content being shared.
 enum ShareContentType { invoice, receipt }
@@ -66,10 +65,15 @@ class ShareBottomSheet extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(Icons.share_outlined, color: AppColors.primary),
+                  child: Icon(
+                    Icons.share_outlined,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -85,7 +89,7 @@ class ShareBottomSheet extends StatelessWidget {
                       Text(
                         'Choose how you want to share',
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: AppColors.onSurfaceVariant,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],
@@ -142,12 +146,14 @@ class _ShareOption extends StatelessWidget {
 
     return Card(
       elevation: isRecommended ? 2 : 0,
-      color: isRecommended ? AppColors.primary.withValues(alpha: 0.05) : null,
+      color: isRecommended
+          ? theme.colorScheme.primary.withValues(alpha: 0.05)
+          : null,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(
           color: isRecommended
-              ? AppColors.primary.withValues(alpha: 0.3)
+              ? theme.colorScheme.primary.withValues(alpha: 0.3)
               : Colors.grey.shade300,
         ),
       ),
@@ -162,15 +168,15 @@ class _ShareOption extends StatelessWidget {
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: isRecommended
-                      ? AppColors.primary.withValues(alpha: 0.1)
+                      ? theme.colorScheme.primary.withValues(alpha: 0.1)
                       : Colors.grey.shade100,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
                   icon,
                   color: isRecommended
-                      ? AppColors.primary
-                      : AppColors.onSurfaceVariant,
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurfaceVariant,
                 ),
               ),
               const SizedBox(width: 16),
@@ -194,7 +200,7 @@ class _ShareOption extends StatelessWidget {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.primary,
+                              color: theme.colorScheme.primary,
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
@@ -212,13 +218,16 @@ class _ShareOption extends StatelessWidget {
                     Text(
                       subtitle,
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: AppColors.onSurfaceVariant,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
                 ),
               ),
-              Icon(Icons.chevron_right, color: AppColors.onSurfaceVariant),
+              Icon(
+                Icons.chevron_right,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ],
           ),
         ),

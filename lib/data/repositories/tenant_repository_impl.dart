@@ -87,7 +87,7 @@ class TenantRepositoryImpl implements TenantRepository {
       securityDeposit: entity.securityDeposit,
       isActive: entity.isActive,
       // Deposit info
-      depositStatus: entity.depositStatus ?? DepositStatus.pending,
+      depositStatus: entity.depositStatus,
       depositReceivedDate: entity.depositReceivedDate,
       depositReturnedDate: entity.depositReturnedDate,
       depositReturnedAmount: entity.depositReturnedAmount,
@@ -319,7 +319,6 @@ class TenantRepositoryImpl implements TenantRepository {
     return _tenantDao.insertOccupancy(occupancy);
   }
 
-  @override
   @override
   Future<bool> endOccupancy(
     int occupancyId,

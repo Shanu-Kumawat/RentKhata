@@ -412,28 +412,4 @@ $landlordName
 
     return result;
   }
-
-  /// Substitute placeholders in reminder template.
-  String _substituteReminderPlaceholders(
-    String template, {
-    required Bill bill,
-    required String landlordName,
-  }) {
-    final dueDate = bill.dueDate;
-    final dueDateStr = dueDate != null
-        ? '${dueDate.day}/${dueDate.month}/${dueDate.year}'
-        : 'N/A';
-
-    return template
-        .replaceAll('{tenant_name}', bill.tenantName ?? 'Tenant')
-        .replaceAll('{tenantName}', bill.tenantName ?? 'Tenant')
-        .replaceAll('{landlord_name}', landlordName)
-        .replaceAll('{landlordName}', landlordName)
-        .replaceAll('{bill_type}', _getBillTypeLabel(bill.billType))
-        .replaceAll('{billType}', _getBillTypeLabel(bill.billType))
-        .replaceAll('{period}', bill.billingPeriod)
-        .replaceAll('{amount}', bill.pendingAmount.toStringAsFixed(0))
-        .replaceAll('{due_date}', dueDateStr)
-        .replaceAll('{dueDate}', dueDateStr);
-  }
 }

@@ -4,7 +4,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart';
-import '../../../core/theme/app_colors.dart';
+
 import '../../../core/utils/currency_formatter.dart';
 
 /// Widget to display UPI QR code for rent collection.
@@ -25,26 +25,29 @@ class UpiQrWidget extends StatelessWidget {
   /// Generate UPI payment URI
   String get _upiUri {
     if (upiId == null || upiId!.isEmpty) return '';
-    
+
     final params = <String, String>{
       'pa': upiId!,
       'pn': payeeName,
       'am': amount.toStringAsFixed(2),
       'cu': 'INR',
     };
-    
+
     if (transactionNote != null && transactionNote!.isNotEmpty) {
       params['tn'] = transactionNote!;
     }
-    
-    final query = params.entries.map((e) => '${e.key}=${Uri.encodeComponent(e.value)}').join('&');
+
+    final query = params.entries
+        .map((e) => '${e.key}=${Uri.encodeComponent(e.value)}')
+        .join('&');
     return 'upi://pay?$query';
   }
 
   void _sharePaymentLink(BuildContext context) {
     if (_upiUri.isEmpty) return;
-    
-    final message = '''
+
+    final message =
+        '''
 Rent Payment Request
 
 Amount: ${formatCurrency(amount)}
@@ -52,7 +55,7 @@ Payee: $payeeName
 ${transactionNote != null ? 'Note: $transactionNote\n' : ''}
 Pay using UPI: $_upiUri
 ''';
-    
+
     Share.share(message, subject: 'Rent Payment - $payeeName');
   }
 
@@ -62,26 +65,32 @@ Pay using UPI: $_upiUri
       return Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: AppColors.warning.withValues(alpha: 0.1),
+          color: Theme.of(
+            context,
+          ).colorScheme.errorContainer.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
           children: [
-            const Icon(Icons.qr_code_outlined, size: 48, color: AppColors.warning),
+            Icon(
+              Icons.qr_code_outlined,
+              size: 48,
+              color: Theme.of(context).colorScheme.error,
+            ),
             const SizedBox(height: 12),
             Text(
               'UPI ID not configured',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 4),
             Text(
               'Add your UPI ID in Settings to generate QR codes',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.onSurfaceVariant,
-                  ),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
           ],
         ),
@@ -91,7 +100,9 @@ Pay using UPI: $_upiUri
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color:
+            Theme.of(context).appBarTheme.backgroundColor ??
+            Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -109,47 +120,47 @@ Pay using UPI: $_upiUri
             data: _upiUri,
             version: QrVersions.auto,
             size: 200,
-            eyeStyle: const QrEyeStyle(
+            eyeStyle: QrEyeStyle(
               eyeShape: QrEyeShape.square,
-              color: AppColors.primary,
+              color: Theme.of(context).colorScheme.primary,
             ),
-            dataModuleStyle: const QrDataModuleStyle(
+            dataModuleStyle: QrDataModuleStyle(
               dataModuleShape: QrDataModuleShape.square,
-              color: Colors.black87,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 16),
-          
+
           // Amount
           Text(
             formatCurrency(amount),
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
-                ),
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.primary,
+            ),
           ),
           const SizedBox(height: 4),
-          
+
           // UPI ID
           Text(
             upiId!,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.onSurfaceVariant,
-                ),
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
-          
+
           if (transactionNote != null) ...[
             const SizedBox(height: 8),
             Text(
               transactionNote!,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.onSurfaceVariant,
-                  ),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
               textAlign: TextAlign.center,
             ),
           ],
           const SizedBox(height: 16),
-          
+
           // Share button
           TextButton.icon(
             onPressed: () => _sharePaymentLink(context),
@@ -209,9 +220,9 @@ class UpiQrDialog extends StatelessWidget {
             children: [
               Text(
                 'Collect Payment',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
               ),
               IconButton(
                 icon: const Icon(Icons.close),

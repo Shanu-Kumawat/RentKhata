@@ -3,7 +3,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/theme/app_colors.dart';
+
 import '../../../core/utils/currency_formatter.dart';
 import '../../../domain/entities/bill.dart';
 import '../../../application/providers/repository_providers.dart';
@@ -54,7 +54,10 @@ class InvoicePreviewScreen extends ConsumerWidget {
               // Close button
               IconButton.outlined(
                 onPressed: () => Navigator.pop(context),
-                icon: Icon(Icons.close, color: AppColors.primary),
+                icon: Icon(
+                  Icons.close,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
                 tooltip: 'Close',
               ),
               const SizedBox(width: 12),
@@ -144,9 +147,12 @@ class _InvoiceCard extends StatelessWidget {
           // Header with gradient
           Container(
             padding: const EdgeInsets.all(20),
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [AppColors.primary, AppColors.primaryDark],
+                colors: [
+                  Theme.of(context).colorScheme.primary,
+                  Theme.of(context).colorScheme.tertiary,
+                ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -227,7 +233,9 @@ class _InvoiceCard extends StatelessWidget {
                     label: 'Due Date',
                     value: _formatDate(bill.dueDate!),
                     valueStyle: theme.textTheme.bodyMedium?.copyWith(
-                      color: bill.isOverdue ? AppColors.error : null,
+                      color: bill.isOverdue
+                          ? Theme.of(context).colorScheme.error
+                          : null,
                       fontWeight: bill.isOverdue ? FontWeight.bold : null,
                     ),
                   ),
@@ -329,10 +337,14 @@ class _InvoiceCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.05),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: AppColors.primary.withValues(alpha: 0.2),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: 0.2),
                     ),
                   ),
                   child: Column(
@@ -348,7 +360,7 @@ class _InvoiceCard extends StatelessWidget {
                             formatCurrency(bill.amount),
                             style: theme.textTheme.titleLarge?.copyWith(
                               fontWeight: FontWeight.bold,
-                              color: AppColors.primary,
+                              color: Theme.of(context).colorScheme.primary,
                             ),
                           ),
                         ],
@@ -361,13 +373,13 @@ class _InvoiceCard extends StatelessWidget {
                             Text(
                               'Paid',
                               style: theme.textTheme.bodyMedium?.copyWith(
-                                color: AppColors.success,
+                                color: Theme.of(context).colorScheme.tertiary,
                               ),
                             ),
                             Text(
                               '- ${formatCurrency(bill.paidAmount)}',
                               style: theme.textTheme.bodyLarge?.copyWith(
-                                color: AppColors.success,
+                                color: Theme.of(context).colorScheme.tertiary,
                               ),
                             ),
                           ],
@@ -387,8 +399,8 @@ class _InvoiceCard extends StatelessWidget {
                               style: theme.textTheme.titleLarge?.copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: bill.pendingAmount > 0
-                                    ? AppColors.moneyPending
-                                    : AppColors.success,
+                                    ? Theme.of(context).colorScheme.error
+                                    : Theme.of(context).colorScheme.tertiary,
                               ),
                             ),
                           ],
@@ -407,7 +419,9 @@ class _InvoiceCard extends StatelessWidget {
                         Text(
                           'Scan to Pay',
                           style: theme.textTheme.titleSmall?.copyWith(
-                            color: AppColors.onSurfaceVariant,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -431,7 +445,9 @@ class _InvoiceCard extends StatelessWidget {
                         Text(
                           'UPI: $landlordUpi',
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: AppColors.onSurfaceVariant,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ],
@@ -445,7 +461,7 @@ class _InvoiceCard extends StatelessWidget {
                   child: Text(
                     'Generated on ${_formatDate(DateTime.now())}',
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: AppColors.onSurfaceVariant,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ),
@@ -534,7 +550,7 @@ class _DetailRow extends StatelessWidget {
             child: Text(
               label,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.onSurfaceVariant,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
           ),

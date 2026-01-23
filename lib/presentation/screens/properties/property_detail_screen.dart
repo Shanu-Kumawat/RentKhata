@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../application/providers/property_providers.dart';
 import '../../../application/providers/repository_providers.dart';
-import '../../../core/theme/app_colors.dart';
+
 import '../../../core/utils/currency_formatter.dart';
 import '../../../domain/entities/property.dart';
 import '../../../domain/entities/room.dart';
@@ -47,11 +47,14 @@ class PropertyDetailScreen extends ConsumerWidget {
                   }
                 },
                 itemBuilder: (context) => [
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     value: 'delete',
                     child: Row(
                       children: [
-                        Icon(Icons.delete_outline, color: AppColors.error),
+                        Icon(
+                          Icons.delete_outline,
+                          color: Theme.of(context).colorScheme.error,
+                        ),
                         SizedBox(width: 8),
                         Text('Delete Property'),
                       ],
@@ -107,28 +110,30 @@ class PropertyDetailScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: AppColors.secondary.withValues(alpha: 0.1),
+                color: Theme.of(
+                  context,
+                ).colorScheme.secondary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.meeting_room_outlined,
                 size: 48,
-                color: AppColors.secondary,
+                color: Theme.of(context).colorScheme.secondary,
               ),
             ),
             const SizedBox(height: 24),
             Text(
               'No rooms yet',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
               'Add rooms to start managing tenants',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.onSurfaceVariant,
-                  ),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
           ],
         ),
@@ -192,7 +197,7 @@ class PropertyDetailScreen extends ConsumerWidget {
               }
             },
             style: FilledButton.styleFrom(
-              backgroundColor: AppColors.error,
+              backgroundColor: Theme.of(context).colorScheme.error,
             ),
             child: const Text('Delete'),
           ),
@@ -217,13 +222,15 @@ class _PropertyHeader extends StatelessWidget {
             width: 64,
             height: 64,
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.apartment_rounded,
               size: 32,
-              color: AppColors.primary,
+              color: Theme.of(context).colorScheme.primary,
             ),
           ),
           const SizedBox(width: 16),
@@ -234,19 +241,21 @@ class _PropertyHeader extends StatelessWidget {
                 if (property.address != null) ...[
                   Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.location_on_outlined,
                         size: 16,
-                        color: AppColors.onSurfaceVariant,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
                           property.address!,
-                          style:
-                              Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: AppColors.onSurfaceVariant,
-                                  ),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
+                              ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -265,7 +274,7 @@ class _PropertyHeader extends StatelessWidget {
                     _InfoChip(
                       icon: Icons.people_outline,
                       label: '${property.occupiedRoomCount} occupied',
-                      color: AppColors.secondary,
+                      color: Theme.of(context).colorScheme.secondary,
                     ),
                   ],
                 ),
@@ -283,15 +292,11 @@ class _InfoChip extends StatelessWidget {
   final String label;
   final Color? color;
 
-  const _InfoChip({
-    required this.icon,
-    required this.label,
-    this.color,
-  });
+  const _InfoChip({required this.icon, required this.label, this.color});
 
   @override
   Widget build(BuildContext context) {
-    final chipColor = color ?? AppColors.primary;
+    final chipColor = color ?? Theme.of(context).colorScheme.primary;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
@@ -306,9 +311,9 @@ class _InfoChip extends StatelessWidget {
           Text(
             label,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: chipColor,
-                  fontWeight: FontWeight.w500,
-                ),
+              color: chipColor,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ],
       ),
@@ -338,8 +343,8 @@ class _RoomCard extends StatelessWidget {
                 height: 48,
                 decoration: BoxDecoration(
                   color: room.isOccupied
-                      ? AppColors.success.withValues(alpha: 0.1)
-                      : AppColors.surfaceVariant,
+                      ? Theme.of(context).colorScheme.primaryContainer
+                      : Theme.of(context).colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
@@ -347,8 +352,8 @@ class _RoomCard extends StatelessWidget {
                       ? Icons.person_rounded
                       : Icons.meeting_room_outlined,
                   color: room.isOccupied
-                      ? AppColors.success
-                      : AppColors.onSurfaceVariant,
+                      ? Theme.of(context).colorScheme.onPrimaryContainer
+                      : Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
               const SizedBox(width: 16),
@@ -360,23 +365,23 @@ class _RoomCard extends StatelessWidget {
                     Text(
                       'Room ${room.roomNumber}',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     if (room.isOccupied && room.currentTenantName != null)
                       Text(
                         room.currentTenantName!,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: AppColors.success,
-                            ),
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
                       )
                     else
                       Text(
                         'Vacant',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: AppColors.onSurfaceVariant,
-                            ),
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
                       ),
                   ],
                 ),
@@ -388,19 +393,22 @@ class _RoomCard extends StatelessWidget {
                   Text(
                     formatCurrency(room.baseRent),
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   Text(
                     '/month',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.onSurfaceVariant,
-                        ),
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ],
               ),
               const SizedBox(width: 8),
-              const Icon(Icons.chevron_right, color: AppColors.onSurfaceVariant),
+              Icon(
+                Icons.chevron_right,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ],
           ),
         ),

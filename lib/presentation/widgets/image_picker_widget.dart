@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../services/image_service.dart';
-import '../../core/theme/app_colors.dart';
 
 class ImagePickerWidget extends StatefulWidget {
   final String? initialImagePath;
@@ -40,9 +39,9 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
     if (file != null) {
       if (_currentImagePath != null) {
         // Optionally delete old image if needed, but for now we keep history
-        // await _imageService.deleteImage(_currentImagePath!); 
+        // await _imageService.deleteImage(_currentImagePath!);
       }
-      
+
       setState(() => _currentImagePath = file.path);
       widget.onImageSelected(file.path);
     }
@@ -73,9 +72,14 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
             ),
             if (_currentImagePath != null)
               ListTile(
-                leading: const Icon(Icons.delete, color: AppColors.error),
-                title: const Text('Remove Photo',
-                    style: TextStyle(color: AppColors.error)),
+                leading: Icon(
+                  Icons.delete,
+                  color: Theme.of(context).colorScheme.error,
+                ),
+                title: Text(
+                  'Remove Photo',
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                ),
                 onTap: () {
                   Navigator.pop(context);
                   setState(() => _currentImagePath = null);
@@ -98,8 +102,12 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
             width: widget.size,
             height: widget.size,
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(widget.size / 4), // Rounded square
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(
+                widget.size / 4,
+              ), // Rounded square
               image: _currentImagePath != null
                   ? DecorationImage(
                       image: FileImage(File(_currentImagePath!)),
@@ -111,7 +119,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
                 ? Icon(
                     widget.placeholderIcon,
                     size: widget.size * 0.4,
-                    color: AppColors.primary,
+                    color: Theme.of(context).colorScheme.primary,
                   )
                 : null,
           ),
@@ -120,15 +128,11 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
             right: 0,
             child: Container(
               padding: const EdgeInsets.all(8),
-              decoration: const BoxDecoration(
-                color: AppColors.primary,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
-                Icons.edit,
-                size: 16,
-                color: Colors.white,
-              ),
+              child: const Icon(Icons.edit, size: 16, color: Colors.white),
             ),
           ),
         ],

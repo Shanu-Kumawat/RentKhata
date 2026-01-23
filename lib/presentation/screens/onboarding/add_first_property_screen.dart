@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../application/providers/repository_providers.dart';
-import '../../../core/theme/app_colors.dart';
+
 import '../../../core/utils/validators.dart';
 
 /// Screen to add the first property during onboarding.
@@ -50,9 +50,9 @@ class _AddFirstPropertyScreenState
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error adding property: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error adding property: $e')));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -70,10 +70,7 @@ class _AddFirstPropertyScreenState
         title: const Text('Add Property'),
         automaticallyImplyLeading: false,
         actions: [
-          TextButton(
-            onPressed: _skipForNow,
-            child: const Text('Skip'),
-          ),
+          TextButton(onPressed: _skipForNow, child: const Text('Skip')),
         ],
       ),
       body: SingleChildScrollView(
@@ -87,15 +84,15 @@ class _AddFirstPropertyScreenState
               Text(
                 'Add your first property',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 8),
               Text(
                 'A property can be a building, apartment complex, or any rental unit you manage.',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.onSurfaceVariant,
-                    ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
               const SizedBox(height: 32),
 
@@ -105,13 +102,13 @@ class _AddFirstPropertyScreenState
                   width: 120,
                   height: 120,
                   decoration: BoxDecoration(
-                    color: AppColors.secondary.withValues(alpha: 0.1),
+                    color: Theme.of(context).colorScheme.secondaryContainer,
                     borderRadius: BorderRadius.circular(24),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.apartment_rounded,
                     size: 64,
-                    color: AppColors.secondary,
+                    color: Theme.of(context).colorScheme.secondary,
                   ),
                 ),
               ),
@@ -147,20 +144,22 @@ class _AddFirstPropertyScreenState
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.secondary.withValues(alpha: 0.1),
+                  color: Theme.of(context).colorScheme.secondaryContainer,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.lightbulb_outline,
-                        color: AppColors.secondary),
+                    Icon(
+                      Icons.lightbulb_outline,
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         'You can add rooms to this property after setup.',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: AppColors.secondary,
-                            ),
+                          color: Theme.of(context).colorScheme.secondary,
+                        ),
                       ),
                     ),
                   ],

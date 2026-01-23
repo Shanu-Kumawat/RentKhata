@@ -170,15 +170,17 @@ class _OccupancyInfoCard extends StatelessWidget {
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: isActive
-                        ? AppColors.success.withValues(alpha: 0.1)
-                        : AppColors.surfaceVariant,
+                        ? Theme.of(
+                            context,
+                          ).colorScheme.primary.withValues(alpha: 0.1)
+                        : Theme.of(context).colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
                     Icons.home_work_outlined,
                     color: isActive
-                        ? AppColors.success
-                        : AppColors.onSurfaceVariant,
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.onSurfaceVariant,
                     size: 24,
                   ),
                 ),
@@ -196,7 +198,7 @@ class _OccupancyInfoCard extends StatelessWidget {
                       Text(
                         'Room ${occupancy.roomNumber ?? 'N/A'}',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.onSurfaceVariant,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],
@@ -209,16 +211,18 @@ class _OccupancyInfoCard extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: isActive
-                        ? AppColors.success.withValues(alpha: 0.1)
-                        : AppColors.surfaceVariant,
+                        ? Theme.of(
+                            context,
+                          ).colorScheme.primary.withValues(alpha: 0.1)
+                        : Theme.of(context).colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
                     isActive ? 'Active' : 'Past Stay',
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
                       color: isActive
-                          ? AppColors.success
-                          : AppColors.onSurfaceVariant,
+                          ? Theme.of(context).colorScheme.primary
+                          : Theme.of(context).colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -229,7 +233,9 @@ class _OccupancyInfoCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColors.surfaceVariant.withValues(alpha: 0.5),
+                color: Theme.of(
+                  context,
+                ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -239,13 +245,15 @@ class _OccupancyInfoCard extends StatelessWidget {
                       label: 'Move In',
                       date: dateFormat.format(occupancy.moveInDate),
                       icon: Icons.login,
-                      color: AppColors.success,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
                   Container(
                     width: 1,
                     height: 30,
-                    color: AppColors.onSurfaceVariant.withValues(alpha: 0.2),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurfaceVariant.withValues(alpha: 0.2),
                   ),
                   Expanded(
                     child: _DateColumn(
@@ -254,7 +262,9 @@ class _OccupancyInfoCard extends StatelessWidget {
                           ? dateFormat.format(occupancy.moveOutDate!)
                           : 'Present',
                       icon: Icons.logout,
-                      color: isActive ? AppColors.primary : AppColors.warning,
+                      color: isActive
+                          ? Theme.of(context).colorScheme.primary
+                          : Theme.of(context).colorScheme.error,
                     ),
                   ),
                 ],
@@ -331,7 +341,7 @@ class _OccupancyStatsGrid extends StatelessWidget {
             label: 'Rent',
             value: formatCurrency(detail.occupancy.agreedRent),
             icon: Icons.payments_outlined,
-            color: AppColors.primary,
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
         const SizedBox(width: 12),
@@ -340,7 +350,7 @@ class _OccupancyStatsGrid extends StatelessWidget {
             label: 'Total Paid',
             value: formatCurrency(detail.totalPaid),
             icon: Icons.check_circle_outline,
-            color: AppColors.success,
+            color: Theme.of(context).colorScheme.secondary,
           ),
         ),
         const SizedBox(width: 12),
@@ -352,8 +362,8 @@ class _OccupancyStatsGrid extends StatelessWidget {
             ),
             icon: Icons.pending_outlined,
             color: detail.totalPending > 0
-                ? AppColors.error
-                : AppColors.onSurfaceVariant,
+                ? Theme.of(context).colorScheme.error
+                : Theme.of(context).colorScheme.onSurfaceVariant,
           ),
         ),
       ],

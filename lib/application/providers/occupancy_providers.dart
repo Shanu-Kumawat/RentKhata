@@ -55,7 +55,7 @@ Future<Occupancy?> occupancy(Ref ref, int occupancyId) async {
     agreedRent: entity.agreedRent,
     securityDeposit: entity.securityDeposit,
     isActive: entity.isActive,
-    depositStatus: entity.depositStatus ?? DepositStatus.pending,
+    depositStatus: entity.depositStatus,
     depositReceivedDate: entity.depositReceivedDate,
     depositReturnedDate: entity.depositReturnedDate,
     depositReturnedAmount: entity.depositReturnedAmount,

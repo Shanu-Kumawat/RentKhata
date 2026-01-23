@@ -7,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../application/providers/repository_providers.dart';
 import '../../../application/providers/tenant_providers.dart';
-import '../../../core/theme/app_colors.dart';
+
 import '../../../core/utils/validators.dart';
 import '../../../domain/entities/tenant.dart';
 import '../../widgets/image_picker_widget.dart';
@@ -468,7 +468,11 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
                         Text(
                           'Front',
                           style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(color: AppColors.onSurfaceVariant),
+                              ?.copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
+                              ),
                         ),
                       ],
                     ),
@@ -485,7 +489,11 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
                         Text(
                           'Back',
                           style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(color: AppColors.onSurfaceVariant),
+                              ?.copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
+                              ),
                         ),
                       ],
                     ),
@@ -541,8 +549,8 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
                       ? Icons.verified_user
                       : Icons.verified_user_outlined,
                   color: _isPoliceVerified
-                      ? AppColors.success
-                      : AppColors.onSurfaceVariant,
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
                 value: _isPoliceVerified,
                 onChanged: (v) => setState(() => _isPoliceVerified = v),
@@ -587,9 +595,9 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
           const SizedBox(height: 8),
           Text(
             'Profile Photo',
-            style: Theme.of(
-              context,
-            ).textTheme.bodySmall?.copyWith(color: AppColors.onSurfaceVariant),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
         ],
       ),
@@ -609,7 +617,11 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
           children: [
             Row(
               children: [
-                Icon(icon, color: AppColors.primary, size: 20),
+                Icon(
+                  icon,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 20,
+                ),
                 const SizedBox(width: 8),
                 Text(
                   title,

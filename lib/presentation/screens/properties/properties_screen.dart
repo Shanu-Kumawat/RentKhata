@@ -17,9 +17,7 @@ class PropertiesScreen extends ConsumerWidget {
     final propertiesAsync = ref.watch(propertiesStreamProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Properties'),
-      ),
+      appBar: AppBar(title: const Text('Properties')),
       body: propertiesAsync.when(
         data: (properties) => properties.isEmpty
             ? _buildEmptyState(context)
@@ -59,28 +57,30 @@ class PropertiesScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                color: Theme.of(
+                  context,
+                ).colorScheme.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.home_work_outlined,
                 size: 64,
-                color: AppColors.primary,
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
             const SizedBox(height: 24),
             Text(
               'No properties yet',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
               'Add your first property to get started',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.onSurfaceVariant,
-                  ),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 32),
@@ -132,12 +132,14 @@ class _PropertyCard extends StatelessWidget {
                 width: 56,
                 height: 56,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.apartment_rounded,
-                  color: AppColors.primary,
+                  color: Theme.of(context).colorScheme.primary,
                   size: 28,
                 ),
               ),
@@ -150,16 +152,16 @@ class _PropertyCard extends StatelessWidget {
                     Text(
                       property.name,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     if (property.address != null) ...[
                       const SizedBox(height: 4),
                       Text(
                         property.address!,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: AppColors.onSurfaceVariant,
-                            ),
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -178,15 +180,18 @@ class _PropertyCard extends StatelessWidget {
                           color: occupancyPercent >= 80
                               ? AppColors.success
                               : occupancyPercent >= 50
-                                  ? AppColors.warning
-                                  : AppColors.onSurfaceVariant,
+                              ? AppColors.warning
+                              : Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ],
                     ),
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right, color: AppColors.onSurfaceVariant),
+              const Icon(
+                Icons.chevron_right,
+                color: AppColors.onSurfaceVariant,
+              ),
             ],
           ),
         ),
@@ -200,15 +205,11 @@ class _StatChip extends StatelessWidget {
   final String label;
   final Color? color;
 
-  const _StatChip({
-    required this.icon,
-    required this.label,
-    this.color,
-  });
+  const _StatChip({required this.icon, required this.label, this.color});
 
   @override
   Widget build(BuildContext context) {
-    final chipColor = color ?? AppColors.onSurfaceVariant;
+    final chipColor = color ?? Theme.of(context).colorScheme.onSurfaceVariant;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -216,9 +217,9 @@ class _StatChip extends StatelessWidget {
         const SizedBox(width: 4),
         Text(
           label,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: chipColor,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: chipColor),
         ),
       ],
     );

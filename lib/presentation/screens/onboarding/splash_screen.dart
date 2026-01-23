@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../application/providers/dashboard_providers.dart';
-import '../../../core/theme/app_colors.dart';
 
 /// Splash screen shown on app launch.
 class SplashScreen extends ConsumerStatefulWidget {
@@ -53,9 +52,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
     // Check if this is the first launch (no landlord profile)
     final isFirstLaunch = await ref.read(isFirstLaunchProvider.future);
-    
+
     if (!mounted) return;
-    
+
     if (isFirstLaunch) {
       context.go('/welcome');
     } else {
@@ -73,13 +72,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              AppColors.primary,
-              AppColors.primaryDark,
+              Theme.of(context).colorScheme.primary,
+              Theme.of(context).colorScheme.tertiary,
             ],
           ),
         ),
@@ -108,10 +107,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                             ),
                           ],
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.home_work_rounded,
                           size: 56,
-                          color: AppColors.primary,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
                       ),
                       const SizedBox(height: 24),

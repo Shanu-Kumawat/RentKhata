@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../application/providers/repository_providers.dart';
 import '../../../application/providers/dashboard_providers.dart';
-import '../../../core/theme/app_colors.dart';
+
 import '../../../core/utils/validators.dart';
 import '../../../domain/entities/landlord.dart';
 import '../../widgets/image_picker_widget.dart';
@@ -53,7 +53,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     try {
       final repo = ref.read(landlordRepositoryProvider);
       final existingLandlord = await repo.getLandlord();
-      
+
       if (existingLandlord != null) {
         await repo.updateLandlord(
           existingLandlord.copyWith(
@@ -73,15 +73,15 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
       if (mounted) {
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profile updated')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Profile updated')));
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -93,9 +93,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     final landlordAsync = ref.watch(landlordProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Edit Profile'),
-      ),
+      appBar: AppBar(title: const Text('Edit Profile')),
       body: landlordAsync.when(
         data: (landlord) {
           _initializeFromLandlord(landlord);
@@ -110,7 +108,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     initialImagePath: _photoPath,
                     placeholderIcon: Icons.person,
                     size: 100,
-                    onImageSelected: (path) => setState(() => _photoPath = path),
+                    onImageSelected: (path) =>
+                        setState(() => _photoPath = path),
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -160,8 +159,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 Text(
                   'Your UPI ID is used to generate QR codes for rent collection.',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.onSurfaceVariant,
-                      ),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
                 const SizedBox(height: 32),
 

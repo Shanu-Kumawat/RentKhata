@@ -11,7 +11,7 @@ import 'package:intl/intl.dart';
 import '../../../application/providers/tenant_providers.dart';
 import '../../../application/providers/repository_providers.dart';
 import '../../../application/providers/database_provider.dart';
-import '../../../core/theme/app_colors.dart';
+
 import '../../../core/utils/currency_formatter.dart';
 import '../../../domain/entities/tenant.dart';
 import '../../../domain/entities/occupancy.dart';
@@ -80,11 +80,14 @@ class _TenantDetailContent extends ConsumerWidget {
               }
             },
             itemBuilder: (context) => [
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'delete',
                 child: Row(
                   children: [
-                    Icon(Icons.delete_outline, color: AppColors.error),
+                    Icon(
+                      Icons.delete_outline,
+                      color: Theme.of(context).colorScheme.error,
+                    ),
                     SizedBox(width: 8),
                     Text('Delete Tenant'),
                   ],
@@ -271,10 +274,12 @@ class _TenantDetailContent extends ConsumerWidget {
                       padding: const EdgeInsets.only(bottom: 12),
                       child: Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.credit_card_outlined,
                             size: 18,
-                            color: AppColors.onSurfaceVariant,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
                           ),
                           const SizedBox(width: 12),
                           Text(
@@ -399,7 +404,11 @@ class _TenantDetailContent extends ConsumerWidget {
           children: [
             Row(
               children: [
-                Icon(icon, color: AppColors.primary, size: 20),
+                Icon(
+                  icon,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 20,
+                ),
                 const SizedBox(width: 8),
                 Text(
                   title,
@@ -463,7 +472,9 @@ class _TenantDetailContent extends ConsumerWidget {
                 ).showSnackBar(const SnackBar(content: Text('Tenant deleted')));
               }
             },
-            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
             child: const Text('Delete'),
           ),
         ],
@@ -488,13 +499,13 @@ class _ProfileCard extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 36,
-              backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
               child: Text(
                 tenant.name[0].toUpperCase(),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
                 ),
               ),
             ),
@@ -518,8 +529,10 @@ class _ProfileCard extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: tenant.isCurrentlyOccupying
-                          ? AppColors.success.withValues(alpha: 0.1)
-                          : AppColors.onSurfaceVariant.withValues(alpha: 0.1),
+                          ? Theme.of(context).colorScheme.primaryContainer
+                          : Theme.of(
+                              context,
+                            ).colorScheme.surfaceContainerHighest,
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
@@ -531,8 +544,12 @@ class _ProfileCard extends StatelessWidget {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: tenant.isCurrentlyOccupying
-                                ? AppColors.success
-                                : AppColors.onSurfaceVariant,
+                                ? Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimaryContainer
+                                : Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
                           ),
                         ),
                         const SizedBox(width: 6),
@@ -543,8 +560,12 @@ class _ProfileCard extends StatelessWidget {
                           style: Theme.of(context).textTheme.labelMedium
                               ?.copyWith(
                                 color: tenant.isCurrentlyOccupying
-                                    ? AppColors.success
-                                    : AppColors.onSurfaceVariant,
+                                    ? Theme.of(
+                                        context,
+                                      ).colorScheme.onPrimaryContainer
+                                    : Theme.of(
+                                        context,
+                                      ).colorScheme.onSurfaceVariant,
                                 fontWeight: FontWeight.w600,
                               ),
                         ),
@@ -571,15 +592,20 @@ class _CurrentOccupancyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: AppColors.success.withValues(alpha: 0.05),
+      color: Theme.of(
+        context,
+      ).colorScheme.primaryContainer.withValues(alpha: 0.5),
       child: ListTile(
         leading: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: AppColors.success.withValues(alpha: 0.1),
+            color: Theme.of(context).colorScheme.primaryContainer,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: const Icon(Icons.home_outlined, color: AppColors.success),
+          child: Icon(
+            Icons.home_outlined,
+            color: Theme.of(context).colorScheme.onPrimaryContainer,
+          ),
         ),
         title: Text(
           '${tenant.currentPropertyName ?? 'Property'} - Room ${tenant.currentRoomNumber}',
@@ -620,7 +646,11 @@ class _InfoRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 8),
         child: Row(
           children: [
-            Icon(icon, size: 20, color: AppColors.onSurfaceVariant),
+            Icon(
+              icon,
+              size: 20,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -629,7 +659,7 @@ class _InfoRow extends StatelessWidget {
                   Text(
                     label,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.onSurfaceVariant,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
                   Text(value, style: Theme.of(context).textTheme.bodyMedium),
@@ -637,10 +667,10 @@ class _InfoRow extends StatelessWidget {
               ),
             ),
             if (onTap != null)
-              const Icon(
+              Icon(
                 Icons.chevron_right,
                 size: 20,
-                color: AppColors.onSurfaceVariant,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
           ],
         ),
@@ -669,7 +699,9 @@ class _AadhaarPhotoTile extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: AppColors.onSurfaceVariant.withValues(alpha: 0.2),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurfaceVariant.withValues(alpha: 0.2),
               ),
             ),
             child: ClipRRect(
@@ -681,11 +713,13 @@ class _AadhaarPhotoTile extends StatelessWidget {
                     File(imagePath),
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) => Container(
-                      color: AppColors.surfaceVariant,
-                      child: const Center(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.surfaceContainerHighest,
+                      child: Center(
                         child: Icon(
                           Icons.broken_image_outlined,
-                          color: AppColors.onSurfaceVariant,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ),
@@ -715,9 +749,9 @@ class _AadhaarPhotoTile extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           label,
-          style: Theme.of(
-            context,
-          ).textTheme.bodySmall?.copyWith(color: AppColors.onSurfaceVariant),
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
         ),
       ],
     );
@@ -829,8 +863,8 @@ class _VerificationCard extends StatelessWidget {
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
             color: tenant.isPoliceVerified
-                ? AppColors.success.withValues(alpha: 0.1)
-                : AppColors.surfaceVariant,
+                ? Theme.of(context).colorScheme.primaryContainer
+                : Theme.of(context).colorScheme.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(
@@ -838,8 +872,8 @@ class _VerificationCard extends StatelessWidget {
                 ? Icons.verified_user
                 : Icons.verified_user_outlined,
             color: tenant.isPoliceVerified
-                ? AppColors.success
-                : AppColors.onSurfaceVariant,
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).colorScheme.onSurfaceVariant,
           ),
         ),
         title: Text(
@@ -876,10 +910,10 @@ class _OccupancyHistorySection extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 4),
           child: Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.history_outlined,
                 size: 20,
-                color: AppColors.primary,
+                color: Theme.of(context).colorScheme.primary,
               ),
               const SizedBox(width: 8),
               Text(
@@ -896,13 +930,15 @@ class _OccupancyHistorySection extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.surfaceVariant,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     '${list.length} stay${list.length != 1 ? 's' : ''}',
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: AppColors.onSurfaceVariant,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -926,15 +962,19 @@ class _OccupancyHistorySection extends StatelessWidget {
                         Icon(
                           Icons.home_outlined,
                           size: 48,
-                          color: AppColors.onSurfaceVariant.withValues(
-                            alpha: 0.5,
-                          ),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
                         ),
                         const SizedBox(height: 12),
                         Text(
                           'No occupancy history yet',
                           style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(color: AppColors.onSurfaceVariant),
+                              ?.copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
+                              ),
                         ),
                       ],
                     ),
@@ -980,7 +1020,9 @@ class _OccupancyHistoryCard extends StatelessWidget {
         : 'Present';
 
     final isActive = occupancy.isActive;
-    final color = isActive ? AppColors.success : AppColors.onSurfaceVariant;
+    final color = isActive
+        ? Theme.of(context).colorScheme.primary
+        : Theme.of(context).colorScheme.onSurfaceVariant;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -1024,7 +1066,7 @@ class _OccupancyHistoryCard extends StatelessWidget {
                     Text(
                       'Room ${occupancy.roomNumber ?? 'N/A'}',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.onSurfaceVariant,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -1034,13 +1076,15 @@ class _OccupancyHistoryCard extends StatelessWidget {
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.surfaceVariant,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
                         '$start - $end',
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: AppColors.onSurfaceVariant,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -1057,13 +1101,13 @@ class _OccupancyHistoryCard extends StatelessWidget {
                     formatCurrency(occupancy.agreedRent),
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: AppColors.primary,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
                   Text(
                     '/month',
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: AppColors.onSurfaceVariant,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],
@@ -1072,7 +1116,9 @@ class _OccupancyHistoryCard extends StatelessWidget {
               Icon(
                 Icons.chevron_right,
                 size: 20,
-                color: AppColors.onSurfaceVariant.withValues(alpha: 0.5),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
               ),
             ],
           ),
@@ -1101,9 +1147,9 @@ class _FamilyMembersSection extends ConsumerWidget {
 
     return Card(
       child: ExpansionTile(
-        leading: const Icon(
+        leading: Icon(
           Icons.family_restroom_outlined,
-          color: AppColors.primary,
+          color: Theme.of(context).colorScheme.primary,
         ),
         title: const Text('Family Members'),
         subtitle: familyMembersAsync.when(
@@ -1129,9 +1175,10 @@ class _FamilyMembersSection extends ConsumerWidget {
                           Icon(
                             Icons.people_outline,
                             size: 48,
-                            color: AppColors.onSurfaceVariant.withValues(
-                              alpha: 0.5,
-                            ),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurfaceVariant
+                                .withValues(alpha: 0.5),
                           ),
                           const SizedBox(height: 12),
                           Text(
@@ -1140,7 +1187,11 @@ class _FamilyMembersSection extends ConsumerWidget {
                                 : 'No active occupancy - view past occupancies for family history',
                             textAlign: TextAlign.center,
                             style: Theme.of(context).textTheme.bodyMedium
-                                ?.copyWith(color: AppColors.onSurfaceVariant),
+                                ?.copyWith(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
+                                ),
                           ),
                         ],
                       ),
@@ -1149,12 +1200,14 @@ class _FamilyMembersSection extends ConsumerWidget {
                     ...members.map(
                       (member) => ListTile(
                         leading: CircleAvatar(
-                          backgroundColor: AppColors.primary.withValues(
-                            alpha: 0.1,
-                          ),
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.primaryContainer,
                           child: Text(
                             member.name[0].toUpperCase(),
-                            style: const TextStyle(color: AppColors.primary),
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
                           ),
                         ),
                         title: Text(member.name),
@@ -1167,9 +1220,9 @@ class _FamilyMembersSection extends ConsumerWidget {
                         ),
                         trailing: currentOccupancyId != null
                             ? IconButton(
-                                icon: const Icon(
+                                icon: Icon(
                                   Icons.delete_outline,
-                                  color: AppColors.error,
+                                  color: Theme.of(context).colorScheme.error,
                                 ),
                                 onPressed: () => _deleteFamilyMember(
                                   context,
@@ -1191,7 +1244,7 @@ class _FamilyMembersSection extends ConsumerWidget {
                     Text(
                       'Family members can only be added to active occupancies',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.onSurfaceVariant,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         fontStyle: FontStyle.italic,
                       ),
                     ),
@@ -1539,7 +1592,7 @@ class _CustomFieldsSectionState extends ConsumerState<_CustomFieldsSection> {
                   ? Text(
                       'No custom fields',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.onSurfaceVariant,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     )
                   : Column(

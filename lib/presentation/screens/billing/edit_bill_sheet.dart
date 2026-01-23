@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../application/providers/repository_providers.dart';
 import '../../../application/providers/billing_providers.dart';
 import '../../../application/providers/dashboard_providers.dart';
-import '../../../core/theme/app_colors.dart';
+
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/validators.dart';
 import '../../../domain/entities/bill.dart';
@@ -200,7 +200,9 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: AppColors.surfaceVariant,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Column(
@@ -217,7 +219,7 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
                         Text(
                           'Paid: ${formatCurrency(widget.bill.paidAmount)}',
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: AppColors.success,
+                            color: Theme.of(context).colorScheme.tertiary,
                           ),
                         ),
                       ],

@@ -110,7 +110,6 @@ class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           _showCreateBill(
-            context,
             occupancy,
             cycleStart: widget.cycleStart,
             cycleEnd: widget.cycleEnd,
@@ -163,7 +162,7 @@ class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
                   SizedBox(
                     width: double.infinity,
                     child: FilledButton.icon(
-                      onPressed: () => _showCreateBill(context, occupancy),
+                      onPressed: () => _showCreateBill(occupancy),
                       icon: const Icon(Icons.receipt_long_outlined),
                       label: const Text('Create Bill'),
                     ),
@@ -198,7 +197,6 @@ class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
   }
 
   Future<void> _showCreateBill(
-    BuildContext context,
     Occupancy occupancy, {
     DateTime? cycleStart,
     DateTime? cycleEnd,
@@ -317,7 +315,7 @@ class _RoomInfoCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: room.isOccupied
                         ? AppColors.success.withValues(alpha: 0.1)
-                        : AppColors.surfaceVariant,
+                        : Theme.of(context).colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -326,7 +324,7 @@ class _RoomInfoCard extends StatelessWidget {
                         : Icons.meeting_room_outlined,
                     color: room.isOccupied
                         ? AppColors.success
-                        : AppColors.onSurfaceVariant,
+                        : Theme.of(context).colorScheme.onSurfaceVariant,
                     size: 28,
                   ),
                 ),
@@ -338,7 +336,7 @@ class _RoomInfoCard extends StatelessWidget {
                       Text(
                         room.propertyName ?? 'Property',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.onSurfaceVariant,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
                       Text(
@@ -348,7 +346,9 @@ class _RoomInfoCard extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                               color: room.isOccupied
                                   ? AppColors.success
-                                  : AppColors.onSurfaceVariant,
+                                  : Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
                             ),
                       ),
                     ],
@@ -430,13 +430,15 @@ class _OccupancyCard extends ConsumerWidget {
                 children: [
                   CircleAvatar(
                     radius: 24,
-                    backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                    backgroundColor: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.1),
                     child: Text(
                       (occupancy.tenantName ?? 'T')[0].toUpperCase(),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
                   ),
@@ -453,7 +455,11 @@ class _OccupancyCard extends ConsumerWidget {
                         Text(
                           'Since ${occupancy.moveInDate.day}/${occupancy.moveInDate.month}/${occupancy.moveInDate.year}',
                           style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(color: AppColors.onSurfaceVariant),
+                              ?.copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
+                              ),
                         ),
                       ],
                     ),
@@ -505,13 +511,19 @@ class _OccupancyCard extends ConsumerWidget {
                             Icon(
                               Icons.calendar_today_outlined,
                               size: 16,
-                              color: AppColors.onSurfaceVariant,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurfaceVariant,
                             ),
                             const SizedBox(width: 4),
                             Text(
                               'Billing Start',
                               style: Theme.of(context).textTheme.labelSmall
-                                  ?.copyWith(color: AppColors.onSurfaceVariant),
+                                  ?.copyWith(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
+                                  ),
                             ),
                             if (!hasSeparateBillingDate) ...[
                               const SizedBox(width: 4),
@@ -521,16 +533,18 @@ class _OccupancyCard extends ConsumerWidget {
                                   vertical: 2,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: AppColors.primary.withValues(
-                                    alpha: 0.1,
-                                  ),
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.primary.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
                                   'Same as move-in',
                                   style: Theme.of(context).textTheme.labelSmall
                                       ?.copyWith(
-                                        color: AppColors.primary,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.primary,
                                         fontSize: 10,
                                       ),
                                 ),
@@ -620,9 +634,9 @@ class _InfoTile extends StatelessWidget {
       children: [
         Text(
           label,
-          style: Theme.of(
-            context,
-          ).textTheme.bodySmall?.copyWith(color: AppColors.onSurfaceVariant),
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
         ),
         Text(
           value,
@@ -650,13 +664,13 @@ class _VacantRoomCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.surfaceVariant,
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.person_add_outlined,
                 size: 32,
-                color: AppColors.onSurfaceVariant,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 16),
@@ -670,7 +684,7 @@ class _VacantRoomCard extends StatelessWidget {
             Text(
               'Assign a tenant to start collecting rent',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.onSurfaceVariant,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 16),
@@ -713,7 +727,7 @@ class _BillsSection extends ConsumerWidget {
                     child: Text(
                       'No bills yet',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.onSurfaceVariant,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ),
