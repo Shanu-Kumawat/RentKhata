@@ -156,7 +156,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
                 ),
                 child: Icon(
                   Icons.backup_outlined,
-                  color: Theme.of(context).colorScheme.primary,
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
                 ),
               ),
               title: const Text('Create & Share Backup'),

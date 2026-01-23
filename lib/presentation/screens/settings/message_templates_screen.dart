@@ -34,25 +34,26 @@ class MessageTemplatesScreen extends ConsumerWidget {
   }
 
   Widget _buildInfoCard(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Card(
-      color: AppColors.primary.withValues(alpha: 0.05),
+      color: colorScheme.primary.withValues(alpha: 0.05),
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: AppColors.primary.withValues(alpha: 0.2)),
+        side: BorderSide(color: colorScheme.primary.withValues(alpha: 0.2)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            Icon(Icons.info_outline, color: AppColors.primary),
+            Icon(Icons.info_outline, color: colorScheme.primary),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 'Edit templates used for invoices, receipts, and reminders. '
                 'Use placeholders like {tenantName}, {amount}, etc.',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.onSurfaceVariant,
+                  color: colorScheme.onSurfaceVariant,
                 ),
               ),
             ),
@@ -117,25 +118,29 @@ class _TemplateEditorState extends ConsumerState<_TemplateEditor> {
     };
   }
 
-  Color _getTypeColor() {
+  Color _getTypeColor(BuildContext context) {
+    // Use theme aware or semantic colors
     return switch (widget.type) {
-      TemplateType.invoice => Colors.blue,
-      TemplateType.receipt => Colors.green,
-      TemplateType.reminder => Colors.orange,
+      TemplateType.invoice => Theme.of(
+        context,
+      ).colorScheme.primary, // Or AppColors.info
+      TemplateType.receipt => AppColors.moneyReceived, // Green via AppColors
+      TemplateType.reminder => AppColors.warning, // Orange via AppColors
     };
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final templateAsync = ref.watch(defaultTemplateProvider(widget.type));
-    final typeColor = _getTypeColor();
+    final typeColor = _getTypeColor(context);
 
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Colors.grey.shade300),
+        side: BorderSide(color: colorScheme.outlineVariant),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -173,7 +178,7 @@ class _TemplateEditorState extends ConsumerState<_TemplateEditor> {
                       Text(
                         'Used when sharing ${_getTypeLabel().toLowerCase()}s',
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: AppColors.onSurfaceVariant,
+                          color: colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],
@@ -225,10 +230,9 @@ class _TemplateEditorState extends ConsumerState<_TemplateEditor> {
                       Row(
                         children: [
                           // Reset button
-                          TextButton.icon(
+                          TextButton(
                             onPressed: _hasChanges ? _resetToOriginal : null,
-                            icon: const Icon(Icons.undo, size: 18),
-                            label: const Text('Discard'),
+                            child: const Text('Discard'),
                           ),
                           const Spacer(),
                           // Cancel button
@@ -266,7 +270,7 @@ class _TemplateEditorState extends ConsumerState<_TemplateEditor> {
                         width: double.infinity,
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: AppColors.surfaceVariant.withValues(
+                          color: colorScheme.surfaceContainerHighest.withValues(
                             alpha: 0.5,
                           ),
                           borderRadius: BorderRadius.circular(8),
@@ -276,7 +280,7 @@ class _TemplateEditorState extends ConsumerState<_TemplateEditor> {
                               TemplateService.getDefaultBody(widget.type),
                           style: theme.textTheme.bodySmall?.copyWith(
                             fontFamily: 'monospace',
-                            color: AppColors.onSurfaceVariant,
+                            color: colorScheme.onSurfaceVariant,
                           ),
                           maxLines: 6,
                           overflow: TextOverflow.ellipsis,
@@ -292,7 +296,7 @@ class _TemplateEditorState extends ConsumerState<_TemplateEditor> {
                                 _confirmResetToDefault(template?.body),
                             icon: const Icon(Icons.restart_alt, size: 18),
                             style: TextButton.styleFrom(
-                              foregroundColor: Colors.orange,
+                              foregroundColor: AppColors.warning,
                             ),
                             label: const Text('Reset to Default'),
                           ),
@@ -357,7 +361,10 @@ class _TemplateEditorState extends ConsumerState<_TemplateEditor> {
               Navigator.pop(context);
               await _resetToDefault();
             },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+              foregroundColor: Theme.of(context).colorScheme.onError,
+            ),
             child: const Text('Reset'),
           ),
         ],
