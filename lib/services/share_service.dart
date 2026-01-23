@@ -58,6 +58,49 @@ class ShareService {
     return false;
   }
 
+  /// Share bill reminder, optionally with meter photo.
+  Future<void> shareBillReminder({
+    required Bill bill,
+    required String landlordName,
+    String? tenantPhone,
+  }) async {
+    final message = billReminderMessage(
+      tenantName: bill.tenantName ?? 'Tenant',
+      billType: bill.billType.name,
+      period: bill.billingPeriod,
+      amount: bill.pendingAmount,
+      dueDate: bill.dueDate ?? DateTime.now(),
+      landlordName: landlordName,
+    );
+
+    // If meter photo exists, share it with text using native share
+    if (bill.meterPhotoPath != null && bill.meterPhotoPath!.isNotEmpty) {
+      final file = File(bill.meterPhotoPath!);
+      if (await file.exists()) {
+        await shareFiles(
+          files: [file],
+          text: message,
+          subject: 'Bill Reminder - ${bill.billingPeriod}',
+        );
+        return;
+      }
+    }
+
+    // Fallback to text-only WhatsApp share
+    final whatsappSuccess = await shareToWhatsApp(
+      message: message,
+      phoneNumber: tenantPhone,
+    );
+
+    // If WhatsApp fails/not installed, fallback to native text share
+    if (!whatsappSuccess) {
+      await shareText(
+        text: message,
+        subject: 'Bill Reminder - ${bill.billingPeriod}',
+      );
+    }
+  }
+
   /// Share files with optional text.
   Future<void> shareFiles({
     required List<File> files,

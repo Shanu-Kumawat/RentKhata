@@ -390,21 +390,11 @@ class _BillDetailContent extends ConsumerWidget {
   }
 
   void _sendReminder(BuildContext context, String? landlordName) async {
-    final message = ShareService.billReminderMessage(
-      tenantName: bill.tenantName ?? 'Tenant',
-      billType: bill.billType.name,
-      period: bill.billingPeriod,
-      amount: bill.pendingAmount,
-      dueDate: bill.dueDate ?? DateTime.now(),
+    final shareService = ShareService();
+    await shareService.shareBillReminder(
+      bill: bill,
       landlordName: landlordName ?? 'Landlord',
     );
-
-    final shareService = ShareService();
-    final success = await shareService.shareToWhatsApp(message: message);
-    if (!success && context.mounted) {
-      // Fallback to native share
-      await shareService.shareText(text: message, subject: 'Payment Reminder');
-    }
   }
 
   void _confirmDeleteBill(BuildContext context, WidgetRef ref) {
