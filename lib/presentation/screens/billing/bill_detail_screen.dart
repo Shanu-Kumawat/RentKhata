@@ -71,11 +71,6 @@ class _BillDetailContent extends ConsumerWidget {
       appBar: AppBar(
         title: Text(bill.billNumber ?? 'Bill Details'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.receipt_long_outlined),
-            tooltip: 'View Invoice',
-            onPressed: () => _viewInvoice(context, landlordName, landlordUpi),
-          ),
           PopupMenuButton<String>(
             onSelected: (value) => _handleMenuAction(
               context,
@@ -126,6 +121,17 @@ class _BillDetailContent extends ConsumerWidget {
           children: [
             // Status & Amount Card
             _StatusCard(bill: bill),
+            const SizedBox(height: 16),
+
+            // Quick Actions
+            _QuickActionsCard(
+              bill: bill,
+              onViewInvoice: () =>
+                  _viewInvoice(context, landlordName, landlordUpi),
+              onSendReminder: () => _sendReminder(context, landlordName),
+              onShareInvoice: () =>
+                  _shareInvoice(context, landlordName, landlordUpi),
+            ),
             const SizedBox(height: 16),
 
             // Bill Details Card
@@ -618,6 +624,82 @@ class _AmountColumn extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+/// Card with quick actions for the bill.
+class _QuickActionsCard extends StatelessWidget {
+  final Bill bill;
+  final VoidCallback onViewInvoice;
+  final VoidCallback onSendReminder;
+  final VoidCallback onShareInvoice;
+
+  const _QuickActionsCard({
+    required this.bill,
+    required this.onViewInvoice,
+    required this.onSendReminder,
+    required this.onShareInvoice,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (bill.isFullyPaid) {
+      // Paid Actions
+      return Row(
+        children: [
+          Expanded(
+            child: OutlinedButton.icon(
+              onPressed: onViewInvoice,
+              icon: const Icon(Icons.receipt_long_outlined),
+              label: const Text('View Invoice'),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: OutlinedButton.icon(
+              onPressed: onShareInvoice,
+              icon: const Icon(Icons.share_outlined),
+              label: const Text('Share Receipt'),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+            ),
+          ),
+        ],
+      );
+    } else {
+      // Unpaid Actions
+      return Row(
+        children: [
+          Expanded(
+            child: OutlinedButton.icon(
+              onPressed: onViewInvoice,
+              icon: const Icon(Icons.receipt_long_outlined),
+              label: const Text('View Invoice'),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: FilledButton.icon(
+              onPressed: onSendReminder,
+              icon: const Icon(Icons.notifications_active_outlined),
+              label: const Text('Send Reminder'),
+              style: FilledButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
   }
 }
 

@@ -906,34 +906,65 @@ class _BillTile extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  // Quick action button
-                  if (!isPaid)
-                    IconButton.filledTonal(
-                      onPressed: () => _sendReminder(context, ref),
-                      icon: const Icon(
-                        Icons.notifications_active_outlined,
-                        size: 20,
-                      ),
-                      tooltip: 'Send Reminder',
-                      style: IconButton.styleFrom(
-                        backgroundColor: statusColor.withValues(alpha: 0.1),
-                        foregroundColor: statusColor,
-                      ),
-                    )
-                  else
-                    IconButton.filledTonal(
-                      onPressed: () => _shareInvoice(context, ref),
-                      icon: const Icon(Icons.share_outlined, size: 20),
-                      tooltip: 'Share Invoice',
-                      style: IconButton.styleFrom(
-                        backgroundColor: AppColors.success.withValues(
-                          alpha: 0.1,
-                        ),
-                        foregroundColor: AppColors.success,
-                      ),
-                    ),
                 ],
               ),
+              const SizedBox(height: 12),
+              // Action Buttons
+              if (!isPaid)
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => _sendReminder(context, ref),
+                        icon: const Icon(
+                          Icons.notifications_active_outlined,
+                          size: 18,
+                        ),
+                        label: const Text('Remind'),
+                        style: OutlinedButton.styleFrom(
+                          visualDensity: VisualDensity.compact,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: FilledButton.icon(
+                        onPressed: () => _viewBillDetails(context),
+                        icon: const Icon(Icons.payment, size: 18),
+                        label: const Text('Pay'),
+                        style: FilledButton.styleFrom(
+                          visualDensity: VisualDensity.compact,
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              else
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => _viewBillDetails(context),
+                        icon: const Icon(Icons.receipt_long_outlined, size: 18),
+                        label: const Text('View'),
+                        style: OutlinedButton.styleFrom(
+                          visualDensity: VisualDensity.compact,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => _shareInvoice(context, ref),
+                        icon: const Icon(Icons.share_outlined, size: 18),
+                        label: const Text('Share'),
+                        style: OutlinedButton.styleFrom(
+                          visualDensity: VisualDensity.compact,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
             ],
           ),
         ),
