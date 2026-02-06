@@ -52,22 +52,27 @@ class InvoicePreviewScreen extends ConsumerWidget {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              // Close button
-              IconButton.outlined(
-                onPressed: () => Navigator.pop(context),
-                icon: Icon(
-                  Icons.close,
-                  color: Theme.of(context).colorScheme.primary,
+              // PDF Preview button
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => _previewPdf(context),
+                  icon: const Icon(Icons.picture_as_pdf),
+                  label: const Text('PDF Preview'),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
                 ),
-                tooltip: 'Close',
               ),
               const SizedBox(width: 12),
               // Share button - opens bottom sheet
               Expanded(
-                child: ElevatedButton.icon(
+                child: FilledButton.icon(
                   onPressed: () => _showShareOptions(context, ref),
                   icon: const Icon(Icons.share),
                   label: const Text('Share'),
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
                 ),
               ),
             ],
@@ -94,6 +99,27 @@ class InvoicePreviewScreen extends ConsumerWidget {
       landlordName: landlordName ?? 'Landlord',
       landlordUpi: landlordUpi,
     );
+  }
+
+  Future<void> _previewPdf(BuildContext context) async {
+    try {
+      final pdfService = InvoicePdfService();
+      final file = await pdfService.generateInvoice(
+        bill: bill,
+        landlordName: landlordName ?? 'Landlord',
+        landlordPhone: landlordPhone ?? '',
+        landlordUpiId: landlordUpi,
+      );
+
+      final bytes = await file.readAsBytes();
+      await pdfService.previewPdf(bytes, 'Invoice - ${bill.billingPeriod}');
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error previewing PDF: $e')));
+      }
+    }
   }
 
   Future<void> _shareAsPdf(BuildContext context) async {
