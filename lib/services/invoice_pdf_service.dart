@@ -48,7 +48,6 @@ class InvoicePdfService {
     String? landlordAddress,
     String? landlordUpiId,
     List<Payment> paymentHistory = const [],
-    String? signaturePath,
   }) async {
     final pdf = pw.Document();
 
@@ -80,16 +79,6 @@ class InvoicePdfService {
       }
     }
 
-    // Load signature image if available
-    pw.MemoryImage? signatureImage;
-    if (signaturePath != null) {
-      final file = File(signaturePath);
-      if (await file.exists()) {
-        final imageBytes = await file.readAsBytes();
-        signatureImage = pw.MemoryImage(imageBytes);
-      }
-    }
-
     pdf.addPage(
       pw.Page(
         pageFormat: PdfPageFormat.a4,
@@ -105,56 +94,62 @@ class InvoicePdfService {
                   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
-                  pw.Column(
-                    crossAxisAlignment: pw.CrossAxisAlignment.start,
-                    children: [
-                      pw.Text(
-                        landlordName.toUpperCase(),
-                        style: pw.TextStyle(
-                          fontSize: 20,
-                          fontWeight: pw.FontWeight.bold,
-                          color: primaryColor,
-                          letterSpacing: 1.2,
-                        ),
-                      ),
-                      pw.SizedBox(height: 4),
-                      if (landlordPhone.isNotEmpty)
+                    pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
                         pw.Text(
-                          landlordPhone,
-                          style: pw.TextStyle(fontSize: 10, color: accentColor),
+                          landlordName.toUpperCase(),
+                          style: pw.TextStyle(
+                            fontSize: 20,
+                            fontWeight: pw.FontWeight.bold,
+                            color: primaryColor,
+                            letterSpacing: 1.2,
+                          ),
                         ),
-                      if (landlordAddress != null)
+                        pw.SizedBox(height: 4),
+                        if (landlordPhone.isNotEmpty)
+                          pw.Text(
+                            landlordPhone,
+                            style: pw.TextStyle(
+                              fontSize: 10,
+                              color: accentColor,
+                            ),
+                          ),
+                        if (landlordAddress != null)
+                          pw.Text(
+                            landlordAddress,
+                            style: pw.TextStyle(
+                              fontSize: 10,
+                              color: accentColor,
+                            ),
+                          ),
+                      ],
+                    ),
+                    pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.end,
+                      children: [
                         pw.Text(
-                          landlordAddress,
-                          style: pw.TextStyle(fontSize: 10, color: accentColor),
+                          'INVOICE',
+                          style: pw.TextStyle(
+                            fontSize: 32,
+                            fontWeight: pw.FontWeight.bold,
+                            color: PdfColors.grey200, // Watermark style
+                            letterSpacing: 2.0,
+                          ),
                         ),
-                    ],
-                  ),
-                  pw.Column(
-                    crossAxisAlignment: pw.CrossAxisAlignment.end,
-                    children: [
-                      pw.Text(
-                        'INVOICE',
-                        style: pw.TextStyle(
-                          fontSize: 32,
-                          fontWeight: pw.FontWeight.bold,
-                          color: PdfColors.grey200, // Watermark style
-                          letterSpacing: 2.0,
+                        pw.SizedBox(height: 10),
+                        pw.Text(
+                          '# INV-${bill.id.toString().padLeft(6, '0')}',
+                          style: pw.TextStyle(
+                            fontSize: 12,
+                            color: accentColor,
+                            fontWeight: pw.FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      pw.SizedBox(height: 10),
-                      pw.Text(
-                        '# INV-${bill.id.toString().padLeft(6, '0')}',
-                        style: pw.TextStyle(
-                          fontSize: 12,
-                          color: accentColor,
-                          fontWeight: pw.FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
               pw.SizedBox(height: 40),
 
@@ -641,38 +636,7 @@ class InvoicePdfService {
                       ),
                     ),
 
-                  // Authorized Signatory
-                  pw.Column(
-                    crossAxisAlignment: pw.CrossAxisAlignment.end,
-                    children: [
-                      if (signatureImage != null)
-                        pw.Container(
-                          height: 40,
-                          child: pw.Image(
-                            signatureImage,
-                            fit: pw.BoxFit.contain,
-                          ),
-                        ),
-                      if (signatureImage != null) pw.SizedBox(height: 4),
-                      pw.Container(
-                        width: 150,
-                        decoration: const pw.BoxDecoration(
-                          border: pw.Border(
-                            top: pw.BorderSide(color: PdfColors.grey400),
-                          ),
-                        ),
-                        padding: const pw.EdgeInsets.only(top: 4),
-                        alignment: pw.Alignment.centerRight,
-                        child: pw.Text(
-                          'Authorized Signatory',
-                          style: const pw.TextStyle(
-                            fontSize: 8,
-                            color: PdfColors.grey600,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                  // Authorized Signatory (Removed)
                 ],
               ),
 
