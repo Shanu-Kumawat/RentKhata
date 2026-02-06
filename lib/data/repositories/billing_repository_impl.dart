@@ -372,6 +372,58 @@ class BillingRepositoryImpl implements BillingRepository {
     return result > 0;
   }
 
+  @override
+  Future<bool> markBillAsSent(int id) async {
+    final bill = await _billingDao.getBillById(id);
+    if (bill == null) return false;
+
+    // Only allow transition from Draft
+    if (bill.status != db.BillStatus.draft) return false;
+
+    final updated = await _billingDao.updateBillStatus(id, db.BillStatus.sent);
+
+    if (updated) {
+      await _billingDao.insertAuditLog(
+        entityType: dbAudit.AuditEntityType.bill,
+        entityId: id,
+        action: dbAudit.AuditAction.update,
+        oldValue: 'draft',
+        newValue: 'sent',
+        notes: 'Bill marked as sent',
+      );
+    }
+    return updated;
+  }
+
+  @override
+  Future<bool> voidBill(int id, String reason) async {
+    final bill = await _billingDao.getBillById(id);
+    if (bill == null) return false;
+
+    // Don't allow voiding if already paid/partial
+    if (bill.status == db.BillStatus.paid ||
+        bill.status == db.BillStatus.partial) {
+      return false;
+    }
+
+    final updated = await _billingDao.updateBillStatus(
+      id,
+      db.BillStatus.voided,
+    );
+
+    if (updated) {
+      await _billingDao.insertAuditLog(
+        entityType: dbAudit.AuditEntityType.bill,
+        entityId: id,
+        action: dbAudit.AuditAction.void_,
+        oldValue: bill.status.name,
+        newValue: 'voided',
+        notes: 'Bill voided: $reason',
+      );
+    }
+    return updated;
+  }
+
   // ========== Payment Operations ==========
 
   @override

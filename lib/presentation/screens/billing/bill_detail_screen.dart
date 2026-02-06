@@ -22,6 +22,7 @@ import 'edit_bill_sheet.dart';
 import 'invoice_preview_screen.dart';
 import 'record_payment_sheet.dart';
 import 'edit_payment_sheet.dart';
+import '../../../core/theme/app_colors.dart';
 
 /// Screen to view detailed bill information including payments.
 class BillDetailScreen extends ConsumerWidget {
@@ -102,7 +103,23 @@ class _BillDetailContent extends ConsumerWidget {
                     contentPadding: EdgeInsets.zero,
                   ),
                 ),
-              if (!bill.isFullyPaid)
+              if (bill.status != BillStatus.voided &&
+                  !bill.isFullyPaid &&
+                  bill.status != BillStatus.partial)
+                const PopupMenuItem(
+                  value: 'void',
+                  child: ListTile(
+                    leading: Icon(Icons.block, color: AppColors.error),
+                    title: Text(
+                      'Void Bill',
+                      style: TextStyle(color: AppColors.error),
+                    ),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
+              if (!bill.isFullyPaid &&
+                  bill.status != BillStatus.draft &&
+                  bill.status != BillStatus.voided)
                 const PopupMenuItem(
                   value: 'reminder',
                   child: ListTile(
@@ -127,12 +144,6 @@ class _BillDetailContent extends ConsumerWidget {
             // Quick Actions
             _QuickActionsCard(
               bill: bill,
-              onViewInvoice: () => _viewInvoice(
-                context,
-                landlordName,
-                landlordPhone,
-                landlordUpi,
-              ),
               onSendReminder: () => _sendReminder(context, landlordName),
               onShareInvoice: () => _shareInvoice(
                 context,
@@ -244,70 +255,79 @@ class _BillDetailContent extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               // Main action buttons
-              Row(
-                children: [
-                  if (bill.canRecordPayment) ...[
-                    // Unpaid/Partial: Share Invoice (secondary)
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => _shareInvoice(
-                          context,
-                          landlordName,
-                          landlordPhone,
-                          landlordUpi,
-                        ),
-                        child: const Text('Share'),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    // Unpaid/Partial: Record Payment (primary)
-                    Expanded(
-                      flex: 2,
-                      child: ElevatedButton.icon(
-                        onPressed: () => _recordPayment(context),
-                        icon: const Icon(Icons.payment),
-                        label: Text(
-                          'Pay ${formatCurrency(bill.pendingAmount)}',
+              if (bill.status == BillStatus.voided)
+                const SizedBox.shrink()
+              else
+                Row(
+                  children: [
+                    if (bill.canRecordPayment) ...[
+                      // Draft/Unpaid: Review & Send / Share (Secondary)
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => _shareInvoice(
+                            context,
+                            landlordName,
+                            landlordPhone,
+                            landlordUpi,
+                          ),
+                          child: Text(
+                            bill.status == BillStatus.draft
+                                ? 'Review & Send'
+                                : 'Share Invoice',
+                          ),
                         ),
                       ),
-                    ),
-                  ] else ...[
-                    // Paid: Save Invoice PDF (secondary)
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => _savePdf(
-                          context,
-                          landlordName,
-                          landlordPhone,
-                          landlordUpi,
+                      const SizedBox(width: 12),
+                      // Draft/Unpaid: Record Payment (Primary & Default)
+                      Expanded(
+                        flex: 1,
+                        child: ElevatedButton.icon(
+                          onPressed: () => _recordPayment(context),
+                          icon: const Icon(Icons.payment),
+                          label: Text(
+                            'Pay ${formatCurrency(bill.pendingAmount)}',
+                          ),
                         ),
-                        child: const Text('Save'),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    // Paid: Share Invoice (primary)
-                    Expanded(
-                      flex: 2,
-                      child: ElevatedButton.icon(
-                        onPressed: () => _shareInvoice(
-                          context,
-                          landlordName,
-                          landlordPhone,
-                          landlordUpi,
+                    ] else ...[
+                      // Paid: Save Invoice PDF (secondary)
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => _savePdf(
+                            context,
+                            ref,
+                            landlordName,
+                            landlordPhone,
+                            landlordUpi,
+                          ),
+                          child: const Text('Save'),
                         ),
-                        icon: const Icon(Icons.share),
-                        label: const Text('Share'),
                       ),
-                    ),
+                      const SizedBox(width: 12),
+                      // Paid: Share Invoice (primary)
+                      Expanded(
+                        flex: 1,
+                        child: ElevatedButton.icon(
+                          onPressed: () => _shareInvoice(
+                            context,
+                            landlordName,
+                            landlordPhone,
+                            landlordUpi,
+                          ),
+                          icon: const Icon(Icons.share),
+                          label: const Text('Share'),
+                        ),
+                      ),
+                    ],
                   ],
-                ],
-              ),
+                ),
               // Save PDF link for unpaid bills
               if (bill.canRecordPayment) ...[
                 const SizedBox(height: 8),
                 TextButton(
                   onPressed: () => _savePdf(
                     context,
+                    ref,
                     landlordName,
                     landlordPhone,
                     landlordUpi,
@@ -360,6 +380,9 @@ class _BillDetailContent extends ConsumerWidget {
       case 'edit':
         _editBill(context);
         break;
+      case 'void':
+        _confirmVoid(context, ref);
+        break;
       case 'delete':
         _confirmDeleteBill(context, ref);
         break;
@@ -389,6 +412,7 @@ class _BillDetailContent extends ConsumerWidget {
 
   Future<void> _savePdf(
     BuildContext context,
+    WidgetRef ref,
     String? landlordName,
     String? landlordPhone,
     String? landlordUpi,
@@ -404,11 +428,27 @@ class _BillDetailContent extends ConsumerWidget {
 
       // Copy to Downloads folder
       final downloadsPath = '/storage/emulated/0/Download';
-      final fileName =
-          'Invoice_${bill.billNumber ?? bill.id}_${DateTime.now().millisecondsSinceEpoch}.pdf';
+
+      // Helper to sanitize filenames (same as in service)
+      String sanitize(String name) => name
+          .replaceAll(RegExp(r'[^\w\s\-]'), '')
+          .replaceAll(RegExp(r'\s+'), '_');
+
+      final safePeriod = sanitize(bill.billingPeriod);
+      final safeTenant = sanitize(bill.tenantName ?? 'Tenant');
+      final safeType = sanitize(bill.billType.name);
+      final niceType = safeType.isEmpty
+          ? 'Bill'
+          : '${safeType[0].toUpperCase()}${safeType.substring(1)}';
+
+      final fileName = 'Invoice_${niceType}_${safePeriod}_$safeTenant.pdf';
+
       await file.copy('$downloadsPath/$fileName');
 
       if (context.mounted) {
+        // Mark as SENT on save
+        ref.read(billingRepositoryProvider).markBillAsSent(bill.id);
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Invoice saved to Downloads'),
@@ -431,6 +471,59 @@ class _BillDetailContent extends ConsumerWidget {
       bill: bill,
       landlordName: landlordName ?? 'Landlord',
     );
+  }
+
+  void _confirmVoid(BuildContext context, WidgetRef ref) async {
+    final reasonController = TextEditingController();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Void Bill?'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'This will mark the bill as void. This action cannot be undone.',
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: reasonController,
+              decoration: const InputDecoration(
+                labelText: 'Reason for voiding',
+                hintText: 'e.g., Incorrect amount',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(context, true);
+            },
+            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+            child: const Text('Void Bill'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      final success = await ref
+          .read(billingRepositoryProvider)
+          .voidBill(bill.id, reasonController.text);
+      if (success && context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Bill marked as Void')));
+        ref.invalidate(billByIdProvider(bill.id));
+        ref.invalidate(billingRepositoryProvider);
+      }
+    }
   }
 
   void _confirmDeleteBill(BuildContext context, WidgetRef ref) {
@@ -660,74 +753,42 @@ class _AmountColumn extends StatelessWidget {
 /// Card with quick actions for the bill.
 class _QuickActionsCard extends StatelessWidget {
   final Bill bill;
-  final VoidCallback onViewInvoice;
   final VoidCallback onSendReminder;
   final VoidCallback onShareInvoice;
 
   const _QuickActionsCard({
     required this.bill,
-    required this.onViewInvoice,
     required this.onSendReminder,
     required this.onShareInvoice,
   });
 
   @override
   Widget build(BuildContext context) {
+    if (bill.status == BillStatus.voided) {
+      return const SizedBox.shrink();
+    }
+
+    // If Fully Paid, we usually don't show QuickActions (or just Share Receipt)
+    // Redundancy fix: We already have "Share" in the bottom bar, so hide it here.
     if (bill.isFullyPaid) {
-      // Paid Actions
-      return Row(
-        children: [
-          Expanded(
-            child: OutlinedButton.icon(
-              onPressed: onViewInvoice,
-              icon: const Icon(Icons.receipt_long_outlined),
-              label: const Text('View Invoice'),
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: OutlinedButton.icon(
-              onPressed: onShareInvoice,
-              icon: const Icon(Icons.share_outlined),
-              label: const Text('Share Receipt'),
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-              ),
-            ),
-          ),
-        ],
-      );
+      return const SizedBox.shrink();
     } else {
-      // Unpaid Actions
-      return Row(
-        children: [
-          Expanded(
-            child: OutlinedButton.icon(
-              onPressed: onViewInvoice,
-              icon: const Icon(Icons.receipt_long_outlined),
-              label: const Text('View Invoice'),
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-              ),
-            ),
+      // Unpaid: Only show Reminder if not draft. View Invoice is redundant.
+      if (bill.status == BillStatus.draft) {
+        return const SizedBox.shrink(); // No quick actions for draft (everything is at bottom)
+      }
+      return SizedBox(
+        width: double.infinity,
+        child: FilledButton.icon(
+          onPressed: onSendReminder,
+          icon: const Icon(Icons.notifications_active_outlined),
+          label: const Text('Send Reminder'),
+          style: FilledButton.styleFrom(
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+            padding: const EdgeInsets.symmetric(vertical: 12),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: FilledButton.icon(
-              onPressed: onSendReminder,
-              icon: const Icon(Icons.notifications_active_outlined),
-              label: const Text('Send Reminder'),
-              style: FilledButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-              ),
-            ),
-          ),
-        ],
+        ),
       );
     }
   }

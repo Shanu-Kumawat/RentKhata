@@ -58,7 +58,9 @@ class Bill with _$Bill {
   factory Bill.fromJson(Map<String, dynamic> json) => _$BillFromJson(json);
 
   /// Check if bill is fully paid
-  bool get isFullyPaid => pendingAmount <= 0 || status == BillStatus.paid;
+  bool get isFullyPaid =>
+      status != BillStatus.voided &&
+      (pendingAmount <= 0 || status == BillStatus.paid);
 
   /// Check if bill is overdue
   bool get isOverdue =>

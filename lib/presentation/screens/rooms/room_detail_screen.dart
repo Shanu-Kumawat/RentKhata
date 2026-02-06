@@ -712,29 +712,91 @@ class _BillsSection extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Bills',
-          style: Theme.of(
-            context,
-          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 12),
         billsAsync.when(
-          data: (bills) => bills.isEmpty
-              ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Text(
-                      'No bills yet',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
+          data: (bills) {
+            if (bills.isEmpty) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Text(
+                    'No bills yet',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
-                )
-              : Column(
-                  children: bills.map((bill) => _BillTile(bill: bill)).toList(),
                 ),
+              );
+            }
+
+            // Separating bills logic
+            final activeBills = bills.where((b) {
+              // Active = Unpaid AND Not Void
+              return !b.isFullyPaid && b.status != BillStatus.voided;
+            }).toList();
+
+            final historyBills = bills
+                .where((b) => b.isFullyPaid || b.status == BillStatus.voided)
+                .toList();
+
+            // Sort by date descending (assuming input is sorted, but verify)
+            // If repository sorts them, good. Otherwise sorting here helps.
+            // activeBills.sort(...) // Skip for now, assume repo returns sorting.
+
+            // History limits
+            final recentHistory = historyBills.take(2).toList();
+            final olderHistory = historyBills.skip(2).toList();
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (activeBills.isNotEmpty) ...[
+                  Text(
+                    'Active Bills',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  ...activeBills.map((bill) => _BillTile(bill: bill)),
+                ],
+
+                if (recentHistory.isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  // If no active bills, maybe don't need separate header?
+                  // But "History" is good separator.
+                  Text(
+                    'History',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  ...recentHistory.map((bill) => _BillTile(bill: bill)),
+                ],
+
+                if (olderHistory.isNotEmpty) ...[
+                  Theme(
+                    data: Theme.of(
+                      context,
+                    ).copyWith(dividerColor: Colors.transparent),
+                    child: ExpansionTile(
+                      tilePadding: EdgeInsets.zero,
+                      title: Text(
+                        'View Bill History (${olderHistory.length})',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      children: olderHistory
+                          .map((bill) => _BillTile(bill: bill))
+                          .toList(),
+                    ),
+                  ),
+                ],
+              ],
+            );
+          },
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (e, s) => Text('Error: $e'),
         ),
@@ -756,7 +818,9 @@ class _BillTile extends ConsumerWidget {
     final isOverdue = bill.isOverdue;
 
     // Status colors
-    final statusColor = isPaid
+    final statusColor = bill.status == BillStatus.voided
+        ? Colors.grey
+        : isPaid
         ? AppColors.success
         : isPartial
         ? Colors.orange
@@ -836,13 +900,27 @@ class _BillTile extends ConsumerWidget {
                         formatCurrency(bill.amount),
                         style: theme.textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.w700,
-                          color: isPaid
-                              ? statusColor
-                              : theme.colorScheme.onSurface,
+                          color: bill.status == BillStatus.voided
+                              ? theme.disabledColor
+                              : (isPaid
+                                    ? statusColor
+                                    : theme.colorScheme.onSurface),
+                          decoration: bill.status == BillStatus.voided
+                              ? TextDecoration.lineThrough
+                              : null,
                         ),
                       ),
                       const SizedBox(height: 4),
-                      if (isPartial)
+                      if (bill.status == BillStatus.voided)
+                        Text(
+                          'VOID',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: theme.disabledColor,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.0,
+                          ),
+                        )
+                      else if (isPartial)
                         Text(
                           '${formatCurrency(bill.pendingAmount)} due',
                           style: theme.textTheme.labelMedium?.copyWith(
@@ -866,150 +944,151 @@ class _BillTile extends ConsumerWidget {
             ),
 
             // Action Footer (Two-Tone Effect)
-            Container(
-              color: statusColor.withValues(alpha: 0.08),
-              child: Row(
-                children: [
-                  if (!isPaid) ...[
-                    // Remind Button
-                    Expanded(
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () => _sendReminder(context, ref),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.notifications_active_outlined,
-                                  size: 18,
-                                  color: statusColor,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  'Remind',
-                                  style: theme.textTheme.bodyMedium?.copyWith(
+            if (bill.status != BillStatus.voided)
+              Container(
+                color: statusColor.withValues(alpha: 0.08),
+                child: Row(
+                  children: [
+                    if (!isPaid && bill.status != BillStatus.voided) ...[
+                      // Remind Button
+                      Expanded(
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () => _sendReminder(context, ref),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.notifications_active_outlined,
+                                    size: 18,
                                     color: statusColor,
-                                    fontWeight: FontWeight.w600,
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Remind',
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      color: statusColor,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    // Divider
-                    Container(
-                      height: 24,
-                      width: 1,
-                      color: statusColor.withValues(alpha: 0.2),
-                    ),
-                    // Pay Button
-                    Expanded(
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () => _viewBillDetails(context),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.payment,
-                                  size: 18,
-                                  color: statusColor,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  'Pay Now',
-                                  style: theme.textTheme.bodyMedium?.copyWith(
+                      // Divider
+                      Container(
+                        height: 24,
+                        width: 1,
+                        color: statusColor.withValues(alpha: 0.2),
+                      ),
+                      // Pay Button
+                      Expanded(
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () => _viewBillDetails(context),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.payment,
+                                    size: 18,
                                     color: statusColor,
-                                    fontWeight: FontWeight.w600,
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Pay Now',
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      color: statusColor,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ] else ...[
-                    // View Button
-                    Expanded(
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () => _viewBillDetails(context),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.receipt_long_outlined,
-                                  size: 18,
-                                  color: theme.colorScheme.onSurfaceVariant,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  'View',
-                                  style: theme.textTheme.bodyMedium?.copyWith(
+                    ] else ...[
+                      // View Button
+                      Expanded(
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () => _viewBillDetails(context),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.receipt_long_outlined,
+                                    size: 18,
                                     color: theme.colorScheme.onSurfaceVariant,
-                                    fontWeight: FontWeight.w600,
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'View',
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      color: theme.colorScheme.onSurfaceVariant,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    // Divider
-                    Container(
-                      height: 24,
-                      width: 1,
-                      color: theme.colorScheme.onSurfaceVariant.withValues(
-                        alpha: 0.2,
+                      // Divider
+                      Container(
+                        height: 24,
+                        width: 1,
+                        color: theme.colorScheme.onSurfaceVariant.withValues(
+                          alpha: 0.2,
+                        ),
                       ),
-                    ),
-                    // Share Button
-                    Expanded(
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () => _shareInvoice(context, ref),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.share_outlined,
-                                  size: 18,
-                                  color: theme.colorScheme.onSurfaceVariant,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  'Share',
-                                  style: theme.textTheme.bodyMedium?.copyWith(
+                      // Share Button
+                      Expanded(
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () => _shareInvoice(context, ref),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.share_outlined,
+                                    size: 18,
                                     color: theme.colorScheme.onSurfaceVariant,
-                                    fontWeight: FontWeight.w600,
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Share',
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      color: theme.colorScheme.onSurfaceVariant,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
+                    ],
                   ],
-                ],
+                ),
               ),
-            ),
           ],
         ),
       ),

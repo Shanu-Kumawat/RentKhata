@@ -1088,8 +1088,9 @@ class _PremiumBillCard extends ConsumerWidget {
           ? 'Payment received! Receipt for $period - ${formatCurrency(bill.paidAmount)}. Thank you!'
           : 'Rent Due: $amount for $period. Room ${bill.roomNumber ?? ""}. Please pay at your earliest convenience.';
 
-      final success = await shareService.shareToWhatsApp(message: message);
-      if (!success && context.mounted) {
+      await shareService.shareText(text: message);
+      // We don't get success check from native share, assuming triggered
+      if (context.mounted) {
         Clipboard.setData(ClipboardData(text: message));
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Message copied to clipboard!')),

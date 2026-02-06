@@ -1,7 +1,6 @@
 /// Share service for WhatsApp and other sharing.
 library;
 
-import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
 import 'dart:io';
 import '../domain/entities/bill.dart';
@@ -16,47 +15,6 @@ class ShareService {
   final BillingRepository? _repository;
 
   ShareService([this._repository]);
-
-  /// Share text message to WhatsApp.
-  /// If [phoneNumber] is provided, opens chat with that number.
-  /// Otherwise opens WhatsApp to let user select a contact.
-  Future<bool> shareToWhatsApp({
-    required String message,
-    String? phoneNumber,
-  }) async {
-    // Format phone number (remove spaces, ensure country code)
-    String? formattedPhone;
-    if (phoneNumber != null && phoneNumber.isNotEmpty) {
-      formattedPhone = phoneNumber.replaceAll(RegExp(r'[^0-9+]'), '');
-      // Add India country code if not present
-      if (!formattedPhone.startsWith('+')) {
-        if (formattedPhone.startsWith('0')) {
-          formattedPhone = '+91${formattedPhone.substring(1)}';
-        } else if (formattedPhone.length == 10) {
-          formattedPhone = '+91$formattedPhone';
-        }
-      }
-    }
-
-    // Encode message for URL
-    final encodedMessage = Uri.encodeComponent(message);
-
-    // Build WhatsApp URL
-    Uri uri;
-    if (formattedPhone != null) {
-      uri = Uri.parse(
-        'whatsapp://send?phone=$formattedPhone&text=$encodedMessage',
-      );
-    } else {
-      uri = Uri.parse('whatsapp://send?text=$encodedMessage');
-    }
-
-    // Try to launch WhatsApp
-    if (await canLaunchUrl(uri)) {
-      return await launchUrl(uri);
-    }
-    return false;
-  }
 
   /// Share bill reminder, optionally with meter photo.
   Future<void> shareBillReminder({
@@ -86,19 +44,11 @@ class ShareService {
       }
     }
 
-    // Fallback to text-only WhatsApp share
-    final whatsappSuccess = await shareToWhatsApp(
-      message: message,
-      phoneNumber: tenantPhone,
+    // Share via system share sheet
+    await shareText(
+      text: message,
+      subject: 'Bill Reminder - ${bill.billingPeriod}',
     );
-
-    // If WhatsApp fails/not installed, fallback to native text share
-    if (!whatsappSuccess) {
-      await shareText(
-        text: message,
-        subject: 'Bill Reminder - ${bill.billingPeriod}',
-      );
-    }
   }
 
   /// Share files with optional text.
@@ -114,35 +64,6 @@ class ShareService {
   /// Share text only.
   Future<void> shareText({required String text, String? subject}) async {
     await Share.share(text, subject: subject);
-  }
-
-  /// Share invoice to WhatsApp with optional UPI link.
-  Future<bool> shareInvoiceToWhatsApp({
-    required Bill bill,
-    required String landlordName,
-    String? landlordUpi,
-    String? tenantPhone,
-  }) async {
-    final message = generateInvoiceMessage(
-      bill: bill,
-      landlordName: landlordName,
-      landlordUpi: landlordUpi,
-    );
-
-    // If meter photo exists, share it with text using native share (as WhatsApp API doesn't support file + text easily)
-    if (bill.meterPhotoPath != null && bill.meterPhotoPath!.isNotEmpty) {
-      final file = File(bill.meterPhotoPath!);
-      if (await file.exists()) {
-        await shareFiles(
-          files: [file],
-          text: message,
-          subject: 'Invoice - ${bill.billNumber ?? bill.billingPeriod}',
-        );
-        return true;
-      }
-    }
-
-    return shareToWhatsApp(message: message, phoneNumber: tenantPhone);
   }
 
   /// Share invoice using native share dialog.
@@ -201,22 +122,6 @@ class ShareService {
       message,
       subject: 'Invoice - ${bill.billNumber ?? bill.billingPeriod}',
     );
-  }
-
-  /// Share payment receipt to WhatsApp.
-  Future<bool> shareReceiptToWhatsApp({
-    required Bill bill,
-    required Payment payment,
-    required String landlordName,
-    String? tenantPhone,
-  }) async {
-    final message = generateReceiptMessage(
-      bill: bill,
-      payment: payment,
-      landlordName: landlordName,
-    );
-
-    return shareToWhatsApp(message: message, phoneNumber: tenantPhone);
   }
 
   /// Share payment receipt using native share dialog.

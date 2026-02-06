@@ -12,6 +12,13 @@ import '../domain/entities/bill.dart';
 import '../domain/entities/payment.dart';
 import 'upi_qr_service.dart';
 
+/// Helper to sanitize filenames
+String _sanitizeFilename(String name) {
+  return name
+      .replaceAll(RegExp(r'[^\w\s\-]'), '')
+      .replaceAll(RegExp(r'\s+'), '_');
+}
+
 /// Service for generating PDF invoices and receipts.
 class InvoicePdfService {
   // ... existing methods
@@ -88,14 +95,16 @@ class InvoicePdfService {
         pageFormat: PdfPageFormat.a4,
         theme: theme,
         build: (pw.Context context) {
-          return pw.Column(
+          final content = pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
               // 1. BRAND HEADER
-              pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: pw.CrossAxisAlignment.start,
-                children: [
+              pw.SizedBox(
+                width: double.infinity,
+                child: pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
                   pw.Column(
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: [
@@ -145,6 +154,7 @@ class InvoicePdfService {
                     ],
                   ),
                 ],
+              ),
               ),
               pw.SizedBox(height: 40),
 
@@ -720,6 +730,83 @@ class InvoicePdfService {
               ),
             ],
           );
+
+          // Watermark Logic
+          if (bill.status == BillStatus.draft) {
+            return pw.Stack(
+              children: [
+                pw.Center(
+                  child: pw.Transform.rotate(
+                    angle: -0.5,
+                    child: pw.Text(
+                      'DRAFT',
+                      style: pw.TextStyle(
+                        fontSize: 100,
+                        fontWeight: pw.FontWeight.bold,
+                        color: PdfColors.grey300,
+                      ),
+                    ),
+                  ),
+                ),
+                content,
+              ],
+            );
+          } else if (bill.status == BillStatus.voided) {
+            return pw.Stack(
+              children: [
+                pw.Center(
+                  child: pw.Transform.rotate(
+                    angle: -0.5,
+                    child: pw.Text(
+                      'VOID',
+                      style: pw.TextStyle(
+                        fontSize: 100,
+                        fontWeight: pw.FontWeight.bold,
+                        color: PdfColors.red100,
+                      ),
+                    ),
+                  ),
+                ),
+                content,
+              ],
+            );
+          } else if (bill.status == BillStatus.paid) {
+            return pw.Stack(
+              children: [
+                content,
+                pw.Positioned(
+                  bottom: 150,
+                  right: 50,
+                  child: pw.Transform.rotate(
+                    angle: -0.2,
+                    child: pw.Container(
+                      padding: const pw.EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
+                      decoration: pw.BoxDecoration(
+                        border: pw.Border.all(
+                          color: PdfColors.green800,
+                          width: 4,
+                        ),
+                        borderRadius: pw.BorderRadius.circular(10),
+                      ),
+                      child: pw.Text(
+                        'PAID',
+                        style: pw.TextStyle(
+                          fontSize: 50,
+                          fontWeight: pw.FontWeight.bold,
+                          color: PdfColors.green800,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          }
+
+          return content;
         },
       ),
     );
@@ -786,7 +873,21 @@ class InvoicePdfService {
       }
     }
 
-    return _savePdf(pdf, 'invoice_${bill.id}');
+    // Generate smart filename: Invoice_Rent_Sep2023_JohnDoe.pdf
+    final safePeriod = _sanitizeFilename(bill.billingPeriod);
+    final safeTenant = _sanitizeFilename(bill.tenantName ?? 'Tenant');
+    final safeType = _sanitizeFilename(
+      bill.billType.name,
+    ); // e.g., 'rent', 'electricity'
+
+    // Capitalize first letter of bill type for nicer filename
+    final niceType = safeType.isEmpty
+        ? 'Bill'
+        : '${safeType[0].toUpperCase()}${safeType.substring(1)}';
+
+    final filename = 'Invoice_${niceType}_${safePeriod}_$safeTenant';
+
+    return _savePdf(pdf, filename);
   }
 
   pw.Widget _buildInfoRow(String label, String value, {bool isBold = false}) {

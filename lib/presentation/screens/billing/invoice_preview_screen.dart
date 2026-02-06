@@ -102,6 +102,7 @@ class InvoicePreviewScreen extends ConsumerWidget {
       landlordName: landlordName ?? 'Landlord',
       landlordUpi: landlordUpi,
     );
+    await ref.read(billingRepositoryProvider).markBillAsSent(bill.id);
   }
 
   Future<void> _previewPdf(BuildContext context, WidgetRef ref) async {
@@ -131,12 +132,24 @@ class InvoicePreviewScreen extends ConsumerWidget {
 
   Future<void> _shareAsPdf(BuildContext context, WidgetRef ref) async {
     try {
+      // 1. If Draft, Mark as Sent FIRST so the PDF doesn't have "DRAFT" watermark
+      var billToUse = bill;
+      if (bill.status == BillStatus.draft) {
+        await ref.read(billingRepositoryProvider).markBillAsSent(bill.id);
+        // Refresh bill to get updated status
+        ref.invalidate(billByIdProvider(bill.id));
+        final updatedBill = await ref.read(billByIdProvider(bill.id).future);
+        if (updatedBill != null) {
+          billToUse = updatedBill;
+        }
+      }
+
       final payments = await ref.read(paymentsForBillProvider(bill.id).future);
       final landlord = await ref.read(landlordProvider.future);
 
       final pdfService = InvoicePdfService();
       final file = await pdfService.generateInvoice(
-        bill: bill,
+        bill: billToUse,
         landlordName: landlordName ?? 'Landlord',
         landlordPhone: landlordPhone ?? '',
         landlordUpiId: landlordUpi,
@@ -147,8 +160,14 @@ class InvoicePreviewScreen extends ConsumerWidget {
       final shareService = ShareService();
       await shareService.shareFiles(
         files: [file],
-        subject: 'Invoice ${bill.billNumber ?? ""}',
+        subject: 'Invoice ${billToUse.billNumber ?? ""}',
       );
+      // Status is already updated if it was draft.
+      // If it wasn't draft (e.g. Sent -> Sent), we don't strictly need to update again,
+      // but marking as sent again is harmless idempotent op usually.
+      if (bill.status != BillStatus.draft) {
+        await ref.read(billingRepositoryProvider).markBillAsSent(bill.id);
+      }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(

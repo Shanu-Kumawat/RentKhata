@@ -52,6 +52,12 @@ abstract class BillingRepository {
   /// Delete a bill
   Future<bool> deleteBill(int id);
 
+  /// Mark bill as sent (Draft -> Sent)
+  Future<bool> markBillAsSent(int id);
+
+  /// Void a bill
+  Future<bool> voidBill(int id, String reason);
+
   // ========== Payment Operations ==========
 
   /// Get payments for a bill
