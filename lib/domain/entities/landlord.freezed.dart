@@ -26,7 +26,6 @@ mixin _$Landlord {
   String? get upiId => throw _privateConstructorUsedError;
   String? get phone => throw _privateConstructorUsedError;
   String? get photoPath => throw _privateConstructorUsedError;
-  String? get signaturePath => throw _privateConstructorUsedError;
   DateTime get createdAt => throw _privateConstructorUsedError;
   DateTime get updatedAt => throw _privateConstructorUsedError;
 
@@ -51,7 +50,6 @@ abstract class $LandlordCopyWith<$Res> {
     String? upiId,
     String? phone,
     String? photoPath,
-    String? signaturePath,
     DateTime createdAt,
     DateTime updatedAt,
   });
@@ -77,7 +75,6 @@ class _$LandlordCopyWithImpl<$Res, $Val extends Landlord>
     Object? upiId = freezed,
     Object? phone = freezed,
     Object? photoPath = freezed,
-    Object? signaturePath = freezed,
     Object? createdAt = null,
     Object? updatedAt = null,
   }) {
@@ -102,10 +99,6 @@ class _$LandlordCopyWithImpl<$Res, $Val extends Landlord>
             photoPath: freezed == photoPath
                 ? _value.photoPath
                 : photoPath // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            signaturePath: freezed == signaturePath
-                ? _value.signaturePath
-                : signaturePath // ignore: cast_nullable_to_non_nullable
                       as String?,
             createdAt: null == createdAt
                 ? _value.createdAt
@@ -136,7 +129,6 @@ abstract class _$$LandlordImplCopyWith<$Res>
     String? upiId,
     String? phone,
     String? photoPath,
-    String? signaturePath,
     DateTime createdAt,
     DateTime updatedAt,
   });
@@ -161,7 +153,6 @@ class __$$LandlordImplCopyWithImpl<$Res>
     Object? upiId = freezed,
     Object? phone = freezed,
     Object? photoPath = freezed,
-    Object? signaturePath = freezed,
     Object? createdAt = null,
     Object? updatedAt = null,
   }) {
@@ -187,10 +178,6 @@ class __$$LandlordImplCopyWithImpl<$Res>
             ? _value.photoPath
             : photoPath // ignore: cast_nullable_to_non_nullable
                   as String?,
-        signaturePath: freezed == signaturePath
-            ? _value.signaturePath
-            : signaturePath // ignore: cast_nullable_to_non_nullable
-                  as String?,
         createdAt: null == createdAt
             ? _value.createdAt
             : createdAt // ignore: cast_nullable_to_non_nullable
@@ -213,7 +200,6 @@ class _$LandlordImpl implements _Landlord {
     this.upiId,
     this.phone,
     this.photoPath,
-    this.signaturePath,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -232,15 +218,13 @@ class _$LandlordImpl implements _Landlord {
   @override
   final String? photoPath;
   @override
-  final String? signaturePath;
-  @override
   final DateTime createdAt;
   @override
   final DateTime updatedAt;
 
   @override
   String toString() {
-    return 'Landlord(id: $id, name: $name, upiId: $upiId, phone: $phone, photoPath: $photoPath, signaturePath: $signaturePath, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'Landlord(id: $id, name: $name, upiId: $upiId, phone: $phone, photoPath: $photoPath, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -254,8 +238,6 @@ class _$LandlordImpl implements _Landlord {
             (identical(other.phone, phone) || other.phone == phone) &&
             (identical(other.photoPath, photoPath) ||
                 other.photoPath == photoPath) &&
-            (identical(other.signaturePath, signaturePath) ||
-                other.signaturePath == signaturePath) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
@@ -271,7 +253,6 @@ class _$LandlordImpl implements _Landlord {
     upiId,
     phone,
     photoPath,
-    signaturePath,
     createdAt,
     updatedAt,
   );
@@ -297,7 +278,6 @@ abstract class _Landlord implements Landlord {
     final String? upiId,
     final String? phone,
     final String? photoPath,
-    final String? signaturePath,
     required final DateTime createdAt,
     required final DateTime updatedAt,
   }) = _$LandlordImpl;
@@ -315,8 +295,6 @@ abstract class _Landlord implements Landlord {
   String? get phone;
   @override
   String? get photoPath;
-  @override
-  String? get signaturePath;
   @override
   DateTime get createdAt;
   @override

@@ -20,7 +20,6 @@ abstract class LandlordRepository {
     String? upiId,
     String? phone,
     String? photoPath,
-    String? signaturePath,
   });
 
   /// Update the landlord profile

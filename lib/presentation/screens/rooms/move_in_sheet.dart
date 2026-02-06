@@ -287,12 +287,14 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
 
   Future<bool?> _showPartialFillDialog() {
     final missingFields = <String>[];
-    if (_newFatherNameController.text.isEmpty)
+    if (_newFatherNameController.text.isEmpty) {
       missingFields.add('Father\'s Name');
+    }
     if (_newPhoneController.text.isEmpty) missingFields.add('Phone Number');
     if (_newAadharController.text.isEmpty) missingFields.add('Aadhaar Number');
-    if (_addressLineController.text.isEmpty)
+    if (_addressLineController.text.isEmpty) {
       missingFields.add('Permanent Address');
+    }
     if (_cityController.text.isEmpty) missingFields.add('City');
     if (_aadhaarFrontPath == null) missingFields.add('Aadhaar Front Photo');
     if (_aadhaarBackPath == null) missingFields.add('Aadhaar Back Photo');

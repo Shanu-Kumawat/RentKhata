@@ -15,7 +15,6 @@ class Landlord with _$Landlord {
     String? upiId,
     String? phone,
     String? photoPath,
-    String? signaturePath,
     required DateTime createdAt,
     required DateTime updatedAt,
   }) = _Landlord;

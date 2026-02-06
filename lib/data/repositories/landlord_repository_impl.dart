@@ -21,7 +21,6 @@ class LandlordRepositoryImpl implements LandlordRepository {
       upiId: entity.upiId,
       phone: entity.phone,
       photoPath: entity.photoPath,
-      signaturePath: entity.signaturePath,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     );
@@ -51,14 +50,12 @@ class LandlordRepositoryImpl implements LandlordRepository {
     String? upiId,
     String? phone,
     String? photoPath,
-    String? signaturePath,
   }) async {
     final landlord = LandlordsCompanion(
       name: Value(name),
       upiId: Value(upiId),
       phone: Value(phone),
       photoPath: Value(photoPath),
-      signaturePath: Value(signaturePath),
       updatedAt: Value(DateTime.now()),
     );
     return _landlordDao.upsertLandlord(landlord);
@@ -72,7 +69,6 @@ class LandlordRepositoryImpl implements LandlordRepository {
       upiId: landlord.upiId,
       phone: landlord.phone,
       photoPath: landlord.photoPath,
-      signaturePath: landlord.signaturePath,
       createdAt: landlord.createdAt,
       updatedAt: DateTime.now(),
     );

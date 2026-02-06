@@ -534,10 +534,11 @@ class _NotificationSettingsScreenState
         payload: 'test',
       );
     } catch (e) {
-      if (mounted)
+      if (mounted) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
     }
   }
 }
@@ -552,7 +553,7 @@ extension on NotificationSettingsState {
     int? quietHoursEnd,
   }) {
     // Use the existing copyWith but handle nulls manually if needed
-    return this.copyWith(
+    return copyWith(
       enabledSettings: enabledSettings ?? this.enabledSettings,
       daysBeforeSettings: daysBeforeSettings ?? this.daysBeforeSettings,
       notificationHour: notificationHour ?? this.notificationHour,

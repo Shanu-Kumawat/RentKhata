@@ -165,7 +165,9 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
                   height: 4,
                   margin: const EdgeInsets.only(bottom: 20),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.onSurfaceVariant.withOpacity(0.4),
+                    color: theme.colorScheme.onSurfaceVariant.withValues(
+                      alpha: 0.4,
+                    ),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -195,8 +197,9 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
                     vertical: 8,
                   ),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainerHighest
-                        .withOpacity(0.5),
+                    color: theme.colorScheme.surfaceContainerHighest.withValues(
+                      alpha: 0.5,
+                    ),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -259,13 +262,17 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
                           prefixText: '₹',
                           prefixStyle: theme.textTheme.displayMedium?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: theme.colorScheme.primary.withOpacity(0.7),
+                            color: theme.colorScheme.primary.withValues(
+                              alpha: 0.7,
+                            ),
                           ),
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.zero,
                           hintText: '0',
                           hintStyle: theme.textTheme.displayMedium?.copyWith(
-                            color: theme.colorScheme.onSurface.withOpacity(0.2),
+                            color: theme.colorScheme.onSurface.withValues(
+                              alpha: 0.2,
+                            ),
                           ),
                         ),
                         validator: (v) => validatePositiveNumber(v, 'Amount'),
