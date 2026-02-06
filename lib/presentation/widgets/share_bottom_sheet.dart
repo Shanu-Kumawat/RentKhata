@@ -103,7 +103,7 @@ class ShareBottomSheet extends StatelessWidget {
             _ShareOption(
               icon: Icons.message_outlined,
               title: 'Send as Message',
-              subtitle: 'Quick text message with payment details',
+              subtitle: 'Quick text with details',
               isRecommended: true,
               onTap: onShareAsMessage,
             ),
@@ -113,7 +113,7 @@ class ShareBottomSheet extends StatelessWidget {
             _ShareOption(
               icon: Icons.picture_as_pdf_outlined,
               title: 'Share PDF',
-              subtitle: 'Formal document for records',
+              subtitle: 'Formal document',
               isRecommended: false,
               onTap: onShareAsPdf,
             ),
@@ -145,16 +145,14 @@ class _ShareOption extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Card(
-      elevation: isRecommended ? 2 : 0,
+      elevation: 0,
       color: isRecommended
           ? theme.colorScheme.primary.withValues(alpha: 0.05)
           : null,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(
-          color: isRecommended
-              ? theme.colorScheme.primary.withValues(alpha: 0.3)
-              : Colors.grey.shade300,
+          color: theme.colorScheme.primary.withValues(alpha: 0.3),
         ),
       ),
       child: InkWell(
