@@ -65,7 +65,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 9;
+  int get schemaVersion => 10;
 
   @override
   MigrationStrategy get migration {
@@ -351,6 +351,10 @@ Thank you for your payment.
             ALTER TABLE notification_settings 
             ADD COLUMN notification_hour INTEGER NOT NULL DEFAULT 9
           ''');
+        }
+        if (from < 10) {
+          // Add signature_path to landlords table
+          await m.addColumn(landlords, landlords.signaturePath);
         }
       },
     );

@@ -64,6 +64,17 @@ class $LandlordsTable extends Landlords
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _signaturePathMeta = const VerificationMeta(
+    'signaturePath',
+  );
+  @override
+  late final GeneratedColumn<String> signaturePath = GeneratedColumn<String>(
+    'signature_path',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -95,6 +106,7 @@ class $LandlordsTable extends Landlords
     upiId,
     phone,
     photoPath,
+    signaturePath,
     createdAt,
     updatedAt,
   ];
@@ -139,6 +151,15 @@ class $LandlordsTable extends Landlords
         photoPath.isAcceptableOrUnknown(data['photo_path']!, _photoPathMeta),
       );
     }
+    if (data.containsKey('signature_path')) {
+      context.handle(
+        _signaturePathMeta,
+        signaturePath.isAcceptableOrUnknown(
+          data['signature_path']!,
+          _signaturePathMeta,
+        ),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -180,6 +201,10 @@ class $LandlordsTable extends Landlords
         DriftSqlType.string,
         data['${effectivePrefix}photo_path'],
       ),
+      signaturePath: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}signature_path'],
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -213,6 +238,9 @@ class LandlordEntity extends DataClass implements Insertable<LandlordEntity> {
   /// Profile photo path
   final String? photoPath;
 
+  /// Signature image path
+  final String? signaturePath;
+
   /// Created timestamp
   final DateTime createdAt;
 
@@ -224,6 +252,7 @@ class LandlordEntity extends DataClass implements Insertable<LandlordEntity> {
     this.upiId,
     this.phone,
     this.photoPath,
+    this.signaturePath,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -240,6 +269,9 @@ class LandlordEntity extends DataClass implements Insertable<LandlordEntity> {
     }
     if (!nullToAbsent || photoPath != null) {
       map['photo_path'] = Variable<String>(photoPath);
+    }
+    if (!nullToAbsent || signaturePath != null) {
+      map['signature_path'] = Variable<String>(signaturePath);
     }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
@@ -259,6 +291,9 @@ class LandlordEntity extends DataClass implements Insertable<LandlordEntity> {
       photoPath: photoPath == null && nullToAbsent
           ? const Value.absent()
           : Value(photoPath),
+      signaturePath: signaturePath == null && nullToAbsent
+          ? const Value.absent()
+          : Value(signaturePath),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
     );
@@ -275,6 +310,7 @@ class LandlordEntity extends DataClass implements Insertable<LandlordEntity> {
       upiId: serializer.fromJson<String?>(json['upiId']),
       phone: serializer.fromJson<String?>(json['phone']),
       photoPath: serializer.fromJson<String?>(json['photoPath']),
+      signaturePath: serializer.fromJson<String?>(json['signaturePath']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
@@ -288,6 +324,7 @@ class LandlordEntity extends DataClass implements Insertable<LandlordEntity> {
       'upiId': serializer.toJson<String?>(upiId),
       'phone': serializer.toJson<String?>(phone),
       'photoPath': serializer.toJson<String?>(photoPath),
+      'signaturePath': serializer.toJson<String?>(signaturePath),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
@@ -299,6 +336,7 @@ class LandlordEntity extends DataClass implements Insertable<LandlordEntity> {
     Value<String?> upiId = const Value.absent(),
     Value<String?> phone = const Value.absent(),
     Value<String?> photoPath = const Value.absent(),
+    Value<String?> signaturePath = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
   }) => LandlordEntity(
@@ -307,6 +345,9 @@ class LandlordEntity extends DataClass implements Insertable<LandlordEntity> {
     upiId: upiId.present ? upiId.value : this.upiId,
     phone: phone.present ? phone.value : this.phone,
     photoPath: photoPath.present ? photoPath.value : this.photoPath,
+    signaturePath: signaturePath.present
+        ? signaturePath.value
+        : this.signaturePath,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
   );
@@ -317,6 +358,9 @@ class LandlordEntity extends DataClass implements Insertable<LandlordEntity> {
       upiId: data.upiId.present ? data.upiId.value : this.upiId,
       phone: data.phone.present ? data.phone.value : this.phone,
       photoPath: data.photoPath.present ? data.photoPath.value : this.photoPath,
+      signaturePath: data.signaturePath.present
+          ? data.signaturePath.value
+          : this.signaturePath,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
@@ -330,6 +374,7 @@ class LandlordEntity extends DataClass implements Insertable<LandlordEntity> {
           ..write('upiId: $upiId, ')
           ..write('phone: $phone, ')
           ..write('photoPath: $photoPath, ')
+          ..write('signaturePath: $signaturePath, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -337,8 +382,16 @@ class LandlordEntity extends DataClass implements Insertable<LandlordEntity> {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, name, upiId, phone, photoPath, createdAt, updatedAt);
+  int get hashCode => Object.hash(
+    id,
+    name,
+    upiId,
+    phone,
+    photoPath,
+    signaturePath,
+    createdAt,
+    updatedAt,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -348,6 +401,7 @@ class LandlordEntity extends DataClass implements Insertable<LandlordEntity> {
           other.upiId == this.upiId &&
           other.phone == this.phone &&
           other.photoPath == this.photoPath &&
+          other.signaturePath == this.signaturePath &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
 }
@@ -358,6 +412,7 @@ class LandlordsCompanion extends UpdateCompanion<LandlordEntity> {
   final Value<String?> upiId;
   final Value<String?> phone;
   final Value<String?> photoPath;
+  final Value<String?> signaturePath;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   const LandlordsCompanion({
@@ -366,6 +421,7 @@ class LandlordsCompanion extends UpdateCompanion<LandlordEntity> {
     this.upiId = const Value.absent(),
     this.phone = const Value.absent(),
     this.photoPath = const Value.absent(),
+    this.signaturePath = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
   });
@@ -375,6 +431,7 @@ class LandlordsCompanion extends UpdateCompanion<LandlordEntity> {
     this.upiId = const Value.absent(),
     this.phone = const Value.absent(),
     this.photoPath = const Value.absent(),
+    this.signaturePath = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
   }) : name = Value(name);
@@ -384,6 +441,7 @@ class LandlordsCompanion extends UpdateCompanion<LandlordEntity> {
     Expression<String>? upiId,
     Expression<String>? phone,
     Expression<String>? photoPath,
+    Expression<String>? signaturePath,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
   }) {
@@ -393,6 +451,7 @@ class LandlordsCompanion extends UpdateCompanion<LandlordEntity> {
       if (upiId != null) 'upi_id': upiId,
       if (phone != null) 'phone': phone,
       if (photoPath != null) 'photo_path': photoPath,
+      if (signaturePath != null) 'signature_path': signaturePath,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
     });
@@ -404,6 +463,7 @@ class LandlordsCompanion extends UpdateCompanion<LandlordEntity> {
     Value<String?>? upiId,
     Value<String?>? phone,
     Value<String?>? photoPath,
+    Value<String?>? signaturePath,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
   }) {
@@ -413,6 +473,7 @@ class LandlordsCompanion extends UpdateCompanion<LandlordEntity> {
       upiId: upiId ?? this.upiId,
       phone: phone ?? this.phone,
       photoPath: photoPath ?? this.photoPath,
+      signaturePath: signaturePath ?? this.signaturePath,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -436,6 +497,9 @@ class LandlordsCompanion extends UpdateCompanion<LandlordEntity> {
     if (photoPath.present) {
       map['photo_path'] = Variable<String>(photoPath.value);
     }
+    if (signaturePath.present) {
+      map['signature_path'] = Variable<String>(signaturePath.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -453,6 +517,7 @@ class LandlordsCompanion extends UpdateCompanion<LandlordEntity> {
           ..write('upiId: $upiId, ')
           ..write('phone: $phone, ')
           ..write('photoPath: $photoPath, ')
+          ..write('signaturePath: $signaturePath, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -10425,6 +10490,7 @@ typedef $$LandlordsTableCreateCompanionBuilder =
       Value<String?> upiId,
       Value<String?> phone,
       Value<String?> photoPath,
+      Value<String?> signaturePath,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
     });
@@ -10435,6 +10501,7 @@ typedef $$LandlordsTableUpdateCompanionBuilder =
       Value<String?> upiId,
       Value<String?> phone,
       Value<String?> photoPath,
+      Value<String?> signaturePath,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
     });
@@ -10470,6 +10537,11 @@ class $$LandlordsTableFilterComposer
 
   ColumnFilters<String> get photoPath => $composableBuilder(
     column: $table.photoPath,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get signaturePath => $composableBuilder(
+    column: $table.signaturePath,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -10518,6 +10590,11 @@ class $$LandlordsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get signaturePath => $composableBuilder(
+    column: $table.signaturePath,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -10552,6 +10629,11 @@ class $$LandlordsTableAnnotationComposer
 
   GeneratedColumn<String> get photoPath =>
       $composableBuilder(column: $table.photoPath, builder: (column) => column);
+
+  GeneratedColumn<String> get signaturePath => $composableBuilder(
+    column: $table.signaturePath,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -10596,6 +10678,7 @@ class $$LandlordsTableTableManager
                 Value<String?> upiId = const Value.absent(),
                 Value<String?> phone = const Value.absent(),
                 Value<String?> photoPath = const Value.absent(),
+                Value<String?> signaturePath = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
               }) => LandlordsCompanion(
@@ -10604,6 +10687,7 @@ class $$LandlordsTableTableManager
                 upiId: upiId,
                 phone: phone,
                 photoPath: photoPath,
+                signaturePath: signaturePath,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
               ),
@@ -10614,6 +10698,7 @@ class $$LandlordsTableTableManager
                 Value<String?> upiId = const Value.absent(),
                 Value<String?> phone = const Value.absent(),
                 Value<String?> photoPath = const Value.absent(),
+                Value<String?> signaturePath = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
               }) => LandlordsCompanion.insert(
@@ -10622,6 +10707,7 @@ class $$LandlordsTableTableManager
                 upiId: upiId,
                 phone: phone,
                 photoPath: photoPath,
+                signaturePath: signaturePath,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
               ),

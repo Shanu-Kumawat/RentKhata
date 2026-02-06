@@ -24,6 +24,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   final _phoneController = TextEditingController();
   final _upiController = TextEditingController();
   String? _photoPath;
+  String? _signaturePath;
   bool _isLoading = false;
   bool _initialized = false;
 
@@ -41,6 +42,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       _phoneController.text = landlord.phone ?? '';
       _upiController.text = landlord.upiId ?? '';
       _photoPath = landlord.photoPath;
+      _signaturePath = landlord.signaturePath;
       _initialized = true;
     }
   }
@@ -65,6 +67,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 ? null
                 : _upiController.text.trim(),
             photoPath: _photoPath,
+            signaturePath: _signaturePath,
           ),
         );
       }
@@ -163,6 +166,86 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   'Your UPI ID is used to generate QR codes for rent collection.',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 32),
+
+                // Signature Section
+                Text(
+                  'Digital Signature',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surfaceContainer,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.outlineVariant,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Identify Verification',
+                                  style: Theme.of(context).textTheme.bodyMedium
+                                      ?.copyWith(fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'Upload a transparent PNG of your signature to display on invoices.',
+                                  style: Theme.of(context).textTheme.bodySmall
+                                      ?.copyWith(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurfaceVariant,
+                                      ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Center(
+                        child: ImagePickerWidget(
+                          initialImagePath: _signaturePath,
+                          placeholderIcon: Icons.draw_outlined,
+                          size:
+                              100, // Rectangular aspect ratio handling inside widget? No, widget is circular/square.
+                          // We might want to customize the widget or wrap it effectively.
+                          // For now, re-using standard picker but will add note.
+                          onImageSelected: (path) =>
+                              setState(() => _signaturePath = path),
+                        ),
+                      ),
+                      if (_signaturePath != null) ...[
+                        const SizedBox(height: 8),
+                        Center(
+                          child: TextButton.icon(
+                            onPressed: () =>
+                                setState(() => _signaturePath = null),
+                            icon: const Icon(Icons.delete_outline, size: 16),
+                            label: const Text('Remove Signature'),
+                            style: TextButton.styleFrom(
+                              foregroundColor: Theme.of(
+                                context,
+                              ).colorScheme.error,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
                 const SizedBox(height: 32),

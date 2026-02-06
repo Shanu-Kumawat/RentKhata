@@ -21,6 +21,9 @@ class Landlords extends Table {
   /// Profile photo path
   TextColumn get photoPath => text().nullable()();
 
+  /// Signature image path
+  TextColumn get signaturePath => text().nullable()();
+
   /// Created timestamp
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 

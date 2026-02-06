@@ -65,6 +65,7 @@ class _BillDetailContent extends ConsumerWidget {
     // Extract landlord info
     final landlord = landlordAsync.valueOrNull;
     final landlordName = landlord?.name;
+    final landlordPhone = landlord?.phone;
     final landlordUpi = landlord?.upiId;
 
     return Scaffold(
@@ -126,11 +127,19 @@ class _BillDetailContent extends ConsumerWidget {
             // Quick Actions
             _QuickActionsCard(
               bill: bill,
-              onViewInvoice: () =>
-                  _viewInvoice(context, landlordName, landlordUpi),
+              onViewInvoice: () => _viewInvoice(
+                context,
+                landlordName,
+                landlordPhone,
+                landlordUpi,
+              ),
               onSendReminder: () => _sendReminder(context, landlordName),
-              onShareInvoice: () =>
-                  _shareInvoice(context, landlordName, landlordUpi),
+              onShareInvoice: () => _shareInvoice(
+                context,
+                landlordName,
+                landlordPhone,
+                landlordUpi,
+              ),
             ),
             const SizedBox(height: 16),
 
@@ -241,8 +250,12 @@ class _BillDetailContent extends ConsumerWidget {
                     // Unpaid/Partial: Share Invoice (secondary)
                     Expanded(
                       child: OutlinedButton(
-                        onPressed: () =>
-                            _shareInvoice(context, landlordName, landlordUpi),
+                        onPressed: () => _shareInvoice(
+                          context,
+                          landlordName,
+                          landlordPhone,
+                          landlordUpi,
+                        ),
                         child: const Text('Share'),
                       ),
                     ),
@@ -262,8 +275,12 @@ class _BillDetailContent extends ConsumerWidget {
                     // Paid: Save Invoice PDF (secondary)
                     Expanded(
                       child: OutlinedButton(
-                        onPressed: () =>
-                            _savePdf(context, landlordName, landlordUpi),
+                        onPressed: () => _savePdf(
+                          context,
+                          landlordName,
+                          landlordPhone,
+                          landlordUpi,
+                        ),
                         child: const Text('Save'),
                       ),
                     ),
@@ -272,8 +289,12 @@ class _BillDetailContent extends ConsumerWidget {
                     Expanded(
                       flex: 2,
                       child: ElevatedButton.icon(
-                        onPressed: () =>
-                            _shareInvoice(context, landlordName, landlordUpi),
+                        onPressed: () => _shareInvoice(
+                          context,
+                          landlordName,
+                          landlordPhone,
+                          landlordUpi,
+                        ),
                         icon: const Icon(Icons.share),
                         label: const Text('Share'),
                       ),
@@ -285,7 +306,12 @@ class _BillDetailContent extends ConsumerWidget {
               if (bill.canRecordPayment) ...[
                 const SizedBox(height: 8),
                 TextButton(
-                  onPressed: () => _savePdf(context, landlordName, landlordUpi),
+                  onPressed: () => _savePdf(
+                    context,
+                    landlordName,
+                    landlordPhone,
+                    landlordUpi,
+                  ),
                   child: const Text('Save Invoice PDF'),
                 ),
               ],
@@ -299,6 +325,7 @@ class _BillDetailContent extends ConsumerWidget {
   void _viewInvoice(
     BuildContext context,
     String? landlordName,
+    String? landlordPhone,
     String? landlordUpi,
   ) {
     Navigator.push(
@@ -307,6 +334,7 @@ class _BillDetailContent extends ConsumerWidget {
         builder: (context) => InvoicePreviewScreen(
           bill: bill,
           landlordName: landlordName,
+          landlordPhone: landlordPhone,
           landlordUpi: landlordUpi,
         ),
       ),
@@ -352,15 +380,17 @@ class _BillDetailContent extends ConsumerWidget {
   void _shareInvoice(
     BuildContext context,
     String? landlordName,
+    String? landlordPhone,
     String? landlordUpi,
   ) {
     // Directly open invoice preview screen
-    _viewInvoice(context, landlordName, landlordUpi);
+    _viewInvoice(context, landlordName, landlordPhone, landlordUpi);
   }
 
   Future<void> _savePdf(
     BuildContext context,
     String? landlordName,
+    String? landlordPhone,
     String? landlordUpi,
   ) async {
     try {
@@ -368,7 +398,7 @@ class _BillDetailContent extends ConsumerWidget {
       final file = await pdfService.generateInvoice(
         bill: bill,
         landlordName: landlordName ?? 'Landlord',
-        landlordPhone: '',
+        landlordPhone: landlordPhone ?? '',
         landlordUpiId: landlordUpi,
       );
 

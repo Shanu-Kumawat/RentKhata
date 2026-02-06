@@ -7,7 +7,10 @@ import 'dart:io';
 
 import '../../../core/utils/currency_formatter.dart';
 import '../../../domain/entities/bill.dart';
+
 import '../../../application/providers/repository_providers.dart';
+import '../../../application/providers/billing_providers.dart';
+import '../../../application/providers/dashboard_providers.dart';
 import '../../../services/invoice_pdf_service.dart';
 import '../../../services/share_service.dart';
 import '../../../services/upi_qr_service.dart';
@@ -55,7 +58,7 @@ class InvoicePreviewScreen extends ConsumerWidget {
               // PDF Preview button
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: () => _previewPdf(context),
+                  onPressed: () => _previewPdf(context, ref),
                   icon: const Icon(Icons.picture_as_pdf),
                   label: const Text('PDF Preview'),
                   style: OutlinedButton.styleFrom(
@@ -87,7 +90,7 @@ class InvoicePreviewScreen extends ConsumerWidget {
       context: context,
       contentType: ShareContentType.invoice,
       onShareAsMessage: () => _shareAsMessage(context, ref),
-      onShareAsPdf: () => _shareAsPdf(context),
+      onShareAsPdf: () => _shareAsPdf(context, ref),
     );
   }
 
@@ -101,14 +104,19 @@ class InvoicePreviewScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _previewPdf(BuildContext context) async {
+  Future<void> _previewPdf(BuildContext context, WidgetRef ref) async {
     try {
+      final payments = await ref.read(paymentsForBillProvider(bill.id).future);
+      final landlord = await ref.read(landlordProvider.future);
+
       final pdfService = InvoicePdfService();
       final file = await pdfService.generateInvoice(
         bill: bill,
         landlordName: landlordName ?? 'Landlord',
         landlordPhone: landlordPhone ?? '',
         landlordUpiId: landlordUpi,
+        paymentHistory: payments,
+        signaturePath: landlord?.signaturePath,
       );
 
       await pdfService.openPdf(file);
@@ -121,14 +129,19 @@ class InvoicePreviewScreen extends ConsumerWidget {
     }
   }
 
-  Future<void> _shareAsPdf(BuildContext context) async {
+  Future<void> _shareAsPdf(BuildContext context, WidgetRef ref) async {
     try {
+      final payments = await ref.read(paymentsForBillProvider(bill.id).future);
+      final landlord = await ref.read(landlordProvider.future);
+
       final pdfService = InvoicePdfService();
       final file = await pdfService.generateInvoice(
         bill: bill,
         landlordName: landlordName ?? 'Landlord',
         landlordPhone: landlordPhone ?? '',
         landlordUpiId: landlordUpi,
+        paymentHistory: payments,
+        signaturePath: landlord?.signaturePath,
       );
 
       final shareService = ShareService();

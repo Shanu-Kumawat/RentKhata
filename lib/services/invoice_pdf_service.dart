@@ -40,6 +40,8 @@ class InvoicePdfService {
     required String landlordPhone,
     String? landlordAddress,
     String? landlordUpiId,
+    List<Payment> paymentHistory = const [],
+    String? signaturePath,
   }) async {
     final pdf = pw.Document();
 
@@ -68,6 +70,16 @@ class InvoicePdfService {
       if (await file.exists()) {
         final imageBytes = await file.readAsBytes();
         meterImage = pw.MemoryImage(imageBytes);
+      }
+    }
+
+    // Load signature image if available
+    pw.MemoryImage? signatureImage;
+    if (signaturePath != null) {
+      final file = File(signaturePath);
+      if (await file.exists()) {
+        final imageBytes = await file.readAsBytes();
+        signatureImage = pw.MemoryImage(imageBytes);
       }
     }
 
@@ -476,21 +488,118 @@ class InvoicePdfService {
                 pw.SizedBox(height: 20),
               ],
 
+              // 6. PAYMENT HISTORY
+              if (paymentHistory.isNotEmpty) ...[
+                pw.Text(
+                  'PAYMENT HISTORY',
+                  style: pw.TextStyle(
+                    fontSize: 8,
+                    fontWeight: pw.FontWeight.bold,
+                    color: accentColor,
+                    letterSpacing: 1.0,
+                  ),
+                ),
+                pw.SizedBox(height: 8),
+                pw.Table(
+                  border: pw.TableBorder(
+                    horizontalInside: pw.BorderSide(
+                      color: dividerColor,
+                      width: 0.5,
+                    ),
+                  ),
+                  children: [
+                    pw.TableRow(
+                      decoration: const pw.BoxDecoration(
+                        border: pw.Border(
+                          bottom: pw.BorderSide(color: dividerColor),
+                        ),
+                      ),
+                      children: [
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.symmetric(vertical: 4),
+                          child: pw.Text(
+                            'Date',
+                            style: const pw.TextStyle(
+                              fontSize: 8,
+                              color: PdfColors.grey700,
+                            ),
+                          ),
+                        ),
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.symmetric(vertical: 4),
+                          child: pw.Text(
+                            'Mode',
+                            style: const pw.TextStyle(
+                              fontSize: 8,
+                              color: PdfColors.grey700,
+                            ),
+                          ),
+                        ),
+
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.symmetric(vertical: 4),
+                          child: pw.Text(
+                            'Amount',
+                            textAlign: pw.TextAlign.right,
+                            style: const pw.TextStyle(
+                              fontSize: 8,
+                              color: PdfColors.grey700,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    ...paymentHistory.map((payment) {
+                      return pw.TableRow(
+                        children: [
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.symmetric(vertical: 4),
+                            child: pw.Text(
+                              _formatDate(payment.paymentDate),
+                              style: const pw.TextStyle(fontSize: 9),
+                            ),
+                          ),
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.symmetric(vertical: 4),
+                            child: pw.Text(
+                              payment.paymentMode.name.toUpperCase(),
+                              style: const pw.TextStyle(fontSize: 9),
+                            ),
+                          ),
+
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.symmetric(vertical: 4),
+                            child: pw.Text(
+                              '₹${payment.amount.toStringAsFixed(2)}',
+                              textAlign: pw.TextAlign.right,
+                              style: const pw.TextStyle(fontSize: 9),
+                            ),
+                          ),
+                        ],
+                      );
+                    }),
+                  ],
+                ),
+                pw.SizedBox(height: 20),
+              ],
+
               pw.Expanded(child: pw.Container()),
 
-              // 6. PAYMENT FOOTER
-              if (landlordUpiId != null && bill.pendingAmount > 0)
-                pw.Container(
-                  padding: const pw.EdgeInsets.all(16),
-                  decoration: pw.BoxDecoration(
-                    color: PdfColors.grey50,
-                    borderRadius: pw.BorderRadius.circular(4),
-                    border: pw.Border.all(color: dividerColor),
-                  ),
-                  child: pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                    children: [
-                      pw.Column(
+              // 7. PAYMENT DETAILS & SIGNATURE
+              pw.Row(
+                crossAxisAlignment: pw.CrossAxisAlignment.end,
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  // Bank / UPI Details
+                  if (landlordUpiId != null)
+                    pw.Container(
+                      padding: const pw.EdgeInsets.all(12),
+                      decoration: pw.BoxDecoration(
+                        color: PdfColors.grey50,
+                        borderRadius: pw.BorderRadius.circular(4),
+                        border: pw.Border.all(color: dividerColor),
+                      ),
+                      child: pw.Column(
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
                           pw.Text(
@@ -506,37 +615,87 @@ class InvoicePdfService {
                           pw.Text(
                             'UPI ID',
                             style: const pw.TextStyle(
-                              fontSize: 10,
+                              fontSize: 8,
                               color: PdfColors.grey700,
                             ),
                           ),
                           pw.Text(
                             landlordUpiId,
                             style: pw.TextStyle(
-                              fontSize: 12,
+                              fontSize: 10,
                               fontWeight: pw.FontWeight.bold,
                               color: primaryColor,
                             ),
                           ),
                         ],
                       ),
-                      pw.Column(
-                        crossAxisAlignment: pw.CrossAxisAlignment.end,
-                        children: [
-                          pw.Text(
-                            'Scan QR to pay',
-                            style: const pw.TextStyle(
-                              fontSize: 10,
-                              color: PdfColors.grey600,
-                            ),
+                    ),
+
+                  // Authorized Signatory
+                  pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.end,
+                    children: [
+                      if (signatureImage != null)
+                        pw.Container(
+                          height: 40,
+                          child: pw.Image(
+                            signatureImage,
+                            fit: pw.BoxFit.contain,
                           ),
-                        ],
+                        ),
+                      if (signatureImage != null) pw.SizedBox(height: 4),
+                      pw.Container(
+                        width: 150,
+                        decoration: const pw.BoxDecoration(
+                          border: pw.Border(
+                            top: pw.BorderSide(color: PdfColors.grey400),
+                          ),
+                        ),
+                        padding: const pw.EdgeInsets.only(top: 4),
+                        alignment: pw.Alignment.centerRight,
+                        child: pw.Text(
+                          'Authorized Signatory',
+                          style: const pw.TextStyle(
+                            fontSize: 8,
+                            color: PdfColors.grey600,
+                          ),
+                        ),
                       ),
                     ],
                   ),
-                ),
+                ],
+              ),
 
-              pw.SizedBox(height: 30),
+              pw.SizedBox(height: 20),
+
+              // 8. TERMS & CONDITIONS
+              pw.Container(
+                width: double.infinity,
+                child: pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Text(
+                      'TERMS & CONDITIONS',
+                      style: pw.TextStyle(
+                        fontSize: 7,
+                        fontWeight: pw.FontWeight.bold,
+                        color: PdfColors.grey500,
+                      ),
+                    ),
+                    pw.SizedBox(height: 4),
+                    pw.Text(
+                      '1. Please pay the bill before the due date to avoid late fees.\n2. This is a computer-generated invoice and no signature is required unless specified.\n3. Make payments via UPI to the details mentioned above.',
+                      style: const pw.TextStyle(
+                        fontSize: 7,
+                        color: PdfColors.grey500,
+                        lineSpacing: 2,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              pw.SizedBox(height: 20),
               pw.Divider(color: dividerColor),
               pw.Row(
                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
