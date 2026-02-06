@@ -111,8 +111,7 @@ class InvoicePreviewScreen extends ConsumerWidget {
         landlordUpiId: landlordUpi,
       );
 
-      final bytes = await file.readAsBytes();
-      await pdfService.previewPdf(bytes, 'Invoice - ${bill.billingPeriod}');
+      await pdfService.openPdf(file);
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(

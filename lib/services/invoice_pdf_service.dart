@@ -7,12 +7,32 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
 import 'package:printing/printing.dart';
+import 'package:open_file/open_file.dart';
 import '../domain/entities/bill.dart';
 import '../domain/entities/payment.dart';
 import 'upi_qr_service.dart';
 
 /// Service for generating PDF invoices and receipts.
 class InvoicePdfService {
+  // ... existing methods
+
+  /// Open PDF file in external viewer
+  Future<void> openPdf(File file) async {
+    final result = await OpenFile.open(file.path);
+    if (result.type != ResultType.done) {
+      throw Exception('Could not open file: ${result.message}');
+    }
+  }
+
+  Future<void> previewPdf(Uint8List pdfBytes, String title) async {
+    await Printing.layoutPdf(onLayout: (format) => pdfBytes, name: title);
+  }
+
+  /// Share PDF file
+  Future<void> sharePdf(File pdf, String subject) async {
+    await Printing.sharePdf(bytes: await pdf.readAsBytes(), filename: subject);
+  }
+
   /// Generate invoice PDF for a bill.
   Future<File> generateInvoice({
     required Bill bill,
@@ -494,15 +514,5 @@ class InvoicePdfService {
     final file = File('${dir.path}/$filename.pdf');
     await file.writeAsBytes(bytes);
     return file;
-  }
-
-  /// Preview PDF
-  Future<void> previewPdf(Uint8List pdfBytes, String title) async {
-    await Printing.layoutPdf(onLayout: (format) => pdfBytes, name: title);
-  }
-
-  /// Share PDF file
-  Future<void> sharePdf(File pdf, String subject) async {
-    await Printing.sharePdf(bytes: await pdf.readAsBytes(), filename: subject);
   }
 }
