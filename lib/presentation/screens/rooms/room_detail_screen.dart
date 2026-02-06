@@ -756,239 +756,281 @@ class _BillTile extends ConsumerWidget {
     final isOverdue = bill.isOverdue;
 
     // Status colors
-    final (statusColor, statusBg, statusLabel) = isPaid
-        ? (AppColors.success, AppColors.success.withValues(alpha: 0.12), 'PAID')
+    final statusColor = isPaid
+        ? AppColors.success
         : isPartial
-        ? (Colors.orange, Colors.orange.withValues(alpha: 0.12), 'PARTIAL')
+        ? Colors.orange
         : isOverdue
-        ? (AppColors.error, AppColors.error.withValues(alpha: 0.12), 'OVERDUE')
-        : (
-            AppColors.warning,
-            AppColors.warning.withValues(alpha: 0.12),
-            'UNPAID',
-          );
+        ? AppColors.error
+        : AppColors.primary;
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      elevation: 0,
+      margin: const EdgeInsets.only(bottom: 16),
+      elevation: 2,
+      clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: statusColor.withValues(alpha: 0.3), width: 1.5),
+        side: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
       ),
-      child: InkWell(
-        onTap: () => _viewBillDetails(context),
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              // Top row: Bill type & Status badge
-              Row(
-                children: [
-                  // Bill type icon
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          statusColor.withValues(alpha: 0.2),
-                          statusColor.withValues(alpha: 0.05),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      _getBillIcon(bill.billType),
-                      color: statusColor,
-                      size: 22,
-                    ),
+      child: Column(
+        children: [
+          // Main Content Section
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Icon Container
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: statusColor.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
                   ),
-                  const SizedBox(width: 12),
-                  // Bill type & period
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _getBillLabel(bill.billType),
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                  child: Icon(
+                    _getBillIcon(bill.billType),
+                    color: statusColor,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                // Bill Details
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _getBillLabel(bill.billType),
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
                         ),
-                        Text(
-                          bill.billingPeriod,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: AppColors.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  // Status badge
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 5,
-                    ),
-                    decoration: BoxDecoration(
-                      color: statusBg,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      statusLabel,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: statusColor,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 0.5,
                       ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              // Amount row
-              Row(
-                children: [
-                  // Amount info
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              formatCurrency(bill.amount),
-                              style: theme.textTheme.headlineSmall?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: isPaid ? statusColor : null,
-                              ),
+                      const SizedBox(height: 4),
+                      Text(
+                        bill.billingPeriod,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      if (isOverdue && !isPaid)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4.0),
+                          child: Text(
+                            'Overdue by ${_getDaysOverdue(bill.dueDate!)} days',
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: AppColors.error,
+                              fontWeight: FontWeight.bold,
                             ),
-                            if (isPartial) ...[
-                              const SizedBox(width: 8),
-                              Text(
-                                '(${formatCurrency(bill.pendingAmount)} due)',
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: Colors.orange.shade700,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                        if (!isPaid && bill.dueDate != null) ...[
-                          const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.calendar_today_outlined,
-                                size: 14,
-                                color: isOverdue
-                                    ? AppColors.error
-                                    : AppColors.onSurfaceVariant,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                'Due ${bill.dueDate!.day}/${bill.dueDate!.month}/${bill.dueDate!.year}',
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: isOverdue
-                                      ? AppColors.error
-                                      : AppColors.onSurfaceVariant,
-                                  fontWeight: isOverdue
-                                      ? FontWeight.w600
-                                      : null,
-                                ),
-                              ),
-                            ],
                           ),
-                        ],
-                      ],
-                    ),
+                        ),
+                    ],
                   ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              // Action Buttons
-              if (!isPaid)
-                Row(
+                ),
+                // Hero Amount
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () => _sendReminder(context, ref),
-                        icon: const Icon(
-                          Icons.notifications_active_outlined,
-                          size: 18,
-                        ),
-                        label: const Text('Remind'),
-                        style: OutlinedButton.styleFrom(
-                          visualDensity: VisualDensity.compact,
-                        ),
+                    Text(
+                      formatCurrency(bill.amount),
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: isPaid
+                            ? statusColor
+                            : theme.colorScheme.onSurface,
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: FilledButton.icon(
-                        onPressed: () => _viewBillDetails(context),
-                        icon: const Icon(Icons.payment, size: 18),
-                        label: const Text('Pay'),
-                        style: FilledButton.styleFrom(
-                          visualDensity: VisualDensity.compact,
+                    const SizedBox(height: 4),
+                    if (isPartial)
+                      Text(
+                        '${formatCurrency(bill.pendingAmount)} due',
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          color: Colors.orange.shade800,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      )
+                    else
+                      Text(
+                        isPaid ? 'PAID' : 'DUE',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: statusColor,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.0,
                         ),
                       ),
-                    ),
-                  ],
-                )
-              else
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () => _viewBillDetails(context),
-                        icon: const Icon(Icons.receipt_long_outlined, size: 18),
-                        label: const Text('View'),
-                        style: OutlinedButton.styleFrom(
-                          visualDensity: VisualDensity.compact,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () => _shareInvoice(context, ref),
-                        icon: const Icon(Icons.share_outlined, size: 18),
-                        label: const Text('Share'),
-                        style: OutlinedButton.styleFrom(
-                          visualDensity: VisualDensity.compact,
-                        ),
-                      ),
-                    ),
                   ],
                 ),
-            ],
+              ],
+            ),
           ),
-        ),
+
+          // Action Footer (Two-Tone Effect)
+          Container(
+            color: statusColor.withValues(alpha: 0.08),
+            child: Row(
+              children: [
+                if (!isPaid) ...[
+                  // Remind Button
+                  Expanded(
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () => _sendReminder(context, ref),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.notifications_active_outlined,
+                                size: 18,
+                                color: statusColor,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Remind',
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: statusColor,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Divider
+                  Container(
+                    height: 24,
+                    width: 1,
+                    color: statusColor.withValues(alpha: 0.2),
+                  ),
+                  // Pay Button
+                  Expanded(
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () => _viewBillDetails(context),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.payment, size: 18, color: statusColor),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Pay Now',
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: statusColor,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ] else ...[
+                  // View Button
+                  Expanded(
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () => _viewBillDetails(context),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.receipt_long_outlined,
+                                size: 18,
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'View',
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Divider
+                  Container(
+                    height: 24,
+                    width: 1,
+                    color: theme.colorScheme.onSurfaceVariant.withValues(
+                      alpha: 0.2,
+                    ),
+                  ),
+                  // Share Button
+                  Expanded(
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () => _shareInvoice(context, ref),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.share_outlined,
+                                size: 18,
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Share',
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 
+  int _getDaysOverdue(DateTime dueDate) {
+    final now = DateTime.now();
+    return now.difference(dueDate).inDays;
+  }
+
   IconData _getBillIcon(BillType type) {
     return switch (type) {
-      BillType.rent => Icons.home_outlined,
-      BillType.electricity => Icons.bolt_outlined,
-      BillType.water => Icons.water_drop_outlined,
-      BillType.maintenance => Icons.build_outlined,
-      BillType.other => Icons.receipt_long_outlined,
+      BillType.rent => Icons.home_rounded,
+      BillType.electricity => Icons.bolt_rounded,
+      BillType.water => Icons.water_drop_rounded,
+      BillType.maintenance => Icons.build_rounded,
+      BillType.other => Icons.receipt_long_rounded,
     };
   }
 
   String _getBillLabel(BillType type) {
     return switch (type) {
-      BillType.rent => 'Rent',
-      BillType.electricity => 'Electricity',
-      BillType.water => 'Water',
+      BillType.rent => 'Monthly Rent',
+      BillType.electricity => 'Electricity Bill',
+      BillType.water => 'Water Bill',
       BillType.maintenance => 'Maintenance',
-      BillType.other => 'Other',
+      BillType.other => 'Other Charges',
     };
   }
 
