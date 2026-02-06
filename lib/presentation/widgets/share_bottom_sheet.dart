@@ -184,7 +184,9 @@ class _ShareOption extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 8,
                       children: [
                         Text(
                           title,
@@ -192,8 +194,7 @@ class _ShareOption extends StatelessWidget {
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                        if (isRecommended) ...[
-                          const SizedBox(width: 8),
+                        if (isRecommended)
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 8,
@@ -211,7 +212,6 @@ class _ShareOption extends StatelessWidget {
                               ),
                             ),
                           ),
-                        ],
                       ],
                     ),
                     const SizedBox(height: 2),

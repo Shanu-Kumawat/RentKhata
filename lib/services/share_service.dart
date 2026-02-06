@@ -129,6 +129,19 @@ class ShareService {
       landlordUpi: landlordUpi,
     );
 
+    // If meter photo exists, share it with text using native share (as WhatsApp API doesn't support file + text easily)
+    if (bill.meterPhotoPath != null && bill.meterPhotoPath!.isNotEmpty) {
+      final file = File(bill.meterPhotoPath!);
+      if (await file.exists()) {
+        await shareFiles(
+          files: [file],
+          text: message,
+          subject: 'Invoice - ${bill.billNumber ?? bill.billingPeriod}',
+        );
+        return true;
+      }
+    }
+
     return shareToWhatsApp(message: message, phoneNumber: tenantPhone);
   }
 
@@ -169,6 +182,19 @@ class ShareService {
         landlordName: landlordName,
         landlordUpi: landlordUpi,
       );
+    }
+
+    // If meter photo exists, share it with text using native share
+    if (bill.meterPhotoPath != null && bill.meterPhotoPath!.isNotEmpty) {
+      final file = File(bill.meterPhotoPath!);
+      if (await file.exists()) {
+        await shareFiles(
+          files: [file],
+          text: message,
+          subject: 'Invoice - ${bill.billNumber ?? bill.billingPeriod}',
+        );
+        return;
+      }
     }
 
     await Share.share(
