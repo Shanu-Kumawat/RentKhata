@@ -972,21 +972,12 @@ class _BillTile extends ConsumerWidget {
     final landlord = await ref.read(landlordProvider.future);
     final landlordName = landlord?.name ?? 'Landlord';
 
-    final message = ShareService.billReminderMessage(
-      tenantName: bill.tenantName ?? 'Tenant',
-      billType: bill.billType.name,
-      period: bill.billingPeriod,
-      amount: bill.pendingAmount,
-      dueDate: bill.dueDate ?? DateTime.now(),
-      landlordName: landlordName,
-    );
-
     final repo = ref.read(billingRepositoryProvider);
     final shareService = ShareService(repo);
-    final success = await shareService.shareToWhatsApp(message: message);
-    if (!success && context.mounted) {
-      await shareService.shareText(text: message, subject: 'Payment Reminder');
-    }
+    await shareService.shareBillReminder(
+      bill: bill,
+      landlordName: landlordName,
+    );
   }
 
   void _shareInvoice(BuildContext context, WidgetRef ref) async {
