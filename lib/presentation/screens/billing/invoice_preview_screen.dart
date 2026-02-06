@@ -3,6 +3,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:io';
 
 import '../../../core/utils/currency_formatter.dart';
 import '../../../domain/entities/bill.dart';
@@ -322,6 +323,35 @@ class _InvoiceCard extends StatelessWidget {
                           ),
                         ],
                       ),
+                    ),
+                  ],
+                  // Meter Photo Section
+                  if (bill.meterPhotoPath != null &&
+                      bill.meterPhotoPath!.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Meter Photo',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.file(
+                            File(bill.meterPhotoPath!),
+                            height: 150,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const SizedBox(),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ],
