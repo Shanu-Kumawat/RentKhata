@@ -45,9 +45,21 @@ class InvoicePdfService {
 
     // Load fonts
     final fontRegular = await PdfGoogleFonts.robotoRegular();
+    final fontMedium = await PdfGoogleFonts.robotoMedium();
     final fontBold = await PdfGoogleFonts.robotoBold();
+    final fontLight = await PdfGoogleFonts.robotoLight();
 
-    final theme = pw.ThemeData.withFont(base: fontRegular, bold: fontBold);
+    // Define Colors
+    const primaryColor = PdfColor.fromInt(0xFF1A237E); // Deep Navy
+    const accentColor = PdfColor.fromInt(0xFF607D8B); // Slate Grey
+    const dividerColor = PdfColor.fromInt(0xFFECEFF1); // Light Grey
+
+    // Clean Theme
+    final theme = pw.ThemeData.withFont(
+      base: fontRegular,
+      bold: fontBold,
+      fontFallback: [fontRegular],
+    );
 
     // Load meter photo if available
     pw.MemoryImage? meterImage;
@@ -67,48 +79,7 @@ class InvoicePdfService {
           return pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              // Header
-              pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                children: [
-                  pw.Column(
-                    crossAxisAlignment: pw.CrossAxisAlignment.start,
-                    children: [
-                      pw.Text(
-                        landlordName,
-                        style: pw.TextStyle(
-                          fontSize: 24,
-                          fontWeight: pw.FontWeight.bold,
-                        ),
-                      ),
-                      if (landlordPhone.isNotEmpty)
-                        pw.Text('Phone: $landlordPhone'),
-                      if (landlordAddress != null) pw.Text(landlordAddress),
-                    ],
-                  ),
-                  pw.Container(
-                    padding: const pw.EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    decoration: pw.BoxDecoration(
-                      color: PdfColors.blueGrey900,
-                      borderRadius: pw.BorderRadius.circular(4),
-                    ),
-                    child: pw.Text(
-                      'INVOICE',
-                      style: pw.TextStyle(
-                        fontSize: 20,
-                        fontWeight: pw.FontWeight.bold,
-                        color: PdfColors.white,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              pw.SizedBox(height: 40),
-
-              // Info Row
+              // 1. BRAND HEADER
               pw.Row(
                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -117,156 +88,156 @@ class InvoicePdfService {
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: [
                       pw.Text(
-                        'BILL TO',
+                        landlordName.toUpperCase(),
                         style: pw.TextStyle(
-                          color: PdfColors.grey600,
+                          fontSize: 20,
                           fontWeight: pw.FontWeight.bold,
-                          fontSize: 10,
+                          color: primaryColor,
+                          letterSpacing: 1.2,
                         ),
                       ),
                       pw.SizedBox(height: 4),
-                      pw.Text(
-                        bill.tenantName ?? 'Tenant',
-                        style: pw.TextStyle(
-                          fontWeight: pw.FontWeight.bold,
-                          fontSize: 14,
+                      if (landlordPhone.isNotEmpty)
+                        pw.Text(
+                          landlordPhone,
+                          style: pw.TextStyle(fontSize: 10, color: accentColor),
                         ),
-                      ),
-                      if (bill.roomNumber != null)
-                        pw.Text('Room: ${bill.roomNumber}'),
-                      if (bill.propertyName != null)
-                        pw.Text(bill.propertyName!),
+                      if (landlordAddress != null)
+                        pw.Text(
+                          landlordAddress,
+                          style: pw.TextStyle(fontSize: 10, color: accentColor),
+                        ),
                     ],
                   ),
                   pw.Column(
                     crossAxisAlignment: pw.CrossAxisAlignment.end,
                     children: [
-                      _buildInfoRow('Invoice No:', 'INV-${bill.id}'),
-                      _buildInfoRow('Date:', _formatDate(bill.createdAt)),
-                      if (bill.dueDate != null)
-                        _buildInfoRow(
-                          'Due Date:',
-                          _formatDate(bill.dueDate!),
-                          isBold: true,
+                      pw.Text(
+                        'INVOICE',
+                        style: pw.TextStyle(
+                          fontSize: 32,
+                          fontWeight: pw.FontWeight.bold,
+                          color: PdfColors.grey200, // Watermark style
+                          letterSpacing: 2.0,
                         ),
+                      ),
+                      pw.SizedBox(height: 10),
+                      pw.Text(
+                        '# INV-${bill.id.toString().padLeft(6, '0')}',
+                        style: pw.TextStyle(
+                          fontSize: 12,
+                          color: accentColor,
+                          fontWeight: pw.FontWeight.bold,
+                        ),
+                      ),
                     ],
                   ),
                 ],
               ),
-              pw.SizedBox(height: 30),
+              pw.SizedBox(height: 40),
 
-              // Item Table
+              // 2. CONTEXT GRID (FROM / TO / DATES)
               pw.Container(
-                decoration: pw.BoxDecoration(
-                  border: pw.Border.all(color: PdfColors.grey300),
-                  borderRadius: pw.BorderRadius.circular(8),
+                padding: const pw.EdgeInsets.symmetric(vertical: 20),
+                decoration: const pw.BoxDecoration(
+                  border: pw.Border.symmetric(
+                    horizontal: pw.BorderSide(color: dividerColor),
+                  ),
                 ),
-                child: pw.Column(
+                child: pw.Row(
                   children: [
-                    // Header
-                    pw.Container(
-                      padding: const pw.EdgeInsets.all(12),
-                      decoration: const pw.BoxDecoration(
-                        color: PdfColors.grey100,
-                        borderRadius: pw.BorderRadius.vertical(
-                          top: pw.Radius.circular(8),
-                        ),
-                      ),
-                      child: pw.Row(
+                    // BILL TO
+                    pw.Expanded(
+                      child: pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
-                          pw.Expanded(
-                            flex: 3,
-                            child: pw.Text(
-                              'Description',
-                              style: pw.TextStyle(
-                                fontWeight: pw.FontWeight.bold,
-                              ),
+                          pw.Text(
+                            'BILL TO',
+                            style: pw.TextStyle(
+                              color: accentColor,
+                              fontSize: 8,
+                              fontWeight: pw.FontWeight.bold,
+                              letterSpacing: 1.0,
                             ),
                           ),
-                          pw.Expanded(
-                            flex: 2,
-                            child: pw.Text(
-                              'Period',
-                              style: pw.TextStyle(
-                                fontWeight: pw.FontWeight.bold,
-                              ),
+                          pw.SizedBox(height: 8),
+                          pw.Text(
+                            bill.tenantName ?? 'Tenant',
+                            style: pw.TextStyle(
+                              fontSize: 14,
+                              fontWeight: pw.FontWeight.bold,
                             ),
                           ),
-                          pw.Expanded(
-                            child: pw.Text(
-                              'Amount',
-                              textAlign: pw.TextAlign.right,
-                              style: pw.TextStyle(
-                                fontWeight: pw.FontWeight.bold,
+                          pw.SizedBox(height: 2),
+                          if (bill.roomNumber != null)
+                            pw.Text(
+                              'Room ${bill.roomNumber} • ${bill.propertyName ?? ""}',
+                              style: const pw.TextStyle(
+                                fontSize: 10,
+                                color: PdfColors.black,
                               ),
                             ),
-                          ),
                         ],
                       ),
                     ),
-                    // Item
-                    pw.Padding(
-                      padding: const pw.EdgeInsets.all(12),
-                      child: pw.Row(
+                    // DATE DETAILS
+                    pw.Expanded(
+                      child: pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.end,
                         children: [
-                          pw.Expanded(
-                            flex: 3,
-                            child: pw.Column(
-                              crossAxisAlignment: pw.CrossAxisAlignment.start,
-                              children: [
-                                pw.Text(
-                                  bill.billType.name.toUpperCase(),
-                                  style: pw.TextStyle(
-                                    fontWeight: pw.FontWeight.bold,
-                                  ),
-                                ),
-                                if (bill.billType == BillType.electricity &&
-                                    bill.electricityPrevReading != null)
-                                  pw.Padding(
-                                    padding: const pw.EdgeInsets.only(
-                                      top: 4,
-                                      left: 8,
-                                    ),
-                                    child: pw.Column(
-                                      crossAxisAlignment:
-                                          pw.CrossAxisAlignment.start,
-                                      children: [
-                                        pw.Text(
-                                          'Prev Reading: ${bill.electricityPrevReading!.toStringAsFixed(0)}',
-                                          style: const pw.TextStyle(
-                                            fontSize: 10,
-                                            color: PdfColors.grey700,
-                                          ),
-                                        ),
-                                        pw.Text(
-                                          'Curr Reading: ${bill.electricityCurrReading!.toStringAsFixed(0)}',
-                                          style: const pw.TextStyle(
-                                            fontSize: 10,
-                                            color: PdfColors.grey700,
-                                          ),
-                                        ),
-                                        pw.Text(
-                                          'Units: ${(bill.electricityCurrReading! - bill.electricityPrevReading!).toStringAsFixed(0)} @ ₹${bill.electricityRateAtBilling}/unit',
-                                          style: const pw.TextStyle(
-                                            fontSize: 10,
-                                            color: PdfColors.grey700,
-                                          ),
-                                        ),
-                                      ],
+                          pw.Row(
+                            mainAxisAlignment:
+                                pw.MainAxisAlignment.spaceBetween,
+                            mainAxisSize: pw.MainAxisSize.min,
+                            children: [
+                              pw.Column(
+                                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                                children: [
+                                  pw.Text(
+                                    'ISSUED',
+                                    style: pw.TextStyle(
+                                      color: accentColor,
+                                      fontSize: 8,
+                                      fontWeight: pw.FontWeight.bold,
+                                      letterSpacing: 1.0,
                                     ),
                                   ),
-                              ],
-                            ),
-                          ),
-                          pw.Expanded(
-                            flex: 2,
-                            child: pw.Text(bill.billingPeriod),
-                          ),
-                          pw.Expanded(
-                            child: pw.Text(
-                              '₹${bill.amount.toStringAsFixed(2)}',
-                              textAlign: pw.TextAlign.right,
-                            ),
+                                  pw.SizedBox(height: 4),
+                                  pw.Text(
+                                    _formatDate(bill.createdAt),
+                                    style: const pw.TextStyle(fontSize: 10),
+                                  ),
+                                ],
+                              ),
+                              pw.SizedBox(width: 30),
+                              pw.Column(
+                                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                                children: [
+                                  pw.Text(
+                                    'DUE DATE',
+                                    style: pw.TextStyle(
+                                      color: accentColor,
+                                      fontSize: 8,
+                                      fontWeight: pw.FontWeight.bold,
+                                      letterSpacing: 1.0,
+                                    ),
+                                  ),
+                                  pw.SizedBox(height: 4),
+                                  pw.Text(
+                                    bill.dueDate != null
+                                        ? _formatDate(bill.dueDate!)
+                                        : '-',
+                                    style: pw.TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: pw.FontWeight.bold,
+                                      color: bill.isOverdue
+                                          ? PdfColors.red900
+                                          : PdfColors.black,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -275,112 +246,318 @@ class InvoicePdfService {
                 ),
               ),
 
-              pw.SizedBox(height: 20),
+              pw.SizedBox(height: 30),
 
-              // Totals
-              pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.end,
+              // 3. CLEAN TABLE
+              pw.Column(
                 children: [
-                  pw.Column(
-                    crossAxisAlignment: pw.CrossAxisAlignment.end,
-                    children: [
-                      _buildTotalRow(
-                        'Total Amount:',
-                        '₹${bill.amount.toStringAsFixed(2)}',
-                        isBold: true,
+                  // Headers
+                  pw.Container(
+                    padding: const pw.EdgeInsets.only(bottom: 8),
+                    decoration: const pw.BoxDecoration(
+                      border: pw.Border(
+                        bottom: pw.BorderSide(color: dividerColor, width: 2),
                       ),
-                      if (bill.paidAmount > 0)
-                        _buildTotalRow(
-                          'Amount Paid:',
-                          '₹${bill.paidAmount.toStringAsFixed(2)}',
-                          color: PdfColors.green700,
-                        ),
-                      if (bill.pendingAmount > 0)
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.only(top: 8),
-                          child: pw.Container(
-                            padding: const pw.EdgeInsets.all(8),
-                            color: PdfColors.red50,
-                            child: _buildTotalRow(
-                              'Balance Due:',
-                              '₹${bill.pendingAmount.toStringAsFixed(2)}',
-                              isBold: true,
-                              color: PdfColors.red700,
+                    ),
+                    child: pw.Row(
+                      children: [
+                        pw.Expanded(
+                          flex: 3,
+                          child: pw.Text(
+                            'DESCRIPTION',
+                            style: pw.TextStyle(
+                              fontSize: 9,
+                              fontWeight: pw.FontWeight.bold,
+                              color: accentColor,
+                              letterSpacing: 1.0,
                             ),
                           ),
                         ),
+                        pw.Expanded(
+                          flex: 2,
+                          child: pw.Text(
+                            'PERIOD',
+                            style: pw.TextStyle(
+                              fontSize: 9,
+                              fontWeight: pw.FontWeight.bold,
+                              color: accentColor,
+                              letterSpacing: 1.0,
+                            ),
+                          ),
+                        ),
+                        pw.Expanded(
+                          child: pw.Text(
+                            'AMOUNT',
+                            textAlign: pw.TextAlign.right,
+                            style: pw.TextStyle(
+                              fontSize: 9,
+                              fontWeight: pw.FontWeight.bold,
+                              color: accentColor,
+                              letterSpacing: 1.0,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  pw.SizedBox(height: 12),
+                  // Row
+                  pw.Row(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+                      pw.Expanded(
+                        flex: 3,
+                        child: pw.Column(
+                          crossAxisAlignment: pw.CrossAxisAlignment.start,
+                          children: [
+                            pw.Text(
+                              bill.billType.name.toUpperCase(),
+                              style: pw.TextStyle(
+                                fontSize: 11,
+                                fontWeight: pw.FontWeight.bold,
+                              ),
+                            ),
+                            if (bill.billType == BillType.electricity &&
+                                bill.electricityPrevReading != null)
+                              pw.Padding(
+                                padding: const pw.EdgeInsets.only(
+                                  top: 4,
+                                  left: 0,
+                                ),
+                                child: pw.Column(
+                                  crossAxisAlignment:
+                                      pw.CrossAxisAlignment.start,
+                                  children: [
+                                    pw.Text(
+                                      'Readings: ${bill.electricityPrevReading!.toStringAsFixed(0)} → ${bill.electricityCurrReading!.toStringAsFixed(0)}',
+                                      style: const pw.TextStyle(
+                                        fontSize: 9,
+                                        color: PdfColors.grey700,
+                                      ),
+                                    ),
+                                    pw.Text(
+                                      'Consumption: ${(bill.electricityCurrReading! - bill.electricityPrevReading!).toStringAsFixed(0)} units @ ₹${bill.electricityRateAtBilling}',
+                                      style: const pw.TextStyle(
+                                        fontSize: 9,
+                                        color: PdfColors.grey700,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                      pw.Expanded(
+                        flex: 2,
+                        child: pw.Text(
+                          bill.billingPeriod,
+                          style: const pw.TextStyle(fontSize: 11),
+                        ),
+                      ),
+                      pw.Expanded(
+                        child: pw.Text(
+                          '₹${bill.amount.toStringAsFixed(2)}',
+                          textAlign: pw.TextAlign.right,
+                          style: pw.TextStyle(fontSize: 11, font: fontMedium),
+                        ),
+                      ),
                     ],
                   ),
+                  pw.SizedBox(height: 12),
+                  pw.Divider(color: dividerColor),
                 ],
+              ),
+
+              // 4. TOTALS
+              pw.Container(
+                alignment: pw.Alignment.centerRight,
+                child: pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.end,
+                  children: [
+                    pw.SizedBox(height: 8),
+                    _buildTotalRow(
+                      'Total Amount',
+                      '₹${bill.amount.toStringAsFixed(2)}',
+                      fontBold,
+                      isBold: true,
+                    ),
+                    if (bill.paidAmount > 0) ...[
+                      pw.SizedBox(height: 4),
+                      _buildTotalRow(
+                        'Amount Paid',
+                        '- ₹${bill.paidAmount.toStringAsFixed(2)}',
+                        fontRegular,
+                        color: PdfColors.green700,
+                      ),
+                    ],
+                    pw.SizedBox(height: 8),
+                    if (bill.pendingAmount > 0)
+                      pw.Container(
+                        padding: const pw.EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: 0,
+                        ),
+                        decoration: const pw.BoxDecoration(
+                          border: pw.Border(
+                            top: pw.BorderSide(color: dividerColor),
+                          ),
+                        ),
+                        child: _buildTotalRow(
+                          'Balance Due',
+                          '₹${bill.pendingAmount.toStringAsFixed(2)}',
+                          fontBold,
+                          isBold: true,
+                          color: primaryColor,
+                          fontSize: 16,
+                        ),
+                      )
+                    else
+                      pw.Container(
+                        margin: const pw.EdgeInsets.only(top: 8),
+                        padding: const pw.EdgeInsets.symmetric(
+                          vertical: 6,
+                          horizontal: 12,
+                        ),
+                        decoration: pw.BoxDecoration(
+                          color: PdfColors.green50,
+                          borderRadius: pw.BorderRadius.circular(4),
+                        ),
+                        child: pw.Text(
+                          "PAID IN FULL",
+                          style: pw.TextStyle(
+                            color: PdfColors.green800,
+                            fontWeight: pw.FontWeight.bold,
+                            fontSize: 10,
+                            letterSpacing: 1.0,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
 
               pw.SizedBox(height: 30),
 
-              // Meter Photo Section
+              // 5. METER PROOF (Attachment Style)
               if (meterImage != null) ...[
-                pw.Text(
-                  'Meter Reading Proof',
-                  style: pw.TextStyle(
-                    fontWeight: pw.FontWeight.bold,
-                    fontSize: 12,
-                  ),
-                ),
-                pw.SizedBox(height: 8),
                 pw.Container(
-                  height: 150,
-                  alignment: pw.Alignment.centerLeft,
-                  child: pw.Image(meterImage, fit: pw.BoxFit.contain),
+                  width: double.infinity,
+                  padding: const pw.EdgeInsets.all(12),
+                  decoration: pw.BoxDecoration(
+                    border: pw.Border.all(color: dividerColor),
+                    borderRadius: pw.BorderRadius.circular(4),
+                  ),
+                  child: pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+                      pw.Row(
+                        children: [
+                          pw.Text(
+                            'PROOF OF READING',
+                            style: pw.TextStyle(
+                              fontSize: 8,
+                              fontWeight: pw.FontWeight.bold,
+                              color: accentColor,
+                              letterSpacing: 1.0,
+                            ),
+                          ),
+                        ],
+                      ),
+                      pw.SizedBox(height: 8),
+                      pw.Container(
+                        height: 120,
+                        alignment: pw.Alignment.centerLeft,
+                        child: pw.Image(meterImage, fit: pw.BoxFit.contain),
+                      ),
+                    ],
+                  ),
                 ),
                 pw.SizedBox(height: 20),
               ],
 
               pw.Expanded(child: pw.Container()),
 
-              // Payment Info Footer
+              // 6. PAYMENT FOOTER
               if (landlordUpiId != null && bill.pendingAmount > 0)
                 pw.Container(
-                  padding: const pw.EdgeInsets.all(12),
+                  padding: const pw.EdgeInsets.all(16),
                   decoration: pw.BoxDecoration(
-                    color: PdfColors.grey100,
-                    borderRadius: pw.BorderRadius.circular(8),
+                    color: PdfColors.grey50,
+                    borderRadius: pw.BorderRadius.circular(4),
+                    border: pw.Border.all(color: dividerColor),
                   ),
                   child: pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                     children: [
-                      pw.Expanded(
-                        child: pw.Column(
-                          crossAxisAlignment: pw.CrossAxisAlignment.start,
-                          mainAxisSize: pw.MainAxisSize.min,
-                          children: [
-                            pw.Text(
-                              'PAYMENT INFO',
-                              style: pw.TextStyle(
-                                fontSize: 10,
-                                fontWeight: pw.FontWeight.bold,
-                                color: PdfColors.grey700,
-                              ),
+                      pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                        children: [
+                          pw.Text(
+                            'PAYMENT DETAILS',
+                            style: pw.TextStyle(
+                              fontSize: 8,
+                              fontWeight: pw.FontWeight.bold,
+                              color: accentColor,
+                              letterSpacing: 1.0,
                             ),
-                            pw.SizedBox(height: 4),
-                            pw.Text(
-                              'UPI ID: $landlordUpiId',
-                              style: const pw.TextStyle(fontSize: 12),
+                          ),
+                          pw.SizedBox(height: 8),
+                          pw.Text(
+                            'UPI ID',
+                            style: const pw.TextStyle(
+                              fontSize: 10,
+                              color: PdfColors.grey700,
                             ),
-                          ],
-                        ),
+                          ),
+                          pw.Text(
+                            landlordUpiId,
+                            style: pw.TextStyle(
+                              fontSize: 12,
+                              fontWeight: pw.FontWeight.bold,
+                              color: primaryColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                      pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.end,
+                        children: [
+                          pw.Text(
+                            'Scan QR to pay',
+                            style: const pw.TextStyle(
+                              fontSize: 10,
+                              color: PdfColors.grey600,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ),
 
-              pw.SizedBox(height: 20),
-              pw.Divider(color: PdfColors.grey300),
-              pw.Center(
-                child: pw.Text(
-                  'Generated by RentKhata',
-                  style: const pw.TextStyle(
-                    color: PdfColors.grey500,
-                    fontSize: 9,
+              pw.SizedBox(height: 30),
+              pw.Divider(color: dividerColor),
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Text(
+                    'Thank you for your business',
+                    style: pw.TextStyle(
+                      fontSize: 8,
+                      color: accentColor,
+                      font: fontLight,
+                      fontStyle: pw.FontStyle.italic,
+                    ),
                   ),
-                ),
+                  pw.Text(
+                    'Generated by RentKhata',
+                    style: const pw.TextStyle(
+                      color: PdfColors.grey400,
+                      fontSize: 8,
+                    ),
+                  ),
+                ],
               ),
             ],
           );
@@ -388,7 +565,7 @@ class InvoicePdfService {
       ),
     );
 
-    // QR Code Page (Optional)
+    // QR Code Page (Standardized)
     if (landlordUpiId != null && bill.pendingAmount > 0) {
       final qrBytes = await UpiQrService.generateQrImageBytes(
         upiId: landlordUpiId,
@@ -409,15 +586,31 @@ class InvoicePdfService {
                   mainAxisAlignment: pw.MainAxisAlignment.center,
                   children: [
                     pw.Text(
-                      'Scan to Pay via UPI',
+                      'Scan to Pay',
                       style: pw.TextStyle(
                         fontSize: 18,
                         fontWeight: pw.FontWeight.bold,
+                        color: primaryColor,
                       ),
                     ),
                     pw.SizedBox(height: 20),
-                    pw.Image(pw.MemoryImage(qrBytes), width: 200, height: 200),
-                    pw.SizedBox(height: 10),
+                    pw.Container(
+                      padding: const pw.EdgeInsets.all(16),
+                      decoration: pw.BoxDecoration(
+                        border: pw.Border.all(color: dividerColor, width: 2),
+                        borderRadius: pw.BorderRadius.circular(8),
+                      ),
+                      child: pw.Image(
+                        pw.MemoryImage(qrBytes),
+                        width: 200,
+                        height: 200,
+                      ),
+                    ),
+                    pw.SizedBox(height: 20),
+                    pw.Text(
+                      landlordName,
+                      style: const pw.TextStyle(fontSize: 14),
+                    ),
                     pw.Text(
                       'Amount: ₹${bill.pendingAmount.toStringAsFixed(2)}',
                       style: pw.TextStyle(
@@ -461,19 +654,26 @@ class InvoicePdfService {
 
   pw.Widget _buildTotalRow(
     String label,
-    String value, {
+    String value,
+    pw.Font font, {
     bool isBold = false,
     PdfColor? color,
+    double fontSize = 12,
   }) {
     return pw.Row(
       mainAxisSize: pw.MainAxisSize.min,
+      crossAxisAlignment: pw.CrossAxisAlignment.end,
       children: [
-        pw.Text('$label   ', style: const pw.TextStyle(fontSize: 12)),
+        pw.Text(
+          '$label    ',
+          style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey700),
+        ),
         pw.Text(
           value,
           style: pw.TextStyle(
-            fontSize: 14,
+            fontSize: fontSize,
             fontWeight: isBold ? pw.FontWeight.bold : null,
+            font: font,
             color: color,
           ),
         ),
