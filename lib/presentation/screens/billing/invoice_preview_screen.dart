@@ -57,11 +57,11 @@ class InvoicePreviewScreen extends ConsumerWidget {
             children: [
               // PDF Preview button
               Expanded(
-                child: OutlinedButton.icon(
+                child: FilledButton.tonalIcon(
                   onPressed: () => _previewPdf(context, ref),
-                  icon: const Icon(Icons.picture_as_pdf),
-                  label: const Text('PDF Preview'),
-                  style: OutlinedButton.styleFrom(
+                  icon: const Icon(Icons.visibility_outlined),
+                  label: const Text('View PDF'),
+                  style: FilledButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
                 ),
@@ -272,20 +272,7 @@ class _InvoiceCard extends StatelessWidget {
                   const Divider(height: 32),
                 ],
 
-                // Billing period & dates
-                _DetailRow(
-                  label: 'Billing Period',
-                  value: bill.billingPeriod,
-                  valueStyle: theme.textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                if (bill.periodStartDate != null && bill.periodEndDate != null)
-                  _DetailRow(
-                    label: 'Period',
-                    value:
-                        '${_formatDate(bill.periodStartDate!)} - ${_formatDate(bill.periodEndDate!)}',
-                  ),
+                _DetailRow(label: 'Period', value: bill.billingPeriod),
                 if (bill.dueDate != null)
                   _DetailRow(
                     label: 'Due Date',
@@ -633,7 +620,7 @@ class _DetailRow extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 100,
+            width: 80,
             child: Text(
               label,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(

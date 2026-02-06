@@ -6,8 +6,6 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../domain/entities/bill.dart';
 import '../../../domain/entities/payment.dart';
-import '../../../services/invoice_pdf_service.dart';
-import '../../../services/share_service.dart';
 
 /// Dialog to show payment receipt after successful payment.
 class ReceiptDialog extends StatelessWidget {
@@ -47,7 +45,7 @@ class ReceiptDialog extends StatelessWidget {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 400),
+        constraints: const BoxConstraints(maxWidth: 500),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -101,16 +99,6 @@ class ReceiptDialog extends StatelessWidget {
                         ),
                       ),
                     ],
-                  ),
-                  // Close button in top-right corner
-                  Positioned(
-                    top: 0,
-                    right: 0,
-                    child: IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.close, color: Colors.white),
-                      tooltip: 'Close',
-                    ),
                   ),
                 ],
               ),
@@ -175,23 +163,13 @@ class ReceiptDialog extends StatelessWidget {
 
                   const SizedBox(height: 24),
 
-                  // Actions - only Save and Share
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () => _saveReceipt(context),
-                          child: const Text('Save'),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () => _shareReceipt(context),
-                          child: const Text('Share'),
-                        ),
-                      ),
-                    ],
+                  // Actions - Close button only
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Close'),
+                    ),
                   ),
                 ],
               ),
@@ -200,53 +178,6 @@ class ReceiptDialog extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Future<void> _shareReceipt(BuildContext context) async {
-    if (latestPayment == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('No payment to share')));
-      return;
-    }
-
-    final shareService = ShareService();
-    await shareService.shareReceipt(
-      bill: bill,
-      payment: latestPayment!,
-      landlordName: landlordName ?? 'Landlord',
-    );
-  }
-
-  Future<void> _saveReceipt(BuildContext context) async {
-    if (latestPayment == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('No payment to save')));
-      return;
-    }
-
-    try {
-      final pdfService = InvoicePdfService();
-      final file = await pdfService.generateReceipt(
-        bill: bill,
-        payment: latestPayment!,
-        landlordName: landlordName ?? 'Landlord',
-        landlordPhone: '', // Not needed for receipt
-      );
-
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Receipt saved to ${file.path}')),
-        );
-      }
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error saving receipt: $e')));
-      }
-    }
   }
 
   String _formatDate(DateTime date) {
@@ -313,14 +244,18 @@ class _ReceiptRow extends StatelessWidget {
               color: AppColors.onSurfaceVariant,
             ),
           ),
-          Text(
-            value,
-            style: isHighlighted
-                ? theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: valueColor,
-                  )
-                : theme.textTheme.bodyMedium?.copyWith(color: valueColor),
+          const SizedBox(width: 16),
+          Flexible(
+            child: Text(
+              value,
+              textAlign: TextAlign.end,
+              style: isHighlighted
+                  ? theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: valueColor,
+                    )
+                  : theme.textTheme.bodyMedium?.copyWith(color: valueColor),
+            ),
           ),
         ],
       ),

@@ -73,63 +73,67 @@ class _BillDetailContent extends ConsumerWidget {
       appBar: AppBar(
         title: Text(bill.billNumber ?? 'Bill Details'),
         actions: [
-          PopupMenuButton<String>(
-            onSelected: (value) => _handleMenuAction(
-              context,
-              ref,
-              value,
-              landlordName,
-              landlordUpi,
+          if (bill.canEdit ||
+              bill.canEditLimited ||
+              bill.canDelete ||
+              (!bill.isFullyPaid && bill.status != BillStatus.voided))
+            PopupMenuButton<String>(
+              onSelected: (value) => _handleMenuAction(
+                context,
+                ref,
+                value,
+                landlordName,
+                landlordUpi,
+              ),
+              itemBuilder: (context) => [
+                if (bill.canEdit || bill.canEditLimited)
+                  const PopupMenuItem(
+                    value: 'edit',
+                    child: ListTile(
+                      leading: Icon(Icons.edit_outlined),
+                      title: Text('Edit Bill'),
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+                if (bill.canDelete)
+                  const PopupMenuItem(
+                    value: 'delete',
+                    child: ListTile(
+                      leading: Icon(Icons.delete_outline, color: Colors.red),
+                      title: Text(
+                        'Delete Bill',
+                        style: TextStyle(color: Colors.red),
+                      ),
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+                if (bill.status != BillStatus.voided &&
+                    !bill.isFullyPaid &&
+                    bill.status != BillStatus.partial)
+                  const PopupMenuItem(
+                    value: 'void',
+                    child: ListTile(
+                      leading: Icon(Icons.block, color: AppColors.error),
+                      title: Text(
+                        'Void Bill',
+                        style: TextStyle(color: AppColors.error),
+                      ),
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+                if (!bill.isFullyPaid &&
+                    bill.status != BillStatus.draft &&
+                    bill.status != BillStatus.voided)
+                  const PopupMenuItem(
+                    value: 'reminder',
+                    child: ListTile(
+                      leading: Icon(Icons.notifications_active_outlined),
+                      title: Text('Send Reminder'),
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+              ],
             ),
-            itemBuilder: (context) => [
-              if (bill.canEdit || bill.canEditLimited)
-                const PopupMenuItem(
-                  value: 'edit',
-                  child: ListTile(
-                    leading: Icon(Icons.edit_outlined),
-                    title: Text('Edit Bill'),
-                    contentPadding: EdgeInsets.zero,
-                  ),
-                ),
-              if (bill.canDelete)
-                const PopupMenuItem(
-                  value: 'delete',
-                  child: ListTile(
-                    leading: Icon(Icons.delete_outline, color: Colors.red),
-                    title: Text(
-                      'Delete Bill',
-                      style: TextStyle(color: Colors.red),
-                    ),
-                    contentPadding: EdgeInsets.zero,
-                  ),
-                ),
-              if (bill.status != BillStatus.voided &&
-                  !bill.isFullyPaid &&
-                  bill.status != BillStatus.partial)
-                const PopupMenuItem(
-                  value: 'void',
-                  child: ListTile(
-                    leading: Icon(Icons.block, color: AppColors.error),
-                    title: Text(
-                      'Void Bill',
-                      style: TextStyle(color: AppColors.error),
-                    ),
-                    contentPadding: EdgeInsets.zero,
-                  ),
-                ),
-              if (!bill.isFullyPaid &&
-                  bill.status != BillStatus.draft &&
-                  bill.status != BillStatus.voided)
-                const PopupMenuItem(
-                  value: 'reminder',
-                  child: ListTile(
-                    leading: Icon(Icons.notifications_active_outlined),
-                    title: Text('Send Reminder'),
-                    contentPadding: EdgeInsets.zero,
-                  ),
-                ),
-            ],
-          ),
         ],
       ),
       body: SingleChildScrollView(
@@ -822,13 +826,7 @@ class _BillInfoCard extends StatelessWidget {
               label: 'Billing Period',
               value: bill.billingPeriod,
             ),
-            if (bill.periodStartDate != null && bill.periodEndDate != null)
-              _InfoRow(
-                icon: Icons.date_range_outlined,
-                label: 'Period Dates',
-                value:
-                    '${_formatDate(bill.periodStartDate!)} - ${_formatDate(bill.periodEndDate!)}',
-              ),
+
             if (bill.dueDate != null)
               _InfoRow(
                 icon: Icons.event_outlined,
