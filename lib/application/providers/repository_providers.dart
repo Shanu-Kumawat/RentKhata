@@ -31,12 +31,10 @@ PropertyRepository propertyRepository(Ref ref) {
 }
 
 /// Provides the TenantRepository.
-@riverpod
+@Riverpod(keepAlive: true)
 TenantRepository tenantRepository(Ref ref) {
-  return TenantRepositoryImpl(
-    ref.watch(tenantDaoProvider),
-    ref.watch(propertyDaoProvider),
-  );
+  final db = ref.watch(appDatabaseProvider);
+  return TenantRepositoryImpl(db.tenantDao, db.propertyDao, db.documentDao);
 }
 
 /// Provides the BillingRepository.

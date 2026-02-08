@@ -92,12 +92,10 @@ class _OccupancyDetailContent extends StatelessWidget {
               message: 'No bills generated during this stay',
             )
           else
-            ...detail.bills.map(
-              (bill) => _BillCard(
-                bill: bill,
-                propertyName: occupancy.propertyName,
-                roomNumber: occupancy.roomNumber,
-              ),
+            _BillList(
+              bills: detail.bills,
+              propertyName: occupancy.propertyName,
+              roomNumber: occupancy.roomNumber,
             ),
 
           const SizedBox(height: 24),
@@ -520,10 +518,12 @@ class _BillCard extends StatelessWidget {
                           '${_billTypeLabel(bill.billType)} • ${bill.billingPeriod}',
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        if (bill.electricityCharges != null) ...[
+                        if (bill.electricityCharges != null &&
+                            bill.electricityCurrReading != null &&
+                            bill.electricityPrevReading != null) ...[
                           const SizedBox(height: 4),
                           Text(
-                            'Usage: ${bill.electricityCurrReading! - bill.electricityPrevReading!} units',
+                            'Usage: ${(bill.electricityCurrReading! - bill.electricityPrevReading!).toStringAsFixed(2)} units',
                             style: Theme.of(context).textTheme.bodySmall
                                 ?.copyWith(color: AppColors.onSurfaceVariant),
                           ),
@@ -891,6 +891,51 @@ class _EmptyState extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _BillList extends StatefulWidget {
+  final List<Bill> bills;
+  final String? propertyName;
+  final String? roomNumber;
+
+  const _BillList({required this.bills, this.propertyName, this.roomNumber});
+
+  @override
+  State<_BillList> createState() => _BillListState();
+}
+
+class _BillListState extends State<_BillList> {
+  bool _showAll = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final validBills =
+        widget.bills.where((b) => b.status != BillStatus.voided).toList()
+          ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+    final displayBills = _showAll ? validBills : validBills.take(3).toList();
+
+    return Column(
+      children: [
+        ...displayBills.map(
+          (bill) => _BillCard(
+            bill: bill,
+            propertyName: widget.propertyName,
+            roomNumber: widget.roomNumber,
+          ),
+        ),
+        if (validBills.length > 3)
+          TextButton.icon(
+            onPressed: () => setState(() => _showAll = !_showAll),
+            icon: Icon(
+              _showAll ? Icons.expand_less : Icons.expand_more,
+              size: 18,
+            ),
+            label: Text(_showAll ? 'Show Less' : 'View History'),
+          ),
+      ],
     );
   }
 }

@@ -5,7 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../domain/entities/tenant.dart';
 import '../../domain/entities/occupancy.dart';
-import '../../data/database/app_database.dart';
+import '../../domain/entities/document.dart';
+import '../../data/database/app_database.dart' hide Document;
 import 'repository_providers.dart';
 import 'database_provider.dart';
 
@@ -65,6 +66,16 @@ Stream<List<Occupancy>> activeOccupanciesStream(Ref ref) {
 Future<List<Occupancy>> activeOccupancies(Ref ref) {
   final repo = ref.watch(tenantRepositoryProvider);
   return repo.getActiveOccupancies();
+}
+
+@riverpod
+Future<List<Occupancy>> tenantOccupancyHistory(Ref ref, int tenantId) {
+  return ref.watch(tenantRepositoryProvider).getOccupanciesForTenant(tenantId);
+}
+
+@riverpod
+Future<List<Document>> tenantDocuments(Ref ref, int tenantId) {
+  return ref.watch(tenantRepositoryProvider).getDocumentsForTenant(tenantId);
 }
 
 /// Get active occupancy for a room.

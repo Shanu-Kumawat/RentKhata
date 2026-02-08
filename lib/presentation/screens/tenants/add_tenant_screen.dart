@@ -1,10 +1,12 @@
 /// Add/Edit tenant screen with comprehensive profile fields.
 library;
 
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../application/providers/repository_providers.dart';
 import '../../../application/providers/tenant_providers.dart';
 
@@ -57,6 +59,9 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
   // Police Verification
   bool _isPoliceVerified = false;
 
+  // Documents
+  final List<Map<String, String>> _documents = []; // {path, title}
+
   bool _isLoading = false;
 
   bool get isEditing => widget.tenant != null;
@@ -66,6 +71,55 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
     super.initState();
     if (widget.tenant != null) {
       _populateFromTenant(widget.tenant!);
+    }
+  }
+  // ... (omitted methods)
+
+  Future<void> _pickDocument() async {
+    final pickedFile = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+    );
+    if (pickedFile != null) {
+      final titleController = TextEditingController();
+      final title = await showDialog<String>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Document Title'),
+          content: TextField(
+            controller: titleController,
+            decoration: const InputDecoration(hintText: 'e.g. PAN Card'),
+            autofocus: true,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, titleController.text),
+              child: const Text('Add'),
+            ),
+          ],
+        ),
+      );
+
+      if (title != null && title.isNotEmpty) {
+        setState(() {
+          _documents.add({'path': pickedFile.path, 'title': title});
+        });
+      }
+    }
+  }
+
+  Future<void> _saveDocuments(int tenantId) async {
+    final repo = ref.read(tenantRepositoryProvider);
+    for (final doc in _documents) {
+      await repo.addDocument(
+        tenantId: tenantId,
+        title: doc['title']!,
+        filePath: doc['path']!,
+        fileType: 'image',
+      );
     }
   }
 
@@ -125,7 +179,9 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
     try {
       final repo = ref.read(tenantRepositoryProvider);
 
+      int tenantId;
       if (isEditing) {
+        tenantId = widget.tenant!.id;
         await repo.updateTenant(
           widget.tenant!.copyWith(
             name: _nameController.text.trim(),
@@ -177,7 +233,7 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
           ),
         );
       } else {
-        await repo.createTenant(
+        tenantId = await repo.createTenant(
           name: _nameController.text.trim(),
           phone: _phoneController.text.trim().isEmpty
               ? null
@@ -225,6 +281,11 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
               ? null
               : _introducerPhoneController.text.trim(),
         );
+      }
+
+      // Save documents
+      if (_documents.isNotEmpty) {
+        await _saveDocuments(tenantId);
       }
 
       // Invalidate tenant providers to refresh data
@@ -555,6 +616,50 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
                 value: _isPoliceVerified,
                 onChanged: (v) => setState(() => _isPoliceVerified = v),
               ),
+            ),
+            const SizedBox(height: 16),
+
+            // Additional Documents Section
+            _buildSectionCard(
+              title: 'Additional Documents',
+              icon: Icons.folder_outlined,
+              children: [
+                if (_documents.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Text(
+                      'No documents added yet.',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                ..._documents.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final doc = entry.value;
+                  return ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(Icons.description_outlined),
+                    title: Text(doc['title'] ?? ''),
+                    subtitle: Text(
+                      doc['path']?.split('/').last ?? '',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.close, size: 20),
+                      onPressed: () =>
+                          setState(() => _documents.removeAt(index)),
+                    ),
+                  );
+                }),
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  onPressed: _pickDocument,
+                  icon: const Icon(Icons.add),
+                  label: const Text('Add Document'),
+                ),
+              ],
             ),
             const SizedBox(height: 32),
 

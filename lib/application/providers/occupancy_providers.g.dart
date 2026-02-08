@@ -156,7 +156,7 @@ class _OccupancyProviderElement
   int get occupancyId => (origin as OccupancyProvider).occupancyId;
 }
 
-String _$occupancyDetailHash() => r'0d905f24f072170009e9148da4476d28e959ddd0';
+String _$occupancyDetailHash() => r'5cbf9f80cfe26f27688ada19eddceaecb3cd66f3';
 
 /// Get complete occupancy detail with all related data.
 ///

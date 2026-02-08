@@ -87,6 +87,7 @@ Future<OccupancyDetail?> occupancyDetail(Ref ref, int occupancyId) async {
   double totalBilled = 0;
   double totalPaid = 0;
   for (final bill in bills) {
+    if (bill.status == BillStatus.voided) continue;
     totalBilled += bill.amount;
     totalPaid += bill.paidAmount;
   }

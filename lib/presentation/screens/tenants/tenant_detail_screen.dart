@@ -11,15 +11,18 @@ import 'package:intl/intl.dart';
 import '../../../application/providers/tenant_providers.dart';
 import '../../../application/providers/repository_providers.dart';
 import '../../../application/providers/database_provider.dart';
+import '../../../data/database/app_database.dart' hide Document;
+import '../../../data/database/tables/family_member_table.dart';
 
 import '../../../core/utils/currency_formatter.dart';
 import '../../../domain/entities/tenant.dart';
 import '../../../domain/entities/occupancy.dart';
-import '../../../data/database/app_database.dart';
-import '../../../data/database/tables/family_member_table.dart';
+import '../../../domain/entities/document.dart';
+import 'package:open_file/open_file.dart';
+import 'add_tenant_screen.dart';
+import 'add_document_sheet.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
-import 'add_tenant_screen.dart';
 
 /// Tenant detail screen showing profile, custom fields, and history.
 class TenantDetailScreen extends ConsumerWidget {
@@ -338,6 +341,10 @@ class _TenantDetailContent extends ConsumerWidget {
               ),
               error: (_, __) => _FamilyMembersSection(tenantId: tenant.id),
             ),
+            const SizedBox(height: 16),
+
+            // Documents Section
+            _DocumentsSection(tenantId: tenant.id),
             const SizedBox(height: 16),
 
             // Occupancy History Section
@@ -1641,5 +1648,184 @@ class _CustomFieldTile extends StatelessWidget {
         onPressed: onDelete,
       ),
     );
+  }
+}
+
+// ============ Documents Section ============
+
+class _DocumentsSection extends ConsumerWidget {
+  final int tenantId;
+
+  const _DocumentsSection({required this.tenantId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final documentsAsync = ref.watch(tenantDocumentsProvider(tenantId));
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.folder_outlined,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Documents',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                const Spacer(),
+                TextButton.icon(
+                  onPressed: () => _showAddDocumentSheet(context, ref),
+                  icon: const Icon(Icons.add, size: 18),
+                  label: const Text('Add'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            documentsAsync.when(
+              data: (documents) {
+                if (documents.isEmpty) {
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      child: Text(
+                        'No documents attached.',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  );
+                }
+                return ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: documents.length,
+                  separatorBuilder: (_, __) => const Divider(),
+                  itemBuilder: (context, index) {
+                    final doc = documents[index];
+                    return ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: Container(
+                        height: 40,
+                        width: 40,
+                        decoration: BoxDecoration(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.surfaceContainerHighest,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: doc.fileType == 'image'
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.file(
+                                  File(doc.filePath),
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) =>
+                                      const Icon(Icons.broken_image, size: 20),
+                                ),
+                              )
+                            : const Icon(Icons.description, size: 20),
+                      ),
+                      title: Text(
+                        doc.title,
+                        style: const TextStyle(fontWeight: FontWeight.w500),
+                      ),
+                      subtitle: Text(
+                        DateFormat('dd MMM yyyy').format(doc.createdAt),
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.visibility_outlined),
+                            onPressed: () => _viewDocument(context, doc),
+                          ),
+                          IconButton(
+                            icon: Icon(
+                              Icons.delete_outline,
+                              color: Theme.of(context).colorScheme.error,
+                            ),
+                            onPressed: () => _deleteDocument(context, ref, doc),
+                          ),
+                        ],
+                      ),
+                      onTap: () => _viewDocument(context, doc),
+                    );
+                  },
+                );
+              },
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, _) => Text('Error: $e'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showAddDocumentSheet(BuildContext context, WidgetRef ref) async {
+    final result = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => AddDocumentSheet(tenantId: tenantId),
+    );
+
+    if (result == true) {
+      ref.invalidate(tenantDocumentsProvider(tenantId));
+    }
+  }
+
+  void _viewDocument(BuildContext context, Document doc) {
+    if (doc.fileType == 'image') {
+      OpenFile.open(doc.filePath);
+    } else {
+      // Fallback for other types
+      OpenFile.open(doc.filePath);
+    }
+  }
+
+  void _deleteDocument(
+    BuildContext context,
+    WidgetRef ref,
+    Document doc,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Document?'),
+        content: Text('Are you sure you want to delete "${doc.title}"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      await ref.read(tenantRepositoryProvider).deleteDocument(doc.id);
+      ref.invalidate(tenantDocumentsProvider(tenantId));
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Document deleted')));
+      }
+    }
   }
 }

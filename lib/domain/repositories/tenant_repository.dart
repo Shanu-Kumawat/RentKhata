@@ -3,8 +3,9 @@ library;
 
 import '../entities/tenant.dart';
 import '../entities/occupancy.dart';
+import '../entities/document.dart';
 
-/// Abstract repository for tenant and occupancy operations.
+/// Repository for managing tenants and their data.
 abstract class TenantRepository {
   // ========== Tenant Operations ==========
 
@@ -115,4 +116,20 @@ abstract class TenantRepository {
 
   /// Get tenant for a room
   Future<Tenant?> getTenantByRoom(int roomId);
+
+  // ========== Document Operations ==========
+
+  /// Get documents for a tenant
+  Future<List<Document>> getDocumentsForTenant(int tenantId);
+
+  /// Add a document
+  Future<int> addDocument({
+    required int tenantId,
+    required String title,
+    required String filePath,
+    String? fileType,
+  });
+
+  /// Delete a document
+  Future<bool> deleteDocument(int id);
 }

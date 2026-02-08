@@ -25,13 +25,16 @@ import 'tables/notification_setting_table.dart';
 import 'tables/audit_log_table.dart';
 import 'tables/message_template_table.dart';
 import 'tables/bill_settings_table.dart';
+import 'tables/document_table.dart';
 import '../../domain/entities/occupancy.dart';
+import '../../domain/entities/document.dart';
 
 // DAOs
 import 'daos/landlord_dao.dart';
 import 'daos/property_dao.dart';
 import 'daos/tenant_dao.dart';
 import 'daos/billing_dao.dart';
+import 'daos/document_dao.dart';
 
 part 'app_database.g.dart';
 
@@ -55,8 +58,9 @@ part 'app_database.g.dart';
     AuditLogs,
     MessageTemplates,
     BillSettings,
+    Documents,
   ],
-  daos: [LandlordDao, PropertyDao, TenantDao, BillingDao],
+  daos: [LandlordDao, PropertyDao, TenantDao, BillingDao, DocumentDao],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
@@ -65,7 +69,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 10;
+  int get schemaVersion => 12;
 
   @override
   MigrationStrategy get migration {
@@ -232,9 +236,6 @@ Thank you,
           await customStatement(
             'ALTER TABLE family_members_new RENAME TO family_members',
           );
-          await customStatement(
-            'ALTER TABLE family_members_new RENAME TO family_members',
-          );
         }
         if (from < 5) {
           // Add settlement columns to occupancies
@@ -355,6 +356,10 @@ Thank you for your payment.
         if (from < 10) {
           // Add signature_path to landlords table
           await m.addColumn(landlords, landlords.signaturePath);
+        }
+        if (from < 12) {
+          // Add Documents table for tenant document management
+          await m.createTable(documents);
         }
       },
     );

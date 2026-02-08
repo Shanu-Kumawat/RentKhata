@@ -48,13 +48,13 @@ final propertyRepositoryProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef PropertyRepositoryRef = AutoDisposeProviderRef<PropertyRepository>;
-String _$tenantRepositoryHash() => r'b535c0ef962a17004d9163a156636b72b46ad4c3';
+String _$tenantRepositoryHash() => r'5fc252edee739ee4fa1dd194046e877f856325d3';
 
 /// Provides the TenantRepository.
 ///
 /// Copied from [tenantRepository].
 @ProviderFor(tenantRepository)
-final tenantRepositoryProvider = AutoDisposeProvider<TenantRepository>.internal(
+final tenantRepositoryProvider = Provider<TenantRepository>.internal(
   tenantRepository,
   name: r'tenantRepositoryProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -66,7 +66,7 @@ final tenantRepositoryProvider = AutoDisposeProvider<TenantRepository>.internal(
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef TenantRepositoryRef = AutoDisposeProviderRef<TenantRepository>;
+typedef TenantRepositoryRef = ProviderRef<TenantRepository>;
 String _$billingRepositoryHash() => r'f2d2d121d960eaee7cfa7061aa60b230618549ae';
 
 /// Provides the BillingRepository.

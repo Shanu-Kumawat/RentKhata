@@ -59,6 +59,7 @@ dependencies:
   timezone: ^0.10.0
   shared_preferences: ^2.5.4
   open_file: ^3.5.11
+  file_picker: ^10.3.10
 
 dev_dependencies:
   flutter_test:

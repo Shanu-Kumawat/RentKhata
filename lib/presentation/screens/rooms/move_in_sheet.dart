@@ -18,6 +18,7 @@ import '../../../domain/entities/room.dart';
 import '../../../data/database/app_database.dart';
 import '../../../data/database/tables/family_member_table.dart';
 import '../../widgets/image_picker_widget.dart';
+import 'package:image_picker/image_picker.dart';
 
 /// Bottom sheet for moving a tenant into a room.
 class MoveInSheet extends ConsumerStatefulWidget {
@@ -76,10 +77,62 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
   // New family members to add during move-in
   List<_NewFamilyMember> _newFamilyMembers = [];
 
+  // Documents
+  final List<Map<String, String>> _documents = []; // {path, title}
+
   @override
   void initState() {
     super.initState();
     _rentController.text = widget.room.baseRent.toStringAsFixed(0);
+  }
+  // ... (omitted methods)
+
+  Future<void> _pickDocument() async {
+    final pickedFile = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+    );
+    if (pickedFile != null) {
+      final titleController = TextEditingController();
+      final title = await showDialog<String>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Document Title'),
+          content: TextField(
+            controller: titleController,
+            decoration: const InputDecoration(hintText: 'e.g. PAN Card'),
+            autofocus: true,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, titleController.text),
+              child: const Text('Add'),
+            ),
+          ],
+        ),
+      );
+
+      if (title != null && title.isNotEmpty) {
+        setState(() {
+          _documents.add({'path': pickedFile.path, 'title': title});
+        });
+      }
+    }
+  }
+
+  Future<void> _saveDocuments(int tenantId) async {
+    final repo = ref.read(tenantRepositoryProvider);
+    for (final doc in _documents) {
+      await repo.addDocument(
+        tenantId: tenantId,
+        title: doc['title']!,
+        filePath: doc['path']!,
+        fileType: 'image',
+      );
+    }
   }
 
   @override
@@ -245,6 +298,11 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
             gender: Value(member.gender),
           ),
         );
+      }
+
+      // Save documents
+      if (_documents.isNotEmpty) {
+        await _saveDocuments(tenantId);
       }
 
       final totalFamily =
@@ -946,6 +1004,45 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
               prefixIcon: Icon(Icons.phone_outlined),
             ),
             keyboardType: TextInputType.phone,
+          ),
+        ]),
+        const SizedBox(height: 16),
+
+        // Additional Documents Section
+        _buildSection('Additional Documents', Icons.folder_outlined, [
+          if (_documents.isEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Text(
+                'No documents added yet.',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+          ..._documents.asMap().entries.map((entry) {
+            final index = entry.key;
+            final doc = entry.value;
+            return ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.description_outlined),
+              title: Text(doc['title'] ?? ''),
+              subtitle: Text(
+                doc['path']?.split('/').last ?? '',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              trailing: IconButton(
+                icon: const Icon(Icons.close, size: 20),
+                onPressed: () => setState(() => _documents.removeAt(index)),
+              ),
+            );
+          }),
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            onPressed: _pickDocument,
+            icon: const Icon(Icons.add),
+            label: const Text('Add Document'),
           ),
         ]),
         const SizedBox(height: 16),

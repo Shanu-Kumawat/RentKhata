@@ -515,6 +515,253 @@ final activeOccupanciesProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef ActiveOccupanciesRef = AutoDisposeFutureProviderRef<List<Occupancy>>;
+String _$tenantOccupancyHistoryHash() =>
+    r'337d703520f192eb55b7ef39058f8d269595db5b';
+
+/// See also [tenantOccupancyHistory].
+@ProviderFor(tenantOccupancyHistory)
+const tenantOccupancyHistoryProvider = TenantOccupancyHistoryFamily();
+
+/// See also [tenantOccupancyHistory].
+class TenantOccupancyHistoryFamily extends Family<AsyncValue<List<Occupancy>>> {
+  /// See also [tenantOccupancyHistory].
+  const TenantOccupancyHistoryFamily();
+
+  /// See also [tenantOccupancyHistory].
+  TenantOccupancyHistoryProvider call(int tenantId) {
+    return TenantOccupancyHistoryProvider(tenantId);
+  }
+
+  @override
+  TenantOccupancyHistoryProvider getProviderOverride(
+    covariant TenantOccupancyHistoryProvider provider,
+  ) {
+    return call(provider.tenantId);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'tenantOccupancyHistoryProvider';
+}
+
+/// See also [tenantOccupancyHistory].
+class TenantOccupancyHistoryProvider
+    extends AutoDisposeFutureProvider<List<Occupancy>> {
+  /// See also [tenantOccupancyHistory].
+  TenantOccupancyHistoryProvider(int tenantId)
+    : this._internal(
+        (ref) =>
+            tenantOccupancyHistory(ref as TenantOccupancyHistoryRef, tenantId),
+        from: tenantOccupancyHistoryProvider,
+        name: r'tenantOccupancyHistoryProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$tenantOccupancyHistoryHash,
+        dependencies: TenantOccupancyHistoryFamily._dependencies,
+        allTransitiveDependencies:
+            TenantOccupancyHistoryFamily._allTransitiveDependencies,
+        tenantId: tenantId,
+      );
+
+  TenantOccupancyHistoryProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.tenantId,
+  }) : super.internal();
+
+  final int tenantId;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<Occupancy>> Function(TenantOccupancyHistoryRef provider)
+    create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: TenantOccupancyHistoryProvider._internal(
+        (ref) => create(ref as TenantOccupancyHistoryRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        tenantId: tenantId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<Occupancy>> createElement() {
+    return _TenantOccupancyHistoryProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is TenantOccupancyHistoryProvider &&
+        other.tenantId == tenantId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, tenantId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin TenantOccupancyHistoryRef
+    on AutoDisposeFutureProviderRef<List<Occupancy>> {
+  /// The parameter `tenantId` of this provider.
+  int get tenantId;
+}
+
+class _TenantOccupancyHistoryProviderElement
+    extends AutoDisposeFutureProviderElement<List<Occupancy>>
+    with TenantOccupancyHistoryRef {
+  _TenantOccupancyHistoryProviderElement(super.provider);
+
+  @override
+  int get tenantId => (origin as TenantOccupancyHistoryProvider).tenantId;
+}
+
+String _$tenantDocumentsHash() => r'92d4841f8b76a6e83c7c11bfe84bb874116dce7d';
+
+/// See also [tenantDocuments].
+@ProviderFor(tenantDocuments)
+const tenantDocumentsProvider = TenantDocumentsFamily();
+
+/// See also [tenantDocuments].
+class TenantDocumentsFamily extends Family<AsyncValue<List<Document>>> {
+  /// See also [tenantDocuments].
+  const TenantDocumentsFamily();
+
+  /// See also [tenantDocuments].
+  TenantDocumentsProvider call(int tenantId) {
+    return TenantDocumentsProvider(tenantId);
+  }
+
+  @override
+  TenantDocumentsProvider getProviderOverride(
+    covariant TenantDocumentsProvider provider,
+  ) {
+    return call(provider.tenantId);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'tenantDocumentsProvider';
+}
+
+/// See also [tenantDocuments].
+class TenantDocumentsProvider
+    extends AutoDisposeFutureProvider<List<Document>> {
+  /// See also [tenantDocuments].
+  TenantDocumentsProvider(int tenantId)
+    : this._internal(
+        (ref) => tenantDocuments(ref as TenantDocumentsRef, tenantId),
+        from: tenantDocumentsProvider,
+        name: r'tenantDocumentsProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$tenantDocumentsHash,
+        dependencies: TenantDocumentsFamily._dependencies,
+        allTransitiveDependencies:
+            TenantDocumentsFamily._allTransitiveDependencies,
+        tenantId: tenantId,
+      );
+
+  TenantDocumentsProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.tenantId,
+  }) : super.internal();
+
+  final int tenantId;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<Document>> Function(TenantDocumentsRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: TenantDocumentsProvider._internal(
+        (ref) => create(ref as TenantDocumentsRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        tenantId: tenantId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<Document>> createElement() {
+    return _TenantDocumentsProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is TenantDocumentsProvider && other.tenantId == tenantId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, tenantId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin TenantDocumentsRef on AutoDisposeFutureProviderRef<List<Document>> {
+  /// The parameter `tenantId` of this provider.
+  int get tenantId;
+}
+
+class _TenantDocumentsProviderElement
+    extends AutoDisposeFutureProviderElement<List<Document>>
+    with TenantDocumentsRef {
+  _TenantDocumentsProviderElement(super.provider);
+
+  @override
+  int get tenantId => (origin as TenantDocumentsProvider).tenantId;
+}
+
 String _$occupancyForRoomHash() => r'a1f004987a9967048321fc7a173f7310a4d62ea8';
 
 /// Get active occupancy for a room.

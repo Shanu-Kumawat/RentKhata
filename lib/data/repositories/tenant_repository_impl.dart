@@ -5,16 +5,19 @@ import 'package:drift/drift.dart';
 import '../../domain/entities/tenant.dart';
 import '../../domain/entities/occupancy.dart';
 import '../../domain/repositories/tenant_repository.dart';
-import '../database/app_database.dart';
+import '../database/app_database.dart' hide Document;
 import '../database/daos/tenant_dao.dart';
 import '../database/daos/property_dao.dart';
+import '../database/daos/document_dao.dart';
+import '../../domain/entities/document.dart';
 
 /// Implementation of [TenantRepository] using Drift database.
 class TenantRepositoryImpl implements TenantRepository {
   final TenantDao _tenantDao;
   final PropertyDao _propertyDao;
+  final DocumentDao _documentDao;
 
-  TenantRepositoryImpl(this._tenantDao, this._propertyDao);
+  TenantRepositoryImpl(this._tenantDao, this._propertyDao, this._documentDao);
 
   /// Convert tenant entity to domain model with current occupancy info
   Future<Tenant> _tenantToDomain(TenantEntity entity) async {
@@ -349,5 +352,35 @@ class TenantRepositoryImpl implements TenantRepository {
   @override
   Future<bool> updateBillingStartDate(int occupancyId, DateTime date) {
     return _tenantDao.updateBillingStartDate(occupancyId, date);
+  }
+
+  // ========== Document Operations ==========
+
+  @override
+  Future<List<Document>> getDocumentsForTenant(int tenantId) {
+    return _documentDao.getDocumentsForTenant(tenantId);
+  }
+
+  @override
+  Future<int> addDocument({
+    required int tenantId,
+    required String title,
+    required String filePath,
+    String? fileType,
+  }) {
+    final doc = DocumentsCompanion(
+      tenantId: Value(tenantId),
+      title: Value(title),
+      filePath: Value(filePath),
+      fileType: Value(fileType),
+      createdAt: Value(DateTime.now()),
+    );
+    return _documentDao.insertDocument(doc);
+  }
+
+  @override
+  Future<bool> deleteDocument(int id) async {
+    final result = await _documentDao.deleteDocument(id);
+    return result > 0;
   }
 }
