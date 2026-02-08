@@ -21,6 +21,7 @@ import '../screens/settings/settings_screen.dart';
 import '../screens/settings/backup_screen.dart';
 import '../screens/reports/reports_screen.dart';
 import '../screens/occupancies/occupancy_detail_screen.dart';
+import '../screens/auth/lock_screen.dart';
 import '../widgets/main_shell.dart';
 
 /// Route paths
@@ -44,6 +45,7 @@ class AppRoutes {
   static const String occupancyDetail = '/occupancies/:id';
   static const String settings = '/settings';
   static const String backup = '/settings/backup';
+  static const String lock = '/lock';
 }
 
 // Navigation keys for shell routes
@@ -71,6 +73,12 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.addFirstProperty,
         builder: (context, state) => const AddFirstPropertyScreen(),
+      ),
+
+      // ========== Lock Screen (outside shell) ==========
+      GoRoute(
+        path: AppRoutes.lock,
+        builder: (context, state) => const LockScreen(),
       ),
 
       // ========== Room Detail (outside shell for full-screen) ==========

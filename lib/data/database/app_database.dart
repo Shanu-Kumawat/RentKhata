@@ -26,6 +26,7 @@ import 'tables/audit_log_table.dart';
 import 'tables/message_template_table.dart';
 import 'tables/bill_settings_table.dart';
 import 'tables/document_table.dart';
+import 'tables/biometric_settings_table.dart';
 import '../../domain/entities/occupancy.dart';
 import '../../domain/entities/document.dart';
 
@@ -59,6 +60,7 @@ part 'app_database.g.dart';
     MessageTemplates,
     BillSettings,
     Documents,
+    BiometricSettings,
   ],
   daos: [LandlordDao, PropertyDao, TenantDao, BillingDao, DocumentDao],
 )
@@ -69,7 +71,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 12;
+  int get schemaVersion => 13;
 
   @override
   MigrationStrategy get migration {
@@ -360,6 +362,14 @@ Thank you for your payment.
         if (from < 12) {
           // Add Documents table for tenant document management
           await m.createTable(documents);
+        }
+        if (from < 13) {
+          // Add biometric settings table for app lock
+          await m.createTable(biometricSettings);
+          // Insert default settings (disabled)
+          await into(
+            biometricSettings,
+          ).insert(BiometricSettingsCompanion.insert());
         }
       },
     );

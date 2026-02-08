@@ -10705,6 +10705,431 @@ class DocumentsCompanion extends UpdateCompanion<Document> {
   }
 }
 
+class $BiometricSettingsTable extends BiometricSettings
+    with TableInfo<$BiometricSettingsTable, BiometricSetting> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $BiometricSettingsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _isEnabledMeta = const VerificationMeta(
+    'isEnabled',
+  );
+  @override
+  late final GeneratedColumn<bool> isEnabled = GeneratedColumn<bool>(
+    'is_enabled',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_enabled" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _lockOnExitMeta = const VerificationMeta(
+    'lockOnExit',
+  );
+  @override
+  late final GeneratedColumn<bool> lockOnExit = GeneratedColumn<bool>(
+    'lock_on_exit',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("lock_on_exit" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _lockAfterMinutesMeta = const VerificationMeta(
+    'lockAfterMinutes',
+  );
+  @override
+  late final GeneratedColumn<int> lockAfterMinutes = GeneratedColumn<int>(
+    'lock_after_minutes',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    isEnabled,
+    lockOnExit,
+    lockAfterMinutes,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'biometric_settings';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<BiometricSetting> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('is_enabled')) {
+      context.handle(
+        _isEnabledMeta,
+        isEnabled.isAcceptableOrUnknown(data['is_enabled']!, _isEnabledMeta),
+      );
+    }
+    if (data.containsKey('lock_on_exit')) {
+      context.handle(
+        _lockOnExitMeta,
+        lockOnExit.isAcceptableOrUnknown(
+          data['lock_on_exit']!,
+          _lockOnExitMeta,
+        ),
+      );
+    }
+    if (data.containsKey('lock_after_minutes')) {
+      context.handle(
+        _lockAfterMinutesMeta,
+        lockAfterMinutes.isAcceptableOrUnknown(
+          data['lock_after_minutes']!,
+          _lockAfterMinutesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  BiometricSetting map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return BiometricSetting(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      isEnabled: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_enabled'],
+      )!,
+      lockOnExit: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}lock_on_exit'],
+      )!,
+      lockAfterMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}lock_after_minutes'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $BiometricSettingsTable createAlias(String alias) {
+    return $BiometricSettingsTable(attachedDatabase, alias);
+  }
+}
+
+class BiometricSetting extends DataClass
+    implements Insertable<BiometricSetting> {
+  /// Single row ID (always 1)
+  final int id;
+
+  /// Master toggle for biometric lock
+  final bool isEnabled;
+
+  /// Lock immediately when app goes to background
+  final bool lockOnExit;
+
+  /// Lock after N minutes of inactivity (0 = immediate)
+  final int lockAfterMinutes;
+
+  /// Creation timestamp
+  final DateTime createdAt;
+
+  /// Last updated timestamp
+  final DateTime updatedAt;
+  const BiometricSetting({
+    required this.id,
+    required this.isEnabled,
+    required this.lockOnExit,
+    required this.lockAfterMinutes,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['is_enabled'] = Variable<bool>(isEnabled);
+    map['lock_on_exit'] = Variable<bool>(lockOnExit);
+    map['lock_after_minutes'] = Variable<int>(lockAfterMinutes);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  BiometricSettingsCompanion toCompanion(bool nullToAbsent) {
+    return BiometricSettingsCompanion(
+      id: Value(id),
+      isEnabled: Value(isEnabled),
+      lockOnExit: Value(lockOnExit),
+      lockAfterMinutes: Value(lockAfterMinutes),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory BiometricSetting.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return BiometricSetting(
+      id: serializer.fromJson<int>(json['id']),
+      isEnabled: serializer.fromJson<bool>(json['isEnabled']),
+      lockOnExit: serializer.fromJson<bool>(json['lockOnExit']),
+      lockAfterMinutes: serializer.fromJson<int>(json['lockAfterMinutes']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'isEnabled': serializer.toJson<bool>(isEnabled),
+      'lockOnExit': serializer.toJson<bool>(lockOnExit),
+      'lockAfterMinutes': serializer.toJson<int>(lockAfterMinutes),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  BiometricSetting copyWith({
+    int? id,
+    bool? isEnabled,
+    bool? lockOnExit,
+    int? lockAfterMinutes,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => BiometricSetting(
+    id: id ?? this.id,
+    isEnabled: isEnabled ?? this.isEnabled,
+    lockOnExit: lockOnExit ?? this.lockOnExit,
+    lockAfterMinutes: lockAfterMinutes ?? this.lockAfterMinutes,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  BiometricSetting copyWithCompanion(BiometricSettingsCompanion data) {
+    return BiometricSetting(
+      id: data.id.present ? data.id.value : this.id,
+      isEnabled: data.isEnabled.present ? data.isEnabled.value : this.isEnabled,
+      lockOnExit: data.lockOnExit.present
+          ? data.lockOnExit.value
+          : this.lockOnExit,
+      lockAfterMinutes: data.lockAfterMinutes.present
+          ? data.lockAfterMinutes.value
+          : this.lockAfterMinutes,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BiometricSetting(')
+          ..write('id: $id, ')
+          ..write('isEnabled: $isEnabled, ')
+          ..write('lockOnExit: $lockOnExit, ')
+          ..write('lockAfterMinutes: $lockAfterMinutes, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    isEnabled,
+    lockOnExit,
+    lockAfterMinutes,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is BiometricSetting &&
+          other.id == this.id &&
+          other.isEnabled == this.isEnabled &&
+          other.lockOnExit == this.lockOnExit &&
+          other.lockAfterMinutes == this.lockAfterMinutes &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class BiometricSettingsCompanion extends UpdateCompanion<BiometricSetting> {
+  final Value<int> id;
+  final Value<bool> isEnabled;
+  final Value<bool> lockOnExit;
+  final Value<int> lockAfterMinutes;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  const BiometricSettingsCompanion({
+    this.id = const Value.absent(),
+    this.isEnabled = const Value.absent(),
+    this.lockOnExit = const Value.absent(),
+    this.lockAfterMinutes = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  BiometricSettingsCompanion.insert({
+    this.id = const Value.absent(),
+    this.isEnabled = const Value.absent(),
+    this.lockOnExit = const Value.absent(),
+    this.lockAfterMinutes = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  static Insertable<BiometricSetting> custom({
+    Expression<int>? id,
+    Expression<bool>? isEnabled,
+    Expression<bool>? lockOnExit,
+    Expression<int>? lockAfterMinutes,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (isEnabled != null) 'is_enabled': isEnabled,
+      if (lockOnExit != null) 'lock_on_exit': lockOnExit,
+      if (lockAfterMinutes != null) 'lock_after_minutes': lockAfterMinutes,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  BiometricSettingsCompanion copyWith({
+    Value<int>? id,
+    Value<bool>? isEnabled,
+    Value<bool>? lockOnExit,
+    Value<int>? lockAfterMinutes,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+  }) {
+    return BiometricSettingsCompanion(
+      id: id ?? this.id,
+      isEnabled: isEnabled ?? this.isEnabled,
+      lockOnExit: lockOnExit ?? this.lockOnExit,
+      lockAfterMinutes: lockAfterMinutes ?? this.lockAfterMinutes,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (isEnabled.present) {
+      map['is_enabled'] = Variable<bool>(isEnabled.value);
+    }
+    if (lockOnExit.present) {
+      map['lock_on_exit'] = Variable<bool>(lockOnExit.value);
+    }
+    if (lockAfterMinutes.present) {
+      map['lock_after_minutes'] = Variable<int>(lockAfterMinutes.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BiometricSettingsCompanion(')
+          ..write('id: $id, ')
+          ..write('isEnabled: $isEnabled, ')
+          ..write('lockOnExit: $lockOnExit, ')
+          ..write('lockAfterMinutes: $lockAfterMinutes, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -10734,6 +11159,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   );
   late final $BillSettingsTable billSettings = $BillSettingsTable(this);
   late final $DocumentsTable documents = $DocumentsTable(this);
+  late final $BiometricSettingsTable biometricSettings =
+      $BiometricSettingsTable(this);
   late final LandlordDao landlordDao = LandlordDao(this as AppDatabase);
   late final PropertyDao propertyDao = PropertyDao(this as AppDatabase);
   late final TenantDao tenantDao = TenantDao(this as AppDatabase);
@@ -10762,6 +11189,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     messageTemplates,
     billSettings,
     documents,
+    biometricSettings,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -18250,6 +18678,236 @@ typedef $$DocumentsTableProcessedTableManager =
       Document,
       PrefetchHooks Function({bool tenantId})
     >;
+typedef $$BiometricSettingsTableCreateCompanionBuilder =
+    BiometricSettingsCompanion Function({
+      Value<int> id,
+      Value<bool> isEnabled,
+      Value<bool> lockOnExit,
+      Value<int> lockAfterMinutes,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+typedef $$BiometricSettingsTableUpdateCompanionBuilder =
+    BiometricSettingsCompanion Function({
+      Value<int> id,
+      Value<bool> isEnabled,
+      Value<bool> lockOnExit,
+      Value<int> lockAfterMinutes,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+
+class $$BiometricSettingsTableFilterComposer
+    extends Composer<_$AppDatabase, $BiometricSettingsTable> {
+  $$BiometricSettingsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isEnabled => $composableBuilder(
+    column: $table.isEnabled,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get lockOnExit => $composableBuilder(
+    column: $table.lockOnExit,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get lockAfterMinutes => $composableBuilder(
+    column: $table.lockAfterMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$BiometricSettingsTableOrderingComposer
+    extends Composer<_$AppDatabase, $BiometricSettingsTable> {
+  $$BiometricSettingsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isEnabled => $composableBuilder(
+    column: $table.isEnabled,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get lockOnExit => $composableBuilder(
+    column: $table.lockOnExit,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get lockAfterMinutes => $composableBuilder(
+    column: $table.lockAfterMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$BiometricSettingsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $BiometricSettingsTable> {
+  $$BiometricSettingsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<bool> get isEnabled =>
+      $composableBuilder(column: $table.isEnabled, builder: (column) => column);
+
+  GeneratedColumn<bool> get lockOnExit => $composableBuilder(
+    column: $table.lockOnExit,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get lockAfterMinutes => $composableBuilder(
+    column: $table.lockAfterMinutes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$BiometricSettingsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $BiometricSettingsTable,
+          BiometricSetting,
+          $$BiometricSettingsTableFilterComposer,
+          $$BiometricSettingsTableOrderingComposer,
+          $$BiometricSettingsTableAnnotationComposer,
+          $$BiometricSettingsTableCreateCompanionBuilder,
+          $$BiometricSettingsTableUpdateCompanionBuilder,
+          (
+            BiometricSetting,
+            BaseReferences<
+              _$AppDatabase,
+              $BiometricSettingsTable,
+              BiometricSetting
+            >,
+          ),
+          BiometricSetting,
+          PrefetchHooks Function()
+        > {
+  $$BiometricSettingsTableTableManager(
+    _$AppDatabase db,
+    $BiometricSettingsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$BiometricSettingsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$BiometricSettingsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$BiometricSettingsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<bool> isEnabled = const Value.absent(),
+                Value<bool> lockOnExit = const Value.absent(),
+                Value<int> lockAfterMinutes = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => BiometricSettingsCompanion(
+                id: id,
+                isEnabled: isEnabled,
+                lockOnExit: lockOnExit,
+                lockAfterMinutes: lockAfterMinutes,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<bool> isEnabled = const Value.absent(),
+                Value<bool> lockOnExit = const Value.absent(),
+                Value<int> lockAfterMinutes = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => BiometricSettingsCompanion.insert(
+                id: id,
+                isEnabled: isEnabled,
+                lockOnExit: lockOnExit,
+                lockAfterMinutes: lockAfterMinutes,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$BiometricSettingsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $BiometricSettingsTable,
+      BiometricSetting,
+      $$BiometricSettingsTableFilterComposer,
+      $$BiometricSettingsTableOrderingComposer,
+      $$BiometricSettingsTableAnnotationComposer,
+      $$BiometricSettingsTableCreateCompanionBuilder,
+      $$BiometricSettingsTableUpdateCompanionBuilder,
+      (
+        BiometricSetting,
+        BaseReferences<
+          _$AppDatabase,
+          $BiometricSettingsTable,
+          BiometricSetting
+        >,
+      ),
+      BiometricSetting,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -18290,4 +18948,6 @@ class $AppDatabaseManager {
       $$BillSettingsTableTableManager(_db, _db.billSettings);
   $$DocumentsTableTableManager get documents =>
       $$DocumentsTableTableManager(_db, _db.documents);
+  $$BiometricSettingsTableTableManager get biometricSettings =>
+      $$BiometricSettingsTableTableManager(_db, _db.biometricSettings);
 }

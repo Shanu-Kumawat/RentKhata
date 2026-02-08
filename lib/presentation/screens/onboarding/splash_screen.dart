@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../application/providers/dashboard_providers.dart';
+import '../../../application/providers/biometric_providers.dart';
 
 /// Splash screen shown on app launch.
 class SplashScreen extends ConsumerStatefulWidget {
@@ -57,6 +58,21 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
     if (isFirstLaunch) {
       context.go('/welcome');
+      return;
+    }
+
+    // Check if biometric lock is enabled
+    final biometricSettings = await ref.read(
+      biometricSettingsNotifierProvider.future,
+    );
+    final isBiometricEnabled = biometricSettings?.isEnabled ?? false;
+
+    if (!mounted) return;
+
+    if (isBiometricEnabled) {
+      // Lock the app and navigate to lock screen
+      ref.read(appLockStateProvider.notifier).lock();
+      context.go('/lock');
     } else {
       context.go('/dashboard');
     }

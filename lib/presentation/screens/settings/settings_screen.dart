@@ -15,6 +15,7 @@ import 'electricity_rates_screen.dart';
 import 'message_templates_screen.dart';
 import 'billing_cycle_settings_screen.dart';
 import 'notification_settings_screen.dart';
+import 'biometric_settings_screen.dart';
 
 /// Settings screen.
 class SettingsScreen extends ConsumerWidget {
@@ -88,6 +89,22 @@ class SettingsScreen extends ConsumerWidget {
 
           _AnimatedSettingsSection(
             index: 1,
+            title: 'Security',
+            children: [
+              _SettingsTile(
+                icon: Icons.fingerprint,
+                title: 'App Lock',
+                subtitle: 'Biometric authentication',
+                onTap: () => Navigator.push(
+                  context,
+                  _createRoute(const BiometricSettingsScreen()),
+                ),
+              ),
+            ],
+          ),
+
+          _AnimatedSettingsSection(
+            index: 2,
             title: 'Billing & Cycles',
             children: [
               _SettingsTile(
@@ -103,7 +120,7 @@ class SettingsScreen extends ConsumerWidget {
           ),
 
           _AnimatedSettingsSection(
-            index: 2,
+            index: 3,
             title: 'Billing',
             children: [
               _SettingsTile(
@@ -128,7 +145,7 @@ class SettingsScreen extends ConsumerWidget {
           ),
 
           _AnimatedSettingsSection(
-            index: 3,
+            index: 4,
             title: 'Notifications',
             children: [
               _SettingsTile(
@@ -144,7 +161,7 @@ class SettingsScreen extends ConsumerWidget {
           ),
 
           _AnimatedSettingsSection(
-            index: 4,
+            index: 5,
             title: 'Data',
             children: [
               _SettingsTile(
@@ -157,7 +174,7 @@ class SettingsScreen extends ConsumerWidget {
           ),
 
           _AnimatedSettingsSection(
-            index: 5,
+            index: 6,
             title: 'About',
             children: [
               _SettingsTile(
