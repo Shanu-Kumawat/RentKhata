@@ -2,16 +2,11 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../../application/providers/biometric_providers.dart';
 import '../../services/inactivity_service.dart';
-
-/// Provider for the inactivity service instance.
-final inactivityServiceProvider = Provider<InactivityService?>((ref) {
-  // Will be initialized by ActivityTracker widget
-  return null;
-});
+import '../router/app_router.dart';
 
 /// Widget that wraps the app to track user activity for inactivity timeout.
 class ActivityTracker extends ConsumerStatefulWidget {
@@ -26,12 +21,17 @@ class ActivityTracker extends ConsumerStatefulWidget {
 class _ActivityTrackerState extends ConsumerState<ActivityTracker>
     with WidgetsBindingObserver {
   InactivityService? _inactivityService;
+  bool _isInitialized = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _initializeService();
+
+    // Initialize after first frame to ensure providers are ready
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      _initializeFromSettings();
+    });
   }
 
   @override
@@ -41,33 +41,45 @@ class _ActivityTrackerState extends ConsumerState<ActivityTracker>
     super.dispose();
   }
 
-  void _initializeService() {
-    // Service will be created after settings are loaded
+  void _initializeFromSettings() {
+    final settingsAsync = ref.read(biometricSettingsNotifierProvider);
+    settingsAsync.whenData((settings) {
+      if (settings != null) {
+        _setupService(settings.lockAfterMinutes, settings.isEnabled);
+        _isInitialized = true;
+      }
+    });
   }
 
-  void _setupService(int timeoutMinutes, bool enabled, bool lockOnExit) {
+  void _setupService(int timeoutMinutes, bool enabled) {
+    final shouldBeEnabled = enabled && timeoutMinutes > 0;
+
     if (_inactivityService == null) {
       _inactivityService = InactivityService(
         timeoutMinutes: timeoutMinutes,
-        enabled: enabled && timeoutMinutes > 0,
+        enabled: shouldBeEnabled,
         onInactivityTimeout: _handleTimeout,
       );
-      if (enabled && timeoutMinutes > 0) {
+      if (shouldBeEnabled) {
+        debugPrint(
+          'ActivityTracker: Starting timer with $timeoutMinutes min timeout',
+        );
         _inactivityService!.start();
       }
     } else {
       _inactivityService!.updateTimeout(timeoutMinutes);
-      _inactivityService!.setEnabled(enabled && timeoutMinutes > 0);
+      _inactivityService!.setEnabled(shouldBeEnabled);
     }
   }
 
   void _handleTimeout() {
+    debugPrint('ActivityTracker: Timeout triggered, locking app');
     // Lock the app
     ref.read(appLockStateProvider.notifier).lock();
-    // Navigate to lock screen using GoRouter
-    if (mounted) {
-      context.go('/lock');
-    }
+
+    // Navigate to lock screen using router provider
+    final router = ref.read(routerProvider);
+    router.go('/lock');
   }
 
   @override
@@ -75,28 +87,37 @@ class _ActivityTrackerState extends ConsumerState<ActivityTracker>
     final settings = ref.read(biometricSettingsNotifierProvider).valueOrNull;
     final isEnabled = settings?.isEnabled ?? false;
     final lockOnExit = settings?.lockOnExit ?? true;
+    final timeoutMinutes = settings?.lockAfterMinutes ?? 0;
+
+    debugPrint('ActivityTracker: Lifecycle state changed to $state');
 
     switch (state) {
       case AppLifecycleState.paused:
       case AppLifecycleState.inactive:
         // App going to background
         if (isEnabled && lockOnExit) {
+          debugPrint('ActivityTracker: Locking on exit');
           ref.read(appLockStateProvider.notifier).lock();
         }
         _inactivityService?.stop();
       case AppLifecycleState.resumed:
         // App returning to foreground
-        // Navigate to lock screen if locked
+        // Check if should show lock screen
         if (isEnabled) {
           final isLocked = ref.read(appLockStateProvider);
-          if (isLocked && mounted) {
+          if (isLocked) {
+            debugPrint(
+              'ActivityTracker: App resumed while locked, navigating to lock screen',
+            );
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (mounted) context.go('/lock');
+              final router = ref.read(routerProvider);
+              router.go('/lock');
             });
           }
         }
         // Restart inactivity timer
-        if (isEnabled && (settings?.lockAfterMinutes ?? 0) > 0) {
+        if (isEnabled && timeoutMinutes > 0) {
+          debugPrint('ActivityTracker: Restarting inactivity timer');
           _inactivityService?.start();
         }
       case AppLifecycleState.detached:
@@ -116,11 +137,12 @@ class _ActivityTrackerState extends ConsumerState<ActivityTracker>
     final settingsAsync = ref.watch(biometricSettingsNotifierProvider);
 
     settingsAsync.whenData((settings) {
-      final isEnabled = settings?.isEnabled ?? false;
-      final lockOnExit = settings?.lockOnExit ?? true;
-      final timeoutMinutes = settings?.lockAfterMinutes ?? 0;
-
-      _setupService(timeoutMinutes, isEnabled, lockOnExit);
+      if (settings != null && _isInitialized) {
+        _setupService(settings.lockAfterMinutes, settings.isEnabled);
+      } else if (settings != null && !_isInitialized) {
+        _setupService(settings.lockAfterMinutes, settings.isEnabled);
+        _isInitialized = true;
+      }
     });
 
     // Wrap with Listener to detect all pointer events
