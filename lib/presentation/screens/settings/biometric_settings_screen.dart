@@ -46,6 +46,7 @@ class BiometricSettingsScreen extends ConsumerWidget {
       data: (settings) {
         final isEnabled = settings?.isEnabled ?? false;
         final lockOnExit = settings?.lockOnExit ?? true;
+        final lockAfterMinutes = settings?.lockAfterMinutes ?? 0;
 
         return ListView(
           physics: const AlwaysScrollableScrollPhysics(
@@ -134,6 +135,19 @@ class BiometricSettingsScreen extends ConsumerWidget {
                               .read(biometricSettingsNotifierProvider.notifier)
                               .setLockOnExit(value);
                         },
+                      ),
+                    ),
+                    // Lock after inactivity
+                    BouncingScaleWrapper(
+                      child: ListTile(
+                        title: const Text('Lock After Inactivity'),
+                        subtitle: Text(_getInactivityLabel(lockAfterMinutes)),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () => _showInactivityPicker(
+                          context,
+                          ref,
+                          lockAfterMinutes,
+                        ),
                       ),
                     ),
                   ],
@@ -253,12 +267,87 @@ class BiometricSettingsScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Please set up fingerprint or face recognition in your device settings first.',
+              'Please set up fingerprint in your device settings first.',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _getInactivityLabel(int minutes) {
+    if (minutes <= 0) return 'Never';
+    if (minutes == 1) return '1 minute';
+    return '$minutes minutes';
+  }
+
+  void _showInactivityPicker(
+    BuildContext context,
+    WidgetRef ref,
+    int currentValue,
+  ) {
+    final options = [
+      (0, 'Never'),
+      (1, '1 minute'),
+      (5, '5 minutes'),
+      (15, '15 minutes'),
+      (30, '30 minutes'),
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 8),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.outline,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                'Lock After Inactivity',
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(height: 8),
+            ...options.map(
+              (option) => ListTile(
+                leading: Radio<int>(
+                  value: option.$1,
+                  groupValue: currentValue,
+                  onChanged: (value) {
+                    if (value != null) {
+                      ref
+                          .read(biometricSettingsNotifierProvider.notifier)
+                          .setLockAfterMinutes(value);
+                      Navigator.pop(context);
+                    }
+                  },
+                ),
+                title: Text(option.$2),
+                onTap: () {
+                  ref
+                      .read(biometricSettingsNotifierProvider.notifier)
+                      .setLockAfterMinutes(option.$1);
+                  Navigator.pop(context);
+                },
+              ),
+            ),
+            const SizedBox(height: 16),
           ],
         ),
       ),

@@ -7,6 +7,7 @@ import 'application/providers/billing_providers.dart';
 import 'application/providers/theme_settings_provider.dart';
 import 'core/theme/app_theme.dart';
 import 'presentation/router/app_router.dart';
+import 'presentation/widgets/activity_tracker.dart';
 import 'services/notification_scheduler.dart';
 
 /// The root application widget.
@@ -43,13 +44,16 @@ class RentKhataApp extends ConsumerWidget {
         darkThemeData = darkGoldTheme();
     }
 
-    return MaterialApp.router(
-      title: 'RentKhata',
-      debugShowCheckedModeBanner: false,
-      theme: lightTheme(),
-      darkTheme: darkThemeData,
-      themeMode: themeMode,
-      routerConfig: router,
+    // Wrap with ActivityTracker for inactivity-based locking
+    return ActivityTracker(
+      child: MaterialApp.router(
+        title: 'RentKhata',
+        debugShowCheckedModeBanner: false,
+        theme: lightTheme(),
+        darkTheme: darkThemeData,
+        themeMode: themeMode,
+        routerConfig: router,
+      ),
     );
   }
 }
