@@ -12,8 +12,10 @@ import '../../../application/providers/billing_cycle_providers.dart';
 import '../../../domain/entities/billing_status.dart';
 import '../../../domain/entities/bill.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/utils/currency_formatter.dart';
+
 import '../../widgets/bouncing_scale_wrapper.dart';
+import '../../widgets/staggered_fade_in.dart';
+import '../../widgets/animated_counter_text.dart';
 
 /// Main dashboard screen showing financial overview and actionable items.
 class DashboardScreen extends ConsumerWidget {
@@ -61,25 +63,42 @@ class DashboardScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // 1. Top Section: Compact Financial Summary
-              const _CompactFinancialHeader(),
+              const StaggeredFadeIn(
+                delay: Duration(milliseconds: 0),
+                child: _CompactFinancialHeader(),
+              ),
               const SizedBox(height: 24),
 
               // 2. Middle Section: Action Center (Priority Zone)
-              const _SectionHeader(
-                icon: Icons.notifications_active_outlined,
-                title: 'Attention Needed',
+              const StaggeredFadeIn(
+                delay: Duration(milliseconds: 100),
+                child: Column(
+                  children: [
+                    _SectionHeader(
+                      icon: Icons.notifications_active_outlined,
+                      title: 'Attention Needed',
+                    ),
+                    SizedBox(height: 12),
+                    _ActionRequiredSection(),
+                  ],
+                ),
               ),
-              const SizedBox(height: 12),
-              const _ActionRequiredSection(),
               const SizedBox(height: 24),
 
               // 3. Bottom Section: Live Property Status
-              const _SectionHeader(
-                icon: Icons.meeting_room_outlined,
-                title: 'Live Property Status',
+              StaggeredFadeIn(
+                delay: const Duration(milliseconds: 200),
+                child: Column(
+                  children: [
+                    const _SectionHeader(
+                      icon: Icons.meeting_room_outlined,
+                      title: 'Live Property Status',
+                    ),
+                    const SizedBox(height: 12),
+                    _LivePropertyStatusList(),
+                  ],
+                ),
               ),
-              const SizedBox(height: 12),
-              _LivePropertyStatusList(),
               const SizedBox(height: 80), // Bottom padding for FAB
             ],
           ),
@@ -199,10 +218,11 @@ class _CompactFinancialHeader extends ConsumerWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 4),
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Flexible(
                 child: Text(
-                  'Monthly Overview',
+                  'Overview',
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
@@ -212,9 +232,8 @@ class _CompactFinancialHeader extends ConsumerWidget {
               const SizedBox(width: 12),
               Container(
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.surface,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: theme.colorScheme.outline),
+                  color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                  borderRadius: BorderRadius.circular(24),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -232,7 +251,7 @@ class _CompactFinancialHeader extends ConsumerWidget {
                       },
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
                       child: Text(
                         dateFormat.format(selectedMonth),
                         style: theme.textTheme.bodyMedium?.copyWith(
@@ -329,18 +348,14 @@ class _MonthNavButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(10),
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: Icon(
-            icon,
-            size: 20,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
+    return BouncingScaleWrapper(
+      onTap: onPressed,
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: Icon(
+          icon,
+          size: 20,
+          color: Theme.of(context).colorScheme.onSurface,
         ),
       ),
     );
@@ -375,48 +390,86 @@ class _FinancialStatCard extends StatelessWidget {
 
     if (isLoading) {
       return Container(
-        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: theme.colorScheme.outline),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: 60,
-              height: 12,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.outline,
-                borderRadius: BorderRadius.circular(6),
-              ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(15),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      width: 60,
+                      height: 16, // Matches the font height
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.outline.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                    Container(
+                      width: 28,
+                      height: 28, // Matches the icon container size
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.outline.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  width: 120,
+                  height: 32, // Matches headlineSmall approximate height
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.outline.withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 12),
-            Container(
-              width: 100,
-              height: 24,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.outline,
-                borderRadius: BorderRadius.circular(6),
-              ),
-            ),
-          ],
+          ),
         ),
       );
     }
 
-    return Container(
-      decoration: BoxDecoration(
+    return BouncingScaleWrapper(
+      child: Container(
+        decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.colorScheme.outline),
+        boxShadow: [
+          BoxShadow(
+            color: accentColor!.withValues(alpha: 0.08),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+        border: Border.all(
+          color: accentColor!.withValues(alpha: 0.2),
+          width: 1,
+        ),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(15),
         child: Container(
           decoration: BoxDecoration(
-            border: Border(left: BorderSide(color: accentColor!, width: 4)),
+            gradient: LinearGradient(
+              colors: [
+                accentColor!.withValues(alpha: 0.18),
+                accentColor!.withValues(alpha: 0.04),
+                Colors.transparent,
+              ],
+              stops: const [0.0, 0.4, 1.0],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
           ),
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -431,14 +484,14 @@ class _FinancialStatCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 11,
                       letterSpacing: 0.8,
-                      color: theme.colorScheme.onSurface.withAlpha(150),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: accentColor!.withAlpha(25),
+                      color: accentColor!.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(icon, size: 16, color: accentColor),
@@ -447,8 +500,8 @@ class _FinancialStatCard extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               // Amount
-              Text(
-                formatCurrency(amount!),
+              AnimatedCounterText(
+                value: amount!,
                 style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: theme.colorScheme.onSurface,
@@ -457,6 +510,7 @@ class _FinancialStatCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
       ),
     );
   }
@@ -589,18 +643,39 @@ class _ActionRequiredSection extends ConsumerWidget {
             final overdueCount = bills.where((b) => b.isOverdue).length;
             final count = bills.length;
 
-            return InkWell(
+            return BouncingScaleWrapper(
               onTap: () => context.push('/reports'),
               child: Container(
-                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.error.withValues(alpha: 0.05),
+                  color: theme.colorScheme.surface,
+                  boxShadow: [
+                    BoxShadow(
+                      color: theme.colorScheme.error.withValues(alpha: 0.1),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: theme.colorScheme.error.withValues(alpha: 0.2),
-                  ),
                 ),
-                child: Row(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: theme.colorScheme.error.withValues(alpha: 0.25),
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                      gradient: LinearGradient(
+                        colors: [
+                          theme.colorScheme.error.withValues(alpha: 0.1),
+                          theme.colorScheme.error.withValues(alpha: 0.02),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                    ),
+                    child: Row(
                   children: [
                     CircleAvatar(
                       backgroundColor: theme.colorScheme.error.withValues(
@@ -650,6 +725,8 @@ class _ActionRequiredSection extends ConsumerWidget {
                   ],
                 ),
               ),
+            ),
+            ),
             );
           },
           loading: () => const LinearProgressIndicator(),
@@ -841,14 +918,16 @@ class _LivePropertyStatusList extends ConsumerWidget {
         if (items.isEmpty) {
           return const Center(child: Text('No active rooms found'));
         }
-        return ListView.separated(
+        return ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: items.length,
-          separatorBuilder: (context, index) => const Divider(height: 1),
           itemBuilder: (context, index) {
             final item = items[index];
-            return _RoomStatusTile(item: item);
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12.0),
+              child: _RoomStatusTile(item: item),
+            );
           },
         );
       },
@@ -869,51 +948,101 @@ class _RoomStatusTile extends StatelessWidget {
 
     return BouncingScaleWrapper(
       onTap: () => context.push('/rooms/${item.roomId}'),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-        leading: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Text(
-            item.roomNumber,
-            style: const TextStyle(fontWeight: FontWeight.bold),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.05),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+          border: Border.all(
+            color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.3),
+            width: 1,
           ),
         ),
-        title: Text(
-          item.tenantName,
-          style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
-          overflow: TextOverflow.ellipsis,
-        ),
-        trailing: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: color.withValues(alpha: 0.3)),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 6,
-                height: 6,
-                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-              ),
-              const SizedBox(width: 6),
-              Text(
-                item.statusLabel,
-                style: TextStyle(
-                  color: _getStatusTextColor(context, item.status),
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(15),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                // Leading Room Badge
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.secondaryContainer,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Text(
+                      item.roomNumber,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onSecondaryContainer,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(width: 16),
+                // Middle Info
+                Expanded(
+                  child: Text(
+                    item.tenantName,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                // Trailing Status Pill
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: color.withValues(alpha: 0.3)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: color,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: color.withValues(alpha: 0.5),
+                              blurRadius: 4,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        item.statusLabel,
+                        style: TextStyle(
+                          color: _getStatusTextColor(context, item.status),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
+      ),
       ),
     );
   }

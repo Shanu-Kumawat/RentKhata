@@ -48,26 +48,23 @@ class _BouncingScaleWrapperState extends State<BouncingScaleWrapper>
     super.dispose();
   }
 
-  void _onPointerDown(PointerDownEvent event) {
-    HapticFeedback.lightImpact();
-    _controller.forward();
-  }
 
-  void _onPointerUp(PointerUpEvent event) {
-    _controller.reverse();
-    widget.onTap?.call();
-  }
-
-  void _onPointerCancel(PointerCancelEvent event) {
-    _controller.reverse();
-  }
 
   @override
   Widget build(BuildContext context) {
-    return Listener(
-      onPointerDown: _onPointerDown,
-      onPointerUp: _onPointerUp,
-      onPointerCancel: _onPointerCancel,
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTapDown: (_) {
+        HapticFeedback.lightImpact();
+        _controller.forward();
+      },
+      onTapUp: (_) {
+        _controller.reverse();
+        widget.onTap?.call();
+      },
+      onTapCancel: () {
+        _controller.reverse();
+      },
       child: ScaleTransition(scale: _scaleAnimation, child: widget.child),
     );
   }
