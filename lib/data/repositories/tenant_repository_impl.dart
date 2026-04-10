@@ -297,6 +297,17 @@ class TenantRepositoryImpl implements TenantRepository {
   }
 
   @override
+  Future<Occupancy?> getOccupancyById(int id) async {
+    // We can fetch from Dao if it exists, or just get all and filter
+    // Since tenantDao doesn't have a direct getOccupancyById yet:
+    final entities = await _tenantDao.getActiveOccupancies(); // or a new dao method
+    
+    // Instead of querying all active (which might miss completed occupancies), let's use the DB directly:
+    final entity = await (_tenantDao.select(_tenantDao.occupancies)..where((o) => o.id.equals(id))).getSingleOrNull();
+    return entity != null ? _occupancyToDomain(entity) : null;
+  }
+
+  @override
   Future<List<Occupancy>> getOccupanciesForTenant(int tenantId) async {
     final entities = await _tenantDao.getOccupanciesForTenant(tenantId);
     return Future.wait(entities.map(_occupancyToDomain));

@@ -87,6 +87,9 @@ abstract class TenantRepository {
   /// Get occupancy for a room
   Future<Occupancy?> getActiveOccupancyForRoom(int roomId);
 
+  /// Get occupancy by ID
+  Future<Occupancy?> getOccupancyById(int id);
+
   /// Get occupancy history for a tenant
   Future<List<Occupancy>> getOccupanciesForTenant(int tenantId);
 

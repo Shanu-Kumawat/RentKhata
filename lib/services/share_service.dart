@@ -61,6 +61,16 @@ class ShareService {
     await Share.shareXFiles(xFiles, text: text, subject: subject);
   }
 
+  /// Share a generated PDF Statement.
+  Future<void> sharePdfStatement(File pdfFile, {String? tenantName}) async {
+    final name = tenantName ?? 'Tenant';
+    await shareFiles(
+      files: [pdfFile],
+      text: 'Dear $name,\n\nPlease find your generated Khata Statement attached.',
+      subject: 'Khata Statement',
+    );
+  }
+
   /// Share text only.
   Future<void> shareText({required String text, String? subject}) async {
     await Share.share(text, subject: subject);

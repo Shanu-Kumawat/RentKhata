@@ -16,6 +16,8 @@ import '../../../domain/entities/occupancy.dart';
 import '../../../domain/entities/bill.dart';
 import '../../../services/share_service.dart';
 import '../../../services/billing_cycle_service.dart';
+import '../../../services/ledger_service.dart';
+import '../../../services/pdf_service.dart';
 import '../billing/create_bill_sheet.dart';
 import '../billing/bill_detail_screen.dart';
 import 'move_in_sheet.dart';
@@ -159,13 +161,25 @@ class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
                   const SizedBox(height: 16),
 
                   // Actions - Create Bill button (full width)
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton.icon(
-                      onPressed: () => _showCreateBill(occupancy),
-                      icon: const Icon(Icons.receipt_long_outlined),
-                      label: const Text('Create Bill'),
-                    ),
+                  // Actions - Create Bill & Khata Statement
+                  Row(
+                    children: [
+                      Expanded(
+                        child: FilledButton.icon(
+                          onPressed: () => _showCreateBill(occupancy),
+                          icon: const Icon(Icons.receipt_long_outlined),
+                          label: const Text('Create Bill'),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => _generateAndShareKhataStatement(context, ref, occupancy.id),
+                          icon: const Icon(Icons.picture_as_pdf_outlined),
+                          label: const Text('Statement'),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 24),
 
@@ -293,6 +307,40 @@ class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
       builder: (context) =>
           MoveOutScreen(occupancy: occupancy, room: widget.room),
     );
+  }
+
+  Future<void> _generateAndShareKhataStatement(BuildContext context, WidgetRef ref, int occupancyId) async {
+    // Show loading indicator
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      final ledgerStatement = await ref.read(ledgerStatementProvider(occupancyId).future);
+      if (ledgerStatement == null) throw Exception('Ledger not found');
+
+      final pdfFile = await PdfService.generateTenantLedgerPdf(ledgerStatement);
+
+      // Hide loading
+      if (context.mounted) Navigator.pop(context);
+
+      final shareService = ShareService(ref.read(billingRepositoryProvider));
+      await shareService.sharePdfStatement(pdfFile, tenantName: ledgerStatement.tenantName);
+    } catch (e) {
+      // Hide loading
+      if (context.mounted) Navigator.pop(context);
+      
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error generating statement: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
   }
 }
 
