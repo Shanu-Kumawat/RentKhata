@@ -1464,7 +1464,7 @@ class _OccupanciesForTenantProviderElement
 }
 
 String _$expiringAgreementsHash() =>
-    r'97c6eb5476a701da51e4bcbc43f23098f4f9add9';
+    r'b370265278ea0430ce17e4dfafc6ff66b4b01bdf';
 
 /// See also [expiringAgreements].
 @ProviderFor(expiringAgreements)

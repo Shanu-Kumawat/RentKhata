@@ -144,9 +144,8 @@ class AgreementExpirationStatus {
 
 @riverpod
 Future<List<AgreementExpirationStatus>> expiringAgreements(Ref ref) async {
-  // Watch active occupancies stream to refresh automatically.
-  ref.watch(activeOccupanciesStreamProvider);
-  final occupancies = await ref.watch(activeOccupanciesProvider.future);
+  // Use the stream's future to guarantee we get the latest real-time emitted value
+  final occupancies = await ref.watch(activeOccupanciesStreamProvider.future);
   
   final now = DateTime.now();
   // Strip time for accurate day calculation
