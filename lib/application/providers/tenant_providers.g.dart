@@ -1463,5 +1463,25 @@ class _OccupanciesForTenantProviderElement
   int get tenantId => (origin as OccupanciesForTenantProvider).tenantId;
 }
 
+String _$expiringAgreementsHash() =>
+    r'97c6eb5476a701da51e4bcbc43f23098f4f9add9';
+
+/// See also [expiringAgreements].
+@ProviderFor(expiringAgreements)
+final expiringAgreementsProvider =
+    AutoDisposeFutureProvider<List<AgreementExpirationStatus>>.internal(
+      expiringAgreements,
+      name: r'expiringAgreementsProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$expiringAgreementsHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef ExpiringAgreementsRef =
+    AutoDisposeFutureProviderRef<List<AgreementExpirationStatus>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

@@ -26,6 +26,9 @@ class Occupancies extends Table {
   /// Move-out date (null if still active)
   DateTimeColumn get moveOutDate => dateTime().nullable()();
 
+  /// Agreement end date
+  DateTimeColumn get agreementEndDate => dateTime().nullable()();
+
   /// Agreed monthly rent for this occupancy
   RealColumn get agreedRent => real()();
 

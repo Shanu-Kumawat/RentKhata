@@ -266,6 +266,7 @@ class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
         suggestedPeriodEnd: effectiveCycleEnd,
         billingStartDate: occupancy.effectiveBillingStartDate,
         initialBillType: billType,
+        agreementEndDate: occupancy.agreementEndDate,
       ),
     );
   }

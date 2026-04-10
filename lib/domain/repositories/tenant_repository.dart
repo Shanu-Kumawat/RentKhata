@@ -98,6 +98,7 @@ abstract class TenantRepository {
     required double agreedRent,
     double securityDeposit = 0.0,
     DateTime? billingStartDate,
+    DateTime? agreementEndDate,
   });
 
   /// Update the billing start date for an occupancy

@@ -6,7 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../domain/entities/tenant.dart';
 import '../../domain/entities/occupancy.dart';
 import '../../domain/entities/document.dart';
-import '../../data/database/app_database.dart' hide Document;
+import '../../data/database/app_database.dart';
 import 'repository_providers.dart';
 import 'database_provider.dart';
 
@@ -124,4 +124,54 @@ Future<List<Occupancy>> occupanciesForTenant(Ref ref, int tenantId) {
   ref.watch(activeOccupanciesStreamProvider);
   final repo = ref.watch(tenantRepositoryProvider);
   return repo.getOccupanciesForTenant(tenantId);
+}
+
+// ============================================================================
+// AGREEMENT EXPIRATION PROVIDERS
+// ============================================================================
+
+class AgreementExpirationStatus {
+  final Occupancy occupancy;
+  final bool isExpired;
+  final int daysRemaining;
+
+  const AgreementExpirationStatus({
+    required this.occupancy,
+    required this.isExpired,
+    required this.daysRemaining,
+  });
+}
+
+@riverpod
+Future<List<AgreementExpirationStatus>> expiringAgreements(Ref ref) async {
+  // Watch active occupancies stream to refresh automatically.
+  ref.watch(activeOccupanciesStreamProvider);
+  final occupancies = await ref.watch(activeOccupanciesProvider.future);
+  
+  final now = DateTime.now();
+  // Strip time for accurate day calculation
+  final today = DateTime(now.year, now.month, now.day);
+
+  final List<AgreementExpirationStatus> expiring = [];
+
+  for (final o in occupancies) {
+    if (o.agreementEndDate != null) {
+      final end = o.agreementEndDate!;
+      final endDate = DateTime(end.year, end.month, end.day);
+      final days = endDate.difference(today).inDays;
+      
+      // If expired or expiring within 30 days
+      if (days <= 30) {
+        expiring.add(AgreementExpirationStatus(
+          occupancy: o,
+          isExpired: days < 0,
+          daysRemaining: days,
+        ));
+      }
+    }
+  }
+
+  // Sort by urgency
+  expiring.sort((a, b) => a.daysRemaining.compareTo(b.daysRemaining));
+  return expiring;
 }

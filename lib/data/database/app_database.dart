@@ -71,7 +71,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 13;
+  int get schemaVersion => 14;
 
   @override
   MigrationStrategy get migration {
@@ -370,6 +370,10 @@ Thank you for your payment.
           await into(
             biometricSettings,
           ).insert(BiometricSettingsCompanion.insert());
+        }
+        if (from < 14) {
+          // Add agreementEndDate to occupancies
+          await m.addColumn(occupancies, occupancies.agreementEndDate);
         }
       },
     );

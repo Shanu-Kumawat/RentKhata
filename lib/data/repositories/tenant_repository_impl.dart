@@ -5,7 +5,7 @@ import 'package:drift/drift.dart';
 import '../../domain/entities/tenant.dart';
 import '../../domain/entities/occupancy.dart';
 import '../../domain/repositories/tenant_repository.dart';
-import '../database/app_database.dart' hide Document;
+import '../database/app_database.dart';
 import '../database/daos/tenant_dao.dart';
 import '../database/daos/property_dao.dart';
 import '../database/daos/document_dao.dart';
@@ -86,6 +86,7 @@ class TenantRepositoryImpl implements TenantRepository {
       tenantId: entity.tenantId,
       moveInDate: entity.moveInDate,
       moveOutDate: entity.moveOutDate,
+      agreementEndDate: entity.agreementEndDate,
       agreedRent: entity.agreedRent,
       securityDeposit: entity.securityDeposit,
       isActive: entity.isActive,
@@ -309,6 +310,7 @@ class TenantRepositoryImpl implements TenantRepository {
     required double agreedRent,
     double securityDeposit = 0.0,
     DateTime? billingStartDate,
+    DateTime? agreementEndDate,
   }) async {
     final occupancy = OccupanciesCompanion(
       roomId: Value(roomId),
@@ -318,6 +320,7 @@ class TenantRepositoryImpl implements TenantRepository {
       securityDeposit: Value(securityDeposit),
       isActive: const Value(true),
       billingStartDate: Value(billingStartDate),
+      agreementEndDate: Value(agreementEndDate),
     );
     return _tenantDao.insertOccupancy(occupancy);
   }

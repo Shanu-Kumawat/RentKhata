@@ -15,6 +15,9 @@ _$OccupancyImpl _$$OccupancyImplFromJson(Map<String, dynamic> json) =>
       moveOutDate: json['moveOutDate'] == null
           ? null
           : DateTime.parse(json['moveOutDate'] as String),
+      agreementEndDate: json['agreementEndDate'] == null
+          ? null
+          : DateTime.parse(json['agreementEndDate'] as String),
       agreedRent: (json['agreedRent'] as num).toDouble(),
       securityDeposit: (json['securityDeposit'] as num?)?.toDouble() ?? 0.0,
       isActive: json['isActive'] as bool? ?? true,
@@ -48,6 +51,7 @@ Map<String, dynamic> _$$OccupancyImplToJson(_$OccupancyImpl instance) =>
       'tenantId': instance.tenantId,
       'moveInDate': instance.moveInDate.toIso8601String(),
       'moveOutDate': instance.moveOutDate?.toIso8601String(),
+      'agreementEndDate': instance.agreementEndDate?.toIso8601String(),
       'agreedRent': instance.agreedRent,
       'securityDeposit': instance.securityDeposit,
       'isActive': instance.isActive,

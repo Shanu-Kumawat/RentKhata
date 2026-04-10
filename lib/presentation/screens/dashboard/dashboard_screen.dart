@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 import '../../../application/providers/dashboard_providers.dart';
 import '../../../application/providers/billing_providers.dart';
 import '../../../application/providers/billing_cycle_providers.dart';
+import '../../../application/providers/tenant_providers.dart';
 import '../../../domain/entities/billing_status.dart';
 import '../../../domain/entities/bill.dart';
 import '../../../core/theme/app_colors.dart';
@@ -201,6 +202,7 @@ class _ActionRequiredSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final unpaidBillsAsync = ref.watch(unpaidBillsProvider);
     final billingAttentionAsync = ref.watch(billingAttentionListProvider);
+    final expiringAgreementsAsync = ref.watch(expiringAgreementsProvider);
     final theme = Theme.of(context);
 
     return Column(
@@ -310,6 +312,104 @@ class _ActionRequiredSection extends ConsumerWidget {
               ),
             ),
           ),
+        ),
+
+        // Subsection A2: "Agreements Expiring"
+        expiringAgreementsAsync.when(
+          data: (expiring) {
+            if (expiring.isEmpty) return const SizedBox.shrink();
+
+            final expiredCount = expiring.where((e) => e.isExpired).length;
+            final count = expiring.length;
+            
+            final color = expiredCount > 0 ? theme.colorScheme.error : AppColors.warning;
+            
+            return Padding(
+              padding: const EdgeInsets.only(top: 12),
+              child: BouncingScaleWrapper(
+                onTap: () {
+                    // Navigate to tenant list maybe, or show a dialog
+                    context.push('/properties');
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surface,
+                    boxShadow: [
+                      BoxShadow(
+                        color: color.withValues(alpha: 0.1),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: color.withValues(alpha: 0.25),
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                        color: color.withValues(alpha: 0.05),
+                      ),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            backgroundColor: color.withValues(alpha: 0.1),
+                            child: Icon(
+                              Icons.handshake_outlined,
+                              color: color,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '$count Agreement${count > 1 ? 's' : ''} Expiring',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                  if (expiredCount > 0)
+                                    Text(
+                                      '$expiredCount already expired',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: theme.colorScheme.error,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    )
+                                  else
+                                    Text(
+                                      'Within next 30 days',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: theme.colorScheme.onSurfaceVariant,
+                                      ),
+                                    ),
+                                ],
+                              ),
+                          ),
+                          const Icon(
+                            Icons.arrow_forward_ios,
+                            size: 14,
+                            color: Colors.grey,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+          loading: () => const LinearProgressIndicator(),
+          error: (_, __) => const SizedBox.shrink(),
         ),
 
         const SizedBox(height: 12),

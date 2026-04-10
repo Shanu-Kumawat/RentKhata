@@ -2,7 +2,7 @@
 library;
 
 import 'package:drift/drift.dart';
-import '../app_database.dart' hide Document;
+import '../app_database.dart';
 import '../tables/document_table.dart';
 import '../../../domain/entities/document.dart';
 

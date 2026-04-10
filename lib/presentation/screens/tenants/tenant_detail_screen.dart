@@ -11,7 +11,7 @@ import 'package:intl/intl.dart';
 import '../../../application/providers/tenant_providers.dart';
 import '../../../application/providers/repository_providers.dart';
 import '../../../application/providers/database_provider.dart';
-import '../../../data/database/app_database.dart' hide Document;
+import '../../../data/database/app_database.dart';
 import '../../../data/database/tables/family_member_table.dart';
 
 import '../../../core/utils/currency_formatter.dart';

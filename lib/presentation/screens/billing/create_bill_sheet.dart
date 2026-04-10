@@ -40,6 +40,9 @@ class CreateBillSheet extends ConsumerStatefulWidget {
   /// Optional: Pre-select bill type
   final BillType? initialBillType;
 
+  /// Optional: Agreement end date to show warnings
+  final DateTime? agreementEndDate;
+
   const CreateBillSheet({
     super.key,
     required this.occupancyId,
@@ -52,6 +55,7 @@ class CreateBillSheet extends ConsumerStatefulWidget {
     this.suggestedPeriodEnd,
     this.billingStartDate,
     this.initialBillType,
+    this.agreementEndDate,
   });
 
   @override
@@ -255,7 +259,9 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
     final isFutureCycle = start.isAfter(today);
     final isPastCycle = end.isBefore(today);
     final canNavigate = widget.billingStartDate != null;
-
+    
+    final bool exceedsAgreement = widget.agreementEndDate != null && end.isAfter(widget.agreementEndDate!);
+    
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -407,6 +413,31 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
               color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
+          
+          if (exceedsAgreement) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.error.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.warning_amber_rounded, size: 16, color: theme.colorScheme.error),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'This cycle exceeds the agreement end date (${widget.agreementEndDate!.day}/${widget.agreementEndDate!.month}/${widget.agreementEndDate!.year})',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.error,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );

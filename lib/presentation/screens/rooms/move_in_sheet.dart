@@ -38,6 +38,7 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
 
   DateTime _moveInDate = DateTime.now();
   DateTime? _billingStartDate; // null means use smart default
+  DateTime? _agreementEndDate; // Indian 11-month default typically
   bool _useSeparateBillingDate = false; // User chose to customize
   Tenant? _selectedTenant;
   bool _isLoading = false;
@@ -169,6 +170,24 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
         _moveInDate = date;
         // Auto-update billing start based on smart default
         _billingStartDate = _calculateSmartBillingStart(date);
+        // Auto-suggest 11 months for new agreement
+        if (_agreementEndDate == null) {
+            _agreementEndDate = DateTime(date.year, date.month + 11, date.day);
+        }
+      });
+    }
+  }
+
+  Future<void> _selectAgreementEndDate() async {
+    final date = await showDatePicker(
+      context: context,
+      initialDate: _agreementEndDate ?? DateTime(_moveInDate.year, _moveInDate.month + 11, _moveInDate.day),
+      firstDate: _moveInDate,
+      lastDate: DateTime(2050),
+    );
+    if (date != null) {
+      setState(() {
+        _agreementEndDate = date;
       });
     }
   }
@@ -284,6 +303,7 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
             double.tryParse(_rentController.text) ?? widget.room.baseRent,
         securityDeposit: double.tryParse(_depositController.text) ?? 0,
         billingStartDate: effectiveBillingStart,
+        agreementEndDate: _agreementEndDate,
       );
 
       // Add family members to this occupancy
@@ -1326,6 +1346,34 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
               ),
             ),
           ),
+        const SizedBox(height: 16),
+
+        // Agreement End Date
+        InkWell(
+          onTap: _selectAgreementEndDate,
+          child: InputDecorator(
+            decoration: InputDecoration(
+              labelText: 'Agreement End Date (Optional)',
+              prefixIcon: const Icon(Icons.handshake_outlined),
+              suffixIcon: _agreementEndDate == null
+                  ? null
+                  : IconButton(
+                      icon: const Icon(Icons.clear, size: 18),
+                      onPressed: () => setState(() => _agreementEndDate = null),
+                    ),
+            ),
+            child: Text(
+              _agreementEndDate != null
+                  ? '${_agreementEndDate!.day}/${_agreementEndDate!.month}/${_agreementEndDate!.year}'
+                  : 'No agreement date set',
+              style: TextStyle(
+                color: _agreementEndDate == null
+                    ? Theme.of(context).hintColor
+                    : null,
+              ),
+            ),
+          ),
+        ),
         const SizedBox(height: 16),
 
         TextFormField(

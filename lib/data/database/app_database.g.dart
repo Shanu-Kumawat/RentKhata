@@ -3177,6 +3177,18 @@ class $OccupanciesTable extends Occupancies
     type: DriftSqlType.dateTime,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _agreementEndDateMeta = const VerificationMeta(
+    'agreementEndDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> agreementEndDate =
+      GeneratedColumn<DateTime>(
+        'agreement_end_date',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
   static const VerificationMeta _agreedRentMeta = const VerificationMeta(
     'agreedRent',
   );
@@ -3326,6 +3338,7 @@ class $OccupanciesTable extends Occupancies
     tenantId,
     moveInDate,
     moveOutDate,
+    agreementEndDate,
     agreedRent,
     securityDeposit,
     isActive,
@@ -3387,6 +3400,15 @@ class $OccupanciesTable extends Occupancies
         moveOutDate.isAcceptableOrUnknown(
           data['move_out_date']!,
           _moveOutDateMeta,
+        ),
+      );
+    }
+    if (data.containsKey('agreement_end_date')) {
+      context.handle(
+        _agreementEndDateMeta,
+        agreementEndDate.isAcceptableOrUnknown(
+          data['agreement_end_date']!,
+          _agreementEndDateMeta,
         ),
       );
     }
@@ -3511,6 +3533,10 @@ class $OccupanciesTable extends Occupancies
         DriftSqlType.dateTime,
         data['${effectivePrefix}move_out_date'],
       ),
+      agreementEndDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}agreement_end_date'],
+      ),
       agreedRent: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
         data['${effectivePrefix}agreed_rent'],
@@ -3591,6 +3617,9 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
   /// Move-out date (null if still active)
   final DateTime? moveOutDate;
 
+  /// Agreement end date
+  final DateTime? agreementEndDate;
+
   /// Agreed monthly rent for this occupancy
   final double agreedRent;
 
@@ -3634,6 +3663,7 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
     required this.tenantId,
     required this.moveInDate,
     this.moveOutDate,
+    this.agreementEndDate,
     required this.agreedRent,
     required this.securityDeposit,
     required this.isActive,
@@ -3656,6 +3686,9 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
     map['move_in_date'] = Variable<DateTime>(moveInDate);
     if (!nullToAbsent || moveOutDate != null) {
       map['move_out_date'] = Variable<DateTime>(moveOutDate);
+    }
+    if (!nullToAbsent || agreementEndDate != null) {
+      map['agreement_end_date'] = Variable<DateTime>(agreementEndDate);
     }
     map['agreed_rent'] = Variable<double>(agreedRent);
     map['security_deposit'] = Variable<double>(securityDeposit);
@@ -3697,6 +3730,9 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
       moveOutDate: moveOutDate == null && nullToAbsent
           ? const Value.absent()
           : Value(moveOutDate),
+      agreementEndDate: agreementEndDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(agreementEndDate),
       agreedRent: Value(agreedRent),
       securityDeposit: Value(securityDeposit),
       isActive: Value(isActive),
@@ -3735,6 +3771,9 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
       tenantId: serializer.fromJson<int>(json['tenantId']),
       moveInDate: serializer.fromJson<DateTime>(json['moveInDate']),
       moveOutDate: serializer.fromJson<DateTime?>(json['moveOutDate']),
+      agreementEndDate: serializer.fromJson<DateTime?>(
+        json['agreementEndDate'],
+      ),
       agreedRent: serializer.fromJson<double>(json['agreedRent']),
       securityDeposit: serializer.fromJson<double>(json['securityDeposit']),
       isActive: serializer.fromJson<bool>(json['isActive']),
@@ -3768,6 +3807,7 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
       'tenantId': serializer.toJson<int>(tenantId),
       'moveInDate': serializer.toJson<DateTime>(moveInDate),
       'moveOutDate': serializer.toJson<DateTime?>(moveOutDate),
+      'agreementEndDate': serializer.toJson<DateTime?>(agreementEndDate),
       'agreedRent': serializer.toJson<double>(agreedRent),
       'securityDeposit': serializer.toJson<double>(securityDeposit),
       'isActive': serializer.toJson<bool>(isActive),
@@ -3793,6 +3833,7 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
     int? tenantId,
     DateTime? moveInDate,
     Value<DateTime?> moveOutDate = const Value.absent(),
+    Value<DateTime?> agreementEndDate = const Value.absent(),
     double? agreedRent,
     double? securityDeposit,
     bool? isActive,
@@ -3811,6 +3852,9 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
     tenantId: tenantId ?? this.tenantId,
     moveInDate: moveInDate ?? this.moveInDate,
     moveOutDate: moveOutDate.present ? moveOutDate.value : this.moveOutDate,
+    agreementEndDate: agreementEndDate.present
+        ? agreementEndDate.value
+        : this.agreementEndDate,
     agreedRent: agreedRent ?? this.agreedRent,
     securityDeposit: securityDeposit ?? this.securityDeposit,
     isActive: isActive ?? this.isActive,
@@ -3847,6 +3891,9 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
       moveOutDate: data.moveOutDate.present
           ? data.moveOutDate.value
           : this.moveOutDate,
+      agreementEndDate: data.agreementEndDate.present
+          ? data.agreementEndDate.value
+          : this.agreementEndDate,
       agreedRent: data.agreedRent.present
           ? data.agreedRent.value
           : this.agreedRent,
@@ -3890,6 +3937,7 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
           ..write('tenantId: $tenantId, ')
           ..write('moveInDate: $moveInDate, ')
           ..write('moveOutDate: $moveOutDate, ')
+          ..write('agreementEndDate: $agreementEndDate, ')
           ..write('agreedRent: $agreedRent, ')
           ..write('securityDeposit: $securityDeposit, ')
           ..write('isActive: $isActive, ')
@@ -3913,6 +3961,7 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
     tenantId,
     moveInDate,
     moveOutDate,
+    agreementEndDate,
     agreedRent,
     securityDeposit,
     isActive,
@@ -3935,6 +3984,7 @@ class OccupancyEntity extends DataClass implements Insertable<OccupancyEntity> {
           other.tenantId == this.tenantId &&
           other.moveInDate == this.moveInDate &&
           other.moveOutDate == this.moveOutDate &&
+          other.agreementEndDate == this.agreementEndDate &&
           other.agreedRent == this.agreedRent &&
           other.securityDeposit == this.securityDeposit &&
           other.isActive == this.isActive &&
@@ -3955,6 +4005,7 @@ class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
   final Value<int> tenantId;
   final Value<DateTime> moveInDate;
   final Value<DateTime?> moveOutDate;
+  final Value<DateTime?> agreementEndDate;
   final Value<double> agreedRent;
   final Value<double> securityDeposit;
   final Value<bool> isActive;
@@ -3973,6 +4024,7 @@ class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
     this.tenantId = const Value.absent(),
     this.moveInDate = const Value.absent(),
     this.moveOutDate = const Value.absent(),
+    this.agreementEndDate = const Value.absent(),
     this.agreedRent = const Value.absent(),
     this.securityDeposit = const Value.absent(),
     this.isActive = const Value.absent(),
@@ -3992,6 +4044,7 @@ class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
     required int tenantId,
     required DateTime moveInDate,
     this.moveOutDate = const Value.absent(),
+    this.agreementEndDate = const Value.absent(),
     required double agreedRent,
     this.securityDeposit = const Value.absent(),
     this.isActive = const Value.absent(),
@@ -4014,6 +4067,7 @@ class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
     Expression<int>? tenantId,
     Expression<DateTime>? moveInDate,
     Expression<DateTime>? moveOutDate,
+    Expression<DateTime>? agreementEndDate,
     Expression<double>? agreedRent,
     Expression<double>? securityDeposit,
     Expression<bool>? isActive,
@@ -4033,6 +4087,7 @@ class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
       if (tenantId != null) 'tenant_id': tenantId,
       if (moveInDate != null) 'move_in_date': moveInDate,
       if (moveOutDate != null) 'move_out_date': moveOutDate,
+      if (agreementEndDate != null) 'agreement_end_date': agreementEndDate,
       if (agreedRent != null) 'agreed_rent': agreedRent,
       if (securityDeposit != null) 'security_deposit': securityDeposit,
       if (isActive != null) 'is_active': isActive,
@@ -4057,6 +4112,7 @@ class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
     Value<int>? tenantId,
     Value<DateTime>? moveInDate,
     Value<DateTime?>? moveOutDate,
+    Value<DateTime?>? agreementEndDate,
     Value<double>? agreedRent,
     Value<double>? securityDeposit,
     Value<bool>? isActive,
@@ -4076,6 +4132,7 @@ class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
       tenantId: tenantId ?? this.tenantId,
       moveInDate: moveInDate ?? this.moveInDate,
       moveOutDate: moveOutDate ?? this.moveOutDate,
+      agreementEndDate: agreementEndDate ?? this.agreementEndDate,
       agreedRent: agreedRent ?? this.agreedRent,
       securityDeposit: securityDeposit ?? this.securityDeposit,
       isActive: isActive ?? this.isActive,
@@ -4109,6 +4166,9 @@ class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
     }
     if (moveOutDate.present) {
       map['move_out_date'] = Variable<DateTime>(moveOutDate.value);
+    }
+    if (agreementEndDate.present) {
+      map['agreement_end_date'] = Variable<DateTime>(agreementEndDate.value);
     }
     if (agreedRent.present) {
       map['agreed_rent'] = Variable<double>(agreedRent.value);
@@ -4165,6 +4225,7 @@ class OccupanciesCompanion extends UpdateCompanion<OccupancyEntity> {
           ..write('tenantId: $tenantId, ')
           ..write('moveInDate: $moveInDate, ')
           ..write('moveOutDate: $moveOutDate, ')
+          ..write('agreementEndDate: $agreementEndDate, ')
           ..write('agreedRent: $agreedRent, ')
           ..write('securityDeposit: $securityDeposit, ')
           ..write('isActive: $isActive, ')
@@ -13470,6 +13531,7 @@ typedef $$OccupanciesTableCreateCompanionBuilder =
       required int tenantId,
       required DateTime moveInDate,
       Value<DateTime?> moveOutDate,
+      Value<DateTime?> agreementEndDate,
       required double agreedRent,
       Value<double> securityDeposit,
       Value<bool> isActive,
@@ -13490,6 +13552,7 @@ typedef $$OccupanciesTableUpdateCompanionBuilder =
       Value<int> tenantId,
       Value<DateTime> moveInDate,
       Value<DateTime?> moveOutDate,
+      Value<DateTime?> agreementEndDate,
       Value<double> agreedRent,
       Value<double> securityDeposit,
       Value<bool> isActive,
@@ -13634,6 +13697,11 @@ class $$OccupanciesTableFilterComposer
 
   ColumnFilters<DateTime> get moveOutDate => $composableBuilder(
     column: $table.moveOutDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get agreementEndDate => $composableBuilder(
+    column: $table.agreementEndDate,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -13844,6 +13912,11 @@ class $$OccupanciesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<DateTime> get agreementEndDate => $composableBuilder(
+    column: $table.agreementEndDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<double> get agreedRent => $composableBuilder(
     column: $table.agreedRent,
     builder: (column) => ColumnOrderings(column),
@@ -13970,6 +14043,11 @@ class $$OccupanciesTableAnnotationComposer
 
   GeneratedColumn<DateTime> get moveOutDate => $composableBuilder(
     column: $table.moveOutDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get agreementEndDate => $composableBuilder(
+    column: $table.agreementEndDate,
     builder: (column) => column,
   );
 
@@ -14192,6 +14270,7 @@ class $$OccupanciesTableTableManager
                 Value<int> tenantId = const Value.absent(),
                 Value<DateTime> moveInDate = const Value.absent(),
                 Value<DateTime?> moveOutDate = const Value.absent(),
+                Value<DateTime?> agreementEndDate = const Value.absent(),
                 Value<double> agreedRent = const Value.absent(),
                 Value<double> securityDeposit = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
@@ -14210,6 +14289,7 @@ class $$OccupanciesTableTableManager
                 tenantId: tenantId,
                 moveInDate: moveInDate,
                 moveOutDate: moveOutDate,
+                agreementEndDate: agreementEndDate,
                 agreedRent: agreedRent,
                 securityDeposit: securityDeposit,
                 isActive: isActive,
@@ -14230,6 +14310,7 @@ class $$OccupanciesTableTableManager
                 required int tenantId,
                 required DateTime moveInDate,
                 Value<DateTime?> moveOutDate = const Value.absent(),
+                Value<DateTime?> agreementEndDate = const Value.absent(),
                 required double agreedRent,
                 Value<double> securityDeposit = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
@@ -14248,6 +14329,7 @@ class $$OccupanciesTableTableManager
                 tenantId: tenantId,
                 moveInDate: moveInDate,
                 moveOutDate: moveOutDate,
+                agreementEndDate: agreementEndDate,
                 agreedRent: agreedRent,
                 securityDeposit: securityDeposit,
                 isActive: isActive,

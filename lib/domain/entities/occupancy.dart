@@ -20,6 +20,7 @@ class Occupancy with _$Occupancy {
     required int tenantId,
     required DateTime moveInDate,
     DateTime? moveOutDate,
+    DateTime? agreementEndDate,
     required double agreedRent,
     @Default(0.0) double securityDeposit,
     @Default(true) bool isActive,

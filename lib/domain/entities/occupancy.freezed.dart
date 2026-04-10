@@ -26,6 +26,7 @@ mixin _$Occupancy {
   int get tenantId => throw _privateConstructorUsedError;
   DateTime get moveInDate => throw _privateConstructorUsedError;
   DateTime? get moveOutDate => throw _privateConstructorUsedError;
+  DateTime? get agreementEndDate => throw _privateConstructorUsedError;
   double get agreedRent => throw _privateConstructorUsedError;
   double get securityDeposit => throw _privateConstructorUsedError;
   bool get isActive => throw _privateConstructorUsedError; // Deposit tracking
@@ -66,6 +67,7 @@ abstract class $OccupancyCopyWith<$Res> {
     int tenantId,
     DateTime moveInDate,
     DateTime? moveOutDate,
+    DateTime? agreementEndDate,
     double agreedRent,
     double securityDeposit,
     bool isActive,
@@ -104,6 +106,7 @@ class _$OccupancyCopyWithImpl<$Res, $Val extends Occupancy>
     Object? tenantId = null,
     Object? moveInDate = null,
     Object? moveOutDate = freezed,
+    Object? agreementEndDate = freezed,
     Object? agreedRent = null,
     Object? securityDeposit = null,
     Object? isActive = null,
@@ -141,6 +144,10 @@ class _$OccupancyCopyWithImpl<$Res, $Val extends Occupancy>
             moveOutDate: freezed == moveOutDate
                 ? _value.moveOutDate
                 : moveOutDate // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
+            agreementEndDate: freezed == agreementEndDate
+                ? _value.agreementEndDate
+                : agreementEndDate // ignore: cast_nullable_to_non_nullable
                       as DateTime?,
             agreedRent: null == agreedRent
                 ? _value.agreedRent
@@ -223,6 +230,7 @@ abstract class _$$OccupancyImplCopyWith<$Res>
     int tenantId,
     DateTime moveInDate,
     DateTime? moveOutDate,
+    DateTime? agreementEndDate,
     double agreedRent,
     double securityDeposit,
     bool isActive,
@@ -260,6 +268,7 @@ class __$$OccupancyImplCopyWithImpl<$Res>
     Object? tenantId = null,
     Object? moveInDate = null,
     Object? moveOutDate = freezed,
+    Object? agreementEndDate = freezed,
     Object? agreedRent = null,
     Object? securityDeposit = null,
     Object? isActive = null,
@@ -297,6 +306,10 @@ class __$$OccupancyImplCopyWithImpl<$Res>
         moveOutDate: freezed == moveOutDate
             ? _value.moveOutDate
             : moveOutDate // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
+        agreementEndDate: freezed == agreementEndDate
+            ? _value.agreementEndDate
+            : agreementEndDate // ignore: cast_nullable_to_non_nullable
                   as DateTime?,
         agreedRent: null == agreedRent
             ? _value.agreedRent
@@ -372,6 +385,7 @@ class _$OccupancyImpl extends _Occupancy {
     required this.tenantId,
     required this.moveInDate,
     this.moveOutDate,
+    this.agreementEndDate,
     required this.agreedRent,
     this.securityDeposit = 0.0,
     this.isActive = true,
@@ -402,6 +416,8 @@ class _$OccupancyImpl extends _Occupancy {
   final DateTime moveInDate;
   @override
   final DateTime? moveOutDate;
+  @override
+  final DateTime? agreementEndDate;
   @override
   final double agreedRent;
   @override
@@ -444,7 +460,7 @@ class _$OccupancyImpl extends _Occupancy {
 
   @override
   String toString() {
-    return 'Occupancy(id: $id, roomId: $roomId, tenantId: $tenantId, moveInDate: $moveInDate, moveOutDate: $moveOutDate, agreedRent: $agreedRent, securityDeposit: $securityDeposit, isActive: $isActive, depositStatus: $depositStatus, depositReceivedDate: $depositReceivedDate, depositReturnedDate: $depositReturnedDate, depositReturnedAmount: $depositReturnedAmount, deductionAmount: $deductionAmount, deductionReason: $deductionReason, settlementNotes: $settlementNotes, isSettled: $isSettled, billingStartDate: $billingStartDate, roomNumber: $roomNumber, tenantName: $tenantName, propertyName: $propertyName)';
+    return 'Occupancy(id: $id, roomId: $roomId, tenantId: $tenantId, moveInDate: $moveInDate, moveOutDate: $moveOutDate, agreementEndDate: $agreementEndDate, agreedRent: $agreedRent, securityDeposit: $securityDeposit, isActive: $isActive, depositStatus: $depositStatus, depositReceivedDate: $depositReceivedDate, depositReturnedDate: $depositReturnedDate, depositReturnedAmount: $depositReturnedAmount, deductionAmount: $deductionAmount, deductionReason: $deductionReason, settlementNotes: $settlementNotes, isSettled: $isSettled, billingStartDate: $billingStartDate, roomNumber: $roomNumber, tenantName: $tenantName, propertyName: $propertyName)';
   }
 
   @override
@@ -460,6 +476,8 @@ class _$OccupancyImpl extends _Occupancy {
                 other.moveInDate == moveInDate) &&
             (identical(other.moveOutDate, moveOutDate) ||
                 other.moveOutDate == moveOutDate) &&
+            (identical(other.agreementEndDate, agreementEndDate) ||
+                other.agreementEndDate == agreementEndDate) &&
             (identical(other.agreedRent, agreedRent) ||
                 other.agreedRent == agreedRent) &&
             (identical(other.securityDeposit, securityDeposit) ||
@@ -501,6 +519,7 @@ class _$OccupancyImpl extends _Occupancy {
     tenantId,
     moveInDate,
     moveOutDate,
+    agreementEndDate,
     agreedRent,
     securityDeposit,
     isActive,
@@ -539,6 +558,7 @@ abstract class _Occupancy extends Occupancy {
     required final int tenantId,
     required final DateTime moveInDate,
     final DateTime? moveOutDate,
+    final DateTime? agreementEndDate,
     required final double agreedRent,
     final double securityDeposit,
     final bool isActive,
@@ -570,6 +590,8 @@ abstract class _Occupancy extends Occupancy {
   DateTime get moveInDate;
   @override
   DateTime? get moveOutDate;
+  @override
+  DateTime? get agreementEndDate;
   @override
   double get agreedRent;
   @override
