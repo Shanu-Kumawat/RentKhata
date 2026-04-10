@@ -10,8 +10,9 @@ import '../../../application/providers/dashboard_providers.dart';
 import '../../../application/providers/billing_providers.dart';
 import '../../../application/providers/billing_cycle_providers.dart';
 import '../../../application/providers/tenant_providers.dart';
-import '../../../domain/entities/billing_status.dart';
-import '../../../domain/entities/bill.dart';
+import 'widgets/attention_bottom_sheet.dart';
+import 'widgets/unpaid_bills_bottom_sheet.dart';
+import 'widgets/expiring_agreements_bottom_sheet.dart';
 import '../../../core/theme/app_colors.dart';
 
 import '../../widgets/bouncing_scale_wrapper.dart';
@@ -205,316 +206,218 @@ class _ActionRequiredSection extends ConsumerWidget {
     final expiringAgreementsAsync = ref.watch(expiringAgreementsProvider);
     final theme = Theme.of(context);
 
-    return Column(
-      children: [
-        // Subsection A: "Create Bills" (Proactive - Anniversary-Based)
-        billingAttentionAsync.when(
-          data: (attentionItems) {
-            if (attentionItems.isEmpty) {
-              return _EmptyAttentionCard();
-            }
+    // Compute loaded states
+    final attentionItems = billingAttentionAsync.valueOrNull ?? [];
+    final unpaidBills = unpaidBillsAsync.valueOrNull ?? [];
+    final expiring = expiringAgreementsAsync.valueOrNull ?? [];
 
-            final overdueCount = attentionItems
-                .where((i) => i.status == BillingCycleStatus.overdue)
-                .length;
-            final dueSoonCount = attentionItems
-                .where((i) => i.status == BillingCycleStatus.dueSoon)
-                .length;
+    // If completely empty and finished loading, show empty state
+    final isLoading = billingAttentionAsync.isLoading || unpaidBillsAsync.isLoading || expiringAgreementsAsync.isLoading;
+    if (!isLoading && attentionItems.isEmpty && unpaidBills.isEmpty && expiring.isEmpty) {
+      return _EmptyAttentionCard();
+    }
 
-            // Determine card styling based on urgency
-            final hasOverdue = overdueCount > 0;
-            final borderColor = hasOverdue
-                ? theme.colorScheme.error.withValues(alpha: 0.5)
-                : theme.colorScheme.error.withValues(
-                    alpha: 0.5,
-                  ); // Warning context
-            final iconBgColor = hasOverdue
-                ? theme.colorScheme.error.withValues(alpha: 0.1)
-                : theme.colorScheme.error.withValues(alpha: 0.1);
-            final iconColor = hasOverdue
-                ? theme.colorScheme.error
-                : theme.colorScheme.error;
-
-            return Card(
-              elevation: 2,
-              clipBehavior: Clip.antiAlias,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-                side: BorderSide(color: borderColor),
-              ),
-              child: ExpansionTile(
-                backgroundColor: iconBgColor,
-                collapsedBackgroundColor: Theme.of(context).cardColor,
-                shape: const Border(),
-                leading: CircleAvatar(
-                  backgroundColor: iconBgColor,
-                  child: Icon(
-                    hasOverdue
-                        ? Icons.warning_amber_rounded
-                        : Icons.schedule_outlined,
-                    color: iconColor,
-                  ),
-                ),
-                title: Text(
-                  _buildAttentionTitle(overdueCount, dueSoonCount),
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                  ),
-                ),
-                subtitle: Text(
-                  hasOverdue
-                      ? 'Bills need to be created urgently'
-                      : 'Billing cycles ending soon',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                children: [
-                  ...attentionItems.map(
-                    (item) => _BillingAttentionTile(item: item),
-                  ),
-                  if (attentionItems.length > 1)
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        'Tap a tenant to create their bill',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: theme.colorScheme.onSurfaceVariant,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            );
-          },
-          loading: () => const Card(
-            child: Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Center(
-                child: SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
-              ),
-            ),
-          ),
-          error: (error, _) => Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                'Error loading billing status',
-                style: TextStyle(color: theme.colorScheme.error),
-              ),
+    if (isLoading && attentionItems.isEmpty && unpaidBills.isEmpty && expiring.isEmpty) {
+      return const Card(
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Center(
+            child: SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
             ),
           ),
         ),
+      );
+    }
 
-        // Subsection A2: "Agreements Expiring"
-        expiringAgreementsAsync.when(
-          data: (expiring) {
-            if (expiring.isEmpty) return const SizedBox.shrink();
-
-            final expiredCount = expiring.where((e) => e.isExpired).length;
-            final count = expiring.length;
-            
-            final color = expiredCount > 0 ? theme.colorScheme.error : AppColors.warning;
-            
-            return Padding(
-              padding: const EdgeInsets.only(top: 12),
-              child: BouncingScaleWrapper(
-                onTap: () {
-                    // Navigate to tenant list maybe, or show a dialog
-                    context.push('/properties');
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surface,
-                    boxShadow: [
-                      BoxShadow(
-                        color: color.withValues(alpha: 0.1),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                    borderRadius: BorderRadius.circular(12),
+    return Card(
+      elevation: 2,
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        children: [
+          if (attentionItems.isNotEmpty)
+            _ActionTile(
+              icon: Icons.receipt_long_outlined,
+              iconColor: Colors.blue,
+              title: 'Pending Invoices',
+              subtitle: '${attentionItems.length} tenants need bills created',
+              badgeColor: Colors.blue,
+              onTap: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                   ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: color.withValues(alpha: 0.25),
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                        color: color.withValues(alpha: 0.05),
-                      ),
-                      child: Row(
-                        children: [
-                          CircleAvatar(
-                            backgroundColor: color.withValues(alpha: 0.1),
-                            child: Icon(
-                              Icons.handshake_outlined,
-                              color: color,
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    '$count Agreement${count > 1 ? 's' : ''} Expiring',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 15,
-                                    ),
-                                  ),
-                                  if (expiredCount > 0)
-                                    Text(
-                                      '$expiredCount already expired',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: theme.colorScheme.error,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    )
-                                  else
-                                    Text(
-                                      'Within next 30 days',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: theme.colorScheme.onSurfaceVariant,
-                                      ),
-                                    ),
-                                ],
-                              ),
-                          ),
-                          const Icon(
-                            Icons.arrow_forward_ios,
-                            size: 14,
-                            color: Colors.grey,
-                          ),
-                        ],
-                      ),
+                  builder: (context) => DraggableScrollableSheet(
+                    initialChildSize: 0.6,
+                    maxChildSize: 0.9,
+                    minChildSize: 0.4,
+                    expand: false,
+                    builder: (_, scrollController) => SingleChildScrollView(
+                      controller: scrollController,
+                      child: AttentionBottomSheet(attentionItems: attentionItems),
                     ),
                   ),
-                ),
-              ),
-            );
-          },
-          loading: () => const LinearProgressIndicator(),
-          error: (_, __) => const SizedBox.shrink(),
-        ),
-
-        const SizedBox(height: 12),
-
-        // Subsection B: "Collect Payment" (Existing Unpaid Bills)
-        unpaidBillsAsync.when(
-          data: (bills) {
-            if (bills.isEmpty) return const SizedBox.shrink();
-            final overdueCount = bills.where((b) => b.isOverdue).length;
-            final count = bills.length;
-
-            return BouncingScaleWrapper(
-              onTap: () => context.push('/reports'),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surface,
-                  boxShadow: [
-                    BoxShadow(
-                      color: theme.colorScheme.error.withValues(alpha: 0.1),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: theme.colorScheme.error.withValues(alpha: 0.25),
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                      color: theme.colorScheme.error.withValues(alpha: 0.05),
-                    ),
-                    child: Row(
-                  children: [
-                    CircleAvatar(
-                      backgroundColor: theme.colorScheme.error.withValues(
-                        alpha: 0.1,
-                      ),
-                      child: Icon(
-                        Icons.priority_high,
-                        color: theme.colorScheme.error,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '$count Bills Unpaid',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                          ),
-                        ),
-                        if (overdueCount > 0)
-                          Text(
-                            '$overdueCount are overdue',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: AppColors.errorText,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          )
-                        else
-                          Text(
-                            'Follow up with tenants',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: theme.colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                      ],
-                    ),
-                    const Spacer(),
-                    const Icon(
-                      Icons.arrow_forward_ios,
-                      size: 14,
-                      color: Colors.grey,
-                    ),
-                  ],
-                ),
-              ),
+                );
+              },
             ),
+          
+          if (attentionItems.isNotEmpty && (unpaidBills.isNotEmpty || expiring.isNotEmpty))
+            const Divider(height: 1, indent: 64),
+
+          if (unpaidBills.isNotEmpty)
+            _ActionTile(
+              icon: Icons.account_balance_wallet_outlined,
+              iconColor: theme.colorScheme.error,
+              title: 'Collect Payments',
+              subtitle: '${unpaidBills.length} generated bills await payment',
+              badgeColor: theme.colorScheme.error,
+              onTap: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                  ),
+                  builder: (context) => DraggableScrollableSheet(
+                    initialChildSize: 0.6,
+                    maxChildSize: 0.9,
+                    minChildSize: 0.4,
+                    expand: false,
+                    builder: (_, scrollController) => SingleChildScrollView(
+                      controller: scrollController,
+                      child: UnpaidBillsBottomSheet(unpaidBills: unpaidBills),
+                    ),
+                  ),
+                );
+              },
             ),
-            );
-          },
-          loading: () => const LinearProgressIndicator(),
-          error: (_, __) => const SizedBox.shrink(),
-        ),
-      ],
+
+          if (unpaidBills.isNotEmpty && expiring.isNotEmpty)
+            const Divider(height: 1, indent: 64),
+
+          if (expiring.isNotEmpty)
+            _ActionTile(
+              icon: Icons.handshake_outlined,
+              iconColor: AppColors.warning,
+              title: 'Renew Agreements',
+              subtitle: '${expiring.length} agreements expiring soon',
+              badgeColor: AppColors.warning,
+              onTap: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                  ),
+                  builder: (context) => DraggableScrollableSheet(
+                    initialChildSize: 0.6,
+                    maxChildSize: 0.9,
+                    minChildSize: 0.4,
+                    expand: false,
+                    builder: (_, scrollController) => SingleChildScrollView(
+                      controller: scrollController,
+                      child: ExpiringAgreementsBottomSheet(expiringAgreements: expiring),
+                    ),
+                  ),
+                );
+              },
+            ),
+        ],
+      ),
     );
   }
+}
 
-  String _buildAttentionTitle(int overdueCount, int dueSoonCount) {
-    if (overdueCount > 0 && dueSoonCount > 0) {
-      return '$overdueCount overdue, $dueSoonCount due soon';
-    } else if (overdueCount > 0) {
-      return '$overdueCount ${overdueCount == 1 ? 'tenant' : 'tenants'} overdue';
-    } else {
-      return '$dueSoonCount ${dueSoonCount == 1 ? 'tenant' : 'tenants'} due soon';
-    }
+class _ActionTile extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String title;
+  final String subtitle;
+  final Color badgeColor;
+  final VoidCallback onTap;
+
+  const _ActionTile({
+    required this.icon,
+    required this.iconColor,
+    required this.title,
+    required this.subtitle,
+    required this.badgeColor,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: iconColor.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: iconColor, size: 24),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                width: 8,
+                height: 8,
+                margin: const EdgeInsets.only(right: 8),
+                decoration: BoxDecoration(
+                  color: badgeColor,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: badgeColor.withValues(alpha: 0.4),
+                      blurRadius: 4,
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -570,114 +473,7 @@ class _EmptyAttentionCard extends StatelessWidget {
   }
 }
 
-/// Tile for a single billing attention item.
-class _BillingAttentionTile extends StatelessWidget {
-  final BillingAttentionItem item;
 
-  const _BillingAttentionTile({required this.item});
-
-  String _billTypeLabel(BillType type) => switch (type) {
-    BillType.rent => 'Rent',
-    BillType.electricity => 'Elec',
-    BillType.water => 'Water',
-    BillType.maintenance => 'Maint',
-    BillType.other => 'Other',
-  };
-
-  Color _billTypeColor(BuildContext context, BillType type) => switch (type) {
-    BillType.rent => Theme.of(context).colorScheme.primary,
-    BillType.electricity => Theme.of(context).colorScheme.error,
-    BillType.water => Colors.blue,
-    BillType.maintenance => Colors.green,
-    BillType.other => Colors.grey,
-  };
-
-  @override
-  Widget build(BuildContext context) {
-    final isOverdue = item.status == BillingCycleStatus.overdue;
-    final statusColor = isOverdue
-        ? Theme.of(context).colorScheme.error
-        : Theme.of(context).colorScheme.error; // Warning
-    final statusTextColor = isOverdue
-        ? Theme.of(context).colorScheme.error
-        : Theme.of(context).colorScheme.error;
-    final billColor = _billTypeColor(context, item.billType);
-
-    return ListTile(
-      visualDensity: VisualDensity.compact,
-      onTap: () {
-        // Navigate to room detail with cycle dates and bill type for bill creation
-        context.push(
-          '/rooms/${item.roomId}?createBill=true'
-          '&cycleStart=${item.cycleStart.toIso8601String()}'
-          '&cycleEnd=${item.cycleEnd.toIso8601String()}'
-          '&billType=${item.billType.name}',
-        );
-      },
-      leading: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-        decoration: BoxDecoration(
-          color: billColor.withValues(alpha: 0.15),
-          borderRadius: BorderRadius.circular(4),
-          border: Border.all(color: billColor.withValues(alpha: 0.3)),
-        ),
-        child: Text(
-          _billTypeLabel(item.billType),
-          style: TextStyle(
-            fontSize: 10,
-            fontWeight: FontWeight.w600,
-            color: billColor,
-          ),
-        ),
-      ),
-      title: Row(
-        children: [
-          Container(
-            width: 6,
-            height: 6,
-            margin: const EdgeInsets.only(right: 6),
-            decoration: BoxDecoration(
-              color: statusColor,
-              shape: BoxShape.circle,
-            ),
-          ),
-          Expanded(
-            child: Text(
-              'Room ${item.roomNumber} - ${item.tenantName}',
-              style: const TextStyle(fontSize: 13),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
-      ),
-      subtitle: Text(
-        item.cycleEndDescription,
-        style: TextStyle(
-          fontSize: 11,
-          color: statusTextColor,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-      trailing: OutlinedButton(
-        onPressed: () {
-          context.push(
-            '/rooms/${item.roomId}?createBill=true'
-            '&cycleStart=${item.cycleStart.toIso8601String()}'
-            '&cycleEnd=${item.cycleEnd.toIso8601String()}'
-            '&billType=${item.billType.name}',
-          );
-        },
-        style: OutlinedButton.styleFrom(
-          visualDensity: VisualDensity.compact,
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          foregroundColor: statusColor,
-          side: BorderSide(color: statusColor.withValues(alpha: 0.5)),
-        ),
-        child: const Text('Create'),
-      ),
-    );
-  }
-}
 
 class _LivePropertyStatusList extends ConsumerWidget {
   @override
