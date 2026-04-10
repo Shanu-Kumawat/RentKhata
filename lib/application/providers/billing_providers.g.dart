@@ -1682,5 +1682,66 @@ final ensureDefaultTemplatesProvider = AutoDisposeFutureProvider<bool>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef EnsureDefaultTemplatesRef = AutoDisposeFutureProviderRef<bool>;
+String _$billsByFinancialYearHash() =>
+    r'1cd136547e9b957721e31eb5a26de07b386508d0';
+
+/// Bills filtered by the Selected Financial Year
+///
+/// Copied from [billsByFinancialYear].
+@ProviderFor(billsByFinancialYear)
+final billsByFinancialYearProvider =
+    AutoDisposeFutureProvider<List<Bill>>.internal(
+      billsByFinancialYear,
+      name: r'billsByFinancialYearProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$billsByFinancialYearHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef BillsByFinancialYearRef = AutoDisposeFutureProviderRef<List<Bill>>;
+String _$yearlyFinancialsHash() => r'f8fb97fa2a086a51a335448af1d3d09f10c18609';
+
+/// Aggregated Financial metrics by Financial Year
+///
+/// Copied from [yearlyFinancials].
+@ProviderFor(yearlyFinancials)
+final yearlyFinancialsProvider =
+    AutoDisposeFutureProvider<YearlyFinancialSummary>.internal(
+      yearlyFinancials,
+      name: r'yearlyFinancialsProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$yearlyFinancialsHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef YearlyFinancialsRef =
+    AutoDisposeFutureProviderRef<YearlyFinancialSummary>;
+String _$reportsFinancialYearHash() =>
+    r'93b612159a6a33099522cea946cf0fb21346b5c1';
+
+/// Selected Financial Year for Reports
+///
+/// Copied from [ReportsFinancialYear].
+@ProviderFor(ReportsFinancialYear)
+final reportsFinancialYearProvider =
+    AutoDisposeNotifierProvider<ReportsFinancialYear, int>.internal(
+      ReportsFinancialYear.new,
+      name: r'reportsFinancialYearProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$reportsFinancialYearHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+typedef _$ReportsFinancialYear = AutoDisposeNotifier<int>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

@@ -201,3 +201,87 @@ Future<bool> ensureDefaultTemplates(Ref ref) async {
   await service.ensureDefaultTemplatesExist();
   return true;
 }
+
+// ============================================================================
+// FINANCIAL YEAR REPORTING PROVIDERS
+// ============================================================================
+
+/// Selected Financial Year for Reports
+@riverpod
+class ReportsFinancialYear extends _$ReportsFinancialYear {
+  @override
+  int build() {
+    final now = DateTime.now();
+    // Indian Financial Year: April 1 to March 31
+    return now.month >= 4 ? now.year : now.year - 1;
+  }
+
+  void setYear(int year) {
+    state = year;
+  }
+}
+
+/// Bills filtered by the Selected Financial Year
+@riverpod
+Future<List<Bill>> billsByFinancialYear(Ref ref) async {
+  final startYear = ref.watch(reportsFinancialYearProvider);
+  final repo = ref.watch(billingRepositoryProvider);
+  final startDate = DateTime(startYear, 4, 1);
+  final endDate = DateTime(startYear + 1, 3, 31, 23, 59, 59);
+
+  // Auto-refresh via unpaidBillsProvider
+  ref.watch(unpaidBillsProvider);
+  
+  final allBills = await repo.getAllBills();
+  return allBills.where((b) {
+    final bStart = b.periodStartDate ?? b.createdAt;
+    final bEnd = b.periodEndDate ?? b.createdAt;
+    return bStart.isBefore(endDate) && bEnd.isAfter(startDate);
+  }).toList();
+}
+
+class YearlyFinancialSummary {
+  final double collected;
+  final double pending;
+  final int overdueCount;
+  final int year;
+
+  const YearlyFinancialSummary({
+    required this.collected,
+    required this.pending,
+    required this.overdueCount,
+    required this.year,
+  });
+}
+
+/// Aggregated Financial metrics by Financial Year
+@riverpod
+Future<YearlyFinancialSummary> yearlyFinancials(Ref ref) async {
+  final year = ref.watch(reportsFinancialYearProvider);
+  final billingRepo = ref.watch(billingRepositoryProvider);
+  final allBills = await ref.watch(billsByFinancialYearProvider.future);
+  
+  final startYearDate = DateTime(year, 4, 1);
+  final endYearDate = DateTime(year + 1, 3, 31, 23, 59, 59);
+
+  // Payments collected within this FY
+  final payments = await billingRepo.getPaymentsInDateRange(startYearDate, endYearDate);
+  final totalCollected = payments.fold<double>(0, (sum, p) => sum + p.amount);
+
+  // Pending strictly from bills generated in this FY
+  double totalDue = 0;
+  int overdueCount = 0;
+  for (final bill in allBills) {
+    if (!bill.isFullyPaid) {
+      totalDue += bill.pendingAmount;
+      if (bill.isOverdue) overdueCount++;
+    }
+  }
+
+  return YearlyFinancialSummary(
+    collected: totalCollected,
+    pending: totalDue,
+    overdueCount: overdueCount,
+    year: year,
+  );
+}

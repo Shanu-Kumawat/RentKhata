@@ -9,6 +9,7 @@ class AnimatedCounterText extends StatelessWidget {
   final Duration duration;
   final TextStyle? style;
   final CounterFormat format;
+  final String? suffix;
 
   const AnimatedCounterText({
     super.key,
@@ -16,6 +17,7 @@ class AnimatedCounterText extends StatelessWidget {
     this.duration = const Duration(milliseconds: 1000),
     this.style,
     this.format = CounterFormat.currency,
+    this.suffix,
   });
 
   @override
@@ -30,6 +32,9 @@ class AnimatedCounterText extends StatelessWidget {
           displayValue = formatCurrency(val);
         } else {
           displayValue = val.toStringAsFixed(0);
+        }
+        if (suffix != null) {
+          displayValue += suffix!;
         }
         return Text(
           displayValue,

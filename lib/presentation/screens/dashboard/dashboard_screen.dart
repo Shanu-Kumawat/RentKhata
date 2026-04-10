@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
+
 import '../../../application/providers/dashboard_providers.dart';
 import '../../../application/providers/billing_providers.dart';
 import '../../../application/providers/billing_cycle_providers.dart';
@@ -15,7 +15,7 @@ import '../../../core/theme/app_colors.dart';
 
 import '../../widgets/bouncing_scale_wrapper.dart';
 import '../../widgets/staggered_fade_in.dart';
-import '../../widgets/animated_counter_text.dart';
+
 
 /// Main dashboard screen showing financial overview and actionable items.
 class DashboardScreen extends ConsumerWidget {
@@ -62,16 +62,9 @@ class DashboardScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 1. Top Section: Compact Financial Summary
+              // 1. Top Section: Action Center (Priority Zone)
               const StaggeredFadeIn(
                 delay: Duration(milliseconds: 0),
-                child: _CompactFinancialHeader(),
-              ),
-              const SizedBox(height: 24),
-
-              // 2. Middle Section: Action Center (Priority Zone)
-              const StaggeredFadeIn(
-                delay: Duration(milliseconds: 100),
                 child: Column(
                   children: [
                     _SectionHeader(
@@ -199,322 +192,7 @@ class DashboardScreen extends ConsumerWidget {
   }
 }
 
-// ============ New Components ============
 
-class _CompactFinancialHeader extends ConsumerWidget {
-  const _CompactFinancialHeader();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final filteredAsync = ref.watch(filteredFinancialsProvider);
-    final selectedMonth = ref.watch(dashboardMonthProvider);
-    final dateFormat = DateFormat('MMMM yyyy');
-    final theme = Theme.of(context);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Month Selector - Clean minimal design
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 4),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Flexible(
-                child: Text(
-                  'Overview',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Container(
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _MonthNavButton(
-                      icon: Icons.chevron_left_rounded,
-                      onPressed: () {
-                        final newDate = DateTime(
-                          selectedMonth.year,
-                          selectedMonth.month - 1,
-                        );
-                        ref
-                            .read(dashboardMonthProvider.notifier)
-                            .setMonth(newDate);
-                      },
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: Text(
-                        dateFormat.format(selectedMonth),
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    _MonthNavButton(
-                      icon: Icons.chevron_right_rounded,
-                      onPressed: () {
-                        final newDate = DateTime(
-                          selectedMonth.year,
-                          selectedMonth.month + 1,
-                        );
-                        ref
-                            .read(dashboardMonthProvider.notifier)
-                            .setMonth(newDate);
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-
-        // Financial Cards Row
-        filteredAsync.when(
-          data: (data) => Row(
-            children: [
-              Expanded(
-                child: _FinancialStatCard(
-                  label: 'Collected',
-                  amount: data.collected,
-                  icon: Icons.arrow_downward_rounded,
-                  accentColor: Theme.of(context).colorScheme.primary,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _FinancialStatCard(
-                  label: 'Outstanding',
-                  amount: data.pending,
-                  icon: Icons.schedule_rounded,
-                  accentColor: Theme.of(context).colorScheme.error,
-                ),
-              ),
-            ],
-          ),
-          loading: () => Row(
-            children: [
-              Expanded(child: _FinancialStatCard.loading()),
-              const SizedBox(width: 12),
-              Expanded(child: _FinancialStatCard.loading()),
-            ],
-          ),
-          error: (_, __) => Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.errorContainer.withAlpha(20),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: Theme.of(context).colorScheme.error.withAlpha(50),
-              ),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.error_outline,
-                  color: Theme.of(context).colorScheme.error,
-                  size: 20,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'Error loading financials',
-                  style: TextStyle(color: Theme.of(context).colorScheme.error),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-/// Navigation button for month selector.
-class _MonthNavButton extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onPressed;
-
-  const _MonthNavButton({required this.icon, required this.onPressed});
-
-  @override
-  Widget build(BuildContext context) {
-    return BouncingScaleWrapper(
-      onTap: onPressed,
-      child: Padding(
-        padding: const EdgeInsets.all(8),
-        child: Icon(
-          icon,
-          size: 20,
-          color: Theme.of(context).colorScheme.onSurface,
-        ),
-      ),
-    );
-  }
-}
-
-/// Premium financial stat card with accent border and icon.
-class _FinancialStatCard extends StatelessWidget {
-  final String? label;
-  final double? amount;
-  final IconData? icon;
-  final Color? accentColor;
-  final bool isLoading;
-
-  const _FinancialStatCard({
-    required String this.label,
-    required double this.amount,
-    required IconData this.icon,
-    required Color this.accentColor,
-  }) : isLoading = false;
-
-  const _FinancialStatCard.loading()
-    : label = null,
-      amount = null,
-      icon = null,
-      accentColor = null,
-      isLoading = true;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    if (isLoading) {
-      return Container(
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: theme.colorScheme.outline),
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      width: 60,
-                      height: 16, // Matches the font height
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.outline.withValues(alpha: 0.3),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                    ),
-                    Container(
-                      width: 28,
-                      height: 28, // Matches the icon container size
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.outline.withValues(alpha: 0.3),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Container(
-                  width: 120,
-                  height: 32, // Matches headlineSmall approximate height
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.outline.withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
-
-    return BouncingScaleWrapper(
-      child: Container(
-        decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: accentColor!.withValues(alpha: 0.08),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-          ),
-        ],
-        border: Border.all(
-          color: accentColor!.withValues(alpha: 0.2),
-          width: 1,
-        ),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(15),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                accentColor!.withValues(alpha: 0.18),
-                accentColor!.withValues(alpha: 0.04),
-                Colors.transparent,
-              ],
-              stops: const [0.0, 0.4, 1.0],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header row with label and icon
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    label!.toUpperCase(),
-                    style: TextStyle(
-                      fontSize: 11,
-                      letterSpacing: 0.8,
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: accentColor!.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(icon, size: 16, color: accentColor),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              // Amount
-              AnimatedCounterText(
-                value: amount!,
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.onSurface,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      ),
-    );
-  }
-}
 
 class _ActionRequiredSection extends ConsumerWidget {
   const _ActionRequiredSection();
@@ -666,14 +344,7 @@ class _ActionRequiredSection extends ConsumerWidget {
                         color: theme.colorScheme.error.withValues(alpha: 0.25),
                       ),
                       borderRadius: BorderRadius.circular(12),
-                      gradient: LinearGradient(
-                        colors: [
-                          theme.colorScheme.error.withValues(alpha: 0.1),
-                          theme.colorScheme.error.withValues(alpha: 0.02),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
+                      color: theme.colorScheme.error.withValues(alpha: 0.05),
                     ),
                     child: Row(
                   children: [
