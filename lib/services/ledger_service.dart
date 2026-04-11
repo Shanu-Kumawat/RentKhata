@@ -54,7 +54,7 @@ class LedgerService {
         LedgerEntry(
           date: bill.createdAt, // Or bill.periodStartDate ?? bill.createdAt
           type: LedgerEntryType.billGenerated,
-          description: 'Bill Generated: ${bill.billType.name.toUpperCase()} - ${bill.billingPeriod}',
+          description: '${bill.billType.name.toUpperCase()} - ${bill.billingPeriod}',
           debit: bill.amount,
           credit: 0,
           balance: 0, // Computed later
@@ -71,7 +71,7 @@ class LedgerService {
           LedgerEntry(
             date: pay.paymentDate,
             type: LedgerEntryType.paymentReceived,
-            description: 'Payment Received: ${pay.paymentMode.name.toUpperCase()} - Ref: ${pay.notes ?? ""}'.trim(),
+            description: 'Payment - ${pay.paymentMode.name.toUpperCase()}',
             debit: 0,
             credit: pay.amount,
             balance: 0, // Computed later

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 import 'package:path_provider/path_provider.dart';
 import '../domain/entities/ledger.dart';
 import '../core/utils/currency_formatter.dart';
@@ -10,9 +11,19 @@ class PdfService {
   static Future<File> generateTenantLedgerPdf(LedgerStatement statement) async {
     final pdf = pw.Document();
 
+    final fontRegular = await PdfGoogleFonts.robotoRegular();
+    final fontBold = await PdfGoogleFonts.robotoBold();
+
+    final theme = pw.ThemeData.withFont(
+      base: fontRegular,
+      bold: fontBold,
+      fontFallback: [fontRegular],
+    );
+
     pdf.addPage(
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
+        theme: theme,
         margin: const pw.EdgeInsets.all(32),
         build: (pw.Context context) {
           return [
@@ -118,13 +129,23 @@ class PdfService {
   }
 
   static pw.Widget _buildLedgerTable(List<LedgerEntry> entries) {
-    final headers = ['Date', 'Description', 'Charge (Dr)', 'Payment (Cr)', 'Balance'];
+    final headers = ['Date', 'Description', 'Billed', 'Paid', 'Balance'];
     
     final data = entries.map((e) {
       final dateStr = '${e.date.day}/${e.date.month}/${e.date.year}';
-      final debitStr = e.debit > 0 ? formatCurrency(e.debit) : '-';
-      final creditStr = e.credit > 0 ? formatCurrency(e.credit) : '-';
-      final balanceStr = formatCurrency(e.balance);
+      final debitStr = e.debit > 0 ? formatCurrency(e.debit) : '';
+      final creditStr = e.credit > 0 ? formatCurrency(e.credit) : '';
+      
+      // Format balance specifically so it's perfectly clear
+      String balanceStr;
+      if (e.balance == 0) {
+        balanceStr = '₹0';
+      } else if (e.balance < 0) {
+        // Negative balance means tenant overpaid / has advance
+        balanceStr = '${formatCurrency(e.balance.abs())} (Adv)';
+      } else {
+        balanceStr = formatCurrency(e.balance);
+      }
 
       return [dateStr, e.description, debitStr, creditStr, balanceStr];
     }).toList();
@@ -137,12 +158,26 @@ class PdfService {
       headerDecoration: const pw.BoxDecoration(color: PdfColors.blueGrey800),
       rowDecoration: const pw.BoxDecoration(border: pw.Border(bottom: pw.BorderSide(color: PdfColors.grey300, width: 0.5))),
       cellAlignment: pw.Alignment.centerLeft,
+      headerAlignments: {
+        0: pw.Alignment.centerLeft,
+        1: pw.Alignment.centerLeft,
+        2: pw.Alignment.centerRight,
+        3: pw.Alignment.centerRight,
+        4: pw.Alignment.centerRight,
+      },
       cellAlignments: {
         0: pw.Alignment.centerLeft,
         1: pw.Alignment.centerLeft,
         2: pw.Alignment.centerRight,
         3: pw.Alignment.centerRight,
         4: pw.Alignment.centerRight,
+      },
+      columnWidths: {
+        0: const pw.FlexColumnWidth(1.5), // Date
+        1: const pw.FlexColumnWidth(2.5), // Description
+        2: const pw.FlexColumnWidth(2),   // Billed
+        3: const pw.FlexColumnWidth(2),   // Paid
+        4: const pw.FlexColumnWidth(2),   // Balance
       },
       cellPadding: const pw.EdgeInsets.symmetric(vertical: 8, horizontal: 4),
       headerPadding: const pw.EdgeInsets.symmetric(vertical: 8, horizontal: 4),
