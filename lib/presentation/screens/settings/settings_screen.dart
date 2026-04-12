@@ -291,39 +291,38 @@ class SettingsScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 8),
             ...AppTheme.values.map(
-              (theme) => RadioListTile<AppTheme>(
-                value: theme,
-                groupValue: currentTheme,
-                activeColor: Theme.of(context).colorScheme.primary,
-                onChanged: (value) {
-                  if (value != null) {
-                    ref.read(themeSettingsProvider.notifier).setTheme(value);
+              (theme) {
+                final isSelected = currentTheme == theme;
+                return ListTile(
+                  onTap: () {
+                    ref.read(themeSettingsProvider.notifier).setTheme(theme);
                     Navigator.pop(context);
-                  }
-                },
-                title: Text(theme.displayName),
-                subtitle: Text(theme.subtitle),
-                secondary: Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: theme.previewColor,
-                    borderRadius: BorderRadius.circular(8),
-                    border: theme == AppTheme.system
-                        ? Border.all(
-                            color: Theme.of(context).colorScheme.outline,
-                          )
+                  },
+                  title: Text(theme.displayName),
+                  subtitle: Text(theme.subtitle),
+                  leading: Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: theme.previewColor,
+                      borderRadius: BorderRadius.circular(8),
+                      border: theme == AppTheme.system
+                          ? Border.all(
+                              color: Theme.of(context).colorScheme.outline,
+                            )
+                          : null,
+                    ),
+                    child: theme == AppTheme.system
+                        ? Icon(Icons.brightness_auto, size: 18,
+                            color: Theme.of(context).colorScheme.onSurface)
                         : null,
                   ),
-                  child: theme == AppTheme.system
-                      ? Icon(
-                          Icons.brightness_auto,
-                          size: 18,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        )
-                      : null,
-                ),
-              ),
+                  trailing: isSelected
+                      ? Icon(Icons.check_circle,
+                          color: Theme.of(context).colorScheme.primary)
+                      : const Icon(Icons.circle_outlined, color: Colors.grey),
+                );
+              },
             ),
             const SizedBox(height: 16),
           ],

@@ -6,7 +6,10 @@ import '../../../../core/theme/app_colors.dart';
 class ExpiringAgreementsBottomSheet extends StatelessWidget {
   final List<AgreementExpirationStatus> expiringAgreements;
 
-  const ExpiringAgreementsBottomSheet({super.key, required this.expiringAgreements});
+  const ExpiringAgreementsBottomSheet({
+    super.key,
+    required this.expiringAgreements,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +22,9 @@ class ExpiringAgreementsBottomSheet extends StatelessWidget {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -34,12 +39,18 @@ class ExpiringAgreementsBottomSheet extends StatelessWidget {
                     color: AppColors.warning.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.handshake_outlined, color: AppColors.warning, size: 20),
+                  child: const Icon(
+                    Icons.handshake_outlined,
+                    color: AppColors.warning,
+                    size: 20,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Text(
                   'Renew Agreements',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -49,7 +60,9 @@ class ExpiringAgreementsBottomSheet extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Text(
               'Select a tenant below to view their profile and update their agreement status.',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.onSurfaceVariant),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: AppColors.onSurfaceVariant,
+              ),
             ),
           ),
           const SizedBox(height: 16),
@@ -57,7 +70,8 @@ class ExpiringAgreementsBottomSheet extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
             itemCount: expiringAgreements.length,
-            separatorBuilder: (context, index) => const Divider(height: 1, indent: 20, endIndent: 20),
+            separatorBuilder: (context, index) =>
+                const Divider(height: 1, indent: 20, endIndent: 20),
             itemBuilder: (context, index) {
               final status = expiringAgreements[index];
               return _ExpiringAgreementTile(status: status);
@@ -101,7 +115,7 @@ class _ExpiringAgreementTile extends StatelessWidget {
           ),
           Expanded(
             child: Text(
-              '${status.occupancy.tenantName ?? 'Tenant'}',
+              status.occupancy.tenantName ?? 'Tenant',
               style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
               overflow: TextOverflow.ellipsis,
             ),
@@ -109,8 +123,8 @@ class _ExpiringAgreementTile extends StatelessWidget {
         ],
       ),
       subtitle: Text(
-        isExpired 
-            ? 'Expired ${-status.daysRemaining} days ago' 
+        isExpired
+            ? 'Expired ${-status.daysRemaining} days ago'
             : 'Expiring in ${status.daysRemaining} days',
         style: TextStyle(
           fontSize: 12,
@@ -128,9 +142,14 @@ class _ExpiringAgreementTile extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           foregroundColor: AppColors.warning,
           side: BorderSide(color: AppColors.warning.withValues(alpha: 0.5)),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
         ),
-        child: Text('Renew', style: TextStyle(fontWeight: FontWeight.bold, color: statusColor)),
+        child: Text(
+          'Renew',
+          style: TextStyle(fontWeight: FontWeight.bold, color: statusColor),
+        ),
       ),
     );
   }

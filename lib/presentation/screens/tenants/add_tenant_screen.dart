@@ -1,7 +1,6 @@
 /// Add/Edit tenant screen with comprehensive profile fields.
 library;
 
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -80,6 +79,7 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
       source: ImageSource.gallery,
     );
     if (pickedFile != null) {
+      if (!mounted) return;
       final titleController = TextEditingController();
       final title = await showDialog<String>(
         context: context,

@@ -66,7 +66,8 @@ class ShareService {
     final name = tenantName ?? 'Tenant';
     await shareFiles(
       files: [pdfFile],
-      text: 'Dear $name,\n\nPlease find your generated Khata Statement attached.',
+      text:
+          'Dear $name,\n\nPlease find your generated Khata Statement attached.',
       subject: 'Khata Statement',
     );
   }

@@ -7,10 +7,12 @@ import '../../domain/repositories/landlord_repository.dart';
 import '../../domain/repositories/property_repository.dart';
 import '../../domain/repositories/tenant_repository.dart';
 import '../../domain/repositories/billing_repository.dart';
+import '../../domain/repositories/expense_repository.dart';
 import '../../data/repositories/landlord_repository_impl.dart';
 import '../../data/repositories/property_repository_impl.dart';
 import '../../data/repositories/tenant_repository_impl.dart';
 import '../../data/repositories/billing_repository_impl.dart';
+import '../../data/repositories/expense_repository_impl.dart';
 import 'database_provider.dart';
 
 part 'repository_providers.g.dart';
@@ -45,4 +47,11 @@ BillingRepository billingRepository(Ref ref) {
     ref.watch(tenantDaoProvider),
     ref.watch(propertyDaoProvider),
   );
+}
+
+/// Provides the ExpenseRepository.
+@riverpod
+ExpenseRepository expenseRepository(Ref ref) {
+  final db = ref.watch(appDatabaseProvider);
+  return ExpenseRepositoryImpl(db.expenseDao);
 }

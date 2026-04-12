@@ -326,17 +326,13 @@ class BiometricSettingsScreen extends ConsumerWidget {
             const SizedBox(height: 8),
             ...options.map(
               (option) => ListTile(
-                leading: Radio<int>(
-                  value: option.$1,
-                  groupValue: currentValue,
-                  onChanged: (value) {
-                    if (value != null) {
-                      ref
-                          .read(biometricSettingsNotifierProvider.notifier)
-                          .setLockAfterMinutes(value);
-                      Navigator.pop(context);
-                    }
-                  },
+                leading: Icon(
+                  option.$1 == currentValue
+                      ? Icons.check_circle
+                      : Icons.radio_button_unchecked,
+                  color: option.$1 == currentValue
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.outline,
                 ),
                 title: Text(option.$2),
                 onTap: () {

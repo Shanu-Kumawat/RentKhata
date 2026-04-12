@@ -76,7 +76,7 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
   Set<int> _selectedFamilyMemberIds = {};
 
   // New family members to add during move-in
-  List<_NewFamilyMember> _newFamilyMembers = [];
+  final List<_NewFamilyMember> _newFamilyMembers = [];
 
   // Documents
   final List<Map<String, String>> _documents = []; // {path, title}
@@ -93,6 +93,7 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
       source: ImageSource.gallery,
     );
     if (pickedFile != null) {
+      if (!mounted) return;
       final titleController = TextEditingController();
       final title = await showDialog<String>(
         context: context,
@@ -171,9 +172,7 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
         // Auto-update billing start based on smart default
         _billingStartDate = _calculateSmartBillingStart(date);
         // Auto-suggest 11 months for new agreement
-        if (_agreementEndDate == null) {
-            _agreementEndDate = DateTime(date.year, date.month + 11, date.day);
-        }
+        _agreementEndDate ??= DateTime(date.year, date.month + 11, date.day);
       });
     }
   }
@@ -181,7 +180,9 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
   Future<void> _selectAgreementEndDate() async {
     final date = await showDatePicker(
       context: context,
-      initialDate: _agreementEndDate ?? DateTime(_moveInDate.year, _moveInDate.month + 11, _moveInDate.day),
+      initialDate:
+          _agreementEndDate ??
+          DateTime(_moveInDate.year, _moveInDate.month + 11, _moveInDate.day),
       firstDate: _moveInDate,
       lastDate: DateTime(2050),
     );

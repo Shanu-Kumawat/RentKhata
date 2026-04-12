@@ -87,5 +87,25 @@ final billingRepositoryProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef BillingRepositoryRef = AutoDisposeProviderRef<BillingRepository>;
+String _$expenseRepositoryHash() => r'1fd9570a1c5574d730c8ff439fe37869183bd328';
+
+/// Provides the ExpenseRepository.
+///
+/// Copied from [expenseRepository].
+@ProviderFor(expenseRepository)
+final expenseRepositoryProvider =
+    AutoDisposeProvider<ExpenseRepository>.internal(
+      expenseRepository,
+      name: r'expenseRepositoryProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$expenseRepositoryHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef ExpenseRepositoryRef = AutoDisposeProviderRef<ExpenseRepository>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

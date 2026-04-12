@@ -27,6 +27,7 @@ import 'tables/message_template_table.dart';
 import 'tables/bill_settings_table.dart';
 import 'tables/document_table.dart';
 import 'tables/biometric_settings_table.dart';
+import 'tables/expense_table.dart';
 import '../../domain/entities/occupancy.dart';
 import '../../domain/entities/document.dart';
 
@@ -36,6 +37,7 @@ import 'daos/property_dao.dart';
 import 'daos/tenant_dao.dart';
 import 'daos/billing_dao.dart';
 import 'daos/document_dao.dart';
+import 'daos/expense_dao.dart';
 
 part 'app_database.g.dart';
 
@@ -61,8 +63,9 @@ part 'app_database.g.dart';
     BillSettings,
     Documents,
     BiometricSettings,
+    Expenses,
   ],
-  daos: [LandlordDao, PropertyDao, TenantDao, BillingDao, DocumentDao],
+  daos: [LandlordDao, PropertyDao, TenantDao, BillingDao, DocumentDao, ExpenseDao],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
@@ -71,7 +74,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 14;
+  int get schemaVersion => 15;
 
   @override
   MigrationStrategy get migration {
@@ -374,6 +377,10 @@ Thank you for your payment.
         if (from < 14) {
           // Add agreementEndDate to occupancies
           await m.addColumn(occupancies, occupancies.agreementEndDate);
+        }
+        if (from < 15) {
+          // Add Expense Tracking table
+          await m.createTable(expenses);
         }
       },
     );

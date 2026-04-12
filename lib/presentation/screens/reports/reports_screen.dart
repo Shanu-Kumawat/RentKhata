@@ -56,7 +56,9 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
+                color: Theme.of(
+                  context,
+                ).colorScheme.primaryContainer.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: DropdownButtonHideUnderline(
@@ -71,7 +73,9 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
                   ),
                   onChanged: (int? newValue) {
                     if (newValue != null) {
-                      ref.read(reportsFinancialYearProvider.notifier).setYear(newValue);
+                      ref
+                          .read(reportsFinancialYearProvider.notifier)
+                          .setYear(newValue);
                     }
                   },
                   items: List.generate(5, (index) {
@@ -115,7 +119,9 @@ class _OverviewTab extends ConsumerWidget {
     final year = ref.watch(reportsFinancialYearProvider);
     final financialsAsync = ref.watch(yearlyFinancialsProvider);
     final billsAsync = ref.watch(billsByFinancialYearProvider);
-    final unpaidAsync = ref.watch(unpaidBillsProvider); // We'll filter this inline
+    final unpaidAsync = ref.watch(
+      unpaidBillsProvider,
+    ); // We'll filter this inline
 
     final yearStr = '$year-${(year + 1).toString().substring(2)}';
 
@@ -131,10 +137,7 @@ class _OverviewTab extends ConsumerWidget {
                 delay: Duration(milliseconds: 0),
                 child: Text(
                   'Financial Summary',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
               ),
             ],
@@ -151,9 +154,9 @@ class _OverviewTab extends ConsumerWidget {
                   final startDate = DateTime(year, 4, 1);
                   final endDate = DateTime(year + 1, 3, 31, 23, 59, 59);
                   final unpaidInYear = unpaidBills.where((b) {
-                     final bStart = b.periodStartDate ?? b.createdAt;
-                     final bEnd = b.periodEndDate ?? b.createdAt;
-                     return bStart.isBefore(endDate) && bEnd.isAfter(startDate);
+                    final bStart = b.periodStartDate ?? b.createdAt;
+                    final bEnd = b.periodEndDate ?? b.createdAt;
+                    return bStart.isBefore(endDate) && bEnd.isAfter(startDate);
                   }).toList();
 
                   final overdueAmount = unpaidInYear
@@ -210,7 +213,11 @@ class _OverviewTab extends ConsumerWidget {
                           Expanded(
                             child: _SummaryCard(
                               label: 'Collection Rate',
-                              amount: (data.collected + data.pending) > 0 ? ((data.collected / (data.collected + data.pending)) * 100) : 0,
+                              amount: (data.collected + data.pending) > 0
+                                  ? ((data.collected /
+                                            (data.collected + data.pending)) *
+                                        100)
+                                  : 0,
                               icon: Icons.trending_up_rounded,
                               accentColor: AppColors.info,
                               suffix: '%',
@@ -238,10 +245,7 @@ class _OverviewTab extends ConsumerWidget {
             delay: Duration(milliseconds: 200),
             child: Text(
               'Bills by Type',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
           ),
           const SizedBox(height: 12),
@@ -250,7 +254,8 @@ class _OverviewTab extends ConsumerWidget {
             delay: const Duration(milliseconds: 300),
             child: billsAsync.when(
               data: (bills) {
-                final typeBreakdown = <BillType, ({int count, double amount})>{};
+                final typeBreakdown =
+                    <BillType, ({int count, double amount})>{};
                 for (final bill in bills) {
                   final current = typeBreakdown[bill.billType];
                   typeBreakdown[bill.billType] = (
@@ -270,7 +275,9 @@ class _OverviewTab extends ConsumerWidget {
                 return Card(
                   elevation: 2,
                   shadowColor: Colors.black12,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
@@ -470,7 +477,9 @@ class _SummaryCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 10,
                           letterSpacing: 0.8,
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                          color: theme.colorScheme.onSurface.withValues(
+                            alpha: 0.7,
+                          ),
                           fontWeight: FontWeight.w600,
                         ),
                         overflow: TextOverflow.ellipsis,
@@ -489,7 +498,9 @@ class _SummaryCard extends StatelessWidget {
                 const SizedBox(height: 8),
                 AnimatedCounterText(
                   value: amount!,
-                  format: formatRaw ? CounterFormat.raw : CounterFormat.currency,
+                  format: formatRaw
+                      ? CounterFormat.raw
+                      : CounterFormat.currency,
                   suffix: suffix,
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
@@ -764,11 +775,10 @@ class _PremiumBillCard extends ConsumerWidget {
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(15),
-          child: Container(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Header row
                   Row(
@@ -778,7 +788,9 @@ class _PremiumBillCard extends ConsumerWidget {
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: _getBillTypeColor(bill.billType).withValues(alpha: 0.15),
+                          color: _getBillTypeColor(
+                            bill.billType,
+                          ).withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Icon(
@@ -825,7 +837,9 @@ class _PremiumBillCard extends ConsumerWidget {
                                     ).withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(4),
                                     border: Border.all(
-                                      color: _getBillTypeColor(bill.billType).withValues(alpha: 0.3),
+                                      color: _getBillTypeColor(
+                                        bill.billType,
+                                      ).withValues(alpha: 0.3),
                                     ),
                                   ),
                                   child: Text(
@@ -885,14 +899,22 @@ class _PremiumBillCard extends ConsumerWidget {
 
                   // Period and Due Date row (Cleaned up format)
                   Container(
-                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 12,
+                    ),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                      color: theme.colorScheme.surfaceContainerHighest
+                          .withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.calendar_month, size: 16, color: theme.colorScheme.onSurfaceVariant),
+                        Icon(
+                          Icons.calendar_month,
+                          size: 16,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
                         const SizedBox(width: 8),
                         Text(
                           bill.billingPeriod,
@@ -902,26 +924,32 @@ class _PremiumBillCard extends ConsumerWidget {
                         ),
                         const Spacer(),
                         if (bill.dueDate != null) ...[
-                           Icon(Icons.event, size: 16, color: theme.colorScheme.onSurfaceVariant),
-                           const SizedBox(width: 8),
-                           Text(
-                             dateFormat.format(bill.dueDate!),
-                             style: theme.textTheme.bodySmall?.copyWith(
-                               fontWeight: FontWeight.w500,
-                             ),
-                           ),
-                           if (dueInfo != null) ...[
-                             const SizedBox(width: 8),
-                             Text(
-                               '($dueInfo)',
-                               style: theme.textTheme.bodySmall?.copyWith(
-                                 color: bill.isOverdue ? AppColors.error : AppColors.warning,
-                                 fontWeight: FontWeight.bold,
-                               ),
-                             ),
-                           ],
+                          Icon(
+                            Icons.event,
+                            size: 16,
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            dateFormat.format(bill.dueDate!),
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          if (dueInfo != null) ...[
+                            const SizedBox(width: 8),
+                            Text(
+                              '($dueInfo)',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: bill.isOverdue
+                                    ? AppColors.error
+                                    : AppColors.warning,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ] else
-                           Text('No Due Date', style: theme.textTheme.bodySmall),
+                          Text('No Due Date', style: theme.textTheme.bodySmall),
                       ],
                     ),
                   ),
@@ -1040,7 +1068,9 @@ class _PremiumBillCard extends ConsumerWidget {
                       PopupMenuButton<String>(
                         icon: const Icon(Icons.share_outlined, size: 20),
                         tooltip: 'Share',
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         onSelected: (value) {
                           HapticFeedback.lightImpact();
                           _handleShare(context, ref, bill, value);
@@ -1079,8 +1109,10 @@ class _PremiumBillCard extends ConsumerWidget {
                           _showBillDetails(context, ref, bill);
                         },
                         style: TextButton.styleFrom(
-                           padding: const EdgeInsets.symmetric(horizontal: 12),
-                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
                         icon: const Icon(Icons.visibility_outlined, size: 18),
                         label: const Text('Details'),
@@ -1093,9 +1125,11 @@ class _PremiumBillCard extends ConsumerWidget {
                             _showRecordPayment(context, bill);
                           },
                           style: FilledButton.styleFrom(
-                             padding: const EdgeInsets.symmetric(horizontal: 16),
-                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                             backgroundColor: statusColor,
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            backgroundColor: statusColor,
                           ),
                           icon: const Icon(Icons.payment, size: 18),
                           label: const Text('Pay'),
@@ -1108,8 +1142,7 @@ class _PremiumBillCard extends ConsumerWidget {
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 
   void _showBillDetails(BuildContext context, WidgetRef ref, Bill bill) {
