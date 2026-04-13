@@ -203,8 +203,6 @@ class _OverviewTab extends ConsumerWidget {
                         // ── Net Profit Hero Card (full width) ──
                         _NetProfitCard(
                           netProfit: netProfit,
-                          income: data.collected,
-                          expenses: totalExpenses,
                           isProfitable: isProfitable,
                           yearStr: yearStr,
                         ),
@@ -414,15 +412,11 @@ class _OverviewTab extends ConsumerWidget {
 /// Full-width Net Profit hero card.
 class _NetProfitCard extends StatelessWidget {
   final double netProfit;
-  final double income;
-  final double expenses;
   final bool isProfitable;
   final String yearStr;
 
   const _NetProfitCard({
     required this.netProfit,
-    required this.income,
-    required this.expenses,
     required this.isProfitable,
     required this.yearStr,
   });
@@ -430,8 +424,8 @@ class _NetProfitCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final primaryColor = isProfitable
-        ? const Color(0xFF1DB954) // vibrant green
-        : const Color(0xFFE53935); // vibrant red
+        ? const Color(0xFF1DB954)
+        : const Color(0xFFE53935);
 
     return BouncingScaleWrapper(
       child: Container(
@@ -453,7 +447,7 @@ class _NetProfitCard extends StatelessWidget {
             ),
           ],
         ),
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(26),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -467,80 +461,50 @@ class _NetProfitCard extends StatelessWidget {
                       isProfitable ? 'NET PROFIT' : 'NET LOSS',
                       style: const TextStyle(
                         color: Colors.white70,
-                        fontSize: 11,
+                        fontSize: 12,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 1.2,
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.baseline,
-                      textBaseline: TextBaseline.alphabetic,
-                      children: [
-                        Text(
-                          isProfitable ? '₹ +' : '₹ −',
+                    const SizedBox(height: 6),
+                    // Use CounterFormat.raw to avoid double ₹
+                    TweenAnimationBuilder<double>(
+                      tween: Tween<double>(begin: 0.0, end: netProfit.abs()),
+                      duration: const Duration(milliseconds: 1200),
+                      curve: Curves.easeOutQuart,
+                      builder: (_, val, __) {
+                        final formatter = NumberFormat.currency(
+                          locale: 'en_IN', symbol: '₹', decimalDigits: 0);
+                        return Text(
+                          formatter.format(val),
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        AnimatedCounterText(
-                          value: netProfit.abs(),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 32,
+                            fontSize: 36,
                             fontWeight: FontWeight.bold,
                             letterSpacing: -0.5,
                           ),
-                        ),
-                      ],
+                        );
+                      },
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 4),
                     Text(
                       'FY $yearStr',
-                      style: const TextStyle(color: Colors.white60, fontSize: 12),
+                      style: const TextStyle(color: Colors.white60, fontSize: 13),
                     ),
                   ],
                 ),
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(16),
                   ),
                   child: Icon(
                     isProfitable
                         ? Icons.trending_up_rounded
                         : Icons.trending_down_rounded,
                     color: Colors.white,
-                    size: 28,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Container(height: 1, color: Colors.white.withValues(alpha: 0.2)),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: _NetProfitStat(
-                    label: 'Income',
-                    value: formatCurrency(income),
-                    icon: Icons.arrow_downward_rounded,
-                  ),
-                ),
-                Container(
-                  width: 1,
-                  height: 32,
-                  color: Colors.white.withValues(alpha: 0.2),
-                ),
-                Expanded(
-                  child: _NetProfitStat(
-                    label: 'Expenses',
-                    value: formatCurrency(expenses),
-                    icon: Icons.arrow_upward_rounded,
+                    size: 32,
                   ),
                 ),
               ],
@@ -552,42 +516,6 @@ class _NetProfitCard extends StatelessWidget {
   }
 }
 
-class _NetProfitStat extends StatelessWidget {
-  final String label;
-  final String value;
-  final IconData icon;
-
-  const _NetProfitStat({
-    required this.label,
-    required this.value,
-    required this.icon,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      child: Row(
-        children: [
-          Icon(icon, color: Colors.white70, size: 14),
-          const SizedBox(width: 6),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(label, style: const TextStyle(color: Colors.white60, fontSize: 11)),
-              Text(value,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                  )),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 /// Premium summary card with accent border.
 class _SummaryCard extends StatelessWidget {

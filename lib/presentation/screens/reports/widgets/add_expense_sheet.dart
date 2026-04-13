@@ -152,10 +152,12 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
               children: [
                 Expanded(
                   child: DropdownButtonFormField<ExpenseCategory>(
+                    isExpanded: true,
                     initialValue: _selectedCategory,
                     decoration: InputDecoration(
                       labelText: 'Category',
                       filled: true,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
@@ -163,7 +165,11 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
                     ),
                     items: _categories.map((c) => DropdownMenuItem(
                       value: c,
-                      child: Text(c.name[0].toUpperCase() + c.name.substring(1)),
+                      child: Text(
+                        c.name[0].toUpperCase() + c.name.substring(1),
+                        style: const TextStyle(fontSize: 14),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     )).toList(),
                     onChanged: (v) {
                       if (v != null) {
