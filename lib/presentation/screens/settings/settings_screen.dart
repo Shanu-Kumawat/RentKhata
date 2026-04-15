@@ -7,8 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../widgets/bouncing_scale_wrapper.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 import '../../../application/providers/dashboard_providers.dart';
 import '../../../application/providers/theme_settings_provider.dart';
+import '../../../application/providers/locale_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import 'edit_profile_screen.dart';
 import 'electricity_rates_screen.dart';
@@ -25,9 +28,11 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final landlordAsync = ref.watch(landlordProvider);
     final appTheme = ref.watch(themeSettingsProvider);
+    final currentLocale = ref.watch(localeNotifierProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(title: Text(l10n.settings)),
       body: ListView(
         physics: const AlwaysScrollableScrollPhysics(
           parent: BouncingScrollPhysics(),
@@ -37,32 +42,33 @@ class SettingsScreen extends ConsumerWidget {
           landlordAsync.when(
             data: (landlord) => BouncingScaleWrapper(
               child: _ProfileTile(
-                name: landlord?.name ?? 'Set up profile',
+                name: landlord?.name ?? l10n.setUpProfile,
                 upiId: landlord?.upiId,
                 photoPath: landlord?.photoPath,
+                tapToAddUpiIdText: l10n.tapToAddUpiId,
                 onTap: () => Navigator.push(
                   context,
                   _createRoute(const EditProfileScreen()),
                 ),
               ),
             ),
-            loading: () => const ListTile(
-              leading: CircleAvatar(child: CircularProgressIndicator()),
-              title: Text('Loading...'),
+            loading: () => ListTile(
+              leading: const CircleAvatar(child: CircularProgressIndicator()),
+              title: Text(l10n.loading),
             ),
             error: (e, s) => ListTile(
               leading: const CircleAvatar(
                 backgroundColor: AppColors.error,
                 child: Icon(Icons.error, color: Colors.white),
               ),
-              title: Text('Error: $e'),
+              title: Text(l10n.error(e.toString())),
             ),
           ),
           const Divider(),
 
           _AnimatedSettingsSection(
             index: 0,
-            title: 'Appearance',
+            title: l10n.appearance,
             children: [
               // Unified theme selector
               BouncingScaleWrapper(
@@ -78,10 +84,30 @@ class SettingsScreen extends ConsumerWidget {
                       color: Theme.of(context).colorScheme.onSecondaryContainer,
                     ),
                   ),
-                  title: const Text('Theme'),
+                  title: Text(l10n.theme),
                   subtitle: Text(appTheme.displayName),
                   trailing: const Icon(Icons.chevron_right),
-                  onTap: () => _showThemeSheet(context, ref, appTheme),
+                  onTap: () => _showThemeSheet(context, ref, appTheme, l10n),
+                ),
+              ),
+              // Language selector
+              BouncingScaleWrapper(
+                child: ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.secondaryContainer,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      Icons.language,
+                      color: Theme.of(context).colorScheme.onSecondaryContainer,
+                    ),
+                  ),
+                  title: Text(l10n.language),
+                  subtitle: Text(currentLocale.languageCode == 'hi' ? 'हिंदी (Hindi)' : 'English'),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => _showLanguageSheet(context, ref, currentLocale, l10n),
                 ),
               ),
             ],
@@ -89,12 +115,12 @@ class SettingsScreen extends ConsumerWidget {
 
           _AnimatedSettingsSection(
             index: 1,
-            title: 'Security',
+            title: l10n.security,
             children: [
               _SettingsTile(
                 icon: Icons.fingerprint,
-                title: 'App Lock',
-                subtitle: 'Biometric authentication',
+                title: l10n.appLock,
+                subtitle: l10n.biometricAuthentication,
                 onTap: () => Navigator.push(
                   context,
                   _createRoute(const BiometricSettingsScreen()),
@@ -105,12 +131,12 @@ class SettingsScreen extends ConsumerWidget {
 
           _AnimatedSettingsSection(
             index: 2,
-            title: 'Billing & Cycles',
+            title: l10n.billingAndCycles,
             children: [
               _SettingsTile(
                 icon: Icons.calendar_month_outlined,
-                title: 'Anniversary Billing',
-                subtitle: 'Configure billing cycles and due dates',
+                title: l10n.anniversaryBilling,
+                subtitle: l10n.configureBillingCycles,
                 onTap: () => Navigator.push(
                   context,
                   _createRoute(const BillingCycleSettingsScreen()),
@@ -263,6 +289,7 @@ class SettingsScreen extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     AppTheme currentTheme,
+    AppLocalizations l10n,
   ) {
     showModalBottomSheet(
       context: context,
@@ -283,7 +310,7 @@ class SettingsScreen extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Text(
-                'Choose Theme',
+                l10n.chooseTheme,
                 style: Theme.of(
                   context,
                 ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
@@ -330,18 +357,81 @@ class SettingsScreen extends ConsumerWidget {
       ),
     );
   }
+
+  void _showLanguageSheet(
+    BuildContext context,
+    WidgetRef ref,
+    Locale currentLocale,
+    AppLocalizations l10n,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 8),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.outline,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                l10n.chooseLanguage,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(height: 8),
+            ListTile(
+              onTap: () {
+                ref.read(localeNotifierProvider.notifier).setLocale(const Locale('en'));
+                Navigator.pop(context);
+              },
+              title: const Text('English (English)'),
+              leading: const Icon(Icons.language),
+              trailing: currentLocale.languageCode == 'en'
+                  ? Icon(Icons.check_circle, color: Theme.of(context).colorScheme.primary)
+                  : const Icon(Icons.circle_outlined, color: Colors.grey),
+            ),
+            ListTile(
+              onTap: () {
+                ref.read(localeNotifierProvider.notifier).setLocale(const Locale('hi'));
+                Navigator.pop(context);
+              },
+              title: const Text('हिंदी (Hindi)'),
+              leading: const Icon(Icons.language),
+              trailing: currentLocale.languageCode == 'hi'
+                  ? Icon(Icons.check_circle, color: Theme.of(context).colorScheme.primary)
+                  : const Icon(Icons.circle_outlined, color: Colors.grey),
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _ProfileTile extends StatelessWidget {
   final String name;
   final String? upiId;
   final String? photoPath;
+  final String? tapToAddUpiIdText;
   final VoidCallback onTap;
 
   const _ProfileTile({
     required this.name,
     this.upiId,
     this.photoPath,
+    this.tapToAddUpiIdText,
     required this.onTap,
   });
 
@@ -375,7 +465,7 @@ class _ProfileTile extends StatelessWidget {
       subtitle: upiId != null
           ? Text(upiId!)
           : Text(
-              'Tap to add UPI ID',
+              tapToAddUpiIdText ?? 'Tap to add UPI ID',
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),

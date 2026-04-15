@@ -1,0 +1,73 @@
+{
+  "@@locale": "en",
+  "appTitle": "RentKhata",
+  "settings": "Settings",
+  "setUpProfile": "Set up profile",
+  "loading": "Loading...",
+  "error": "Error: {error}",
+  "@error": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "appearance": "Appearance",
+  "theme": "Theme",
+  "language": "Language",
+  "chooseLanguage": "Choose Language",
+  "chooseTheme": "Choose Theme",
+  "security": "Security",
+  "appLock": "App Lock",
+  "biometricAuthentication": "Biometric authentication",
+  "billingAndCycles": "Billing & Cycles",
+  "anniversaryBilling": "Anniversary Billing",
+  "configureBillingCycles": "Configure billing cycles and due dates",
+  "billing": "Billing",
+  "electricityRates": "Electricity Rates",
+  "viewAndUpdateElectricityRates": "View and update electricity rates",
+  "messageTemplates": "Message Templates",
+  "customizeInvoice": "Customize invoice and receipt messages",
+  "notifications": "Notifications",
+  "reminderSettings": "Reminder Settings",
+  "dueDateAndOverdue": "Due date and overdue reminders",
+  "data": "Data",
+  "backupAndRestore": "Backup & Restore",
+  "saveOrRestoreData": "Save or restore your data",
+  "about": "About",
+  "aboutRentKhata": "About RentKhata",
+  "offlineFirstRentalApp": "Offline-first rental management app for Indian landlords.",
+  "tapToAddUpiId": "Tap to add UPI ID",
+  "reports": "Reports",
+  "attentionNeeded": "Attention Needed",
+  "livePropertyStatus": "Live Property Status",
+  "quickAdd": "Quick Add",
+  "addProperty": "Add Property",
+  "addTenant": "Add Tenant",
+  "createBill": "Create Bill",
+  "goToRoomToCreateBills": "Go to a room to create bills",
+  "pendingInvoices": "Pending Invoices",
+  "tenantsNeedBills": "{count} tenants need bills created",
+  "@tenantsNeedBills": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "collectPayments": "Collect Payments",
+  "billsAwaitPayment": "{count} generated bills await payment",
+  "@billsAwaitPayment": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "renewAgreements": "Renew Agreements",
+  "agreementsExpiring": "{count} agreements expiring soon",
+  "@agreementsExpiring": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "allCaughtUp": "All caught up!",
+  "noBillingCyclesEnding": "No billing cycles ending soon",
+  "noActiveRooms": "No active rooms found"
+}

@@ -3,7 +3,11 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
 import 'application/providers/billing_providers.dart';
+import 'application/providers/locale_provider.dart';
 import 'application/providers/theme_settings_provider.dart';
 import 'core/theme/app_theme.dart';
 import 'presentation/router/app_router.dart';
@@ -24,6 +28,9 @@ class RentKhataApp extends ConsumerWidget {
 
     // Auto-schedule notifications on app startup
     ref.watch(notificationStartupSchedulerProvider);
+
+    // Watch Locale
+    final locale = ref.watch(localeNotifierProvider);
 
     // Determine theme mode and dark theme based on selection
     final ThemeMode themeMode;
@@ -52,6 +59,17 @@ class RentKhataApp extends ConsumerWidget {
         theme: lightTheme(),
         darkTheme: darkThemeData,
         themeMode: themeMode,
+        locale: locale,
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('en'),
+          Locale('hi'),
+        ],
         routerConfig: router,
       ),
     );

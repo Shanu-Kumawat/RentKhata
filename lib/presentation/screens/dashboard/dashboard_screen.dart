@@ -6,6 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 import '../../../application/providers/dashboard_providers.dart';
 import '../../../application/providers/billing_providers.dart';
 import '../../../application/providers/billing_cycle_providers.dart';
@@ -35,9 +37,11 @@ class DashboardScreen extends ConsumerWidget {
     // Watch necessary providers
     // (Variables removed to silence warnings)
 
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('RentKhata'),
+        title: Text(l10n.appTitle),
         actions: [
           // Prominent Reports button
           Padding(
@@ -45,7 +49,7 @@ class DashboardScreen extends ConsumerWidget {
             child: TextButton.icon(
               onPressed: () => context.push('/reports'),
               icon: const Icon(Icons.assessment_outlined, size: 20),
-              label: const Text('Reports'),
+              label: Text(l10n.reports),
               style: TextButton.styleFrom(
                 foregroundColor: Theme.of(context).colorScheme.primary,
               ),
@@ -71,7 +75,7 @@ class DashboardScreen extends ConsumerWidget {
                   children: [
                     _SectionHeader(
                       icon: Icons.notifications_active_outlined,
-                      title: 'Attention Needed',
+                      title: l10n.attentionNeeded,
                     ),
                     SizedBox(height: 12),
                     _ActionRequiredSection(),
@@ -85,9 +89,9 @@ class DashboardScreen extends ConsumerWidget {
                 delay: const Duration(milliseconds: 200),
                 child: Column(
                   children: [
-                    const _SectionHeader(
+                    _SectionHeader(
                       icon: Icons.meeting_room_outlined,
-                      title: 'Live Property Status',
+                      title: l10n.livePropertyStatus,
                     ),
                     const SizedBox(height: 12),
                     _LivePropertyStatusList(),
@@ -105,12 +109,13 @@ class DashboardScreen extends ConsumerWidget {
           _showQuickActions(context);
         },
         icon: const Icon(Icons.add),
-        label: const Text('Quick Add'),
+        label: Text(l10n.quickAdd),
       ),
     );
   }
 
   void _showQuickActions(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
       builder: (context) => SafeArea(
@@ -141,7 +146,7 @@ class DashboardScreen extends ConsumerWidget {
                   color: Theme.of(context).colorScheme.primary,
                 ),
               ),
-              title: const Text('Add Property'),
+              title: Text(l10n.addProperty),
               onTap: () {
                 Navigator.pop(context);
                 context.push('/properties/add');
@@ -161,7 +166,7 @@ class DashboardScreen extends ConsumerWidget {
                   color: Theme.of(context).colorScheme.secondary,
                 ),
               ),
-              title: const Text('Add Tenant'),
+              title: Text(l10n.addTenant),
               onTap: () {
                 Navigator.pop(context);
                 context.push('/tenants/add');
@@ -179,8 +184,8 @@ class DashboardScreen extends ConsumerWidget {
                   color: Theme.of(context).colorScheme.error,
                 ),
               ),
-              title: const Text('Create Bill'),
-              subtitle: const Text('Go to a room to create bills'),
+              title: Text(l10n.createBill),
+              subtitle: Text(l10n.goToRoomToCreateBills),
               onTap: () {
                 Navigator.pop(context);
                 context.push('/properties');
@@ -205,6 +210,8 @@ class _ActionRequiredSection extends ConsumerWidget {
     final billingAttentionAsync = ref.watch(billingAttentionListProvider);
     final expiringAgreementsAsync = ref.watch(expiringAgreementsProvider);
     final theme = Theme.of(context);
+
+    final l10n = AppLocalizations.of(context)!;
 
     // Compute loaded states
     final attentionItems = billingAttentionAsync.valueOrNull ?? [];
@@ -245,8 +252,8 @@ class _ActionRequiredSection extends ConsumerWidget {
             _ActionTile(
               icon: Icons.receipt_long_outlined,
               iconColor: Colors.blue,
-              title: 'Pending Invoices',
-              subtitle: '${attentionItems.length} tenants need bills created',
+              title: l10n.pendingInvoices,
+              subtitle: l10n.tenantsNeedBills(attentionItems.length),
               badgeColor: Colors.blue,
               onTap: () {
                 showModalBottomSheet(
@@ -276,8 +283,8 @@ class _ActionRequiredSection extends ConsumerWidget {
             _ActionTile(
               icon: Icons.account_balance_wallet_outlined,
               iconColor: theme.colorScheme.error,
-              title: 'Collect Payments',
-              subtitle: '${unpaidBills.length} generated bills await payment',
+              title: l10n.collectPayments,
+              subtitle: l10n.billsAwaitPayment(unpaidBills.length),
               badgeColor: theme.colorScheme.error,
               onTap: () {
                 showModalBottomSheet(
@@ -307,8 +314,8 @@ class _ActionRequiredSection extends ConsumerWidget {
             _ActionTile(
               icon: Icons.handshake_outlined,
               iconColor: AppColors.warning,
-              title: 'Renew Agreements',
-              subtitle: '${expiring.length} agreements expiring soon',
+              title: l10n.renewAgreements,
+              subtitle: l10n.agreementsExpiring(expiring.length),
               badgeColor: AppColors.warning,
               onTap: () {
                 showModalBottomSheet(
@@ -452,12 +459,12 @@ class _EmptyAttentionCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'All caught up!',
-                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                  Text(
+                    AppLocalizations.of(context)!.allCaughtUp,
+                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
                   ),
                   Text(
-                    'No billing cycles ending soon',
+                    AppLocalizations.of(context)!.noBillingCyclesEnding,
                     style: TextStyle(
                       fontSize: 12,
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -483,7 +490,7 @@ class _LivePropertyStatusList extends ConsumerWidget {
     return statusListAsync.when(
       data: (items) {
         if (items.isEmpty) {
-          return const Center(child: Text('No active rooms found'));
+          return Center(child: Text(AppLocalizations.of(context)!.noActiveRooms));
         }
         return ListView.builder(
           shrinkWrap: true,
