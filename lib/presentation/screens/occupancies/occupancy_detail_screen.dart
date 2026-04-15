@@ -11,6 +11,10 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../domain/entities/bill.dart';
 import '../../../domain/entities/occupancy.dart';
+import '../../../domain/entities/settlement_statement.dart';
+import '../../../services/pdf_service.dart';
+import '../../../services/share_service.dart';
+import '../../../application/providers/repository_providers.dart';
 import '../billing/bill_detail_screen.dart';
 
 /// Screen showing complete historical details of an occupancy period.
@@ -741,10 +745,71 @@ class _DepositSettlementCard extends StatelessWidget {
                 icon: Icons.notes,
               ),
             ],
+            if (occupancy.isSettled) ...[
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: Consumer(
+                  builder: (context, ref, child) {
+                    return OutlinedButton.icon(
+                      onPressed: () => _shareSettlementReceipt(context, ref),
+                      icon: const Icon(Icons.receipt_long),
+                      label: const Text('View Settlement Receipt'),
+                    );
+                  },
+                ),
+              ),
+            ],
           ],
         ),
       ),
     );
+  }
+
+  Future<void> _shareSettlementReceipt(BuildContext context, WidgetRef ref) async {
+    // Show loading
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      final landlordRepo = ref.read(landlordRepositoryProvider);
+      final landlord = await landlordRepo.getLandlord();
+      
+      final totalDeductionCalc = occupancy.securityDeposit - (occupancy.depositReturnedAmount ?? 0);
+      
+      final statement = SettlementStatement(
+        occupancyId: occupancy.id,
+        tenantName: occupancy.tenantName ?? 'Tenant',
+        landlordName: landlord?.name ?? 'Landlord',
+        propertyName: occupancy.propertyName ?? 'Property',
+        roomNumber: occupancy.roomNumber ?? '',
+        moveInDate: occupancy.moveInDate,
+        moveOutDate: occupancy.moveOutDate ?? DateTime.now(),
+        securityDeposit: occupancy.securityDeposit,
+        billDeductions: [], 
+        manualDeduction: totalDeductionCalc > 0 ? totalDeductionCalc : 0,
+        manualDeductionReason: occupancy.deductionReason ?? 'Prior Deductions',
+        totalDeductions: totalDeductionCalc > 0 ? totalDeductionCalc : 0,
+        refundAmount: occupancy.depositReturnedAmount ?? 0,
+      );
+
+      final pdfFile = await PdfService.generateSettlementPdf(statement);
+
+      if (context.mounted) Navigator.pop(context); // Hide loading
+
+      final shareService = ShareService();
+      await shareService.shareSettlementPdf(pdfFile, tenantName: statement.tenantName);
+    } catch (e) {
+      if (context.mounted) {
+        Navigator.pop(context); // Hide loading
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error generating receipt: $e')),
+        );
+      }
+    }
   }
 
   Color _getStatusColor(DepositStatus status) {

@@ -72,6 +72,17 @@ class ShareService {
     );
   }
 
+  /// Share a generated PDF Settlement Receipt.
+  Future<void> shareSettlementPdf(File pdfFile, {String? tenantName}) async {
+    final name = tenantName ?? 'Tenant';
+    await shareFiles(
+      files: [pdfFile],
+      text:
+          'Dear $name,\n\nYour Move-Out Settlement is complete. Please find the detailed Settlement Receipt attached.',
+      subject: 'Move-Out Settlement Receipt',
+    );
+  }
+
   /// Share text only.
   Future<void> shareText({required String text, String? subject}) async {
     await Share.share(text, subject: subject);

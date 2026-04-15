@@ -11,6 +11,9 @@ import '../../../domain/entities/bill.dart';
 import '../../../domain/entities/occupancy.dart';
 import '../../../domain/entities/payment.dart';
 import '../../../domain/entities/room.dart';
+import '../../../domain/entities/settlement_statement.dart';
+import '../../../services/pdf_service.dart';
+import '../../../services/share_service.dart';
 
 /// Screen for processing move out with deposit settlement
 class MoveOutScreen extends ConsumerStatefulWidget {
@@ -31,6 +34,7 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
 
   // Settlement state
   final Set<int> _selectedBillIdsToDeduct = {};
+  final Set<int> _selectedBillIdsToVoid = {};
   double _manualDeduction = 0;
 
   @override
@@ -184,34 +188,66 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
                         ),
                         const SizedBox(height: 8),
                         ...pendingBills.map((bill) {
-                          final isSelected = _selectedBillIdsToDeduct.contains(
-                            bill.id,
-                          );
-                          return CheckboxListTile(
-                            value: isSelected,
-                            onChanged: (val) {
-                              setState(() {
-                                if (val == true) {
-                                  _selectedBillIdsToDeduct.add(bill.id);
-                                } else {
-                                  _selectedBillIdsToDeduct.remove(bill.id);
-                                }
-                              });
-                            },
-                            title: Text(
-                              '${bill.billType.name.toUpperCase()} - ${bill.billingPeriod}',
-                            ),
-                            subtitle: Text(
-                              'Due: ${formatCurrency(bill.pendingAmount)}',
-                            ),
-                            secondary: Icon(
-                              isSelected
-                                  ? Icons.remove_circle
-                                  : Icons.circle_outlined,
-                              color: isSelected ? AppColors.error : null,
-                            ),
-                            activeColor: AppColors.error,
-                            contentPadding: EdgeInsets.zero,
+                          final isDeducting = _selectedBillIdsToDeduct.contains(bill.id);
+                          final isVoiding = _selectedBillIdsToVoid.contains(bill.id);
+
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              CheckboxListTile(
+                                value: isDeducting,
+                                onChanged: (val) {
+                                  setState(() {
+                                    if (val == true) {
+                                      _selectedBillIdsToDeduct.add(bill.id);
+                                      _selectedBillIdsToVoid.remove(bill.id);
+                                    } else {
+                                      _selectedBillIdsToDeduct.remove(bill.id);
+                                    }
+                                  });
+                                },
+                                title: Text(
+                                  '${bill.billType.name.toUpperCase()} - ${bill.billingPeriod}',
+                                  style: TextStyle(
+                                    decoration: isVoiding ? TextDecoration.lineThrough : null,
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  'Due: ${formatCurrency(bill.pendingAmount)}',
+                                  style: TextStyle(
+                                    decoration: isVoiding
+                                        ? TextDecoration.lineThrough
+                                        : null,
+                                  ),
+                                ),
+                                secondary: Icon(
+                                  isDeducting
+                                      ? Icons.remove_circle
+                                      : Icons.circle_outlined,
+                                  color: isDeducting ? AppColors.error : null,
+                                ),
+                                activeColor: AppColors.error,
+                                contentPadding: EdgeInsets.zero,
+                              ),
+                              if (!isDeducting)
+                                TextButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      if (isVoiding) {
+                                        _selectedBillIdsToVoid.remove(bill.id);
+                                      } else {
+                                        _selectedBillIdsToVoid.add(bill.id);
+                                      }
+                                    });
+                                  },
+                                  style: TextButton.styleFrom(
+                                    visualDensity: VisualDensity.compact,
+                                    foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
+                                    textStyle: const TextStyle(fontSize: 12),
+                                  ),
+                                  child: Text(isVoiding ? 'Undo Void' : 'Mark as Void'),
+                                ),
+                            ],
                           );
                         }),
                         const Divider(height: 32),
@@ -370,11 +406,26 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
       final bills =
           ref.read(billsForOccupancyProvider(widget.occupancy.id)).value ?? [];
 
+      final List<SettlementBillDeduction> billDeductions = [];
+
+      // 0. Mark voided bills
+      for (final billId in _selectedBillIdsToVoid) {
+        await billingRepo.voidBill(billId, 'Voided during move-out settlement');
+      }
+
       // 1. Mark selected bills as PAID (settled via deposit)
       for (final billId in _selectedBillIdsToDeduct) {
         final bill = bills.firstWhere((b) => b.id == billId);
         // Only pay what is pending
         if (bill.pendingAmount > 0) {
+          billDeductions.add(
+            SettlementBillDeduction(
+              billTypeLabel: bill.billType.name.toUpperCase(),
+              period: bill.billingPeriod,
+              amount: bill.pendingAmount,
+            ),
+          );
+          
           await billingRepo.recordPayment(
             billId: billId,
             amount: bill.pendingAmount,
@@ -385,28 +436,41 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
         }
       }
 
-      // Since I can't easily get pending amount inside this loop without reading bills,
-      // I'll rely on the fact that I have bills logic above.
-      // I'll refine this in a moment.
-
       // 2. End Occupancy
       await ref
           .read(tenantRepositoryProvider)
           .endOccupancy(
             widget.occupancy.id,
             _moveOutDate,
-            deductionAmount: _manualDeduction, // Only manual part stored here?
-            // Or calculated total?
-            // If we store bill deductions separately as PAID bills, then deductionAmount should probably be just Manual ones
-            // OR we store total deduction for record.
-            // Let's store MANUAL deduction here, as bills are tracked via Bill entity.
+            deductionAmount: _manualDeduction, 
             deductionReason: _reasonController.text,
             settlementNotes:
                 'Bill Deductions: ${formatCurrency(totalDeduction - _manualDeduction)}; Refund: ${formatCurrency(refundAmount)}',
-            isSettled:
-                true, // Assuming settled if confirmed? Or only if refund paid?
+            isSettled: true, 
             depositReturnedAmount: refundAmount > 0 ? refundAmount : 0,
           );
+
+      // 3. Generate Settlement PDF
+      final landlordRepo = ref.read(landlordRepositoryProvider);
+      final landlord = await landlordRepo.getLandlord();
+      
+      final statement = SettlementStatement(
+        occupancyId: widget.occupancy.id,
+        tenantName: widget.occupancy.tenantName ?? 'Tenant',
+        landlordName: landlord?.name ?? 'Landlord',
+        propertyName: widget.room.propertyName ?? 'Property',
+        roomNumber: widget.room.roomNumber,
+        moveInDate: widget.occupancy.moveInDate,
+        moveOutDate: _moveOutDate,
+        securityDeposit: widget.occupancy.securityDeposit,
+        billDeductions: billDeductions,
+        manualDeduction: _manualDeduction,
+        manualDeductionReason: _reasonController.text.trim().isEmpty ? null : _reasonController.text.trim(),
+        totalDeductions: totalDeduction,
+        refundAmount: refundAmount,
+      );
+
+      final pdfFile = await PdfService.generateSettlementPdf(statement);
 
       // Trigger updates
       if (mounted) {
@@ -415,21 +479,17 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
         ref.invalidate(propertiesStreamProvider);
         ref.invalidate(roomsForPropertyStreamProvider(widget.room.propertyId));
         ref.invalidate(tenantsProvider);
+        ref.invalidate(tenantsStreamProvider);
+        ref.invalidate(tenantProvider(widget.occupancy.tenantId));
         ref.invalidate(dashboardSummaryProvider); // Refresh dashboard
 
         Navigator.pop(context); // Close sheet
-        Navigator.pop(
-          context,
-        ); // Close Room Detail (optional? maybe just refresh)
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Settlement recorded. ${refundAmount < 0 ? 'Tenant owes ${formatCurrency(refundAmount.abs())}' : 'Refund processed.'}',
-            ),
-          ),
-        );
+        Navigator.pop(context); // Close Room Detail 
       }
+
+      // 4. Automatically trigger share flow with the PDF
+      final shareService = ShareService();
+      await shareService.shareSettlementPdf(pdfFile, tenantName: statement.tenantName);
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
