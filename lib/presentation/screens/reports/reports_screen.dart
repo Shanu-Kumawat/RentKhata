@@ -20,6 +20,7 @@ import '../../widgets/staggered_fade_in.dart';
 import '../../widgets/animated_counter_text.dart';
 import '../../../application/providers/expense_providers.dart';
 import 'widgets/add_expense_sheet.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 /// Reports screen showing financial overview and bill management.
 class ReportsScreen extends ConsumerStatefulWidget {
@@ -52,10 +53,11 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
   @override
   Widget build(BuildContext context) {
     final year = ref.watch(reportsFinancialYearProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Reports'),
+        title: Text(l10n.reports),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
@@ -103,11 +105,11 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
             padding: const EdgeInsets.symmetric(horizontal: 8),
             labelPadding: EdgeInsets.zero,
             indicatorPadding: EdgeInsets.zero,
-            tabs: const [
-              Tab(text: 'Overview', icon: Icon(Icons.bar_chart_rounded, size: 16)),
-              Tab(text: 'Pending', icon: Icon(Icons.schedule_rounded, size: 16)),
-              Tab(text: 'History', icon: Icon(Icons.history_rounded, size: 16)),
-              Tab(text: 'Expenses', icon: Icon(Icons.receipt_long_rounded, size: 16)),
+            tabs: [
+              Tab(text: l10n.overview, icon: const Icon(Icons.bar_chart_rounded, size: 16)),
+              Tab(text: l10n.pending, icon: const Icon(Icons.schedule_rounded, size: 16)),
+              Tab(text: l10n.history, icon: const Icon(Icons.history_rounded, size: 16)),
+              Tab(text: l10n.expenses, icon: const Icon(Icons.receipt_long_rounded, size: 16)),
             ],
           ),
         ),
@@ -124,7 +126,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
                 );
               },
               icon: const Icon(Icons.add),
-              label: const Text('Add Expense'),
+              label: Text(l10n.addExpense),
             )
           : null,
       body: TabBarView(
@@ -160,11 +162,11 @@ class _OverviewTab extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const StaggeredFadeIn(
-                delay: Duration(milliseconds: 0),
+              StaggeredFadeIn(
+                delay: const Duration(milliseconds: 0),
                 child: Text(
-                  'Financial Summary',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  AppLocalizations.of(context)!.financialSummary,
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
               ),
             ],
@@ -212,7 +214,7 @@ class _OverviewTab extends ConsumerWidget {
                           children: [
                             Expanded(
                               child: _SummaryCard(
-                                label: 'Outstanding',
+                                label: AppLocalizations.of(context)!.outstanding,
                                 amount: data.pending,
                                 icon: Icons.schedule_rounded,
                                 accentColor: AppColors.warning,
@@ -223,13 +225,13 @@ class _OverviewTab extends ConsumerWidget {
                             const SizedBox(width: 12),
                             Expanded(
                               child: _SummaryCard(
-                                label: 'Overdue',
+                                label: AppLocalizations.of(context)!.overdue,
                                 amount: overdueAmount,
                                 icon: Icons.warning_amber_rounded,
                                 accentColor: AppColors.error,
                                 subtitle: overdueCount > 0
-                                    ? '$overdueCount urgent'
-                                    : 'All on time',
+                                    ? AppLocalizations.of(context)!.urgent(overdueCount)
+                                    : AppLocalizations.of(context)!.allOnTime,
                                 isUrgent: overdueCount > 0,
                               ),
                             ),
@@ -241,7 +243,7 @@ class _OverviewTab extends ConsumerWidget {
                           children: [
                             Expanded(
                               child: _SummaryCard(
-                                label: 'Collected',
+                                label: AppLocalizations.of(context)!.collected,
                                 amount: data.collected,
                                 icon: Icons.arrow_downward_rounded,
                                 accentColor: AppColors.success,
@@ -251,11 +253,11 @@ class _OverviewTab extends ConsumerWidget {
                             const SizedBox(width: 12),
                             Expanded(
                               child: _SummaryCard(
-                                label: 'Expenses',
+                                label: AppLocalizations.of(context)!.expenses,
                                 amount: totalExpenses,
                                 icon: Icons.upload_rounded,
                                 accentColor: Colors.orange,
-                                subtitle: '${expensesInYear.length} items',
+                                subtitle: AppLocalizations.of(context)!.items(expensesInYear.length),
                               ),
                             ),
                           ],
@@ -264,24 +266,24 @@ class _OverviewTab extends ConsumerWidget {
                     );
                   },
                   loading: () => _buildLoadingCards(),
-                  error: (_, __) => _buildErrorCard('Error loading bills'),
+                  error: (_, __) => _buildErrorCard(AppLocalizations.of(context)!.errorLoadingBills),
                 ),
                 loading: () => _buildLoadingCards(),
-                error: (_, __) => _buildErrorCard('Error loading expenses'),
+                error: (_, __) => _buildErrorCard(AppLocalizations.of(context)!.errorLoadingExpenses),
               ),
               loading: () => _buildLoadingCards(),
-              error: (_, __) => _buildErrorCard('Error loading financials'),
+              error: (_, __) => _buildErrorCard(AppLocalizations.of(context)!.errorLoadingFinancials),
             ),
           ),
 
           const SizedBox(height: 24),
 
           // Bills by Type
-          const StaggeredFadeIn(
-            delay: Duration(milliseconds: 200),
+          StaggeredFadeIn(
+            delay: const Duration(milliseconds: 200),
             child: Text(
-              'Bills by Type',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              AppLocalizations.of(context)!.billsByType,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
           ),
           const SizedBox(height: 12),

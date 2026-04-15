@@ -23,6 +23,7 @@ import 'add_tenant_screen.dart';
 import 'add_document_sheet.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 /// Tenant detail screen showing profile, custom fields, and history.
 class TenantDetailScreen extends ConsumerWidget {
@@ -38,8 +39,8 @@ class TenantDetailScreen extends ConsumerWidget {
       data: (tenant) {
         if (tenant == null) {
           return Scaffold(
-            appBar: AppBar(title: const Text('Tenant')),
-            body: const Center(child: Text('Tenant not found')),
+            appBar: AppBar(title: Text(AppLocalizations.of(context)!.tenantDetail)),
+            body: Center(child: Text(AppLocalizations.of(context)!.tenantNotFound)),
           );
         }
         return _TenantDetailContent(tenant: tenant);
@@ -49,8 +50,8 @@ class TenantDetailScreen extends ConsumerWidget {
         body: const Center(child: CircularProgressIndicator()),
       ),
       error: (e, s) => Scaffold(
-        appBar: AppBar(title: const Text('Error')),
-        body: Center(child: Text('Error: $e')),
+        appBar: AppBar(title: Text(AppLocalizations.of(context)!.error(e.toString()))),
+        body: Center(child: Text(AppLocalizations.of(context)!.error(e.toString()))),
       ),
     );
   }
@@ -91,8 +92,8 @@ class _TenantDetailContent extends ConsumerWidget {
                       Icons.delete_outline,
                       color: Theme.of(context).colorScheme.error,
                     ),
-                    SizedBox(width: 8),
-                    Text('Delete Tenant'),
+                    const SizedBox(width: 8),
+                    Text(AppLocalizations.of(context)!.deleteTenant),
                   ],
                 ),
               ),
@@ -119,25 +120,25 @@ class _TenantDetailContent extends ConsumerWidget {
             if (_hasPersonalDetails()) ...[
               _buildInfoSection(
                 context,
-                title: 'Personal Details',
+                title: AppLocalizations.of(context)!.personalDetails,
                 icon: Icons.person_outline,
                 children: [
                   if (tenant.fatherName != null)
                     _InfoRow(
                       icon: Icons.person_outline,
-                      label: 'Father\'s Name',
+                      label: AppLocalizations.of(context)!.fathersName,
                       value: tenant.fatherName!,
                     ),
                   if (tenant.age != null)
                     _InfoRow(
                       icon: Icons.cake_outlined,
-                      label: 'Age',
-                      value: '${tenant.age} years',
+                      label: AppLocalizations.of(context)!.age,
+                      value: AppLocalizations.of(context)!.years(tenant.age!),
                     ),
                   if (tenant.gender != null)
                     _InfoRow(
                       icon: Icons.wc_outlined,
-                      label: 'Gender',
+                      label: AppLocalizations.of(context)!.gender,
                       value: _formatGender(tenant.gender!),
                     ),
                 ],
@@ -148,27 +149,27 @@ class _TenantDetailContent extends ConsumerWidget {
             // Contact Information
             _buildInfoSection(
               context,
-              title: 'Contact Information',
+              title: AppLocalizations.of(context)!.contactInformation,
               icon: Icons.phone_outlined,
               children: [
                 if (tenant.phone != null)
                   _InfoRow(
                     icon: Icons.phone_outlined,
-                    label: 'Phone',
+                    label: AppLocalizations.of(context)!.phone,
                     value: tenant.phone!,
                     onTap: () => _launchPhone(tenant.phone!),
                   ),
                 if (tenant.secondaryPhone != null)
                   _InfoRow(
                     icon: Icons.phone_outlined,
-                    label: 'Secondary Phone',
+                    label: AppLocalizations.of(context)!.secondaryPhone,
                     value: tenant.secondaryPhone!,
                     onTap: () => _launchPhone(tenant.secondaryPhone!),
                   ),
                 if (tenant.aadharNumber != null)
                   _InfoRow(
                     icon: Icons.credit_card_outlined,
-                    label: 'Aadhaar',
+                    label: AppLocalizations.of(context)!.aadhaar,
                     value: tenant.aadharNumber!,
                   ),
               ],
@@ -179,20 +180,20 @@ class _TenantDetailContent extends ConsumerWidget {
             if (_hasAddressDetails()) ...[
               _buildInfoSection(
                 context,
-                title: 'Permanent Address',
+                title: AppLocalizations.of(context)!.permanentAddress,
                 icon: Icons.home_outlined,
                 children: [
                   if (tenant.permanentAddressLine != null)
                     _InfoRow(
                       icon: Icons.location_on_outlined,
-                      label: 'Address',
+                      label: AppLocalizations.of(context)!.address,
                       value: tenant.permanentAddressLine!,
                     ),
                   if (tenant.permanentCity != null ||
                       tenant.permanentState != null)
                     _InfoRow(
                       icon: Icons.location_city_outlined,
-                      label: 'City, State',
+                      label: AppLocalizations.of(context)!.cityState,
                       value: [
                         tenant.permanentCity,
                         tenant.permanentState,
@@ -201,7 +202,7 @@ class _TenantDetailContent extends ConsumerWidget {
                   if (tenant.permanentPincode != null)
                     _InfoRow(
                       icon: Icons.pin_drop_outlined,
-                      label: 'Pincode',
+                      label: AppLocalizations.of(context)!.pincode,
                       value: tenant.permanentPincode!,
                     ),
                 ],
@@ -213,19 +214,19 @@ class _TenantDetailContent extends ConsumerWidget {
             if (_hasWorkDetails()) ...[
               _buildInfoSection(
                 context,
-                title: 'Work Details',
+                title: AppLocalizations.of(context)!.workDetails,
                 icon: Icons.work_outline,
                 children: [
                   if (tenant.companyName != null)
                     _InfoRow(
                       icon: Icons.business_outlined,
-                      label: 'Company',
+                      label: AppLocalizations.of(context)!.company,
                       value: tenant.companyName!,
                     ),
                   if (tenant.officeAddress != null)
                     _InfoRow(
                       icon: Icons.location_city_outlined,
-                      label: 'Office Address',
+                      label: AppLocalizations.of(context)!.officeAddress,
                       value: tenant.officeAddress!,
                     ),
                 ],
@@ -237,25 +238,25 @@ class _TenantDetailContent extends ConsumerWidget {
             if (_hasIntroducerDetails()) ...[
               _buildInfoSection(
                 context,
-                title: 'Introducer / Reference',
+                title: AppLocalizations.of(context)!.introducerReference,
                 icon: Icons.handshake_outlined,
                 children: [
                   if (tenant.introducerName != null)
                     _InfoRow(
                       icon: Icons.person_outline,
-                      label: 'Name',
+                      label: AppLocalizations.of(context)!.name,
                       value: tenant.introducerName!,
                     ),
                   if (tenant.introducerAddress != null)
                     _InfoRow(
                       icon: Icons.location_on_outlined,
-                      label: 'Address',
+                      label: AppLocalizations.of(context)!.address,
                       value: tenant.introducerAddress!,
                     ),
                   if (tenant.introducerPhone != null)
                     _InfoRow(
                       icon: Icons.phone_outlined,
-                      label: 'Phone',
+                      label: AppLocalizations.of(context)!.phone,
                       value: tenant.introducerPhone!,
                       onTap: () => _launchPhone(tenant.introducerPhone!),
                     ),

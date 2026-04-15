@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../../application/providers/tenant_providers.dart';
 
 import '../../../domain/entities/tenant.dart';
@@ -33,8 +34,10 @@ class _TenantsScreenState extends ConsumerState<TenantsScreen> {
         ? ref.watch(tenantsStreamProvider)
         : ref.watch(searchTenantsProvider(_searchQuery));
 
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Tenants')),
+      appBar: AppBar(title: Text(l10n.tenants)),
       body: Column(
         children: [
           // Search bar
@@ -43,7 +46,7 @@ class _TenantsScreenState extends ConsumerState<TenantsScreen> {
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'Search by name or phone...',
+                hintText: l10n.searchByNameOrPhone,
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: _searchQuery.isNotEmpty
                     ? IconButton(
@@ -67,7 +70,7 @@ class _TenantsScreenState extends ConsumerState<TenantsScreen> {
                   ? _buildEmptyState(context)
                   : _buildTenantList(context, tenants, ref),
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, s) => Center(child: Text('Error: $e')),
+              error: (e, s) => Center(child: Text(l10n.error(e.toString()))),
             ),
           ),
         ],
@@ -96,7 +99,7 @@ class _TenantsScreenState extends ConsumerState<TenantsScreen> {
             ),
             const SizedBox(height: 24),
             Text(
-              _searchQuery.isEmpty ? 'No tenants yet' : 'No tenants found',
+              _searchQuery.isEmpty ? AppLocalizations.of(context)!.noTenantsYet : AppLocalizations.of(context)!.noTenantsFound,
               style: Theme.of(
                 context,
               ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
@@ -104,8 +107,8 @@ class _TenantsScreenState extends ConsumerState<TenantsScreen> {
             const SizedBox(height: 8),
             Text(
               _searchQuery.isEmpty
-                  ? 'Tenants will appear here after you move them into a room'
-                  : 'Try a different search term',
+                  ? AppLocalizations.of(context)!.tenantsAppearHereAfterMoveIn
+                  : AppLocalizations.of(context)!.tryDifferentSearchTerm,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
@@ -263,8 +266,8 @@ class _TenantCard extends ConsumerWidget {
                               const SizedBox(width: 4),
                               Text(
                                 tenant.isCurrentlyOccupying
-                                    ? 'Current'
-                                    : 'Past',
+                                    ? AppLocalizations.of(context)!.current
+                                    : AppLocalizations.of(context)!.past,
                                 style: Theme.of(context).textTheme.labelSmall
                                     ?.copyWith(
                                       color: tenant.isCurrentlyOccupying
@@ -337,7 +340,7 @@ class _TenantCard extends ConsumerWidget {
                               const SizedBox(width: 4),
                               Expanded(
                                 child: Text(
-                                  '${lastOccupancy.propertyName ?? 'Property'} - Room ${lastOccupancy.roomNumber ?? 'N/A'} • ${dateFormat.format(lastOccupancy.moveOutDate ?? lastOccupancy.moveInDate)}',
+                                  '${lastOccupancy.propertyName ?? AppLocalizations.of(context)!.property} - Room ${lastOccupancy.roomNumber ?? AppLocalizations.of(context)!.na} • ${dateFormat.format(lastOccupancy.moveOutDate ?? lastOccupancy.moveInDate)}',
                                   style: Theme.of(context).textTheme.bodySmall
                                       ?.copyWith(
                                         color: Theme.of(
