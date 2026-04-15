@@ -74,7 +74,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 15;
+  int get schemaVersion => 16;
 
   @override
   MigrationStrategy get migration {
@@ -379,7 +379,17 @@ Thank you for your payment.
           await m.addColumn(occupancies, occupancies.agreementEndDate);
         }
         if (from < 15) {
-          // Add Expense Tracking table
+          // Add Expense Tracking table (initial migration)
+          try {
+            await m.createTable(expenses);
+          } catch (_) {
+            // Table may already exist from a prior schema - handled in v16
+          }
+        }
+        if (from < 16) {
+          // Recreate expenses table with correct schema
+          // (previous v15 may have had a different column layout)
+          await customStatement('DROP TABLE IF EXISTS expenses');
           await m.createTable(expenses);
         }
       },

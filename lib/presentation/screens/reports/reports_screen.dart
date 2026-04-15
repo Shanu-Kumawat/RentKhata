@@ -18,6 +18,8 @@ import '../billing/record_payment_sheet.dart';
 import '../../widgets/bouncing_scale_wrapper.dart';
 import '../../widgets/staggered_fade_in.dart';
 import '../../widgets/animated_counter_text.dart';
+import '../../../application/providers/expense_providers.dart';
+import 'widgets/add_expense_sheet.dart';
 
 /// Reports screen showing financial overview and bill management.
 class ReportsScreen extends ConsumerStatefulWidget {
@@ -34,7 +36,11 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
+    _tabController.addListener(() {
+      if (!mounted) return;
+      setState(() {});
+    });
   }
 
   @override
@@ -90,18 +96,40 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
             ),
           ),
         ],
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: 'Overview'),
-            Tab(text: 'Pending'),
-            Tab(text: 'History'),
-          ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(56),
+          child: TabBar(
+            controller: _tabController,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            labelPadding: EdgeInsets.zero,
+            indicatorPadding: EdgeInsets.zero,
+            tabs: const [
+              Tab(text: 'Overview', icon: Icon(Icons.bar_chart_rounded, size: 16)),
+              Tab(text: 'Pending', icon: Icon(Icons.schedule_rounded, size: 16)),
+              Tab(text: 'History', icon: Icon(Icons.history_rounded, size: 16)),
+              Tab(text: 'Expenses', icon: Icon(Icons.receipt_long_rounded, size: 16)),
+            ],
+          ),
         ),
       ),
+      floatingActionButton: (_tabController.index == 0 || _tabController.index == 3)
+          ? FloatingActionButton.extended(
+              onPressed: () {
+                HapticFeedback.mediumImpact();
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) => const AddExpenseSheet(),
+                );
+              },
+              icon: const Icon(Icons.add),
+              label: const Text('Add Expense'),
+            )
+          : null,
       body: TabBarView(
         controller: _tabController,
-        children: const [_OverviewTab(), _PendingBillsTab(), _HistoryTab()],
+        children: const [_OverviewTab(), _PendingBillsTab(), _HistoryTab(), _ExpensesTab()],
       ),
     );
   }
@@ -119,9 +147,8 @@ class _OverviewTab extends ConsumerWidget {
     final year = ref.watch(reportsFinancialYearProvider);
     final financialsAsync = ref.watch(yearlyFinancialsProvider);
     final billsAsync = ref.watch(billsByFinancialYearProvider);
-    final unpaidAsync = ref.watch(
-      unpaidBillsProvider,
-    ); // We'll filter this inline
+    final unpaidAsync = ref.watch(unpaidBillsProvider);
+    final expensesAsync = ref.watch(expensesProvider);
 
     final yearStr = '$year-${(year + 1).toString().substring(2)}';
 
@@ -146,92 +173,103 @@ class _OverviewTab extends ConsumerWidget {
 
           // Summary Cards Grid
           StaggeredFadeIn(
-            delay: const Duration(milliseconds: 100),
+            delay: const Duration(milliseconds: 50),
             child: financialsAsync.when(
-              data: (data) => unpaidAsync.when(
-                data: (unpaidBills) {
-                  // Filter unpaid bills strictly for the selected FY based on periodStartDate
-                  final startDate = DateTime(year, 4, 1);
-                  final endDate = DateTime(year + 1, 3, 31, 23, 59, 59);
-                  final unpaidInYear = unpaidBills.where((b) {
-                    final bStart = b.periodStartDate ?? b.createdAt;
-                    final bEnd = b.periodEndDate ?? b.createdAt;
-                    return bStart.isBefore(endDate) && bEnd.isAfter(startDate);
-                  }).toList();
+              data: (data) => expensesAsync.when(
+                data: (allExpenses) => unpaidAsync.when(
+                  data: (unpaidBills) {
+                    final startDate = DateTime(year, 4, 1);
+                    final endDate = DateTime(year + 1, 3, 31, 23, 59, 59);
+                    final unpaidInYear = unpaidBills.where((b) {
+                      final bStart = b.periodStartDate ?? b.createdAt;
+                      final bEnd = b.periodEndDate ?? b.createdAt;
+                      return bStart.isBefore(endDate) && bEnd.isAfter(startDate);
+                    }).toList();
 
-                  final overdueAmount = unpaidInYear
-                      .where((b) => b.isOverdue)
-                      .fold(0.0, (sum, b) => sum + b.pendingAmount);
-                  final overdueCount = unpaidInYear
-                      .where((b) => b.isOverdue)
-                      .length;
+                    final overdueAmount = unpaidInYear
+                        .where((b) => b.isOverdue)
+                        .fold(0.0, (sum, b) => sum + b.pendingAmount);
+                    final overdueCount = unpaidInYear.where((b) => b.isOverdue).length;
 
-                  return Column(
-                    children: [
-                      // Row 1: Outstanding & Overdue
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _SummaryCard(
-                              label: 'Outstanding',
-                              amount: data.pending,
-                              icon: Icons.schedule_rounded,
-                              accentColor: AppColors.warning,
-                              subtitle:
-                                  '${unpaidBills.length} ${unpaidBills.length == 1 ? 'bill' : 'bills'}',
+                    final expensesInYear = allExpenses.where((e) {
+                      return e.date.isBefore(endDate) && e.date.isAfter(startDate);
+                    }).toList();
+                    final totalExpenses = expensesInYear.fold(0.0, (sum, e) => sum + e.amount);
+                    final netProfit = data.collected - totalExpenses;
+                    final isProfitable = netProfit >= 0;
+
+                    return Column(
+                      children: [
+                        // ── Net Profit Hero Card (full width) ──
+                        _NetProfitCard(
+                          netProfit: netProfit,
+                          income: data.collected,
+                          expenses: totalExpenses,
+                          isProfitable: isProfitable,
+                          yearStr: yearStr,
+                        ),
+                        const SizedBox(height: 12),
+                        // Row 1: Outstanding & Overdue
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _SummaryCard(
+                                label: 'Outstanding',
+                                amount: data.pending,
+                                icon: Icons.schedule_rounded,
+                                accentColor: AppColors.warning,
+                                subtitle:
+                                    '${unpaidBills.length} ${unpaidBills.length == 1 ? 'bill' : 'bills'}',
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _SummaryCard(
-                              label: 'Overdue',
-                              amount: overdueAmount,
-                              icon: Icons.warning_amber_rounded,
-                              accentColor: AppColors.error,
-                              subtitle: overdueCount > 0
-                                  ? '$overdueCount urgent'
-                                  : 'All on time',
-                              isUrgent: overdueCount > 0,
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _SummaryCard(
+                                label: 'Overdue',
+                                amount: overdueAmount,
+                                icon: Icons.warning_amber_rounded,
+                                accentColor: AppColors.error,
+                                subtitle: overdueCount > 0
+                                    ? '$overdueCount urgent'
+                                    : 'All on time',
+                                isUrgent: overdueCount > 0,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      // Row 2: Collected & Rate
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _SummaryCard(
-                              label: 'Collected',
-                              amount: data.collected,
-                              icon: Icons.arrow_downward_rounded,
-                              accentColor: AppColors.success,
-                              subtitle: 'FY $yearStr',
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        // Row 2: Collected & Expenses
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _SummaryCard(
+                                label: 'Collected',
+                                amount: data.collected,
+                                icon: Icons.arrow_downward_rounded,
+                                accentColor: AppColors.success,
+                                subtitle: 'FY $yearStr',
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _SummaryCard(
-                              label: 'Collection Rate',
-                              amount: (data.collected + data.pending) > 0
-                                  ? ((data.collected /
-                                            (data.collected + data.pending)) *
-                                        100)
-                                  : 0,
-                              icon: Icons.trending_up_rounded,
-                              accentColor: AppColors.info,
-                              suffix: '%',
-                              formatRaw: true,
-                              subtitle: 'FY $yearStr',
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _SummaryCard(
+                                label: 'Expenses',
+                                amount: totalExpenses,
+                                icon: Icons.upload_rounded,
+                                accentColor: Colors.orange,
+                                subtitle: '${expensesInYear.length} items',
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  );
-                },
+                          ],
+                        ),
+                      ],
+                    );
+                  },
+                  loading: () => _buildLoadingCards(),
+                  error: (_, __) => _buildErrorCard('Error loading bills'),
+                ),
                 loading: () => _buildLoadingCards(),
-                error: (_, __) => _buildErrorCard('Error loading bills'),
+                error: (_, __) => _buildErrorCard('Error loading expenses'),
               ),
               loading: () => _buildLoadingCards(),
               error: (_, __) => _buildErrorCard('Error loading financials'),
@@ -373,6 +411,184 @@ class _OverviewTab extends ConsumerWidget {
   }
 }
 
+/// Full-width Net Profit hero card.
+class _NetProfitCard extends StatelessWidget {
+  final double netProfit;
+  final double income;
+  final double expenses;
+  final bool isProfitable;
+  final String yearStr;
+
+  const _NetProfitCard({
+    required this.netProfit,
+    required this.income,
+    required this.expenses,
+    required this.isProfitable,
+    required this.yearStr,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final primaryColor = isProfitable
+        ? const Color(0xFF1DB954) // vibrant green
+        : const Color(0xFFE53935); // vibrant red
+
+    return BouncingScaleWrapper(
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: isProfitable
+                ? [const Color(0xFF0D7A3E), const Color(0xFF1DB954)]
+                : [const Color(0xFFA31515), const Color(0xFFE53935)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: primaryColor.withValues(alpha: 0.35),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isProfitable ? 'NET PROFIT' : 'NET LOSS',
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        Text(
+                          isProfitable ? '₹ +' : '₹ −',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        AnimatedCounterText(
+                          value: netProfit.abs(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: -0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'FY $yearStr',
+                      style: const TextStyle(color: Colors.white60, fontSize: 12),
+                    ),
+                  ],
+                ),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(
+                    isProfitable
+                        ? Icons.trending_up_rounded
+                        : Icons.trending_down_rounded,
+                    color: Colors.white,
+                    size: 28,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Container(height: 1, color: Colors.white.withValues(alpha: 0.2)),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: _NetProfitStat(
+                    label: 'Income',
+                    value: formatCurrency(income),
+                    icon: Icons.arrow_downward_rounded,
+                  ),
+                ),
+                Container(
+                  width: 1,
+                  height: 32,
+                  color: Colors.white.withValues(alpha: 0.2),
+                ),
+                Expanded(
+                  child: _NetProfitStat(
+                    label: 'Expenses',
+                    value: formatCurrency(expenses),
+                    icon: Icons.arrow_upward_rounded,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _NetProfitStat extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+
+  const _NetProfitStat({
+    required this.label,
+    required this.value,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.white70, size: 14),
+          const SizedBox(width: 6),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label, style: const TextStyle(color: Colors.white60, fontSize: 11)),
+              Text(value,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  )),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 /// Premium summary card with accent border.
 class _SummaryCard extends StatelessWidget {
   final String? label;
@@ -382,8 +598,6 @@ class _SummaryCard extends StatelessWidget {
   final String? subtitle;
   final bool isUrgent;
   final bool isLoading;
-  final bool formatRaw;
-  final String? suffix;
 
   const _SummaryCard({
     required this.label,
@@ -392,8 +606,6 @@ class _SummaryCard extends StatelessWidget {
     required this.accentColor,
     this.subtitle,
     this.isUrgent = false,
-    this.formatRaw = false,
-    this.suffix,
   }) : isLoading = false;
 
   const _SummaryCard.loading()
@@ -403,8 +615,6 @@ class _SummaryCard extends StatelessWidget {
       accentColor = null,
       subtitle = null,
       isUrgent = false,
-      formatRaw = false,
-      suffix = null,
       isLoading = true;
 
   @override
@@ -498,10 +708,6 @@ class _SummaryCard extends StatelessWidget {
                 const SizedBox(height: 8),
                 AnimatedCounterText(
                   value: amount!,
-                  format: formatRaw
-                      ? CounterFormat.raw
-                      : CounterFormat.currency,
-                  suffix: suffix,
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: isUrgent ? accentColor : theme.colorScheme.onSurface,
@@ -1688,5 +1894,86 @@ class _EditPaymentSheetState extends ConsumerState<_EditPaymentSheet> {
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Expenses Tab
+// ═══════════════════════════════════════════════════════════════════════════
+
+class _ExpensesTab extends ConsumerWidget {
+  const _ExpensesTab();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final expensesAsync = ref.watch(expensesProvider);
+    final year = ref.watch(reportsFinancialYearProvider);
+    
+    return expensesAsync.when(
+      data: (expenses) {
+        final startDate = DateTime(year, 4, 1);
+        final endDate = DateTime(year + 1, 3, 31, 23, 59, 59);
+        
+        final filteredExpenses = expenses.where((e) {
+          return e.date.isBefore(endDate) && e.date.isAfter(startDate);
+        }).toList();
+
+        if (filteredExpenses.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.money_off, size: 64, color: Theme.of(context).disabledColor),
+                const SizedBox(height: 16),
+                Text(
+                  'No expenses recorded',
+                  style: TextStyle(color: Theme.of(context).disabledColor, fontSize: 16),
+                ),
+              ],
+            ),
+          );
+        }
+
+        filteredExpenses.sort((a, b) => b.date.compareTo(a.date));
+
+        return ListView.builder(
+          padding: const EdgeInsets.only(bottom: 80), // padding for FAB
+          itemCount: filteredExpenses.length,
+          itemBuilder: (context, index) {
+            final expense = filteredExpenses[index];
+            return StaggeredFadeIn(
+              delay: Duration(milliseconds: index * 50),
+              child: Card(
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                elevation: 0,
+                color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  leading: CircleAvatar(
+                    backgroundColor: Theme.of(context).colorScheme.errorContainer,
+                    child: Icon(Icons.outbound, color: Theme.of(context).colorScheme.error),
+                  ),
+                  title: Text(expense.category.name[0].toUpperCase() + expense.category.name.substring(1)),
+                  subtitle: Text(
+                    '${DateFormat('dd MMM').format(expense.date)}${expense.description != null ? ' - ${expense.description}' : ''}',
+                  ),
+                  trailing: Text(
+                    formatCurrency(expense.amount),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(child: Text('Error: $e')),
+    );
   }
 }
