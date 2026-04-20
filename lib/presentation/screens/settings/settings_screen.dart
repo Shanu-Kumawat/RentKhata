@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../widgets/bouncing_scale_wrapper.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
 
 import '../../../application/providers/dashboard_providers.dart';
 import '../../../application/providers/theme_settings_provider.dart';

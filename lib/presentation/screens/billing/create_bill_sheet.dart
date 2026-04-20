@@ -18,6 +18,8 @@ import '../../../data/database/tables/bill_table.dart' as db;
 import '../../../services/image_service.dart';
 import '../../../services/billing_cycle_service.dart';
 import '../../../services/local_notification_service.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
+import '../../../core/utils/l10n_helpers.dart';
 
 /// Bottom sheet to create a new bill.
 class CreateBillSheet extends ConsumerStatefulWidget {
@@ -139,39 +141,41 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
     super.dispose();
   }
 
-  String _getMonthName(int month) {
-    const months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
+  String _getMonthName(BuildContext context, int month) {
+    final l10n = AppLocalizations.of(context)!;
+    final months = [
+      l10n.january,
+      l10n.february,
+      l10n.march,
+      l10n.april,
+      l10n.may,
+      l10n.june,
+      l10n.july,
+      l10n.august,
+      l10n.september,
+      l10n.october,
+      l10n.november,
+      l10n.december,
     ];
     return months[month - 1];
   }
 
   /// Formats a date as "Jan 15" or "Feb 14"
-  String _formatShortDate(DateTime date) {
-    const shortMonths = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
+  String _formatShortDate(BuildContext context, DateTime date) {
+    final l10n = AppLocalizations.of(context)!;
+    final shortMonths = [
+      l10n.jan,
+      l10n.feb,
+      l10n.mar,
+      l10n.apr,
+      l10n.mayShort,
+      l10n.jun,
+      l10n.jul,
+      l10n.aug,
+      l10n.sep,
+      l10n.oct,
+      l10n.nov,
+      l10n.dec,
     ];
     return '${shortMonths[date.month - 1]} ${date.day}';
   }
@@ -297,7 +301,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      'Anniversary',
+                      AppLocalizations.of(context)!.anniversary,
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.colorScheme.primary,
                         fontWeight: FontWeight.w600,
@@ -320,7 +324,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    'Overdue',
+                    AppLocalizations.of(context)!.overdueU,
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: Theme.of(context).colorScheme.error,
                       fontWeight: FontWeight.w600,
@@ -341,7 +345,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    'Advance',
+                    AppLocalizations.of(context)!.advance,
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: Theme.of(context).colorScheme.error,
                       fontWeight: FontWeight.w600,
@@ -360,7 +364,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    'Current',
+                    AppLocalizations.of(context)!.currentLabel,
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: theme.colorScheme.primary,
                       fontWeight: FontWeight.w600,
@@ -380,13 +384,13 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                 IconButton(
                   onPressed: _goToPreviousCycle,
                   icon: const Icon(Icons.chevron_left),
-                  tooltip: 'Previous cycle',
+                  tooltip: AppLocalizations.of(context)!.previousCycle,
                 )
               else
                 const SizedBox(width: 48),
               Expanded(
                 child: Text(
-                  '${_formatShortDate(start)} - ${_formatShortDate(end)}',
+                  '${_formatShortDate(context, start)} - ${_formatShortDate(context, end)}',
                   textAlign: TextAlign.center,
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
@@ -397,7 +401,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                 IconButton(
                   onPressed: _goToNextCycle,
                   icon: const Icon(Icons.chevron_right),
-                  tooltip: 'Next cycle',
+                  tooltip: AppLocalizations.of(context)!.nextCycle,
                 )
               else
                 const SizedBox(width: 48),
@@ -428,7 +432,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'This cycle exceeds the agreement end date (${widget.agreementEndDate!.day}/${widget.agreementEndDate!.month}/${widget.agreementEndDate!.year})',
+                      AppLocalizations.of(context)!.cycleExceedsAgreementWarning('${widget.agreementEndDate!.day}/${widget.agreementEndDate!.month}/${widget.agreementEndDate!.year}'),
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.colorScheme.error,
                       ),
@@ -484,7 +488,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
           flex: 2,
           child: DropdownButtonFormField<int>(
             initialValue: _billingMonth,
-            decoration: const InputDecoration(labelText: 'Month'),
+            decoration: InputDecoration(labelText: AppLocalizations.of(context)!.monthLabel),
             items: List.generate(12, (i) {
               return DropdownMenuItem(value: i + 1, child: Text(months[i]));
             }),
@@ -496,7 +500,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
           flex: 1,
           child: DropdownButtonFormField<int>(
             initialValue: _billingYear,
-            decoration: const InputDecoration(labelText: 'Year'),
+            decoration: InputDecoration(labelText: AppLocalizations.of(context)!.yearLabel),
             items: List.generate(5, (i) {
               final year = DateTime.now().year - 2 + i;
               return DropdownMenuItem(
@@ -550,12 +554,12 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
           children: [
             ListTile(
               leading: const Icon(Icons.camera_alt),
-              title: const Text('Take Photo'),
+              title: Text(AppLocalizations.of(context)!.takePhoto),
               onTap: () => Navigator.pop(context, ImageSource.camera),
             ),
             ListTile(
               leading: const Icon(Icons.photo_library),
-              title: const Text('Choose from Gallery'),
+              title: Text(AppLocalizations.of(context)!.chooseFromGallery),
               onTap: () => Navigator.pop(context, ImageSource.gallery),
             ),
           ],
@@ -602,20 +606,23 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
         final proceed = await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Bill Already Exists'),
+            title: Text(AppLocalizations.of(context)!.billAlreadyExists),
             content: Text(
-              'A ${_selectedBillType.name} bill for ${_getMonthName(_billingMonth)} $_billingYear '
-              'already exists (${existingBill.billNumber ?? "Draft"}).\n\n'
-              'Do you want to create another bill anyway?',
+              AppLocalizations.of(context)!.duplicateBillMessage(
+                _selectedBillType.name,
+                _getMonthName(context, _billingMonth),
+                _billingYear,
+                existingBill.billNumber ?? AppLocalizations.of(context)!.draft,
+              ),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: const Text('Cancel'),
+                child: Text(AppLocalizations.of(context)!.cancel),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
-                child: const Text('Create Anyway'),
+                child: Text(AppLocalizations.of(context)!.createAnyway),
               ),
             ],
           ),
@@ -692,14 +699,14 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Bill created. Global rate updated to ₹${_electricityRate.toStringAsFixed(2)}/unit',
+                AppLocalizations.of(context)!.billCreatedWithRate(_electricityRate.toStringAsFixed(2)),
               ),
             ),
           );
         } else {
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(const SnackBar(content: Text('Bill created')));
+          ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.billCreated)));
         }
 
         // Trigger notifications
@@ -730,7 +737,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.error(e.toString()))));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -739,19 +746,20 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
+      l10n.january,
+      l10n.february,
+      l10n.march,
+      l10n.april,
+      l10n.may,
+      l10n.june,
+      l10n.july,
+      l10n.august,
+      l10n.september,
+      l10n.october,
+      l10n.november,
+      l10n.december,
     ];
 
     return Padding(
@@ -779,13 +787,13 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Create Bill',
+                            AppLocalizations.of(context)!.createBill,
                             style: Theme.of(context).textTheme.titleLarge
                                 ?.copyWith(fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Room ${widget.roomNumber}',
+                            AppLocalizations.of(context)!.roomNumber(widget.roomNumber),
                             style: Theme.of(context).textTheme.bodyMedium
                                 ?.copyWith(
                                   color: Theme.of(
@@ -805,7 +813,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
 
                   // Bill type selector
                   Text(
-                    'Bill Type',
+                    AppLocalizations.of(context)!.type,
                     style: Theme.of(context).textTheme.titleSmall,
                   ),
                   const SizedBox(height: 8),
@@ -814,7 +822,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                     children: BillType.values.map((type) {
                       final isSelected = _selectedBillType == type;
                       return FilterChip(
-                        label: Text(type.name.toUpperCase()),
+                        label: Text(getBillTypeLabel(AppLocalizations.of(context)!, type).toUpperCase()),
                         selected: isSelected,
                         onSelected: (_) {
                           setState(() {
@@ -850,7 +858,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                                 Icon(Icons.speed, color: Colors.amber.shade600),
                                 const SizedBox(width: 8),
                                 Text(
-                                  'Meter Readings',
+                                  AppLocalizations.of(context)!.meterReadings,
                                   style: Theme.of(context).textTheme.titleSmall
                                       ?.copyWith(fontWeight: FontWeight.bold),
                                 ),
@@ -862,7 +870,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                               children: [
                                 Expanded(
                                   child: _MeterReadingInput(
-                                    label: 'Previous',
+                                    label: AppLocalizations.of(context)!.previous,
                                     controller: _prevReadingController,
                                     onChanged: (_) =>
                                         _calculateElectricityCharges(),
@@ -879,13 +887,13 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                                 ),
                                 Expanded(
                                   child: _MeterReadingInput(
-                                    label: 'Current',
+                                    label: AppLocalizations.of(context)!.current,
                                     controller: _currReadingController,
                                     onChanged: (_) =>
                                         _calculateElectricityCharges(),
                                     validator: (v) => validatePositiveNumber(
                                       v,
-                                      'Current reading',
+                                      AppLocalizations.of(context)!.currentReading,
                                     ),
                                   ),
                                 ),
@@ -902,7 +910,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
-                                  'Rate per unit:',
+                                  AppLocalizations.of(context)!.ratePerUnit,
                                   style: Theme.of(context).textTheme.bodyMedium,
                                 ),
                                 const SizedBox(width: 8),
@@ -967,7 +975,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Electricity Calculation',
+                                    AppLocalizations.of(context)!.electricityCalculation,
                                     style: Theme.of(context)
                                         .textTheme
                                         .labelSmall
@@ -980,7 +988,10 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    '${((double.tryParse(_currReadingController.text) ?? 0) - (double.tryParse(_prevReadingController.text) ?? 0)).toStringAsFixed(0)} units × ${formatCurrency(_electricityRate)}',
+                                    AppLocalizations.of(context)!.unitsCalculation(
+                                      ((double.tryParse(_currReadingController.text) ?? 0) - (double.tryParse(_prevReadingController.text) ?? 0)).toStringAsFixed(0),
+                                      formatCurrency(_electricityRate)
+                                    ),
                                     style: Theme.of(
                                       context,
                                     ).textTheme.bodyMedium,
@@ -1064,8 +1075,8 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                                         const SizedBox(width: 6),
                                         Text(
                                           _meterPhoto != null
-                                              ? 'Meter Photo Added'
-                                              : 'Add Meter Photo',
+                                              ? AppLocalizations.of(context)!.meterPhotoAdded
+                                              : AppLocalizations.of(context)!.addMeterPhoto,
                                           style: Theme.of(context)
                                               .textTheme
                                               .titleSmall
@@ -1083,8 +1094,8 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                                     const SizedBox(height: 2),
                                     Text(
                                       _meterPhoto != null
-                                          ? 'Tap to change photo'
-                                          : 'Optional - helps with verification',
+                                          ? AppLocalizations.of(context)!.tapToChangePhoto
+                                          : AppLocalizations.of(context)!.optionalVerification,
                                       style: Theme.of(context)
                                           .textTheme
                                           .bodySmall
@@ -1103,7 +1114,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                                       setState(() => _meterPhoto = null),
                                   icon: const Icon(Icons.close),
                                   color: Colors.grey,
-                                  tooltip: 'Remove photo',
+                                  tooltip: AppLocalizations.of(context)!.removePhoto,
                                 )
                               else
                                 const Icon(
@@ -1121,21 +1132,21 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                   // Amount
                   TextFormField(
                     controller: _amountController,
-                    decoration: const InputDecoration(
-                      labelText: 'Bill Amount (₹) *',
-                      prefixIcon: Icon(Icons.currency_rupee),
+                    decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context)!.billAmountLabel,
+                      prefixIcon: const Icon(Icons.currency_rupee),
                     ),
                     keyboardType: TextInputType.number,
-                    validator: (v) => validatePositiveNumber(v, 'Amount'),
+                    validator: (v) => validatePositiveNumber(v, AppLocalizations.of(context)!.amount),
                   ),
                   const SizedBox(height: 16),
 
                   // Notes
                   TextFormField(
                     controller: _notesController,
-                    decoration: const InputDecoration(
-                      labelText: 'Notes (optional)',
-                      prefixIcon: Icon(Icons.note_outlined),
+                    decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context)!.notesOptional,
+                      prefixIcon: const Icon(Icons.note_outlined),
                     ),
                     maxLines: 2,
                   ),
@@ -1155,7 +1166,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                                 color: Colors.white,
                               ),
                             )
-                          : const Text('Create Bill'),
+                          : Text(AppLocalizations.of(context)!.createBill),
                     ),
                   ),
                 ],
@@ -1216,7 +1227,7 @@ class _MeterReadingInput extends StatelessWidget {
             validator: validator,
           ),
           Text(
-            'units',
+            AppLocalizations.of(context)!.units,
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),

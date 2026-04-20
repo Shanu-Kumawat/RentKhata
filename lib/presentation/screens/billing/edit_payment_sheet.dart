@@ -11,6 +11,8 @@ import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/validators.dart';
 import '../../../domain/entities/bill.dart';
 import '../../../domain/entities/payment.dart';
+import '../../../core/utils/l10n_helpers.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
 
 /// Bottom sheet to edit an existing payment.
 class EditPaymentSheet extends ConsumerStatefulWidget {
@@ -77,7 +79,7 @@ class _EditPaymentSheetState extends ConsumerState<EditPaymentSheet> {
     if (amount > maxAllowed) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Amount cannot exceed ${formatCurrency(maxAllowed)}'),
+          content: Text(AppLocalizations.of(context)!.amountCannotExceedMax(formatCurrency(maxAllowed))),
         ),
       );
       return;
@@ -106,13 +108,13 @@ class _EditPaymentSheetState extends ConsumerState<EditPaymentSheet> {
         Navigator.pop(context);
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('Payment updated')));
+        ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.paymentUpdated)));
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.error(e.toString()))));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -138,7 +140,7 @@ class _EditPaymentSheetState extends ConsumerState<EditPaymentSheet> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Edit Payment',
+                    AppLocalizations.of(context)!.editPayment,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -165,11 +167,11 @@ class _EditPaymentSheetState extends ConsumerState<EditPaymentSheet> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '${widget.bill.billType.name.toUpperCase()} - ${widget.bill.billingPeriod}',
+                          '${getBillTypeLabel(AppLocalizations.of(context)!, widget.bill.billType).toUpperCase()} - ${widget.bill.billingPeriod}',
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
                         Text(
-                          'Original: ${formatCurrency(widget.payment.amount)}',
+                          AppLocalizations.of(context)!.originalAmount(formatCurrency(widget.payment.amount)),
                           style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(color: AppColors.onSurfaceVariant),
                         ),
@@ -183,8 +185,8 @@ class _EditPaymentSheetState extends ConsumerState<EditPaymentSheet> {
               // Amount
               TextFormField(
                 controller: _amountController,
-                decoration: const InputDecoration(
-                  labelText: 'Payment Amount (₹) *',
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.paymentAmountRequiredLabel,
                   prefixIcon: Icon(Icons.currency_rupee),
                 ),
                 keyboardType: TextInputType.number,
@@ -194,7 +196,7 @@ class _EditPaymentSheetState extends ConsumerState<EditPaymentSheet> {
 
               // Payment mode
               Text(
-                'Payment Mode',
+                AppLocalizations.of(context)!.paymentModeLabel,
                 style: Theme.of(context).textTheme.titleSmall,
               ),
               const SizedBox(height: 8),
@@ -217,7 +219,7 @@ class _EditPaymentSheetState extends ConsumerState<EditPaymentSheet> {
                   }
                   return ChoiceChip(
                     avatar: Icon(icon, size: 18),
-                    label: Text(mode.name.toUpperCase()),
+                    label: Text(_getPaymentModeLabel(context, mode).toUpperCase()),
                     selected: isSelected,
                     onSelected: (_) => setState(() => _paymentMode = mode),
                   );
@@ -229,8 +231,8 @@ class _EditPaymentSheetState extends ConsumerState<EditPaymentSheet> {
               InkWell(
                 onTap: _selectPaymentDate,
                 child: InputDecorator(
-                  decoration: const InputDecoration(
-                    labelText: 'Payment Date',
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.paymentDateLabel,
                     prefixIcon: Icon(Icons.calendar_today_outlined),
                   ),
                   child: Text(
@@ -243,8 +245,8 @@ class _EditPaymentSheetState extends ConsumerState<EditPaymentSheet> {
               // Notes
               TextFormField(
                 controller: _notesController,
-                decoration: const InputDecoration(
-                  labelText: 'Notes (optional)',
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.notesOptionalLabel,
                   prefixIcon: Icon(Icons.note_outlined),
                 ),
               ),
@@ -264,7 +266,7 @@ class _EditPaymentSheetState extends ConsumerState<EditPaymentSheet> {
                             color: Colors.white,
                           ),
                         )
-                      : const Text('Update Payment'),
+                      : Text(AppLocalizations.of(context)!.updatePayment),
                 ),
               ),
             ],
@@ -272,5 +274,20 @@ class _EditPaymentSheetState extends ConsumerState<EditPaymentSheet> {
         ),
       ),
     );
+  }
+
+  String _getPaymentModeLabel(BuildContext context, PaymentMode mode) {
+    switch (mode) {
+      case PaymentMode.cash:
+        return AppLocalizations.of(context)!.cash;
+      case PaymentMode.upi:
+        return AppLocalizations.of(context)!.upi;
+      case PaymentMode.bankTransfer:
+        return AppLocalizations.of(context)!.bankTransfer;
+      case PaymentMode.cheque:
+        return AppLocalizations.of(context)!.cheque;
+      case PaymentMode.other:
+        return AppLocalizations.of(context)!.other;
+    }
   }
 }

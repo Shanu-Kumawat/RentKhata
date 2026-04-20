@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../application/providers/property_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/property.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
 
 /// Screen displaying all properties.
 class PropertiesScreen extends ConsumerWidget {
@@ -15,9 +16,10 @@ class PropertiesScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final propertiesAsync = ref.watch(propertiesStreamProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Properties')),
+      appBar: AppBar(title: Text(l10n.properties)),
       body: propertiesAsync.when(
         data: (properties) => properties.isEmpty
             ? _buildEmptyState(context)
@@ -29,11 +31,11 @@ class PropertiesScreen extends ConsumerWidget {
             children: [
               const Icon(Icons.error_outline, size: 48, color: AppColors.error),
               const SizedBox(height: 16),
-              Text('Error: $error'),
+              Text(AppLocalizations.of(context)!.error(error.toString())),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () => ref.invalidate(propertiesStreamProvider),
-                child: const Text('Retry'),
+                child: Text(AppLocalizations.of(context)!.retry),
               ),
             ],
           ),
@@ -42,7 +44,7 @@ class PropertiesScreen extends ConsumerWidget {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/properties/add'),
         icon: const Icon(Icons.add),
-        label: const Text('Add Property'),
+        label: Text(AppLocalizations.of(context)!.addProperty),
       ),
     );
   }
@@ -70,14 +72,14 @@ class PropertiesScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              'No properties yet',
+              AppLocalizations.of(context)!.noPropertiesYet,
               style: Theme.of(
                 context,
               ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
-              'Add your first property to get started',
+              AppLocalizations.of(context)!.addYourFirstProperty,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
@@ -87,7 +89,7 @@ class PropertiesScreen extends ConsumerWidget {
             ElevatedButton.icon(
               onPressed: () => context.push('/properties/add'),
               icon: const Icon(Icons.add),
-              label: const Text('Add Property'),
+              label: Text(AppLocalizations.of(context)!.addProperty),
             ),
           ],
         ),
@@ -171,12 +173,12 @@ class _PropertyCard extends StatelessWidget {
                       children: [
                         _StatChip(
                           icon: Icons.meeting_room_outlined,
-                          label: '${property.roomCount} rooms',
+                          label: AppLocalizations.of(context)!.roomsCount(property.roomCount),
                         ),
                         const SizedBox(width: 12),
                         _StatChip(
                           icon: Icons.people_outline,
-                          label: '$occupancyPercent% occupied',
+                          label: AppLocalizations.of(context)!.occupiedPercent(occupancyPercent),
                           color: occupancyPercent >= 80
                               ? AppColors.success
                               : occupancyPercent >= 50

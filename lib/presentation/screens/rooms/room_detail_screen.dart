@@ -14,6 +14,7 @@ import '../../../core/utils/currency_formatter.dart';
 import '../../../domain/entities/room.dart';
 import '../../../domain/entities/occupancy.dart';
 import '../../../domain/entities/bill.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
 import '../../../services/share_service.dart';
 import '../../../services/billing_cycle_service.dart';
 import '../../../services/ledger_service.dart';
@@ -57,8 +58,8 @@ class RoomDetailScreen extends ConsumerWidget {
       data: (room) {
         if (room == null) {
           return Scaffold(
-            appBar: AppBar(title: const Text('Room')),
-            body: const Center(child: Text('Room not found')),
+            appBar: AppBar(title: Text(AppLocalizations.of(context)!.roomTitle)),
+            body: Center(child: Text(AppLocalizations.of(context)!.roomNotFound)),
           );
         }
         return _RoomDetailContent(
@@ -74,7 +75,7 @@ class RoomDetailScreen extends ConsumerWidget {
         body: const Center(child: CircularProgressIndicator()),
       ),
       error: (e, s) => Scaffold(
-        appBar: AppBar(title: const Text('Error')),
+        appBar: AppBar(title: Text(AppLocalizations.of(context)!.errorPrefix.trim())),
         body: Center(child: Text('Error: $e')),
       ),
     );
@@ -168,7 +169,7 @@ class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
                         child: FilledButton.icon(
                           onPressed: () => _showCreateBill(occupancy),
                           icon: const Icon(Icons.receipt_long_outlined),
-                          label: const Text('Create Bill'),
+                          label: Text(AppLocalizations.of(context)!.createBill),
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -176,7 +177,7 @@ class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
                         child: OutlinedButton.icon(
                           onPressed: () => _generateAndShareKhataStatement(context, ref, occupancy.id),
                           icon: const Icon(Icons.picture_as_pdf_outlined),
-                          label: const Text('Statement'),
+                          label: Text(AppLocalizations.of(context)!.statementLabel),
                         ),
                       ),
                     ],
@@ -310,6 +311,7 @@ class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
   }
 
   Future<void> _generateAndShareKhataStatement(BuildContext context, WidgetRef ref, int occupancyId) async {
+    final l10n = AppLocalizations.of(context)!;
     // Show loading indicator
     showDialog(
       context: context,
@@ -319,9 +321,9 @@ class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
 
     try {
       final ledgerStatement = await ref.read(ledgerStatementProvider(occupancyId).future);
-      if (ledgerStatement == null) throw Exception('Ledger not found');
+      if (ledgerStatement == null) throw Exception(l10n.ledgerNotFound);
 
-      final pdfFile = await PdfService.generateTenantLedgerPdf(ledgerStatement);
+      final pdfFile = await PdfService.generateTenantLedgerPdf(ledgerStatement, l10n);
 
       // Hide loading
       if (context.mounted) Navigator.pop(context);
@@ -383,13 +385,13 @@ class _RoomInfoCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        room.propertyName ?? 'Property',
+                        room.propertyName ?? AppLocalizations.of(context)!.property,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
                       Text(
-                        room.isOccupied ? 'Occupied' : 'Vacant',
+                        room.isOccupied ? AppLocalizations.of(context)!.occupiedStatus : AppLocalizations.of(context)!.vacant,
                         style: Theme.of(context).textTheme.titleMedium
                             ?.copyWith(
                               fontWeight: FontWeight.bold,
@@ -483,7 +485,7 @@ class _OccupancyCard extends ConsumerWidget {
                       context,
                     ).colorScheme.primary.withValues(alpha: 0.1),
                     child: Text(
-                      (occupancy.tenantName ?? 'T')[0].toUpperCase(),
+                      (occupancy.tenantName ?? AppLocalizations.of(context)!.tenantT)[0].toUpperCase(),
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -497,7 +499,7 @@ class _OccupancyCard extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          occupancy.tenantName ?? 'Tenant',
+                          occupancy.tenantName ?? AppLocalizations.of(context)!.tenant,
                           style: Theme.of(context).textTheme.titleMedium
                               ?.copyWith(fontWeight: FontWeight.w600),
                         ),
@@ -518,13 +520,13 @@ class _OccupancyCard extends ConsumerWidget {
                       if (value == 'move_out') onEndOccupancy();
                     },
                     itemBuilder: (context) => [
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'move_out',
                         child: Row(
                           children: [
                             Icon(Icons.exit_to_app, color: AppColors.warning),
                             SizedBox(width: 8),
-                            Text('Move Out'),
+                            Text(AppLocalizations.of(context)!.moveOutBtn),
                           ],
                         ),
                       ),
@@ -536,13 +538,13 @@ class _OccupancyCard extends ConsumerWidget {
               Row(
                 children: [
                   _InfoTile(
-                    label: 'Agreed Rent',
+                    label: AppLocalizations.of(context)!.agreedRent,
                     value: formatCurrency(occupancy.agreedRent),
                   ),
                   const SizedBox(width: 24),
                   if (occupancy.securityDeposit > 0)
                     _InfoTile(
-                      label: 'Security Deposit',
+                      label: AppLocalizations.of(context)!.securityDepositLabel,
                       value: formatCurrency(occupancy.securityDeposit),
                     ),
                 ],
@@ -566,7 +568,7 @@ class _OccupancyCard extends ConsumerWidget {
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              'Billing Start',
+                              AppLocalizations.of(context)!.billingStartLabel,
                               style: Theme.of(context).textTheme.labelSmall
                                   ?.copyWith(
                                     color: Theme.of(
@@ -613,7 +615,7 @@ class _OccupancyCard extends ConsumerWidget {
                   TextButton.icon(
                     onPressed: () => _editBillingStartDate(context, ref),
                     icon: const Icon(Icons.edit_outlined, size: 16),
-                    label: const Text('Edit'),
+                    label: Text(AppLocalizations.of(context)!.editBtn),
                     style: TextButton.styleFrom(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                     ),
@@ -636,7 +638,7 @@ class _OccupancyCard extends ConsumerWidget {
       initialDate: occupancy.effectiveBillingStartDate,
       firstDate: occupancy.moveInDate,
       lastDate: DateTime.now().add(const Duration(days: 365)),
-      helpText: 'Select Billing Start Date',
+      helpText: AppLocalizations.of(context)!.selectBillingStartDate,
     );
 
     if (newDate != null && context.mounted) {
@@ -659,8 +661,8 @@ class _OccupancyCard extends ConsumerWidget {
         );
       } else if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to update billing start date'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.failedToUpdateBillingStart),
             behavior: SnackBarBehavior.floating,
             backgroundColor: AppColors.error,
           ),
@@ -724,14 +726,14 @@ class _VacantRoomCard extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Room is Vacant',
+              AppLocalizations.of(context)!.roomIsVacant,
               style: Theme.of(
                 context,
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 4),
             Text(
-              'Assign a tenant to start collecting rent',
+              AppLocalizations.of(context)!.assignTenantToStartCollecting,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
@@ -740,7 +742,7 @@ class _VacantRoomCard extends StatelessWidget {
             FilledButton.icon(
               onPressed: onMoveIn,
               icon: const Icon(Icons.person_add),
-              label: const Text('Move In Tenant'),
+              label: Text(AppLocalizations.of(context)!.moveInTenantBtn),
             ),
           ],
         ),
@@ -768,7 +770,7 @@ class _BillsSection extends ConsumerWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(24),
                   child: Text(
-                    'No bills yet',
+                    AppLocalizations.of(context)!.noBillsYet,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
@@ -800,7 +802,7 @@ class _BillsSection extends ConsumerWidget {
               children: [
                 if (activeBills.isNotEmpty) ...[
                   Text(
-                    'Active Bills',
+                    AppLocalizations.of(context)!.activeBills,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -814,7 +816,7 @@ class _BillsSection extends ConsumerWidget {
                   // If no active bills, maybe don't need separate header?
                   // But "History" is good separator.
                   Text(
-                    'History',
+                    AppLocalizations.of(context)!.history,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -831,7 +833,7 @@ class _BillsSection extends ConsumerWidget {
                     child: ExpansionTile(
                       tilePadding: EdgeInsets.zero,
                       title: Text(
-                        'View Bill History (${olderHistory.length})',
+                        AppLocalizations.of(context)!.viewBillHistory(olderHistory.length),
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.primary,
                           fontWeight: FontWeight.w600,
@@ -915,7 +917,7 @@ class _BillTile extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          _getBillLabel(bill.billType),
+                          _getBillLabel(context, bill.billType),
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
@@ -931,7 +933,7 @@ class _BillTile extends ConsumerWidget {
                           Padding(
                             padding: const EdgeInsets.only(top: 4.0),
                             child: Text(
-                              'Overdue by ${_getDaysOverdue(bill.dueDate!)} days',
+                              AppLocalizations.of(context)!.overdueByDays(_getDaysOverdue(bill.dueDate!)),
                               style: theme.textTheme.labelSmall?.copyWith(
                                 color: AppColors.error,
                                 fontWeight: FontWeight.bold,
@@ -962,7 +964,7 @@ class _BillTile extends ConsumerWidget {
                       const SizedBox(height: 4),
                       if (bill.status == BillStatus.voided)
                         Text(
-                          'VOID',
+                          AppLocalizations.of(context)!.voidLabel,
                           style: theme.textTheme.labelSmall?.copyWith(
                             color: theme.disabledColor,
                             fontWeight: FontWeight.bold,
@@ -971,7 +973,7 @@ class _BillTile extends ConsumerWidget {
                         )
                       else if (isPartial)
                         Text(
-                          '${formatCurrency(bill.pendingAmount)} due',
+                          AppLocalizations.of(context)!.amountDueSuffix(formatCurrency(bill.pendingAmount)),
                           style: theme.textTheme.labelMedium?.copyWith(
                             color: Colors.orange.shade800,
                             fontWeight: FontWeight.w600,
@@ -979,7 +981,7 @@ class _BillTile extends ConsumerWidget {
                         )
                       else
                         Text(
-                          isPaid ? 'PAID' : 'DUE',
+                          isPaid ? AppLocalizations.of(context)!.paidCaps : AppLocalizations.of(context)!.dueCaps,
                           style: theme.textTheme.labelSmall?.copyWith(
                             color: statusColor,
                             fontWeight: FontWeight.bold,
@@ -1017,7 +1019,7 @@ class _BillTile extends ConsumerWidget {
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
-                                    'Remind',
+                                    AppLocalizations.of(context)!.remindBtn,
                                     style: theme.textTheme.bodyMedium?.copyWith(
                                       color: statusColor,
                                       fontWeight: FontWeight.w600,
@@ -1053,7 +1055,7 @@ class _BillTile extends ConsumerWidget {
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
-                                    'Pay Now',
+                                    AppLocalizations.of(context)!.payNowBtn,
                                     style: theme.textTheme.bodyMedium?.copyWith(
                                       color: statusColor,
                                       fontWeight: FontWeight.w600,
@@ -1084,7 +1086,7 @@ class _BillTile extends ConsumerWidget {
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
-                                    'View',
+                                    AppLocalizations.of(context)!.viewBtn,
                                     style: theme.textTheme.bodyMedium?.copyWith(
                                       color: theme.colorScheme.onSurfaceVariant,
                                       fontWeight: FontWeight.w600,
@@ -1122,7 +1124,7 @@ class _BillTile extends ConsumerWidget {
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
-                                    'Share',
+                                    AppLocalizations.of(context)!.shareBtn,
                                     style: theme.textTheme.bodyMedium?.copyWith(
                                       color: theme.colorScheme.onSurfaceVariant,
                                       fontWeight: FontWeight.w600,
@@ -1159,13 +1161,13 @@ class _BillTile extends ConsumerWidget {
     };
   }
 
-  String _getBillLabel(BillType type) {
+  String _getBillLabel(BuildContext context, BillType type) {
     return switch (type) {
-      BillType.rent => 'Monthly Rent',
-      BillType.electricity => 'Electricity Bill',
-      BillType.water => 'Water Bill',
-      BillType.maintenance => 'Maintenance',
-      BillType.other => 'Other Charges',
+      BillType.rent => AppLocalizations.of(context)!.monthlyRentLabel,
+      BillType.electricity => AppLocalizations.of(context)!.electricityBillLabel,
+      BillType.water => AppLocalizations.of(context)!.waterBillLabel,
+      BillType.maintenance => AppLocalizations.of(context)!.maintenanceLabel,
+      BillType.other => AppLocalizations.of(context)!.otherChargesLabel,
     };
   }
 
@@ -1177,6 +1179,7 @@ class _BillTile extends ConsumerWidget {
   }
 
   void _sendReminder(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context)!;
     if (bill.status == BillStatus.draft) {
       if (!context.mounted) return;
       showDialog(
@@ -1221,7 +1224,7 @@ class _BillTile extends ConsumerWidget {
                         style: TextButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
-                        child: const Text('Cancel'),
+                        child: Text(AppLocalizations.of(context)!.cancel),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -1235,7 +1238,7 @@ class _BillTile extends ConsumerWidget {
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           elevation: 0,
                         ),
-                        child: const Text('Send Invoice'),
+                        child: Text(AppLocalizations.of(context)!.sendInvoiceBtn),
                       ),
                     ),
                   ],
@@ -1249,7 +1252,7 @@ class _BillTile extends ConsumerWidget {
     }
 
     final landlord = await ref.read(landlordProvider.future);
-    final landlordName = landlord?.name ?? 'Landlord';
+    final landlordName = landlord?.name ?? l10n.landlord;
 
     final repo = ref.read(billingRepositoryProvider);
     final shareService = ShareService(repo);
@@ -1260,13 +1263,14 @@ class _BillTile extends ConsumerWidget {
   }
 
   void _shareInvoice(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context)!;
     final landlord = await ref.read(landlordProvider.future);
 
     final repo = ref.read(billingRepositoryProvider);
     final shareService = ShareService(repo);
     await shareService.shareInvoice(
       bill: bill,
-      landlordName: landlord?.name ?? 'Landlord',
+      landlordName: landlord?.name ?? l10n.landlord,
       landlordUpi: landlord?.upiId,
     );
   }

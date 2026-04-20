@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
 
 import '../../../application/providers/dashboard_providers.dart';
 import '../../../application/providers/billing_providers.dart';
@@ -69,7 +69,7 @@ class DashboardScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // 1. Top Section: Action Center (Priority Zone)
-              const StaggeredFadeIn(
+              StaggeredFadeIn(
                 delay: Duration(milliseconds: 0),
                 child: Column(
                   children: [

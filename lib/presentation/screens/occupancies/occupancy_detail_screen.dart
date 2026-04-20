@@ -10,6 +10,7 @@ import '../../../application/providers/occupancy_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../domain/entities/bill.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
 import '../../../domain/entities/occupancy.dart';
 import '../../../domain/entities/settlement_statement.dart';
 import '../../../services/pdf_service.dart';
@@ -774,6 +775,8 @@ class _DepositSettlementCard extends StatelessWidget {
       builder: (_) => const Center(child: CircularProgressIndicator()),
     );
 
+    final l10n = AppLocalizations.of(context)!;
+
     try {
       final landlordRepo = ref.read(landlordRepositoryProvider);
       final landlord = await landlordRepo.getLandlord();
@@ -796,7 +799,7 @@ class _DepositSettlementCard extends StatelessWidget {
         refundAmount: occupancy.depositReturnedAmount ?? 0,
       );
 
-      final pdfFile = await PdfService.generateSettlementPdf(statement);
+      final pdfFile = await PdfService.generateSettlementPdf(statement, l10n);
 
       if (context.mounted) Navigator.pop(context); // Hide loading
 

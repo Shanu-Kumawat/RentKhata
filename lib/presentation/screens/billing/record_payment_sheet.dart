@@ -9,9 +9,11 @@ import '../../../application/providers/dashboard_providers.dart';
 
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/validators.dart';
+import '../../../core/utils/l10n_helpers.dart';
 import '../../../domain/entities/bill.dart';
 import '../../../domain/entities/payment.dart';
 import 'receipt_dialog.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
 
 /// Bottom sheet to record a payment.
 class RecordPaymentSheet extends ConsumerStatefulWidget {
@@ -69,7 +71,7 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Amount cannot exceed pending balance of ${formatCurrency(widget.bill.pendingAmount)}',
+            AppLocalizations.of(context)!.amountCannotExceedPendingBalance(formatCurrency(widget.bill.pendingAmount)),
           ),
         ),
       );
@@ -135,7 +137,7 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.error(e.toString()))));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -177,7 +179,7 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Record Payment',
+                      AppLocalizations.of(context)!.recordPayment,
                       style: theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -207,7 +209,7 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
                     children: [
                       Flexible(
                         child: Text(
-                          '${widget.bill.billType.name.toUpperCase()} • ${widget.bill.billingPeriod}',
+                          '${getBillTypeLabel(AppLocalizations.of(context)!, widget.bill.billType).toUpperCase()} • ${widget.bill.billingPeriod}',
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                             fontWeight: FontWeight.w600,
@@ -226,7 +228,7 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        'Due: ${formatCurrency(pending)}',
+                        AppLocalizations.of(context)!.dueAmount(formatCurrency(pending)),
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.primary,
                           fontWeight: FontWeight.bold,
@@ -241,7 +243,7 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
                 Column(
                   children: [
                     Text(
-                      'Enter Amount',
+                      AppLocalizations.of(context)!.enterAmount,
                       style: theme.textTheme.labelMedium?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
@@ -283,7 +285,7 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
                       Padding(
                         padding: const EdgeInsets.only(top: 8),
                         child: ActionChip(
-                          label: const Text('Pay Full Due'),
+                          label: Text(AppLocalizations.of(context)!.payFullDue),
                           avatar: const Icon(Icons.check, size: 16),
                           onPressed: () {
                             _amountController.text = pending.toStringAsFixed(0);
@@ -314,7 +316,7 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
                       final isSelected = _paymentMode == mode;
                       return ChoiceChip(
                         showCheckmark: false,
-                        label: Text(mode.name.toUpperCase()),
+                        label: Text(getPaymentModeLabel(AppLocalizations.of(context)!, mode).toUpperCase()),
                         avatar: isSelected
                             ? Icon(
                                 Icons.check,
@@ -363,7 +365,7 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
                               ),
                               const SizedBox(width: 12),
                               Text(
-                                'Date',
+                                AppLocalizations.of(context)!.date,
                                 style: theme.textTheme.bodyMedium?.copyWith(
                                   color: theme.colorScheme.onSurfaceVariant,
                                 ),
@@ -391,9 +393,9 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
                       ),
                       TextFormField(
                         controller: _notesController,
-                        decoration: const InputDecoration(
-                          hintText: 'Add note (optional)',
-                          prefixIcon: Icon(Icons.edit_note),
+                        decoration: InputDecoration(
+                          hintText: AppLocalizations.of(context)!.addNoteOptional,
+                          prefixIcon: const Icon(Icons.edit_note),
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.symmetric(
                             horizontal: 16,
@@ -423,9 +425,9 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
                               color: Colors.white,
                             ),
                           )
-                        : const Text(
-                            'Record Payment',
-                            style: TextStyle(
+                        : Text(
+                            AppLocalizations.of(context)!.recordPayment,
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),

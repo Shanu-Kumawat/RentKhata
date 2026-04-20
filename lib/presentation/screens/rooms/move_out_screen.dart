@@ -10,6 +10,8 @@ import '../../../core/utils/currency_formatter.dart';
 import '../../../domain/entities/bill.dart';
 import '../../../domain/entities/occupancy.dart';
 import '../../../domain/entities/payment.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
+import '../../../core/utils/l10n_helpers.dart';
 import '../../../domain/entities/room.dart';
 import '../../../domain/entities/settlement_statement.dart';
 import '../../../services/pdf_service.dart';
@@ -102,12 +104,12 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Move Out Settlement',
+                          AppLocalizations.of(context)!.moveOutSettlement,
                           style: Theme.of(context).textTheme.titleLarge
                               ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         Text(
-                          widget.occupancy.tenantName ?? 'Tenant',
+                          widget.occupancy.tenantName ?? AppLocalizations.of(context)!.tenant,
                           style: Theme.of(context).textTheme.bodyMedium
                               ?.copyWith(color: AppColors.onSurfaceVariant),
                         ),
@@ -166,7 +168,7 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('Security Deposit'),
+                              Text(AppLocalizations.of(context)!.securityDepositLabel),
                               Text(
                                 formatCurrency(deposit),
                                 style: const TextStyle(
@@ -182,7 +184,7 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
                       // Bill Deductions
                       if (pendingBills.isNotEmpty) ...[
                         Text(
-                          'Pending Bills to Deduct',
+                          AppLocalizations.of(context)!.pendingBillsToDeduct,
                           style: Theme.of(context).textTheme.titleMedium
                               ?.copyWith(fontWeight: FontWeight.bold),
                         ),
@@ -207,7 +209,7 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
                                   });
                                 },
                                 title: Text(
-                                  '${bill.billType.name.toUpperCase()} - ${bill.billingPeriod}',
+                                  '${getBillTypeLabel(AppLocalizations.of(context)!, bill.billType).toUpperCase()} - ${bill.billingPeriod}',
                                   style: TextStyle(
                                     decoration: isVoiding ? TextDecoration.lineThrough : null,
                                   ),
@@ -245,7 +247,7 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
                                     foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
                                     textStyle: const TextStyle(fontSize: 12),
                                   ),
-                                  child: Text(isVoiding ? 'Undo Void' : 'Mark as Void'),
+                                  child: Text(isVoiding ? AppLocalizations.of(context)!.undoVoid : AppLocalizations.of(context)!.markAsVoid),
                                 ),
                             ],
                           );
@@ -255,7 +257,7 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
 
                       // Manual Deduction
                       Text(
-                        'Other Deductions',
+                        AppLocalizations.of(context)!.otherDeductionsTitle,
                         style: Theme.of(context).textTheme.titleMedium
                             ?.copyWith(fontWeight: FontWeight.bold),
                       ),
@@ -298,19 +300,19 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
                         child: Column(
                           children: [
                             _SettlementRow(
-                              'Total Deposit',
+                              AppLocalizations.of(context)!.totalDeposit,
                               formatCurrency(deposit),
                             ),
                             const SizedBox(height: 8),
                             if (billDeduction > 0)
                               _SettlementRow(
-                                'Bill Deductions',
+                                AppLocalizations.of(context)!.billDeductions,
                                 '- ${formatCurrency(billDeduction)}',
                                 isDeduction: true,
                               ),
                             if (_manualDeduction > 0)
                               _SettlementRow(
-                                'Other Deductions',
+                                AppLocalizations.of(context)!.otherDeductionsTitle,
                                 '- ${formatCurrency(_manualDeduction)}',
                                 isDeduction: true,
                               ),
@@ -323,8 +325,8 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
                               children: [
                                 Text(
                                   isNegative
-                                      ? 'Tenant Owes'
-                                      : 'Refundable Amount',
+                                      ? AppLocalizations.of(context)!.tenantOwes
+                                      : AppLocalizations.of(context)!.refundableAmount,
                                   style: Theme.of(
                                     context,
                                   ).textTheme.titleMedium,
@@ -373,7 +375,7 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
                                 ),
                               )
                             : Text(
-                                'Confirm Move Out & ${isNegative ? 'Record Pending' : 'Settle'}',
+                                isNegative ? AppLocalizations.of(context)!.confirmMoveOutRecord : AppLocalizations.of(context)!.confirmMoveOutSettle,
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -398,6 +400,7 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
     double refundAmount,
     double totalDeduction,
   ) async {
+    final l10n = AppLocalizations.of(context)!;
     setState(() => _isLoading = true);
 
     try {
@@ -420,7 +423,7 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
         if (bill.pendingAmount > 0) {
           billDeductions.add(
             SettlementBillDeduction(
-              billTypeLabel: bill.billType.name.toUpperCase(),
+              billTypeLabel: getBillTypeLabel(l10n, bill.billType).toUpperCase(),
               period: bill.billingPeriod,
               amount: bill.pendingAmount,
             ),
@@ -430,7 +433,7 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
             billId: billId,
             amount: bill.pendingAmount,
             paymentMode: PaymentMode.other,
-            notes: 'Settled via Deposit Deduction',
+            notes: l10n.settledViaDeposit,
             paymentDate: DateTime.now(),
           );
         }
@@ -456,8 +459,8 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
       
       final statement = SettlementStatement(
         occupancyId: widget.occupancy.id,
-        tenantName: widget.occupancy.tenantName ?? 'Tenant',
-        landlordName: landlord?.name ?? 'Landlord',
+        tenantName: widget.occupancy.tenantName ?? l10n.tenant,
+        landlordName: landlord?.name ?? l10n.landlord,
         propertyName: widget.room.propertyName ?? 'Property',
         roomNumber: widget.room.roomNumber,
         moveInDate: widget.occupancy.moveInDate,
@@ -470,7 +473,7 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
         refundAmount: refundAmount,
       );
 
-      final pdfFile = await PdfService.generateSettlementPdf(statement);
+      final pdfFile = await PdfService.generateSettlementPdf(statement, l10n);
 
       // Trigger updates
       if (mounted) {
@@ -537,7 +540,7 @@ class _DateSelectionCard extends StatelessWidget {
     return Card(
       child: ListTile(
         leading: const Icon(Icons.calendar_today, color: AppColors.primary),
-        title: const Text('Move Out Date'),
+        title: Text(AppLocalizations.of(context)!.moveOutDate),
         subtitle: Text('${date.day}/${date.month}/${date.year}'),
         trailing: const Icon(Icons.chevron_right),
         onTap: () async {

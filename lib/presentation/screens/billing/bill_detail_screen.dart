@@ -23,6 +23,7 @@ import 'invoice_preview_screen.dart';
 import 'record_payment_sheet.dart';
 import 'edit_payment_sheet.dart';
 import '../../../core/theme/app_colors.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
 
 /// Screen to view detailed bill information including payments.
 class BillDetailScreen extends ConsumerWidget {
@@ -37,12 +38,12 @@ class BillDetailScreen extends ConsumerWidget {
 
     return billAsync.when(
       loading: () => Scaffold(
-        appBar: AppBar(title: const Text('Bill Details')),
+        appBar: AppBar(title: Text(AppLocalizations.of(context)!.billDetails)),
         body: const Center(child: CircularProgressIndicator()),
       ),
       error: (e, _) => Scaffold(
-        appBar: AppBar(title: const Text('Bill Details')),
-        body: Center(child: Text('Error: $e')),
+        appBar: AppBar(title: Text(AppLocalizations.of(context)!.billDetails)),
+        body: Center(child: Text(AppLocalizations.of(context)!.error(e.toString()))),
       ),
       data: (currentBill) {
         final activeBill = currentBill ?? bill;
@@ -71,7 +72,7 @@ class _BillDetailContent extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(bill.billNumber ?? 'Bill Details'),
+        title: Text(bill.billNumber ?? AppLocalizations.of(context)!.billDetails),
         actions: [
           if (bill.canEdit ||
               bill.canEditLimited ||
@@ -87,22 +88,22 @@ class _BillDetailContent extends ConsumerWidget {
               ),
               itemBuilder: (context) => [
                 if (bill.canEdit || bill.canEditLimited)
-                  const PopupMenuItem(
+                   PopupMenuItem(
                     value: 'edit',
                     child: ListTile(
-                      leading: Icon(Icons.edit_outlined),
-                      title: Text('Edit Bill'),
+                      leading: const Icon(Icons.edit_outlined),
+                      title: Text(AppLocalizations.of(context)!.editBill),
                       contentPadding: EdgeInsets.zero,
                     ),
                   ),
                 if (bill.canDelete)
-                  const PopupMenuItem(
+                   PopupMenuItem(
                     value: 'delete',
                     child: ListTile(
-                      leading: Icon(Icons.delete_outline, color: Colors.red),
+                      leading: const Icon(Icons.delete_outline, color: Colors.red),
                       title: Text(
-                        'Delete Bill',
-                        style: TextStyle(color: Colors.red),
+                        AppLocalizations.of(context)!.deleteBill,
+                        style: const TextStyle(color: Colors.red),
                       ),
                       contentPadding: EdgeInsets.zero,
                     ),
@@ -110,13 +111,13 @@ class _BillDetailContent extends ConsumerWidget {
                 if (bill.status != BillStatus.voided &&
                     !bill.isFullyPaid &&
                     bill.status != BillStatus.partial)
-                  const PopupMenuItem(
+                   PopupMenuItem(
                     value: 'void',
                     child: ListTile(
-                      leading: Icon(Icons.block, color: AppColors.error),
+                      leading: const Icon(Icons.block, color: AppColors.error),
                       title: Text(
-                        'Void Bill',
-                        style: TextStyle(color: AppColors.error),
+                        AppLocalizations.of(context)!.voidBill,
+                        style: const TextStyle(color: AppColors.error),
                       ),
                       contentPadding: EdgeInsets.zero,
                     ),
@@ -124,11 +125,11 @@ class _BillDetailContent extends ConsumerWidget {
                 if (!bill.isFullyPaid &&
                     bill.status != BillStatus.draft &&
                     bill.status != BillStatus.voided)
-                  const PopupMenuItem(
+                   PopupMenuItem(
                     value: 'reminder',
                     child: ListTile(
-                      leading: Icon(Icons.notifications_active_outlined),
-                      title: Text('Send Reminder'),
+                      leading: const Icon(Icons.notifications_active_outlined),
+                      title: Text(AppLocalizations.of(context)!.sendReminder),
                       contentPadding: EdgeInsets.zero,
                     ),
                   ),
@@ -171,7 +172,7 @@ class _BillDetailContent extends ConsumerWidget {
 
             // Payments Section
             Text(
-              'Payment History',
+              AppLocalizations.of(context)!.paymentHistory,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -187,7 +188,7 @@ class _BillDetailContent extends ConsumerWidget {
               error: (e, _) => Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Text('Error loading payments: $e'),
+                  child: Text(AppLocalizations.of(context)!.error(e.toString())),
                 ),
               ),
               data: (payments) => payments.isEmpty
@@ -204,7 +205,7 @@ class _BillDetailContent extends ConsumerWidget {
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                'No payments recorded',
+                                AppLocalizations.of(context)!.noPaymentsRecorded,
                                 style: theme.textTheme.bodyMedium?.copyWith(
                                   color: Theme.of(
                                     context,
@@ -233,7 +234,7 @@ class _BillDetailContent extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Notes',
+                        AppLocalizations.of(context)!.notes,
                         style: theme.textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -276,8 +277,8 @@ class _BillDetailContent extends ConsumerWidget {
                           ),
                           child: Text(
                             bill.status == BillStatus.draft
-                                ? 'Review & Send'
-                                : 'Share Invoice',
+                                ? AppLocalizations.of(context)!.reviewAndSend
+                                : AppLocalizations.of(context)!.shareInvoice,
                           ),
                         ),
                       ),
@@ -289,7 +290,7 @@ class _BillDetailContent extends ConsumerWidget {
                           onPressed: () => _recordPayment(context),
                           icon: const Icon(Icons.payment),
                           label: Text(
-                            'Pay ${formatCurrency(bill.pendingAmount)}',
+                            AppLocalizations.of(context)!.payAmount(formatCurrency(bill.pendingAmount)),
                           ),
                         ),
                       ),
@@ -304,7 +305,7 @@ class _BillDetailContent extends ConsumerWidget {
                             landlordPhone,
                             landlordUpi,
                           ),
-                          child: const Text('Save'),
+                          child: Text(AppLocalizations.of(context)!.save),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -319,7 +320,7 @@ class _BillDetailContent extends ConsumerWidget {
                             landlordUpi,
                           ),
                           icon: const Icon(Icons.share),
-                          label: const Text('Share'),
+                          label: Text(AppLocalizations.of(context)!.share),
                         ),
                       ),
                     ],
@@ -336,7 +337,7 @@ class _BillDetailContent extends ConsumerWidget {
                     landlordPhone,
                     landlordUpi,
                   ),
-                  child: const Text('Save Invoice PDF'),
+                  child: Text(AppLocalizations.of(context)!.saveInvoicePdf),
                 ),
               ],
             ],
@@ -421,11 +422,12 @@ class _BillDetailContent extends ConsumerWidget {
     String? landlordPhone,
     String? landlordUpi,
   ) async {
+    final l10n = AppLocalizations.of(context)!;
     try {
       final pdfService = InvoicePdfService();
       final file = await pdfService.generateInvoice(
         bill: bill,
-        landlordName: landlordName ?? 'Landlord',
+        landlordName: landlordName ?? l10n.landlord,
         landlordPhone: landlordPhone ?? '',
         landlordUpiId: landlordUpi,
       );
@@ -455,8 +457,8 @@ class _BillDetailContent extends ConsumerWidget {
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Invoice saved to Downloads'),
-            action: SnackBarAction(label: 'OK', onPressed: () {}),
+            content: Text(l10n.invoiceSavedToDownloads),
+            action: SnackBarAction(label: l10n.ok, onPressed: () {}),
           ),
         );
       }
@@ -464,7 +466,7 @@ class _BillDetailContent extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error saving PDF: $e')));
+        ).showSnackBar(SnackBar(content: Text(l10n.errorSavingPdf(e.toString()))));
       }
     }
   }
@@ -473,7 +475,7 @@ class _BillDetailContent extends ConsumerWidget {
     final shareService = ShareService();
     await shareService.shareBillReminder(
       bill: bill,
-      landlordName: landlordName ?? 'Landlord',
+      landlordName: landlordName ?? AppLocalizations.of(context)!.landlord,
     );
   }
 
@@ -482,20 +484,20 @@ class _BillDetailContent extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Void Bill?'),
+        title: Text(AppLocalizations.of(context)!.voidBillTitle),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'This will mark the bill as void. This action cannot be undone.',
+            Text(
+              AppLocalizations.of(context)!.voidBillWarning,
             ),
             const SizedBox(height: 16),
             TextField(
               controller: reasonController,
-              decoration: const InputDecoration(
-                labelText: 'Reason for voiding',
-                hintText: 'e.g., Incorrect amount',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.voidReasonLabel,
+                hintText: AppLocalizations.of(context)!.voidReasonHint,
+                border: const OutlineInputBorder(),
               ),
             ),
           ],
@@ -503,14 +505,14 @@ class _BillDetailContent extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
           FilledButton(
             onPressed: () {
               Navigator.pop(context, true);
             },
             style: FilledButton.styleFrom(backgroundColor: AppColors.error),
-            child: const Text('Void Bill'),
+            child: Text(AppLocalizations.of(context)!.voidBill),
           ),
         ],
       ),
@@ -523,7 +525,7 @@ class _BillDetailContent extends ConsumerWidget {
       if (success && context.mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('Bill marked as Void')));
+        ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.billMarkedVoid)));
         ref.invalidate(billByIdProvider(bill.id));
         ref.invalidate(billingRepositoryProvider);
       }
@@ -534,14 +536,14 @@ class _BillDetailContent extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete Bill?'),
+        title: Text(AppLocalizations.of(context)!.deleteBillTitle),
         content: Text(
-          'Are you sure you want to delete this ${bill.billType.name} bill for ${bill.billingPeriod}?\n\nThis action cannot be undone.',
+          AppLocalizations.of(context)!.confirmDeleteBill(bill.billType.name, bill.billingPeriod),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
           TextButton(
             onPressed: () async {
@@ -563,18 +565,18 @@ class _BillDetailContent extends ConsumerWidget {
                   Navigator.pop(context); // Go back to room/occupancy screen
                   ScaffoldMessenger.of(
                     context,
-                  ).showSnackBar(const SnackBar(content: Text('Bill deleted')));
+                  ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.billDeleted)));
                 }
               } catch (e) {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Error deleting bill: $e')),
+                    SnackBar(content: Text(AppLocalizations.of(context)!.errorDeletingBill(e.toString()))),
                   );
                 }
               }
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Delete'),
+            child: Text(AppLocalizations.of(context)!.delete),
           ),
         ],
       ),
@@ -627,7 +629,7 @@ class _StatusCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      'OVERDUE',
+                      AppLocalizations.of(context)!.overdueU,
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -646,7 +648,7 @@ class _StatusCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     _AmountColumn(
-                      label: 'Total',
+                      label: AppLocalizations.of(context)!.total,
                       amount: bill.amount,
                       color: Theme.of(context).colorScheme.primary,
                     ),
@@ -656,7 +658,7 @@ class _StatusCard extends StatelessWidget {
                       color: Colors.grey.shade300,
                     ),
                     _AmountColumn(
-                      label: 'Paid',
+                      label: AppLocalizations.of(context)!.paid,
                       amount: bill.paidAmount,
                       color: Theme.of(context).colorScheme.tertiary,
                     ),
@@ -666,7 +668,7 @@ class _StatusCard extends StatelessWidget {
                       color: Colors.grey.shade300,
                     ),
                     _AmountColumn(
-                      label: 'Pending',
+                      label: AppLocalizations.of(context)!.pendingTitle,
                       amount: bill.pendingAmount,
                       color: bill.pendingAmount > 0
                           ? Theme.of(context).colorScheme.error
@@ -701,20 +703,20 @@ class _StatusCard extends StatelessWidget {
     BillStatus status,
   ) {
     return switch (status) {
-      BillStatus.draft => (Colors.grey, 'Draft', Icons.edit_note),
-      BillStatus.sent => (Colors.blue, 'Sent', Icons.send),
-      BillStatus.partial => (Colors.orange, 'Partially Paid', Icons.timelapse),
+      BillStatus.draft => (Colors.grey, AppLocalizations.of(context)!.draft, Icons.edit_note),
+      BillStatus.sent => (Colors.blue, AppLocalizations.of(context)!.sent, Icons.send),
+      BillStatus.partial => (Colors.orange, AppLocalizations.of(context)!.partiallyPaid, Icons.timelapse),
       BillStatus.paid => (
         Theme.of(context).colorScheme.tertiary,
-        'Paid',
+        AppLocalizations.of(context)!.paid,
         Icons.check_circle,
       ),
       BillStatus.overdue => (
         Theme.of(context).colorScheme.error,
-        'Overdue',
+        AppLocalizations.of(context)!.overdueBill,
         Icons.warning,
       ),
-      BillStatus.voided => (Colors.grey.shade600, 'Voided', Icons.cancel),
+      BillStatus.voided => (Colors.grey.shade600, AppLocalizations.of(context)!.voided, Icons.cancel),
     };
   }
 }
@@ -786,7 +788,7 @@ class _QuickActionsCard extends StatelessWidget {
         child: FilledButton.icon(
           onPressed: onSendReminder,
           icon: const Icon(Icons.notifications_active_outlined),
-          label: const Text('Send Reminder'),
+          label: Text(AppLocalizations.of(context)!.sendReminder),
           style: FilledButton.styleFrom(
             backgroundColor: Theme.of(context).colorScheme.primary,
             foregroundColor: Theme.of(context).colorScheme.onPrimary,
@@ -813,24 +815,24 @@ class _BillInfoCard extends StatelessWidget {
           children: [
             _InfoRow(
               icon: Icons.receipt_outlined,
-              label: 'Bill Number',
-              value: bill.billNumber ?? 'Not assigned',
+              label: AppLocalizations.of(context)!.billNumber,
+              value: bill.billNumber ?? AppLocalizations.of(context)!.notAssigned,
             ),
             _InfoRow(
               icon: Icons.category_outlined,
-              label: 'Type',
-              value: _getBillTypeLabel(bill.billType),
+              label: AppLocalizations.of(context)!.type,
+              value: _getBillTypeLabel(context, bill.billType),
             ),
             _InfoRow(
               icon: Icons.calendar_month_outlined,
-              label: 'Billing Period',
+              label: AppLocalizations.of(context)!.billingPeriod,
               value: bill.billingPeriod,
             ),
 
             if (bill.dueDate != null)
               _InfoRow(
                 icon: Icons.event_outlined,
-                label: 'Due Date',
+                label: AppLocalizations.of(context)!.dueDate,
                 value: _formatDate(bill.dueDate!),
                 valueColor: bill.isOverdue
                     ? Theme.of(context).colorScheme.error
@@ -839,18 +841,18 @@ class _BillInfoCard extends StatelessWidget {
             if (bill.roomNumber != null)
               _InfoRow(
                 icon: Icons.door_front_door_outlined,
-                label: 'Room',
-                value: 'Room ${bill.roomNumber}',
+                label: AppLocalizations.of(context)!.room,
+                value: AppLocalizations.of(context)!.roomNumber(bill.roomNumber!),
               ),
             if (bill.tenantName != null)
               _InfoRow(
                 icon: Icons.person_outlined,
-                label: 'Tenant',
+                label: AppLocalizations.of(context)!.tenant,
                 value: bill.tenantName!,
               ),
             _InfoRow(
               icon: Icons.access_time_outlined,
-              label: 'Created',
+              label: AppLocalizations.of(context)!.created,
               value: _formatDateTime(bill.createdAt),
             ),
           ],
@@ -867,18 +869,18 @@ class _BillInfoCard extends StatelessWidget {
     return '${date.day}/${date.month}/${date.year} ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
   }
 
-  String _getBillTypeLabel(BillType type) {
+  String _getBillTypeLabel(BuildContext context, BillType type) {
     switch (type) {
       case BillType.rent:
-        return 'Monthly Rent';
+        return AppLocalizations.of(context)!.monthlyRent;
       case BillType.electricity:
-        return 'Electricity Bill';
+        return AppLocalizations.of(context)!.electricityBill;
       case BillType.water:
-        return 'Water Bill';
+        return AppLocalizations.of(context)!.waterBill;
       case BillType.maintenance:
-        return 'Maintenance';
+        return AppLocalizations.of(context)!.maintenance;
       case BillType.other:
-        return 'Other Charges';
+        return AppLocalizations.of(context)!.otherCharges;
     }
   }
 }
@@ -906,7 +908,7 @@ class _ElectricityDetailsCard extends ConsumerWidget {
                 Icon(Icons.bolt, color: Colors.amber.shade600),
                 const SizedBox(width: 8),
                 Text(
-                  'Electricity Details',
+                  AppLocalizations.of(context)!.electricityDetails,
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -918,7 +920,7 @@ class _ElectricityDetailsCard extends ConsumerWidget {
               children: [
                 Expanded(
                   child: _ReadingBox(
-                    label: 'Previous',
+                    label: AppLocalizations.of(context)!.previous,
                     value: bill.electricityPrevReading!.toStringAsFixed(0),
                   ),
                 ),
@@ -928,7 +930,7 @@ class _ElectricityDetailsCard extends ConsumerWidget {
                 ),
                 Expanded(
                   child: _ReadingBox(
-                    label: 'Current',
+                    label: AppLocalizations.of(context)!.current,
                     value: bill.electricityCurrReading!.toStringAsFixed(0),
                   ),
                 ),
@@ -974,7 +976,7 @@ class _ElectricityDetailsCard extends ConsumerWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           AppBar(
-                            title: const Text('Meter Photo'),
+                            title: Text(AppLocalizations.of(context)!.meterPhoto),
                             automaticallyImplyLeading: false,
                             actions: [
                               IconButton(
@@ -1018,13 +1020,13 @@ class _ElectricityDetailsCard extends ConsumerWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Meter Photo',
+                              AppLocalizations.of(context)!.meterPhoto,
                               style: theme.textTheme.titleSmall?.copyWith(
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             Text(
-                              'Tap to view full size',
+                              AppLocalizations.of(context)!.tapToViewFullSize,
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: Theme.of(
                                   context,
@@ -1068,7 +1070,7 @@ class _ElectricityDetailsCard extends ConsumerWidget {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        'Add Meter Photo',
+                        AppLocalizations.of(context)!.addMeterPhoto,
                         style: TextStyle(
                           color: theme.colorScheme.primary,
                           fontWeight: FontWeight.w600,
@@ -1098,12 +1100,12 @@ class _ElectricityDetailsCard extends ConsumerWidget {
           children: [
             ListTile(
               leading: const Icon(Icons.camera_alt),
-              title: const Text('Take Photo'),
+              title: Text(AppLocalizations.of(context)!.takePhoto),
               onTap: () => Navigator.pop(context, ImageSource.camera),
             ),
             ListTile(
               leading: const Icon(Icons.photo_library),
-              title: const Text('Choose from Gallery'),
+              title: Text(AppLocalizations.of(context)!.chooseFromGallery),
               onTap: () => Navigator.pop(context, ImageSource.gallery),
             ),
           ],
@@ -1129,14 +1131,14 @@ class _ElectricityDetailsCard extends ConsumerWidget {
             ref.invalidate(billsForOccupancyStreamProvider(bill.occupancyId));
 
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Meter photo added successfully')),
+              SnackBar(content: Text(AppLocalizations.of(context)!.meterPhotoAdded)),
             );
           }
         } catch (e) {
           if (context.mounted) {
             ScaffoldMessenger.of(
               context,
-            ).showSnackBar(SnackBar(content: Text('Error adding photo: $e')));
+            ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.errorAddingPhoto(e.toString()))));
           }
         }
       }
@@ -1259,27 +1261,27 @@ class _PaymentTile extends ConsumerWidget {
           ),
         ),
         subtitle: Text(
-          '${_getPaymentModeLabel(payment.paymentMode)} • ${_formatDate(payment.paymentDate)}',
+          '${_getPaymentModeLabel(context, payment.paymentMode)} • ${_formatDate(payment.paymentDate)}',
         ),
         trailing: PopupMenuButton<String>(
           icon: const Icon(Icons.more_vert, size: 20),
           onSelected: (action) => _handleAction(context, ref, action),
           itemBuilder: (context) => [
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 'edit',
               child: ListTile(
-                leading: Icon(Icons.edit_outlined),
-                title: Text('Edit Payment'),
+                leading: const Icon(Icons.edit_outlined),
+                title: Text(AppLocalizations.of(context)!.editPayment),
                 contentPadding: EdgeInsets.zero,
               ),
             ),
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 'delete',
               child: ListTile(
-                leading: Icon(Icons.delete_outline, color: Colors.red),
+                leading: const Icon(Icons.delete_outline, color: Colors.red),
                 title: Text(
-                  'Delete Payment',
-                  style: TextStyle(color: Colors.red),
+                  AppLocalizations.of(context)!.deletePayment,
+                  style: const TextStyle(color: Colors.red),
                 ),
                 contentPadding: EdgeInsets.zero,
               ),
@@ -1313,14 +1315,14 @@ class _PaymentTile extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete Payment?'),
+        title: Text(AppLocalizations.of(context)!.deletePaymentTitle),
         content: Text(
-          'Delete payment of ${formatCurrency(payment.amount)} made on ${_formatDate(payment.paymentDate)}?\n\nThis will update the bill balance.',
+          AppLocalizations.of(context)!.confirmDeletePayment(formatCurrency(payment.amount), _formatDate(payment.paymentDate)),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
           TextButton(
             onPressed: () async {
@@ -1339,19 +1341,19 @@ class _PaymentTile extends ConsumerWidget {
                   ref.invalidate(dashboardSummaryProvider);
 
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Payment deleted')),
+                    SnackBar(content: Text(AppLocalizations.of(context)!.paymentDeleted)),
                   );
                 }
               } catch (e) {
                 if (context.mounted) {
                   ScaffoldMessenger.of(
                     context,
-                  ).showSnackBar(SnackBar(content: Text('Error: $e')));
+                  ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.error(e.toString()))));
                 }
               }
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Delete'),
+            child: Text(AppLocalizations.of(context)!.delete),
           ),
         ],
       ),
@@ -1372,13 +1374,13 @@ class _PaymentTile extends ConsumerWidget {
     };
   }
 
-  String _getPaymentModeLabel(PaymentMode mode) {
+  String _getPaymentModeLabel(BuildContext context, PaymentMode mode) {
     return switch (mode) {
-      PaymentMode.cash => 'Cash',
-      PaymentMode.upi => 'UPI',
-      PaymentMode.bankTransfer => 'Bank Transfer',
-      PaymentMode.cheque => 'Cheque',
-      PaymentMode.other => 'Other',
+      PaymentMode.cash => AppLocalizations.of(context)!.cash,
+      PaymentMode.upi => AppLocalizations.of(context)!.upi,
+      PaymentMode.bankTransfer => AppLocalizations.of(context)!.bankTransfer,
+      PaymentMode.cheque => AppLocalizations.of(context)!.cheque,
+      PaymentMode.other => AppLocalizations.of(context)!.other,
     };
   }
 }
@@ -1398,7 +1400,7 @@ class _AuditHistorySection extends ConsumerWidget {
       child: ExpansionTile(
         leading: const Icon(Icons.history, size: 20),
         title: Text(
-          'Audit History',
+          AppLocalizations.of(context)!.auditHistory,
           style: theme.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.bold,
           ),
@@ -1411,14 +1413,14 @@ class _AuditHistorySection extends ConsumerWidget {
             ),
             error: (e, _) => Padding(
               padding: const EdgeInsets.all(16),
-              child: Text('Error loading audit logs: $e'),
+              child: Text(AppLocalizations.of(context)!.errorLoadingAuditLogs(e.toString())),
             ),
             data: (logs) {
               if (logs.isEmpty) {
                 return Padding(
                   padding: const EdgeInsets.all(16),
                   child: Text(
-                    'No changes recorded',
+                    AppLocalizations.of(context)!.noChangesRecorded,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
@@ -1456,7 +1458,7 @@ class _AuditLogTile extends StatelessWidget {
         child: Icon(icon, size: 14, color: color),
       ),
       title: Text(
-        _getActionLabel(log.action),
+        _getActionLabel(context, log.action),
         style: theme.textTheme.bodyMedium?.copyWith(
           fontWeight: FontWeight.w500,
         ),
@@ -1494,12 +1496,12 @@ class _AuditLogTile extends StatelessWidget {
     };
   }
 
-  String _getActionLabel(AuditAction action) {
+  String _getActionLabel(BuildContext context, AuditAction action) {
     return switch (action) {
-      AuditAction.create => 'Created',
-      AuditAction.update => 'Updated',
-      AuditAction.delete => 'Deleted',
-      AuditAction.void_ => 'Voided',
+      AuditAction.create => AppLocalizations.of(context)!.created,
+      AuditAction.update => AppLocalizations.of(context)!.updated,
+      AuditAction.delete => AppLocalizations.of(context)!.deleted,
+      AuditAction.void_ => AppLocalizations.of(context)!.voided,
     };
   }
 }

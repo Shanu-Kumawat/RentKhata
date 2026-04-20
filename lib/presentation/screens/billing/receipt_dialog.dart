@@ -6,6 +6,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../domain/entities/bill.dart';
 import '../../../domain/entities/payment.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
 
 /// Dialog to show payment receipt after successful payment.
 class ReceiptDialog extends StatelessWidget {
@@ -83,7 +84,9 @@ class ReceiptDialog extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        isFullyPaid ? 'Payment Complete!' : 'Payment Recorded',
+                        isFullyPaid 
+                            ? AppLocalizations.of(context)!.paymentComplete 
+                            : AppLocalizations.of(context)!.paymentRecorded,
                         style: theme.textTheme.headlineSmall?.copyWith(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -92,8 +95,8 @@ class ReceiptDialog extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         isFullyPaid
-                            ? 'Bill has been fully paid'
-                            : 'Partial payment recorded',
+                            ? AppLocalizations.of(context)!.billFullyPaidLabel
+                            : AppLocalizations.of(context)!.partialPaymentRecorded,
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: Colors.white70,
                         ),
@@ -111,16 +114,16 @@ class ReceiptDialog extends StatelessWidget {
                 children: [
                   // Bill info
                   if (bill.billNumber != null)
-                    _ReceiptRow(label: 'Invoice', value: bill.billNumber!),
+                    _ReceiptRow(label: AppLocalizations.of(context)!.invoiceLabel, value: bill.billNumber!),
                   _ReceiptRow(
-                    label: 'Type',
-                    value: _getBillTypeLabel(bill.billType),
+                    label: AppLocalizations.of(context)!.type,
+                    value: _getBillTypeLabel(context, bill.billType),
                   ),
-                  _ReceiptRow(label: 'Period', value: bill.billingPeriod),
+                  _ReceiptRow(label: AppLocalizations.of(context)!.periodLabel, value: bill.billingPeriod),
                   if (bill.roomNumber != null)
                     _ReceiptRow(
-                      label: 'Room',
-                      value: 'Room ${bill.roomNumber}',
+                      label: AppLocalizations.of(context)!.roomLabel,
+                      value: AppLocalizations.of(context)!.roomNumber(bill.roomNumber!),
                     ),
 
                   const Divider(height: 24),
@@ -128,16 +131,16 @@ class ReceiptDialog extends StatelessWidget {
                   // Payment info
                   if (latestPayment != null) ...[
                     _ReceiptRow(
-                      label: 'Payment Amount',
+                      label: AppLocalizations.of(context)!.paymentAmountLabel,
                       value: formatCurrency(latestPayment!.amount),
                       isHighlighted: true,
                     ),
                     _ReceiptRow(
-                      label: 'Payment Mode',
-                      value: _getPaymentModeLabel(latestPayment!.paymentMode),
+                      label: AppLocalizations.of(context)!.paymentModeLabel,
+                      value: _getPaymentModeLabel(context, latestPayment!.paymentMode),
                     ),
                     _ReceiptRow(
-                      label: 'Date',
+                      label: AppLocalizations.of(context)!.date,
                       value: _formatDate(latestPayment!.paymentDate),
                     ),
                     const Divider(height: 24),
@@ -145,17 +148,17 @@ class ReceiptDialog extends StatelessWidget {
 
                   // Summary
                   _ReceiptRow(
-                    label: 'Bill Total',
+                    label: AppLocalizations.of(context)!.billTotalLabel,
                     value: formatCurrency(bill.amount),
                   ),
                   _ReceiptRow(
-                    label: 'Paid',
+                    label: AppLocalizations.of(context)!.paidLabel,
                     value: formatCurrency(bill.paidAmount),
                     valueColor: AppColors.success,
                   ),
                   if (bill.pendingAmount > 0)
                     _ReceiptRow(
-                      label: 'Balance',
+                      label: AppLocalizations.of(context)!.balanceLabel,
                       value: formatCurrency(bill.pendingAmount),
                       valueColor: AppColors.moneyPending,
                       isHighlighted: true,
@@ -168,7 +171,7 @@ class ReceiptDialog extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () => Navigator.pop(context),
-                      child: const Text('Close'),
+                      child: Text(AppLocalizations.of(context)!.closeLabel),
                     ),
                   ),
                 ],
@@ -184,33 +187,33 @@ class ReceiptDialog extends StatelessWidget {
     return '${date.day}/${date.month}/${date.year}';
   }
 
-  String _getBillTypeLabel(BillType type) {
+  String _getBillTypeLabel(BuildContext context, BillType type) {
     switch (type) {
       case BillType.rent:
-        return 'Monthly Rent';
+        return AppLocalizations.of(context)!.monthlyRent;
       case BillType.electricity:
-        return 'Electricity';
+        return AppLocalizations.of(context)!.electricity;
       case BillType.water:
-        return 'Water';
+        return AppLocalizations.of(context)!.water;
       case BillType.maintenance:
-        return 'Maintenance';
+        return AppLocalizations.of(context)!.maintenance;
       case BillType.other:
-        return 'Other';
+        return AppLocalizations.of(context)!.other;
     }
   }
 
-  String _getPaymentModeLabel(PaymentMode mode) {
+  String _getPaymentModeLabel(BuildContext context, PaymentMode mode) {
     switch (mode) {
       case PaymentMode.cash:
-        return 'Cash';
+        return AppLocalizations.of(context)!.cash;
       case PaymentMode.upi:
-        return 'UPI';
+        return AppLocalizations.of(context)!.upi;
       case PaymentMode.bankTransfer:
-        return 'Bank Transfer';
+        return AppLocalizations.of(context)!.bankTransfer;
       case PaymentMode.cheque:
-        return 'Cheque';
+        return AppLocalizations.of(context)!.cheque;
       case PaymentMode.other:
-        return 'Other';
+        return AppLocalizations.of(context)!.other;
     }
   }
 }

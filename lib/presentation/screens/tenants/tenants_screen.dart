@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
 import '../../../application/providers/tenant_providers.dart';
 
 import '../../../domain/entities/tenant.dart';

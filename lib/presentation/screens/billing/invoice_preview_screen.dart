@@ -14,6 +14,7 @@ import '../../../services/invoice_pdf_service.dart';
 import '../../../services/share_service.dart';
 import '../../../services/upi_qr_service.dart';
 import '../../widgets/share_bottom_sheet.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
 
 /// Screen to preview an invoice before sharing.
 class InvoicePreviewScreen extends ConsumerWidget {
@@ -34,7 +35,7 @@ class InvoicePreviewScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: Colors.grey.shade200,
-      appBar: AppBar(title: const Text('Invoice Preview')),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.invoicePreview)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Center(
@@ -59,7 +60,7 @@ class InvoicePreviewScreen extends ConsumerWidget {
                 child: FilledButton.tonalIcon(
                   onPressed: () => _previewPdf(context, ref),
                   icon: const Icon(Icons.visibility_outlined),
-                  label: const Text('View PDF'),
+                  label: Text(AppLocalizations.of(context)!.viewPdf),
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
@@ -71,7 +72,7 @@ class InvoicePreviewScreen extends ConsumerWidget {
                 child: FilledButton.icon(
                   onPressed: () => _showShareOptions(context, ref),
                   icon: const Icon(Icons.share),
-                  label: const Text('Share'),
+                  label: Text(AppLocalizations.of(context)!.share),
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
@@ -98,20 +99,21 @@ class InvoicePreviewScreen extends ConsumerWidget {
     final shareService = ShareService(repo);
     await shareService.shareInvoice(
       bill: bill,
-      landlordName: landlordName ?? 'Landlord',
+      landlordName: landlordName ?? AppLocalizations.of(context)!.landlord,
       landlordUpi: landlordUpi,
     );
     await ref.read(billingRepositoryProvider).markBillAsSent(bill.id);
   }
 
   Future<void> _previewPdf(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context)!;
     try {
       final payments = await ref.read(paymentsForBillProvider(bill.id).future);
 
       final pdfService = InvoicePdfService();
       final file = await pdfService.generateInvoice(
         bill: bill,
-        landlordName: landlordName ?? 'Landlord',
+        landlordName: landlordName ?? l10n.landlord,
         landlordPhone: landlordPhone ?? '',
         landlordUpiId: landlordUpi,
         paymentHistory: payments,
@@ -122,12 +124,13 @@ class InvoicePreviewScreen extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error previewing PDF: $e')));
+        ).showSnackBar(SnackBar(content: Text(l10n.errorPreviewingPdf(e.toString()))));
       }
     }
   }
 
   Future<void> _shareAsPdf(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context)!;
     try {
       // 1. If Draft, Mark as Sent FIRST so the PDF doesn't have "DRAFT" watermark
       var billToUse = bill;
@@ -146,7 +149,7 @@ class InvoicePreviewScreen extends ConsumerWidget {
       final pdfService = InvoicePdfService();
       final file = await pdfService.generateInvoice(
         bill: billToUse,
-        landlordName: landlordName ?? 'Landlord',
+        landlordName: landlordName ?? l10n.landlord,
         landlordPhone: landlordPhone ?? '',
         landlordUpiId: landlordUpi,
         paymentHistory: payments,
@@ -155,7 +158,7 @@ class InvoicePreviewScreen extends ConsumerWidget {
       final shareService = ShareService();
       await shareService.shareFiles(
         files: [file],
-        subject: 'Invoice ${billToUse.billNumber ?? ""}',
+        subject: l10n.invoiceNumber(billToUse.billNumber ?? ""),
       );
       // Status is already updated if it was draft.
       // If it wasn't draft (e.g. Sent -> Sent), we don't strictly need to update again,
@@ -167,7 +170,7 @@ class InvoicePreviewScreen extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error sharing PDF: $e')));
+        ).showSnackBar(SnackBar(content: Text(l10n.errorSharingPdf(e.toString()))));
       }
     }
   }
@@ -220,7 +223,7 @@ class _InvoiceCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'INVOICE',
+                          AppLocalizations.of(context)!.invoiceLabel.toUpperCase(),
                           style: theme.textTheme.headlineSmall?.copyWith(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -254,23 +257,23 @@ class _InvoiceCard extends StatelessWidget {
                 // Tenant & Property info
                 if (bill.tenantName != null || bill.roomNumber != null) ...[
                   _DetailRow(
-                    label: 'Bill To',
-                    value: bill.tenantName ?? 'Tenant',
+                    label: AppLocalizations.of(context)!.billTo,
+                    value: bill.tenantName ?? AppLocalizations.of(context)!.tenant,
                     valueStyle: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   if (bill.roomNumber != null)
-                    _DetailRow(label: 'Room', value: 'Room ${bill.roomNumber}'),
+                    _DetailRow(label: AppLocalizations.of(context)!.roomLabel, value: AppLocalizations.of(context)!.roomNumber(bill.roomNumber!)),
                   if (bill.propertyName != null)
-                    _DetailRow(label: 'Property', value: bill.propertyName!),
+                    _DetailRow(label: AppLocalizations.of(context)!.property, value: bill.propertyName!),
                   const Divider(height: 32),
                 ],
 
-                _DetailRow(label: 'Period', value: bill.billingPeriod),
+                _DetailRow(label: AppLocalizations.of(context)!.periodLabel, value: bill.billingPeriod),
                 if (bill.dueDate != null)
                   _DetailRow(
-                    label: 'Due Date',
+                    label: AppLocalizations.of(context)!.dueDate,
                     value: _formatDate(bill.dueDate!),
                     valueStyle: theme.textTheme.bodyMedium?.copyWith(
                       color: bill.isOverdue
@@ -283,8 +286,8 @@ class _InvoiceCard extends StatelessWidget {
 
                 // Bill type & description
                 _DetailRow(
-                  label: 'Type',
-                  value: _getBillTypeLabel(bill.billType),
+                  label: AppLocalizations.of(context)!.type,
+                  value: _getBillTypeLabel(context, bill.billType),
                 ),
 
                 // Electricity-specific details
@@ -304,13 +307,13 @@ class _InvoiceCard extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Previous Reading',
+                                AppLocalizations.of(context)!.previousReading,
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   color: Colors.grey.shade700,
                                 ),
                               ),
                               Text(
-                                '${bill.electricityPrevReading!.toStringAsFixed(0)} units',
+                                AppLocalizations.of(context)!.unitsAmount(bill.electricityPrevReading!.toStringAsFixed(0)),
                                 style: theme.textTheme.bodyMedium?.copyWith(
                                   color: Colors.black87,
                                   fontWeight: FontWeight.w500,
@@ -323,13 +326,13 @@ class _InvoiceCard extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Current Reading',
+                                AppLocalizations.of(context)!.currentReading,
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   color: Colors.grey.shade700,
                                 ),
                               ),
                               Text(
-                                '${bill.electricityCurrReading!.toStringAsFixed(0)} units',
+                                AppLocalizations.of(context)!.unitsAmount(bill.electricityCurrReading!.toStringAsFixed(0)),
                                 style: theme.textTheme.bodyMedium?.copyWith(
                                   color: Colors.black87,
                                   fontWeight: FontWeight.w500,
@@ -342,7 +345,7 @@ class _InvoiceCard extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Units Consumed',
+                                AppLocalizations.of(context)!.unitsConsumed,
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   color: Colors.grey.shade900,
                                   fontWeight: FontWeight.w600,
@@ -350,7 +353,7 @@ class _InvoiceCard extends StatelessWidget {
                               ),
                               Flexible(
                                 child: Text(
-                                  '${(bill.electricityCurrReading! - bill.electricityPrevReading!).toStringAsFixed(0)} units @ ${formatCurrency(bill.electricityRateAtBilling ?? 0)}/unit',
+                                  AppLocalizations.of(context)!.unitsConsumedRate((bill.electricityCurrReading! - bill.electricityPrevReading!).toStringAsFixed(0), formatCurrency(bill.electricityRateAtBilling ?? 0)),
                                   style: theme.textTheme.bodyMedium?.copyWith(
                                     color: Colors.black87,
                                     fontWeight: FontWeight.w600,
@@ -372,7 +375,7 @@ class _InvoiceCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Meter Photo',
+                          AppLocalizations.of(context)!.meterPhoto,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                             fontWeight: FontWeight.bold,
@@ -397,7 +400,7 @@ class _InvoiceCard extends StatelessWidget {
 
                 if (bill.notes != null && bill.notes!.isNotEmpty) ...[
                   const SizedBox(height: 12),
-                  _DetailRow(label: 'Notes', value: bill.notes!),
+                  _DetailRow(label: AppLocalizations.of(context)!.notesLabel, value: bill.notes!),
                 ],
 
                 const SizedBox(height: 24),
@@ -422,7 +425,7 @@ class _InvoiceCard extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Total Amount',
+                            AppLocalizations.of(context)!.totalAmount,
                             style: theme.textTheme.titleMedium,
                           ),
                           Text(
@@ -440,7 +443,7 @@ class _InvoiceCard extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Paid',
+                              AppLocalizations.of(context)!.paidLabel,
                               style: theme.textTheme.bodyMedium?.copyWith(
                                 color: Theme.of(context).colorScheme.tertiary,
                               ),
@@ -458,7 +461,7 @@ class _InvoiceCard extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Balance Due',
+                              AppLocalizations.of(context)!.balanceDueLabel,
                               style: theme.textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -486,7 +489,7 @@ class _InvoiceCard extends StatelessWidget {
                     child: Column(
                       children: [
                         Text(
-                          'Scan to Pay',
+                          AppLocalizations.of(context)!.scanToPay,
                           style: theme.textTheme.titleSmall?.copyWith(
                             color: Theme.of(
                               context,
@@ -503,7 +506,7 @@ class _InvoiceCard extends StatelessWidget {
                           ),
                           child: UpiQrService.generateQrWidget(
                             upiId: landlordUpi!,
-                            payeeName: landlordName ?? 'Landlord',
+                            payeeName: landlordName ?? AppLocalizations.of(context)!.landlord,
                             amount: bill.pendingAmount,
                             transactionNote:
                                 '${bill.billType.name} - ${bill.billingPeriod}',
@@ -528,7 +531,7 @@ class _InvoiceCard extends StatelessWidget {
                 const SizedBox(height: 24),
                 Center(
                   child: Text(
-                    'Generated on ${_formatDate(DateTime.now())}',
+                    AppLocalizations.of(context)!.generatedOn(_formatDate(DateTime.now())),
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
@@ -546,18 +549,18 @@ class _InvoiceCard extends StatelessWidget {
     return '${date.day}/${date.month}/${date.year}';
   }
 
-  String _getBillTypeLabel(BillType type) {
+  String _getBillTypeLabel(BuildContext context, BillType type) {
     switch (type) {
       case BillType.rent:
-        return 'Monthly Rent';
+        return AppLocalizations.of(context)!.monthlyRent;
       case BillType.electricity:
-        return 'Electricity Bill';
+        return AppLocalizations.of(context)!.electricityBill;
       case BillType.water:
-        return 'Water Bill';
+        return AppLocalizations.of(context)!.waterBill;
       case BillType.maintenance:
-        return 'Maintenance';
+        return AppLocalizations.of(context)!.maintenance;
       case BillType.other:
-        return 'Other Charges';
+        return AppLocalizations.of(context)!.otherCharges;
     }
   }
 }
@@ -570,13 +573,14 @@ class _StatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final (color, label) = switch (status) {
-      BillStatus.draft => (Colors.grey, 'DRAFT'),
-      BillStatus.sent => (Colors.blue.shade300, 'SENT'),
-      BillStatus.partial => (Colors.orange, 'PARTIAL'),
-      BillStatus.paid => (Colors.green, 'PAID'),
-      BillStatus.overdue => (Colors.red, 'OVERDUE'),
-      BillStatus.voided => (Colors.grey.shade600, 'VOIDED'),
+      BillStatus.draft => (Colors.grey, l10n.draft),
+      BillStatus.sent => (Colors.blue.shade300, l10n.sentStatus),
+      BillStatus.partial => (Colors.orange, l10n.partialStatus),
+      BillStatus.paid => (Colors.green, l10n.paidStatus),
+      BillStatus.overdue => (Colors.red, l10n.overdueStatus),
+      BillStatus.voided => (Colors.grey.shade600, l10n.voidedStatus),
     };
 
     return Container(

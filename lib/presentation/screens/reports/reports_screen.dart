@@ -14,13 +14,14 @@ import '../../../domain/entities/bill.dart';
 import '../../../domain/entities/payment.dart';
 import '../../../services/share_service.dart';
 import '../../../services/invoice_pdf_service.dart';
+import '../../../core/utils/l10n_helpers.dart';
 import '../billing/record_payment_sheet.dart';
 import '../../widgets/bouncing_scale_wrapper.dart';
 import '../../widgets/staggered_fade_in.dart';
 import '../../widgets/animated_counter_text.dart';
 import '../../../application/providers/expense_providers.dart';
 import 'widgets/add_expense_sheet.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
 
 /// Reports screen showing financial overview and bill management.
 class ReportsScreen extends ConsumerStatefulWidget {
@@ -1355,7 +1356,7 @@ class _BillDetailsSheet extends ConsumerWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      '${bill.billType.name.toUpperCase()} Bill',
+                      '${getBillTypeLabel(AppLocalizations.of(context)!, bill.billType).toUpperCase()} Bill',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -1481,7 +1482,7 @@ class _BillDetailsSheet extends ConsumerWidget {
                                   ),
                                   title: Text(formatCurrency(payment.amount)),
                                   subtitle: Text(
-                                    '${payment.paymentMode.name.toUpperCase()} • ${DateFormat('dd MMM yyyy').format(payment.paymentDate)}',
+                                    '${getPaymentModeLabel(AppLocalizations.of(context)!, payment.paymentMode).toUpperCase()} • ${DateFormat('dd MMM yyyy').format(payment.paymentDate)}',
                                   ),
                                   trailing: PopupMenuButton<String>(
                                     onSelected: (action) {
@@ -1691,7 +1692,7 @@ class _EditPaymentSheetState extends ConsumerState<_EditPaymentSheet> {
                 .map(
                   (mode) => DropdownMenuItem(
                     value: mode,
-                    child: Text(mode.name.toUpperCase()),
+                    child: Text(getPaymentModeLabel(AppLocalizations.of(context)!, mode).toUpperCase()),
                   ),
                 )
                 .toList(),

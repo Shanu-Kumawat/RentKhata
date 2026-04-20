@@ -12,6 +12,7 @@ import '../../../domain/entities/property.dart';
 import '../../../domain/entities/room.dart';
 import '../rooms/add_room_screen.dart';
 import 'add_property_screen.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
 
 /// Property detail screen showing rooms.
 class PropertyDetailScreen extends ConsumerWidget {
@@ -28,8 +29,8 @@ class PropertyDetailScreen extends ConsumerWidget {
       data: (property) {
         if (property == null) {
           return Scaffold(
-            appBar: AppBar(title: const Text('Property')),
-            body: const Center(child: Text('Property not found')),
+            appBar: AppBar(title: Text(AppLocalizations.of(context)!.properties)),
+            body: Center(child: Text(AppLocalizations.of(context)!.propertyNotFound)),
           );
         }
         return Scaffold(
@@ -55,8 +56,8 @@ class PropertyDetailScreen extends ConsumerWidget {
                           Icons.delete_outline,
                           color: Theme.of(context).colorScheme.error,
                         ),
-                        SizedBox(width: 8),
-                        Text('Delete Property'),
+                        const SizedBox(width: 8),
+                        Text(AppLocalizations.of(context)!.deleteProperty),
                       ],
                     ),
                   ),
@@ -85,7 +86,7 @@ class PropertyDetailScreen extends ConsumerWidget {
           floatingActionButton: FloatingActionButton.extended(
             onPressed: () => _showAddRoom(context, property),
             icon: const Icon(Icons.add),
-            label: const Text('Add Room'),
+            label: Text(AppLocalizations.of(context)!.addRoom),
           ),
         );
       },
@@ -94,8 +95,8 @@ class PropertyDetailScreen extends ConsumerWidget {
         body: const Center(child: CircularProgressIndicator()),
       ),
       error: (e, s) => Scaffold(
-        appBar: AppBar(title: const Text('Error')),
-        body: Center(child: Text('Error: $e')),
+        appBar: AppBar(title: Text(AppLocalizations.of(context)!.error(e.toString()))),
+        body: Center(child: Text(AppLocalizations.of(context)!.error(e.toString()))),
       ),
     );
   }
@@ -123,14 +124,14 @@ class PropertyDetailScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              'No rooms yet',
+              AppLocalizations.of(context)!.noRoomsYet,
               style: Theme.of(
                 context,
               ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
-              'Add rooms to start managing tenants',
+              AppLocalizations.of(context)!.addRoomsToStartManaging,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
@@ -174,14 +175,12 @@ class PropertyDetailScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Property?'),
-        content: Text(
-          'Are you sure you want to delete "${property.name}"? This will also delete all rooms in this property.',
-        ),
+        title: Text(AppLocalizations.of(context)!.deletePropertyTitle),
+        content: Text(AppLocalizations.of(context)!.confirmDeleteProperty(property.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context)!.cancel),
           ),
           FilledButton(
             onPressed: () async {
@@ -192,14 +191,14 @@ class PropertyDetailScreen extends ConsumerWidget {
               if (context.mounted) {
                 context.pop();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Property deleted')),
+                  SnackBar(content: Text(AppLocalizations.of(context)!.propertyDeleted)),
                 );
               }
             },
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.error,
             ),
-            child: const Text('Delete'),
+            child: Text(AppLocalizations.of(context)!.delete),
           ),
         ],
       ),
@@ -268,12 +267,12 @@ class _PropertyHeader extends StatelessWidget {
                   children: [
                     _InfoChip(
                       icon: Icons.meeting_room_outlined,
-                      label: '${property.roomCount} rooms',
+                      label: AppLocalizations.of(context)!.roomsCount(property.roomCount),
                     ),
                     const SizedBox(width: 12),
                     _InfoChip(
                       icon: Icons.people_outline,
-                      label: '${property.occupiedRoomCount} occupied',
+                      label: AppLocalizations.of(context)!.occupancyCount(property.occupiedRoomCount),
                       color: Theme.of(context).colorScheme.secondary,
                     ),
                   ],
@@ -363,7 +362,7 @@ class _RoomCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Room ${room.roomNumber}',
+                      AppLocalizations.of(context)!.roomNumber(room.roomNumber),
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
@@ -378,7 +377,7 @@ class _RoomCard extends StatelessWidget {
                       )
                     else
                       Text(
-                        'Vacant',
+                        AppLocalizations.of(context)!.vacant,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
@@ -397,7 +396,7 @@ class _RoomCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '/month',
+                    AppLocalizations.of(context)!.perMonth,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),

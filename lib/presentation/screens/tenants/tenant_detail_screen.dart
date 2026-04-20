@@ -23,7 +23,7 @@ import 'add_tenant_screen.dart';
 import 'add_document_sheet.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
 
 /// Tenant detail screen showing profile, custom fields, and history.
 class TenantDetailScreen extends ConsumerWidget {

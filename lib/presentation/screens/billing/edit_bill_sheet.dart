@@ -10,6 +10,8 @@ import '../../../application/providers/dashboard_providers.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/validators.dart';
 import '../../../domain/entities/bill.dart';
+import '../../../core/utils/l10n_helpers.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import '../../../services/image_service.dart';
@@ -73,12 +75,12 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
           children: [
             ListTile(
               leading: const Icon(Icons.camera_alt),
-              title: const Text('Take Photo'),
+              title: Text(AppLocalizations.of(context)!.takePhoto),
               onTap: () => Navigator.pop(context, ImageSource.camera),
             ),
             ListTile(
               leading: const Icon(Icons.photo_library),
-              title: const Text('Choose from Gallery'),
+              title: Text(AppLocalizations.of(context)!.chooseFromGallery),
               onTap: () => Navigator.pop(context, ImageSource.gallery),
             ),
           ],
@@ -117,7 +119,7 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Amount cannot be less than paid amount of ${formatCurrency(_minimumAmount)}',
+            AppLocalizations.of(context)!.amountCannotBeLessThanPaid(formatCurrency(_minimumAmount)),
           ),
         ),
       );
@@ -156,14 +158,14 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
 
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Bill updated successfully')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.billUpdatedSuccessfully)),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.error(e.toString()))));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -197,7 +199,7 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Edit Bill',
+                      AppLocalizations.of(context)!.editBill,
                       style: theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -228,7 +230,7 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            'This bill has received payments. Amount can only be increased. It cannot be less than paid amount.',
+                            AppLocalizations.of(context)!.partiallyPaidBillWarning,
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: Colors.orange.shade900,
                             ),
@@ -253,7 +255,7 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '${widget.bill.billType.name.toUpperCase()} - ${widget.bill.billingPeriod}',
+                        '${getBillTypeLabel(AppLocalizations.of(context)!, widget.bill.billType).toUpperCase()} - ${widget.bill.billingPeriod}',
                         style: theme.textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -261,7 +263,7 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
                       if (_hasPayments) ...[
                         const SizedBox(height: 4),
                         Text(
-                          'Paid: ${formatCurrency(widget.bill.paidAmount)}',
+                          AppLocalizations.of(context)!.paidAmount(formatCurrency(widget.bill.paidAmount)),
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: Theme.of(context).colorScheme.tertiary,
                           ),
@@ -274,7 +276,7 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
 
                 // Meter Photo Section (Only for electricity bills)
                 if (widget.bill.billType == BillType.electricity) ...[
-                  Text('Meter Photo', style: theme.textTheme.titleSmall),
+                  Text(AppLocalizations.of(context)!.meterPhoto, style: theme.textTheme.titleSmall),
                   const SizedBox(height: 8),
                   if (hasPhoto)
                     Stack(
@@ -343,7 +345,7 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                'Add Meter Photo',
+                                AppLocalizations.of(context)!.addMeterPhoto,
                                 style: TextStyle(
                                   color: theme.colorScheme.primary,
                                   fontWeight: FontWeight.w500,
@@ -362,14 +364,14 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
                   controller: _amountController,
                   enabled: _canEditAmount,
                   decoration: InputDecoration(
-                    labelText: 'Bill Amount (₹) *',
+                    labelText: AppLocalizations.of(context)!.billAmountLabel,
                     prefixIcon: const Icon(Icons.currency_rupee),
                     helperText: _hasPayments
-                        ? 'Min amount: ${formatCurrency(widget.bill.paidAmount)}'
+                        ? AppLocalizations.of(context)!.minAmount(formatCurrency(widget.bill.paidAmount))
                         : null,
                   ),
                   keyboardType: TextInputType.number,
-                  validator: (v) => validatePositiveNumber(v, 'Amount'),
+                  validator: (v) => validatePositiveNumber(v, AppLocalizations.of(context)!.amountLabel),
                 ),
                 const SizedBox(height: 16),
 
@@ -378,7 +380,7 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
                   onTap: _selectDueDate,
                   child: InputDecorator(
                     decoration: InputDecoration(
-                      labelText: 'Due Date',
+                      labelText: AppLocalizations.of(context)!.dueDate,
                       prefixIcon: const Icon(Icons.calendar_today_outlined),
                       suffixIcon: _dueDate != null
                           ? IconButton(
@@ -390,7 +392,7 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
                     child: Text(
                       _dueDate != null
                           ? '${_dueDate!.day}/${_dueDate!.month}/${_dueDate!.year}'
-                          : 'Not set',
+                          : AppLocalizations.of(context)!.notSet,
                     ),
                   ),
                 ),
@@ -399,9 +401,9 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
                 // Notes
                 TextFormField(
                   controller: _notesController,
-                  decoration: const InputDecoration(
-                    labelText: 'Notes (optional)',
-                    prefixIcon: Icon(Icons.note_outlined),
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.notesOptional,
+                    prefixIcon: const Icon(Icons.note_outlined),
                   ),
                   maxLines: 3,
                 ),
@@ -421,7 +423,7 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
                               color: Colors.white,
                             ),
                           )
-                        : const Text('Save Changes'),
+                        : Text(AppLocalizations.of(context)!.saveChanges),
                   ),
                 ),
               ],
