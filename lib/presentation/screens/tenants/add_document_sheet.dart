@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
+import '../../../services/image_service.dart';
 import '../../../application/providers/repository_providers.dart';
 
 class AddDocumentSheet extends ConsumerStatefulWidget {
@@ -209,7 +210,7 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
                     ),
                   ],
                 )
-              : Image.file(_selectedFile!, fit: BoxFit.cover),
+              : Image.file(File(ImageService.resolveImagePathSync(_selectedFile!.path)), fit: BoxFit.cover),
         ),
         Positioned(
           top: 8,

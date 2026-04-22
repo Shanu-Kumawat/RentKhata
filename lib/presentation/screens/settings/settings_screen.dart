@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../widgets/bouncing_scale_wrapper.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rent_khata/l10n/app_localizations.dart';
+import '../../../services/image_service.dart';
 
 import '../../../application/providers/dashboard_providers.dart';
 import '../../../application/providers/theme_settings_provider.dart';
@@ -444,10 +445,10 @@ class _ProfileTile extends StatelessWidget {
           backgroundColor: Theme.of(
             context,
           ).colorScheme.primary.withValues(alpha: 0.1),
-          backgroundImage: photoPath != null && File(photoPath!).existsSync()
-              ? FileImage(File(photoPath!))
+          backgroundImage: photoPath != null && File(ImageService.resolveImagePathSync(photoPath!)).existsSync()
+              ? FileImage(File(ImageService.resolveImagePathSync(photoPath!)))
               : null,
-          child: photoPath == null || !File(photoPath!).existsSync()
+          child: photoPath == null || !File(ImageService.resolveImagePathSync(photoPath!)).existsSync()
               ? Text(
                   name.isNotEmpty ? name[0].toUpperCase() : '?',
                   style: TextStyle(

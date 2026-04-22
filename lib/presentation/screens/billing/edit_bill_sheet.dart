@@ -36,7 +36,8 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
 
   DateTime? _dueDate;
   bool _isLoading = false;
-  File? _meterPhoto;
+  // Stores only the relative filename, not absolute path.
+  String? _meterPhoto;
   String? _existingPhotoPath;
 
   /// Whether this bill has any payments
@@ -90,9 +91,9 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
 
     if (source != null) {
       final imageService = ImageService();
-      final photo = await imageService.pickImage(source: source);
-      if (photo != null) {
-        setState(() => _meterPhoto = photo);
+      final fileName = await imageService.pickAndSaveImage(source: source);
+      if (fileName != null) {
+        setState(() => _meterPhoto = fileName);
       }
     }
   }
@@ -137,7 +138,7 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
         notes: _notesController.text.isEmpty ? null : _notesController.text,
         dueDate: _dueDate,
         meterPhotoPath:
-            _meterPhoto?.path ?? _existingPhotoPath, // Update photo path
+            _meterPhoto ?? _existingPhotoPath, // Use filename stored from new pick or existing
         // Recalculate pending amount if amount changed
         pendingAmount: _canEditAmount
             ? amount - widget.bill.paidAmount
@@ -285,13 +286,13 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
                           borderRadius: BorderRadius.circular(8),
                           child: _meterPhoto != null
                               ? Image.file(
-                                  _meterPhoto!,
+                                  File(ImageService.resolveImagePathSync(_meterPhoto!)),
                                   height: 150,
                                   width: double.infinity,
                                   fit: BoxFit.cover,
                                 )
                               : Image.file(
-                                  File(_existingPhotoPath!),
+                                  File(ImageService.resolveImagePathSync(_existingPhotoPath!)),
                                   height: 150,
                                   width: double.infinity,
                                   fit: BoxFit.cover,

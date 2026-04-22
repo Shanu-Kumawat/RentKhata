@@ -10,37 +10,67 @@ import 'package:path/path.dart' as p;
 class ImageService {
   final ImagePicker _picker = ImagePicker();
 
-  /// Pick an image from gallery or camera
-  Future<File?> pickImage({required ImageSource source}) async {
+  /// Cached app documents directory path, initialized once at startup in main.dart.
+  static late String appDocumentDirPath;
+
+  /// Resolves a stored image filename (e.g. 'img_123.jpg') to its full
+  /// absolute path on the current device. All callers must use this
+  /// for any File I/O or display — never construct image paths manually.
+  static String resolveImagePathSync(String? fileName) {
+    if (fileName == null || fileName.isEmpty) return '';
+    // p.basename is a safety net in case a full path is ever accidentally passed.
+    return p.join(appDocumentDirPath, 'images', p.basename(fileName));
+  }
+
+  /// Picks an image, compresses it, saves it to the app's images directory,
+  /// and returns the **relative filename** (e.g. 'img_1234.jpg') for DB storage.
+  ///
+  /// This is the canonical method to call when saving an image reference to
+  /// the database. Use [resolveImagePathSync] to convert the filename back
+  /// to an absolute path for display.
+  Future<String?> pickAndSaveImage({required ImageSource source}) async {
     try {
       final XFile? pickedFile = await _picker.pickImage(
         source: source,
-        imageQuality: 80, // Basic quality reduction
+        imageQuality: 80,
       );
-
       if (pickedFile == null) return null;
-
-      // Compress and save to app directory
-      return await _compressAndSaveImage(File(pickedFile.path));
+      return await _compressAndSave(File(pickedFile.path));
     } catch (e) {
-      // Handle permission errors or other issues
       return null;
     }
   }
 
-  /// Compress image and save to app documents directory
-  Future<File?> _compressAndSaveImage(File file) async {
+  /// Picks an image, compresses it, and returns a [File] pointing to the
+  /// saved copy. Useful when you need the File object for in-session display
+  /// before a DB save. The file's path can be passed to [resolveImagePathSync]
+  /// or [p.basename] to get the storable filename.
+  Future<File?> pickImage({required ImageSource source}) async {
+    try {
+      final XFile? pickedFile = await _picker.pickImage(
+        source: source,
+        imageQuality: 80,
+      );
+      if (pickedFile == null) return null;
+      final fileName = await _compressAndSave(File(pickedFile.path));
+      if (fileName == null) return null;
+      return File(resolveImagePathSync(fileName));
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// Compresses the image, saves it to the app's images directory,
+  /// and returns only the relative filename for DB storage.
+  Future<String?> _compressAndSave(File file) async {
     try {
       final appDir = await getApplicationDocumentsDirectory();
       final imagesDir = Directory(p.join(appDir.path, 'images'));
-      
       if (!await imagesDir.exists()) {
         await imagesDir.create(recursive: true);
       }
-
       final fileName = 'img_${DateTime.now().millisecondsSinceEpoch}.jpg';
       final targetPath = p.join(imagesDir.path, fileName);
-
       final result = await FlutterImageCompress.compressAndGetFile(
         file.absolute.path,
         targetPath,
@@ -48,20 +78,19 @@ class ImageService {
         minWidth: 1024,
         minHeight: 1024,
       );
-
       if (result != null) {
-        return File(result.path);
+        return p.basename(result.path); // Return ONLY the filename for DB
       }
-      return null; 
+      return null;
     } catch (e) {
       return null;
     }
   }
 
-  /// Delete an image file
-  Future<void> deleteImage(String path) async {
+  /// Deletes an image by its stored filename (e.g. 'img_123.jpg').
+  Future<void> deleteImage(String fileName) async {
     try {
-      final file = File(path);
+      final file = File(resolveImagePathSync(fileName));
       if (await file.exists()) {
         await file.delete();
       }

@@ -78,7 +78,8 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
   bool _isLoading = false;
   double _electricityCharges = 0;
   double _electricityRate = 0;
-  File? _meterPhoto;
+  // Stores only the relative filename (e.g. 'img_123.jpg'), not the absolute path.
+  String? _meterPhoto;
 
   // Mutable cycle state for navigation
   DateTime? _currentPeriodStart;
@@ -569,9 +570,10 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
 
     if (source != null) {
       final imageService = ImageService();
-      final photo = await imageService.pickImage(source: source);
-      if (photo != null) {
-        setState(() => _meterPhoto = photo);
+      // pickAndSaveImage returns the relative filename for DB storage
+      final fileName = await imageService.pickAndSaveImage(source: source);
+      if (fileName != null) {
+        setState(() => _meterPhoto = fileName);
       }
     }
   }
@@ -671,7 +673,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
         electricityCharges: _selectedBillType == BillType.electricity
             ? _electricityCharges
             : null,
-        meterPhotoPath: _meterPhoto?.path,
+        meterPhotoPath: _meterPhoto,
         notes: _notesController.text.isEmpty ? null : _notesController.text,
         periodStartDate: periodStart,
         periodEndDate: periodEnd,
@@ -1039,7 +1041,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                                   ),
                                   image: _meterPhoto != null
                                       ? DecorationImage(
-                                          image: FileImage(_meterPhoto!),
+                                          image: FileImage(File(ImageService.resolveImagePathSync(_meterPhoto!))),
                                           fit: BoxFit.cover,
                                         )
                                       : null,

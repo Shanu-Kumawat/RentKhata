@@ -18,6 +18,7 @@ import '../../../core/utils/currency_formatter.dart';
 import '../../../domain/entities/tenant.dart';
 import '../../../domain/entities/occupancy.dart';
 import '../../../domain/entities/document.dart';
+import '../../../services/image_service.dart';
 import 'package:open_file/open_file.dart';
 import 'add_tenant_screen.dart';
 import 'add_document_sheet.dart';
@@ -508,14 +509,19 @@ class _ProfileCard extends StatelessWidget {
             CircleAvatar(
               radius: 36,
               backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-              child: Text(
-                tenant.name[0].toUpperCase(),
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.onPrimaryContainer,
-                ),
-              ),
+              backgroundImage: tenant.photoPath != null
+                  ? FileImage(File(ImageService.resolveImagePathSync(tenant.photoPath!)))
+                  : null,
+              child: tenant.photoPath == null
+                  ? Text(
+                      tenant.name[0].toUpperCase(),
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      ),
+                    )
+                  : null,
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -718,7 +724,7 @@ class _AadhaarPhotoTile extends StatelessWidget {
                 fit: StackFit.expand,
                 children: [
                   Image.file(
-                    File(imagePath),
+                    File(ImageService.resolveImagePathSync(imagePath)),
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) => Container(
                       color: Theme.of(
@@ -806,7 +812,7 @@ class _FullscreenImageViewer extends StatelessWidget {
         maxScale: 4.0,
         child: Center(
           child: Image.file(
-            File(imagePath),
+            File(ImageService.resolveImagePathSync(imagePath)),
             fit: BoxFit.contain,
             errorBuilder: (context, error, stackTrace) => Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -833,11 +839,12 @@ class _FullscreenImageViewer extends StatelessWidget {
 
   Future<void> _shareImage(BuildContext context) async {
     try {
-      final file = File(imagePath);
+      final resolvedPath = ImageService.resolveImagePathSync(imagePath);
+      final file = File(resolvedPath);
       if (await file.exists()) {
         // Use share_plus to share the image file
         await Share.shareXFiles([
-          XFile(imagePath),
+          XFile(resolvedPath),
         ], text: 'Aadhaar Card - $title');
       } else {
         if (context.mounted) {
@@ -1729,7 +1736,7 @@ class _DocumentsSection extends ConsumerWidget {
                             ? ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
                                 child: Image.file(
-                                  File(doc.filePath),
+                                  File(ImageService.resolveImagePathSync(doc.filePath)),
                                   fit: BoxFit.cover,
                                   errorBuilder: (_, __, ___) =>
                                       const Icon(Icons.broken_image, size: 20),

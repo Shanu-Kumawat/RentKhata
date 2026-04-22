@@ -13,6 +13,7 @@ import '../../../application/providers/billing_providers.dart';
 import '../../../services/invoice_pdf_service.dart';
 import '../../../services/share_service.dart';
 import '../../../services/upi_qr_service.dart';
+import '../../../services/image_service.dart';
 import '../../widgets/share_bottom_sheet.dart';
 import 'package:rent_khata/l10n/app_localizations.dart';
 
@@ -385,7 +386,7 @@ class _InvoiceCard extends StatelessWidget {
                         ClipRRect(
                           borderRadius: BorderRadius.circular(8),
                           child: Image.file(
-                            File(bill.meterPhotoPath!),
+                            File(ImageService.resolveImagePathSync(bill.meterPhotoPath!)),
                             height: 150,
                             width: double.infinity,
                             fit: BoxFit.cover,

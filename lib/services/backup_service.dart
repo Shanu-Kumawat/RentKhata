@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:archive/archive.dart';
+import 'package:path/path.dart' as p;
 import '../data/database/app_database.dart';
 import '../core/constants/app_constants.dart';
 
@@ -52,13 +53,30 @@ class BackupService {
       
       final dbBytes = await dbFile.readAsBytes();
       
-      // Create archive
       final archive = Archive();
       archive.addFile(ArchiveFile(
         DbConstants.databaseName,
         dbBytes.length,
         dbBytes,
       ));
+      
+      // Add images directory if it exists
+      final appDir = await getApplicationDocumentsDirectory();
+      final imagesDir = Directory(p.join(appDir.path, 'images'));
+      if (await imagesDir.exists()) {
+        final List<FileSystemEntity> imageFiles = await imagesDir.list().toList();
+        for (var entity in imageFiles) {
+          if (entity is File) {
+            final fileBytes = await entity.readAsBytes();
+            final fileName = p.basename(entity.path);
+            archive.addFile(ArchiveFile(
+              'images/$fileName',
+              fileBytes.length,
+              fileBytes,
+            ));
+          }
+        }
+      }
       
       // Write zip file
       final zipBytes = ZipEncoder().encode(archive);
@@ -102,6 +120,21 @@ class BackupService {
     // Restore database
     final dbFile = File(dbPath);
     await dbFile.writeAsBytes(dbArchiveFile.content as List<int>);
+    
+    // Restore images
+    final appDir = await getApplicationDocumentsDirectory();
+    final imagesDir = Directory(p.join(appDir.path, 'images'));
+    if (!await imagesDir.exists()) {
+      await imagesDir.create(recursive: true);
+    }
+    
+    for (final file in archive.files) {
+      if (file.name.startsWith('images/') && file.isFile) {
+        final fileName = p.basename(file.name);
+        final extractedFile = File(p.join(imagesDir.path, fileName));
+        await extractedFile.writeAsBytes(file.content as List<int>);
+      }
+    }
   }
 
   /// Restore database from an external backup file (e.g. from File Picker)
@@ -124,6 +157,21 @@ class BackupService {
     // Restore database
     final dbFile = File(dbPath);
     await dbFile.writeAsBytes(dbArchiveFile.content as List<int>);
+
+    // Restore images
+    final appDir = await getApplicationDocumentsDirectory();
+    final imagesDir = Directory(p.join(appDir.path, 'images'));
+    if (!await imagesDir.exists()) {
+      await imagesDir.create(recursive: true);
+    }
+    
+    for (final file in archive.files) {
+      if (file.name.startsWith('images/') && file.isFile) {
+        final fileName = p.basename(file.name);
+        final extractedFile = File(p.join(imagesDir.path, fileName));
+        await extractedFile.writeAsBytes(file.content as List<int>);
+      }
+    }
   }
 
   /// Get list of local backups

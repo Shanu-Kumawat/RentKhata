@@ -2,11 +2,10 @@
 library;
 
 import 'dart:io';
-import 'package:image_picker/image_picker.dart';
-import '../../../services/image_service.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
+import '../../../services/image_service.dart';
 import 'package:intl/intl.dart';
 import '../../../application/providers/billing_providers.dart';
 import '../../../application/providers/dashboard_providers.dart';
@@ -986,7 +985,7 @@ class _ElectricityDetailsCard extends ConsumerWidget {
                             ],
                           ),
                           Image.file(
-                            File(bill.meterPhotoPath!),
+                            File(ImageService.resolveImagePathSync(bill.meterPhotoPath!)),
                             fit: BoxFit.contain,
                           ),
                         ],
@@ -1007,7 +1006,7 @@ class _ElectricityDetailsCard extends ConsumerWidget {
                           left: Radius.circular(7),
                         ),
                         child: Image.file(
-                          File(bill.meterPhotoPath!),
+                          File(ImageService.resolveImagePathSync(bill.meterPhotoPath!)),
                           width: 100,
                           height: 100,
                           fit: BoxFit.cover,
@@ -1115,12 +1114,13 @@ class _ElectricityDetailsCard extends ConsumerWidget {
 
     if (source != null && context.mounted) {
       final imageService = ImageService();
-      final photo = await imageService.pickImage(source: source);
+      // pickAndSaveImage returns just the filename (e.g. 'img_123.jpg') for DB
+      final fileName = await imageService.pickAndSaveImage(source: source);
 
-      if (photo != null && context.mounted) {
+      if (fileName != null && context.mounted) {
         try {
           final repo = ref.read(billingRepositoryProvider);
-          final updatedBill = bill.copyWith(meterPhotoPath: photo.path);
+          final updatedBill = bill.copyWith(meterPhotoPath: fileName);
 
           final success = await repo.updateBill(updatedBill);
 

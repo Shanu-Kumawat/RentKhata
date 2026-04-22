@@ -4,6 +4,7 @@ library;
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as p;
 import '../../services/image_service.dart';
 
 class ImagePickerWidget extends StatefulWidget {
@@ -37,13 +38,11 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
   Future<void> _pickImage(ImageSource source) async {
     final file = await _imageService.pickImage(source: source);
     if (file != null) {
-      if (_currentImagePath != null) {
-        // Optionally delete old image if needed, but for now we keep history
-        // await _imageService.deleteImage(_currentImagePath!);
-      }
-
-      setState(() => _currentImagePath = file.path);
-      widget.onImageSelected(file.path);
+      // Store only the filename in _currentImagePath and pass it to the parent.
+      // resolveImagePathSync will reconstruct the full path for display.
+      final fileName = p.basename(file.path);
+      setState(() => _currentImagePath = fileName);
+      widget.onImageSelected(fileName);
     }
   }
 
@@ -110,7 +109,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
               ), // Rounded square
               image: _currentImagePath != null
                   ? DecorationImage(
-                      image: FileImage(File(_currentImagePath!)),
+                      image: FileImage(File(ImageService.resolveImagePathSync(_currentImagePath!))),
                       fit: BoxFit.cover,
                     )
                   : null,
