@@ -147,12 +147,12 @@ class SettingsScreen extends ConsumerWidget {
 
           _AnimatedSettingsSection(
             index: 3,
-            title: 'Billing',
+            title: l10n.billingLabel,
             children: [
               _SettingsTile(
                 icon: Icons.bolt_outlined,
-                title: 'Electricity Rates',
-                subtitle: 'View and update electricity rates',
+                title: l10n.electricityRates,
+                subtitle: l10n.electricityRatesSubtitle,
                 onTap: () => Navigator.push(
                   context,
                   _createRoute(const ElectricityRatesScreen()),
@@ -160,8 +160,8 @@ class SettingsScreen extends ConsumerWidget {
               ),
               _SettingsTile(
                 icon: Icons.message_outlined,
-                title: 'Message Templates',
-                subtitle: 'Customize invoice and receipt messages',
+                title: l10n.messageTemplates,
+                subtitle: l10n.messageTemplatesSubtitle,
                 onTap: () => Navigator.push(
                   context,
                   _createRoute(const MessageTemplatesScreen()),
@@ -172,12 +172,12 @@ class SettingsScreen extends ConsumerWidget {
 
           _AnimatedSettingsSection(
             index: 4,
-            title: 'Notifications',
+            title: l10n.notifications,
             children: [
               _SettingsTile(
                 icon: Icons.notifications_outlined,
-                title: 'Reminder Settings',
-                subtitle: 'Due date and overdue reminders',
+                title: l10n.reminderSettings,
+                subtitle: l10n.reminderSettingsSubtitle,
                 onTap: () => Navigator.push(
                   context,
                   _createRoute(const NotificationSettingsScreen()),
@@ -188,12 +188,12 @@ class SettingsScreen extends ConsumerWidget {
 
           _AnimatedSettingsSection(
             index: 5,
-            title: 'Data',
+            title: l10n.dataLabel,
             children: [
               _SettingsTile(
                 icon: Icons.backup_outlined,
-                title: 'Backup & Restore',
-                subtitle: 'Save or restore your data',
+                title: l10n.backupAndRestore,
+                subtitle: l10n.backupAndRestoreSubtitle,
                 onTap: () => context.push('/settings/backup'),
               ),
             ],
@@ -201,12 +201,12 @@ class SettingsScreen extends ConsumerWidget {
 
           _AnimatedSettingsSection(
             index: 6,
-            title: 'About',
+            title: l10n.aboutLabel,
             children: [
               _SettingsTile(
                 icon: Icons.info_outline,
-                title: 'About RentKhata',
-                subtitle: 'Version 1.0.0',
+                title: l10n.aboutRentKhata,
+                subtitle: l10n.versionLabel('1.0.0'),
                 onTap: () {
                   showAboutDialog(
                     context: context,
@@ -225,9 +225,7 @@ class SettingsScreen extends ConsumerWidget {
                       ),
                     ),
                     children: [
-                      const Text(
-                        'Offline-first rental management app for Indian landlords.',
-                      ),
+                      Text(l10n.aboutRentKhataDescription),
                     ],
                   );
                 },

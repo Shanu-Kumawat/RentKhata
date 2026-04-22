@@ -1386,4 +1386,365 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get computerGeneratedMsg =>
       'This is a computer-generated statement and does not require a physical signature.';
+
+  @override
+  String get aboutLabel => 'About Label';
+
+  @override
+  String get aboutRentKhataDescription => 'About Rent Khata Description';
+
+  @override
+  String alertDaysBeforeCycle(int count) {
+    return 'Alert $count days before';
+  }
+
+  @override
+  String get anniversaryBillingByBillType => 'Anniversary Billing By Bill Type';
+
+  @override
+  String get anniversaryBillingSubtitle => 'Anniversary Billing Subtitle';
+
+  @override
+  String get backupAndRestoreSubtitle => 'Backup And Restore Subtitle';
+
+  @override
+  String get backupCreatedShare => 'Backup Created Share';
+
+  @override
+  String get backupInfoText => 'Backup Info Text';
+
+  @override
+  String get backupRestoredSuccess => 'Backup Restored Success';
+
+  @override
+  String get billDueSoon => 'Bill Due Soon';
+
+  @override
+  String get billFullyPaid => 'Bill Fully Paid';
+
+  @override
+  String get billFullyPaidSubtitle => 'Bill Fully Paid Subtitle';
+
+  @override
+  String get billingCycleEnding => 'Billing Cycle Ending';
+
+  @override
+  String get billingLabel => 'Billing Label';
+
+  @override
+  String get billingReminders => 'Billing Reminders';
+
+  @override
+  String get biometricFallbackInfo => 'Biometric Fallback Info';
+
+  @override
+  String get biometricLock => 'Biometric Lock';
+
+  @override
+  String get biometricLockSubtitle => 'Biometric Lock Subtitle';
+
+  @override
+  String get biometricsNotAvailable => 'Biometrics Not Available';
+
+  @override
+  String get changesSavedAutomatically => 'Changes Saved Automatically';
+
+  @override
+  String get createBackupToKeepSafe => 'Create Backup To Keep Safe';
+
+  @override
+  String get createShareBackup => 'Create Share Backup';
+
+  @override
+  String get criticalUrgentAttention => 'Critical Urgent Attention';
+
+  @override
+  String get currentRate => 'Current Rate';
+
+  @override
+  String get dataLabel => 'Data Label';
+
+  @override
+  String daysCount(int count) {
+    return '$count days';
+  }
+
+  @override
+  String get deviceDoesNotSupportBiometrics =>
+      'Device Does Not Support Biometrics';
+
+  @override
+  String get discard => 'Discard';
+
+  @override
+  String get dueDateOffsetSubtitle => 'Due Date Offset Subtitle';
+
+  @override
+  String dueDaysAfterCycle(int count) {
+    return 'Due $count days after cycle ends';
+  }
+
+  @override
+  String get dueSoonAlert => 'Due Soon Alert';
+
+  @override
+  String get dueSoonAlertSubtitle => 'Due Soon Alert Subtitle';
+
+  @override
+  String get editProfile => 'Edit Profile';
+
+  @override
+  String effectiveFrom(String date) {
+    return 'Effective from $date';
+  }
+
+  @override
+  String get electricityMeterBills => 'Electricity Meter Bills';
+
+  @override
+  String get electricityRateInfoText => 'Electricity Rate Info Text';
+
+  @override
+  String get electricityRatesSubtitle => 'Electricity Rates Subtitle';
+
+  @override
+  String get enableAppLock => 'Enable App Lock';
+
+  @override
+  String get enterValidRate => 'Enter Valid Rate';
+
+  @override
+  String get firstReminderAfterDueDate => 'First Reminder After Due Date';
+
+  @override
+  String get generalSettingsLabel => 'General Settings Label';
+
+  @override
+  String get localBackups => 'Local Backups';
+
+  @override
+  String get lockAfterInactivity => 'Lock After Inactivity';
+
+  @override
+  String get lockOnExit => 'Lock On Exit';
+
+  @override
+  String get lockOnExitSubtitle => 'Lock On Exit Subtitle';
+
+  @override
+  String get maintenanceCharges => 'Maintenance Charges';
+
+  @override
+  String get messageBody => 'Message Body';
+
+  @override
+  String get messageTemplatesSubtitle => 'Message Templates Subtitle';
+
+  @override
+  String minutes(int count) {
+    return '$count minutes';
+  }
+
+  @override
+  String get mobileNumberHint => 'Mobile Number Hint';
+
+  @override
+  String get monthlyRentBills => 'Monthly Rent Bills';
+
+  @override
+  String get monthlySummary => 'Monthly Summary';
+
+  @override
+  String get monthlySummarySubtitle => 'Monthly Summary Subtitle';
+
+  @override
+  String get never => 'Never';
+
+  @override
+  String get noBiometricsEnrolled => 'No Biometrics Enrolled';
+
+  @override
+  String get noLocalBackups => 'No Local Backups';
+
+  @override
+  String get noRateHistory => 'No Rate History';
+
+  @override
+  String get notEnabled => 'Not Enabled';
+
+  @override
+  String get notificationSettings => 'Notification Settings';
+
+  @override
+  String get notificationTime => 'Notification Time';
+
+  @override
+  String get notificationsWorking => 'Notifications Working';
+
+  @override
+  String get oneDayOverdue => 'One Day Overdue';
+
+  @override
+  String get oneMinute => 'One Minute';
+
+  @override
+  String get oneWeekOverdue => 'One Week Overdue';
+
+  @override
+  String get overdueFollowUps => 'Overdue Follow Ups';
+
+  @override
+  String get paymentNotifications => 'Payment Notifications';
+
+  @override
+  String get paymentReceived => 'Payment Received';
+
+  @override
+  String get paymentReceivedSubtitle => 'Payment Received Subtitle';
+
+  @override
+  String get permissionDenied => 'Permission Denied';
+
+  @override
+  String get profileUpdated => 'Profile Updated';
+
+  @override
+  String get quietHours => 'Quiet Hours';
+
+  @override
+  String get rateHistory => 'Rate History';
+
+  @override
+  String get ratePerUnitLabel => 'Rate Per Unit Label';
+
+  @override
+  String get rateUpdated => 'Rate Updated';
+
+  @override
+  String get receiptLabel => 'Receipt Label';
+
+  @override
+  String remindDaysBeforeCycleEnds(int days) {
+    return 'Remind $days days before cycle ends';
+  }
+
+  @override
+  String remindDaysBeforeDueDate(int days) {
+    return 'Remind $days days before due date';
+  }
+
+  @override
+  String get reminderLabel => 'Reminder Label';
+
+  @override
+  String get reminderSettingsSubtitle => 'Reminder Settings Subtitle';
+
+  @override
+  String get requireBiometric => 'Require Biometric';
+
+  @override
+  String get resetBtn => 'Reset Btn';
+
+  @override
+  String get resetTemplateWarning => 'Reset Template Warning';
+
+  @override
+  String get resetToDefault => 'Reset To Default';
+
+  @override
+  String get restartNowBtn => 'Restart Now Btn';
+
+  @override
+  String get restoreBackupTitle => 'Restore Backup Title';
+
+  @override
+  String get restoreBackupWarning => 'Restore Backup Warning';
+
+  @override
+  String get restoreBtn => 'Restore Btn';
+
+  @override
+  String get restoreFailedPrefix => 'Restore Failed Prefix';
+
+  @override
+  String get restoreFromDevice => 'Restore From Device';
+
+  @override
+  String get restoreFromDeviceSubtitle => 'Restore From Device Subtitle';
+
+  @override
+  String get restoreSuccessTitle => 'Restore Success Title';
+
+  @override
+  String get saveDataToFile => 'Save Data To File';
+
+  @override
+  String get saveProfile => 'Save Profile';
+
+  @override
+  String get secondReminder => 'Second Reminder';
+
+  @override
+  String get sendTestNotification => 'Send Test Notification';
+
+  @override
+  String get setNewRate => 'Set New Rate';
+
+  @override
+  String get setupFingerprintFirst => 'Setup Fingerprint First';
+
+  @override
+  String get template => 'Template';
+
+  @override
+  String get templateAlreadyDefault => 'Template Already Default';
+
+  @override
+  String get templatePlaceholders => 'Template Placeholders';
+
+  @override
+  String get templateResetSuccess => 'Template Reset Success';
+
+  @override
+  String get templateSavedSuccess => 'Template Saved Success';
+
+  @override
+  String templateUsedWhenSharing(String type) {
+    return 'Template used when sharing $type';
+  }
+
+  @override
+  String get testNotificationTitle => 'Test Notification Title';
+
+  @override
+  String get threeDaysOverdue => 'Three Days Overdue';
+
+  @override
+  String get twoWeeksOverdue => 'Two Weeks Overdue';
+
+  @override
+  String get unit => 'Unit';
+
+  @override
+  String get updateRate => 'Update Rate';
+
+  @override
+  String get upiId => 'Upi Id';
+
+  @override
+  String get upiIdHelperText => 'Upi Id Helper Text';
+
+  @override
+  String get upiIdHint => 'Upi Id Hint';
+
+  @override
+  String versionLabel(String version) {
+    return 'Version $version';
+  }
+
+  @override
+  String get weeklyReminder => 'Weekly Reminder';
+
+  @override
+  String get yourName => 'Your Name';
 }

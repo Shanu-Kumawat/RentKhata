@@ -7,6 +7,7 @@ import '../../../application/providers/database_provider.dart';
 import '../../../data/database/app_database.dart';
 import '../../../application/providers/billing_cycle_providers.dart';
 import 'dart:async';
+import 'package:rent_khata/l10n/app_localizations.dart';
 
 enum _SaveStatus { idle, saving, saved, error }
 
@@ -101,9 +102,10 @@ class _BillingCycleSettingsScreenState
     } catch (e) {
       if (mounted) {
         setState(() => _saveStatus = _SaveStatus.error);
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error saving: $e')));
+        ).showSnackBar(SnackBar(content: Text('${l10n.errorPrefix}$e')));
       }
     }
   }
@@ -147,21 +149,22 @@ class _BillingCycleSettingsScreenState
   @override
   Widget build(BuildContext context) {
     final settingsAsync = ref.watch(billSettingsProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Billing Cycle Settings'),
+        title: Text(l10n.configureBillingCycles),
         actions: [_buildAppBarStatus(), const SizedBox(width: 16)],
       ),
       body: _initialized
-          ? _buildContent(context)
+          ? _buildContent(context, l10n)
           : settingsAsync.when(
               skipLoadingOnRefresh: true,
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(child: Text('Error: $e')),
+              error: (e, _) => Center(child: Text('${l10n.errorPrefix}$e')),
               data: (settings) {
                 _initialize(settings);
-                return _buildContent(context);
+                return _buildContent(context, l10n);
               },
             ),
     );
@@ -192,7 +195,7 @@ class _BillingCycleSettingsScreenState
     );
   }
 
-  Widget _buildContent(BuildContext context) {
+  Widget _buildContent(BuildContext context, AppLocalizations l10n) {
     final theme = Theme.of(context);
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -200,7 +203,7 @@ class _BillingCycleSettingsScreenState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Changes are saved automatically.',
+            l10n.changesSavedAutomatically,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
@@ -209,14 +212,14 @@ class _BillingCycleSettingsScreenState
 
           // Due Date Offset
           Text(
-            'Due Date',
+            l10n.dueDate,
             style: theme.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 4),
           Text(
-            'Days after billing cycle ends before bill is due.',
+            l10n.dueDateOffsetSubtitle,
             style: theme.textTheme.bodySmall?.copyWith(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
@@ -226,12 +229,12 @@ class _BillingCycleSettingsScreenState
             min: 1,
             max: 15,
             divisions: 14,
-            label: '${_dueDateOffsetDays ?? 5} days',
+            label: l10n.daysCount(_dueDateOffsetDays ?? 5),
             onChanged: (v) => _updateDueDateOffset(v.round()),
           ),
           Center(
             child: Text(
-              'Due: ${_dueDateOffsetDays ?? 5} days after cycle ends',
+              l10n.dueDaysAfterCycle(_dueDateOffsetDays ?? 5),
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: Theme.of(context).colorScheme.primary,
                 fontWeight: FontWeight.w500,
@@ -242,14 +245,14 @@ class _BillingCycleSettingsScreenState
 
           // Due Soon Threshold
           Text(
-            'Due Soon Alert',
+            l10n.dueSoonAlert,
             style: theme.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 4),
           Text(
-            'Show "due soon" in Attention when cycle ends within this many days.',
+            l10n.dueSoonAlertSubtitle,
             style: theme.textTheme.bodySmall?.copyWith(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
@@ -259,12 +262,12 @@ class _BillingCycleSettingsScreenState
             min: 1,
             max: 10,
             divisions: 9,
-            label: '${_dueSoonThresholdDays ?? 5} days',
+            label: l10n.daysCount(_dueSoonThresholdDays ?? 5),
             onChanged: (v) => _updateDueSoonThreshold(v.round()),
           ),
           Center(
             child: Text(
-              'Alert: ${_dueSoonThresholdDays ?? 5} days before cycle ends',
+              l10n.alertDaysBeforeCycle(_dueSoonThresholdDays ?? 5),
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: Theme.of(context).colorScheme.error,
                 fontWeight: FontWeight.w500,
@@ -275,14 +278,14 @@ class _BillingCycleSettingsScreenState
 
           // Anniversary Billing Toggles
           Text(
-            'Anniversary Billing by Bill Type',
+            l10n.anniversaryBillingByBillType,
             style: theme.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 4),
           Text(
-            'Enable to track billing cycles based on tenant move-in date.',
+            l10n.anniversaryBillingSubtitle,
             style: theme.textTheme.bodySmall?.copyWith(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
@@ -290,40 +293,40 @@ class _BillingCycleSettingsScreenState
           const SizedBox(height: 8),
 
           _buildBillTypeToggle(
-            label: 'Rent',
-            subtitle: 'Monthly rent bills',
+            label: l10n.rent,
+            subtitle: l10n.monthlyRentBills,
             value: _rentUsesAnniversary ?? true,
             onChanged: (v) => _updateBillType('rent', v),
             icon: Icons.home_outlined,
             color: Theme.of(context).colorScheme.primary,
           ),
           _buildBillTypeToggle(
-            label: 'Electricity',
-            subtitle: 'Electricity meter bills',
+            label: l10n.electricity,
+            subtitle: l10n.electricityMeterBills,
             value: _electricityUsesAnniversary ?? true,
             onChanged: (v) => _updateBillType('electricity', v),
             icon: Icons.bolt_outlined,
             color: Theme.of(context).colorScheme.error,
           ),
           _buildBillTypeToggle(
-            label: 'Water',
-            subtitle: 'Water bills',
+            label: l10n.water,
+            subtitle: l10n.waterBill,
             value: _waterUsesAnniversary ?? false,
             onChanged: (v) => _updateBillType('water', v),
             icon: Icons.water_drop_outlined,
             color: Colors.blue,
           ),
           _buildBillTypeToggle(
-            label: 'Maintenance',
-            subtitle: 'Maintenance charges',
+            label: l10n.maintenance,
+            subtitle: l10n.maintenanceCharges,
             value: _maintenanceUsesAnniversary ?? false,
             onChanged: (v) => _updateBillType('maintenance', v),
             icon: Icons.build_outlined,
             color: Colors.green,
           ),
           _buildBillTypeToggle(
-            label: 'Other',
-            subtitle: 'Other charges',
+            label: l10n.other,
+            subtitle: l10n.otherCharges,
             value: _otherUsesAnniversary ?? false,
             onChanged: (v) => _updateBillType('other', v),
             icon: Icons.receipt_outlined,

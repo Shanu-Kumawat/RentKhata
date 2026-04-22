@@ -2658,6 +2658,690 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This is a computer-generated statement and does not require a physical signature.'**
   String get computerGeneratedMsg;
+
+  /// No description provided for @aboutLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'About Label'**
+  String get aboutLabel;
+
+  /// No description provided for @aboutRentKhataDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'About Rent Khata Description'**
+  String get aboutRentKhataDescription;
+
+  /// No description provided for @alertDaysBeforeCycle.
+  ///
+  /// In en, this message translates to:
+  /// **'Alert {count} days before'**
+  String alertDaysBeforeCycle(int count);
+
+  /// No description provided for @anniversaryBillingByBillType.
+  ///
+  /// In en, this message translates to:
+  /// **'Anniversary Billing By Bill Type'**
+  String get anniversaryBillingByBillType;
+
+  /// No description provided for @anniversaryBillingSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Anniversary Billing Subtitle'**
+  String get anniversaryBillingSubtitle;
+
+  /// No description provided for @backupAndRestoreSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup And Restore Subtitle'**
+  String get backupAndRestoreSubtitle;
+
+  /// No description provided for @backupCreatedShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup Created Share'**
+  String get backupCreatedShare;
+
+  /// No description provided for @backupInfoText.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup Info Text'**
+  String get backupInfoText;
+
+  /// No description provided for @backupRestoredSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup Restored Success'**
+  String get backupRestoredSuccess;
+
+  /// No description provided for @billDueSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Bill Due Soon'**
+  String get billDueSoon;
+
+  /// No description provided for @billFullyPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Bill Fully Paid'**
+  String get billFullyPaid;
+
+  /// No description provided for @billFullyPaidSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Bill Fully Paid Subtitle'**
+  String get billFullyPaidSubtitle;
+
+  /// No description provided for @billingCycleEnding.
+  ///
+  /// In en, this message translates to:
+  /// **'Billing Cycle Ending'**
+  String get billingCycleEnding;
+
+  /// No description provided for @billingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Billing Label'**
+  String get billingLabel;
+
+  /// No description provided for @billingReminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Billing Reminders'**
+  String get billingReminders;
+
+  /// No description provided for @biometricFallbackInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Biometric Fallback Info'**
+  String get biometricFallbackInfo;
+
+  /// No description provided for @biometricLock.
+  ///
+  /// In en, this message translates to:
+  /// **'Biometric Lock'**
+  String get biometricLock;
+
+  /// No description provided for @biometricLockSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Biometric Lock Subtitle'**
+  String get biometricLockSubtitle;
+
+  /// No description provided for @biometricsNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Biometrics Not Available'**
+  String get biometricsNotAvailable;
+
+  /// No description provided for @changesSavedAutomatically.
+  ///
+  /// In en, this message translates to:
+  /// **'Changes Saved Automatically'**
+  String get changesSavedAutomatically;
+
+  /// No description provided for @createBackupToKeepSafe.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Backup To Keep Safe'**
+  String get createBackupToKeepSafe;
+
+  /// No description provided for @createShareBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Share Backup'**
+  String get createShareBackup;
+
+  /// No description provided for @criticalUrgentAttention.
+  ///
+  /// In en, this message translates to:
+  /// **'Critical Urgent Attention'**
+  String get criticalUrgentAttention;
+
+  /// No description provided for @currentRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Rate'**
+  String get currentRate;
+
+  /// No description provided for @dataLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Data Label'**
+  String get dataLabel;
+
+  /// No description provided for @daysCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} days'**
+  String daysCount(int count);
+
+  /// No description provided for @deviceDoesNotSupportBiometrics.
+  ///
+  /// In en, this message translates to:
+  /// **'Device Does Not Support Biometrics'**
+  String get deviceDoesNotSupportBiometrics;
+
+  /// No description provided for @discard.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard'**
+  String get discard;
+
+  /// No description provided for @dueDateOffsetSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Due Date Offset Subtitle'**
+  String get dueDateOffsetSubtitle;
+
+  /// No description provided for @dueDaysAfterCycle.
+  ///
+  /// In en, this message translates to:
+  /// **'Due {count} days after cycle ends'**
+  String dueDaysAfterCycle(int count);
+
+  /// No description provided for @dueSoonAlert.
+  ///
+  /// In en, this message translates to:
+  /// **'Due Soon Alert'**
+  String get dueSoonAlert;
+
+  /// No description provided for @dueSoonAlertSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Due Soon Alert Subtitle'**
+  String get dueSoonAlertSubtitle;
+
+  /// No description provided for @editProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Profile'**
+  String get editProfile;
+
+  /// No description provided for @effectiveFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'Effective from {date}'**
+  String effectiveFrom(String date);
+
+  /// No description provided for @electricityMeterBills.
+  ///
+  /// In en, this message translates to:
+  /// **'Electricity Meter Bills'**
+  String get electricityMeterBills;
+
+  /// No description provided for @electricityRateInfoText.
+  ///
+  /// In en, this message translates to:
+  /// **'Electricity Rate Info Text'**
+  String get electricityRateInfoText;
+
+  /// No description provided for @electricityRatesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Electricity Rates Subtitle'**
+  String get electricityRatesSubtitle;
+
+  /// No description provided for @enableAppLock.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable App Lock'**
+  String get enableAppLock;
+
+  /// No description provided for @enterValidRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Valid Rate'**
+  String get enterValidRate;
+
+  /// No description provided for @firstReminderAfterDueDate.
+  ///
+  /// In en, this message translates to:
+  /// **'First Reminder After Due Date'**
+  String get firstReminderAfterDueDate;
+
+  /// No description provided for @generalSettingsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'General Settings Label'**
+  String get generalSettingsLabel;
+
+  /// No description provided for @localBackups.
+  ///
+  /// In en, this message translates to:
+  /// **'Local Backups'**
+  String get localBackups;
+
+  /// No description provided for @lockAfterInactivity.
+  ///
+  /// In en, this message translates to:
+  /// **'Lock After Inactivity'**
+  String get lockAfterInactivity;
+
+  /// No description provided for @lockOnExit.
+  ///
+  /// In en, this message translates to:
+  /// **'Lock On Exit'**
+  String get lockOnExit;
+
+  /// No description provided for @lockOnExitSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Lock On Exit Subtitle'**
+  String get lockOnExitSubtitle;
+
+  /// No description provided for @maintenanceCharges.
+  ///
+  /// In en, this message translates to:
+  /// **'Maintenance Charges'**
+  String get maintenanceCharges;
+
+  /// No description provided for @messageBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Message Body'**
+  String get messageBody;
+
+  /// No description provided for @messageTemplatesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Message Templates Subtitle'**
+  String get messageTemplatesSubtitle;
+
+  /// No description provided for @minutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} minutes'**
+  String minutes(int count);
+
+  /// No description provided for @mobileNumberHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Mobile Number Hint'**
+  String get mobileNumberHint;
+
+  /// No description provided for @monthlyRentBills.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Rent Bills'**
+  String get monthlyRentBills;
+
+  /// No description provided for @monthlySummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Summary'**
+  String get monthlySummary;
+
+  /// No description provided for @monthlySummarySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Summary Subtitle'**
+  String get monthlySummarySubtitle;
+
+  /// No description provided for @never.
+  ///
+  /// In en, this message translates to:
+  /// **'Never'**
+  String get never;
+
+  /// No description provided for @noBiometricsEnrolled.
+  ///
+  /// In en, this message translates to:
+  /// **'No Biometrics Enrolled'**
+  String get noBiometricsEnrolled;
+
+  /// No description provided for @noLocalBackups.
+  ///
+  /// In en, this message translates to:
+  /// **'No Local Backups'**
+  String get noLocalBackups;
+
+  /// No description provided for @noRateHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'No Rate History'**
+  String get noRateHistory;
+
+  /// No description provided for @notEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Not Enabled'**
+  String get notEnabled;
+
+  /// No description provided for @notificationSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification Settings'**
+  String get notificationSettings;
+
+  /// No description provided for @notificationTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification Time'**
+  String get notificationTime;
+
+  /// No description provided for @notificationsWorking.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications Working'**
+  String get notificationsWorking;
+
+  /// No description provided for @oneDayOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'One Day Overdue'**
+  String get oneDayOverdue;
+
+  /// No description provided for @oneMinute.
+  ///
+  /// In en, this message translates to:
+  /// **'One Minute'**
+  String get oneMinute;
+
+  /// No description provided for @oneWeekOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'One Week Overdue'**
+  String get oneWeekOverdue;
+
+  /// No description provided for @overdueFollowUps.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue Follow Ups'**
+  String get overdueFollowUps;
+
+  /// No description provided for @paymentNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Notifications'**
+  String get paymentNotifications;
+
+  /// No description provided for @paymentReceived.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Received'**
+  String get paymentReceived;
+
+  /// No description provided for @paymentReceivedSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Received Subtitle'**
+  String get paymentReceivedSubtitle;
+
+  /// No description provided for @permissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Permission Denied'**
+  String get permissionDenied;
+
+  /// No description provided for @profileUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile Updated'**
+  String get profileUpdated;
+
+  /// No description provided for @quietHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Quiet Hours'**
+  String get quietHours;
+
+  /// No description provided for @rateHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate History'**
+  String get rateHistory;
+
+  /// No description provided for @ratePerUnitLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate Per Unit Label'**
+  String get ratePerUnitLabel;
+
+  /// No description provided for @rateUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate Updated'**
+  String get rateUpdated;
+
+  /// No description provided for @receiptLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt Label'**
+  String get receiptLabel;
+
+  /// No description provided for @remindDaysBeforeCycleEnds.
+  ///
+  /// In en, this message translates to:
+  /// **'Remind {days} days before cycle ends'**
+  String remindDaysBeforeCycleEnds(int days);
+
+  /// No description provided for @remindDaysBeforeDueDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Remind {days} days before due date'**
+  String remindDaysBeforeDueDate(int days);
+
+  /// No description provided for @reminderLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder Label'**
+  String get reminderLabel;
+
+  /// No description provided for @reminderSettingsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder Settings Subtitle'**
+  String get reminderSettingsSubtitle;
+
+  /// No description provided for @requireBiometric.
+  ///
+  /// In en, this message translates to:
+  /// **'Require Biometric'**
+  String get requireBiometric;
+
+  /// No description provided for @resetBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Btn'**
+  String get resetBtn;
+
+  /// No description provided for @resetTemplateWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Template Warning'**
+  String get resetTemplateWarning;
+
+  /// No description provided for @resetToDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset To Default'**
+  String get resetToDefault;
+
+  /// No description provided for @restartNowBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Restart Now Btn'**
+  String get restartNowBtn;
+
+  /// No description provided for @restoreBackupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Backup Title'**
+  String get restoreBackupTitle;
+
+  /// No description provided for @restoreBackupWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Backup Warning'**
+  String get restoreBackupWarning;
+
+  /// No description provided for @restoreBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Btn'**
+  String get restoreBtn;
+
+  /// No description provided for @restoreFailedPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Failed Prefix'**
+  String get restoreFailedPrefix;
+
+  /// No description provided for @restoreFromDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore From Device'**
+  String get restoreFromDevice;
+
+  /// No description provided for @restoreFromDeviceSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore From Device Subtitle'**
+  String get restoreFromDeviceSubtitle;
+
+  /// No description provided for @restoreSuccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Success Title'**
+  String get restoreSuccessTitle;
+
+  /// No description provided for @saveDataToFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Data To File'**
+  String get saveDataToFile;
+
+  /// No description provided for @saveProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Profile'**
+  String get saveProfile;
+
+  /// No description provided for @secondReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Second Reminder'**
+  String get secondReminder;
+
+  /// No description provided for @sendTestNotification.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Test Notification'**
+  String get sendTestNotification;
+
+  /// No description provided for @setNewRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Set New Rate'**
+  String get setNewRate;
+
+  /// No description provided for @setupFingerprintFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Setup Fingerprint First'**
+  String get setupFingerprintFirst;
+
+  /// No description provided for @template.
+  ///
+  /// In en, this message translates to:
+  /// **'Template'**
+  String get template;
+
+  /// No description provided for @templateAlreadyDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Template Already Default'**
+  String get templateAlreadyDefault;
+
+  /// No description provided for @templatePlaceholders.
+  ///
+  /// In en, this message translates to:
+  /// **'Template Placeholders'**
+  String get templatePlaceholders;
+
+  /// No description provided for @templateResetSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Template Reset Success'**
+  String get templateResetSuccess;
+
+  /// No description provided for @templateSavedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Template Saved Success'**
+  String get templateSavedSuccess;
+
+  /// No description provided for @templateUsedWhenSharing.
+  ///
+  /// In en, this message translates to:
+  /// **'Template used when sharing {type}'**
+  String templateUsedWhenSharing(String type);
+
+  /// No description provided for @testNotificationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Test Notification Title'**
+  String get testNotificationTitle;
+
+  /// No description provided for @threeDaysOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'Three Days Overdue'**
+  String get threeDaysOverdue;
+
+  /// No description provided for @twoWeeksOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'Two Weeks Overdue'**
+  String get twoWeeksOverdue;
+
+  /// No description provided for @unit.
+  ///
+  /// In en, this message translates to:
+  /// **'Unit'**
+  String get unit;
+
+  /// No description provided for @updateRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Rate'**
+  String get updateRate;
+
+  /// No description provided for @upiId.
+  ///
+  /// In en, this message translates to:
+  /// **'Upi Id'**
+  String get upiId;
+
+  /// No description provided for @upiIdHelperText.
+  ///
+  /// In en, this message translates to:
+  /// **'Upi Id Helper Text'**
+  String get upiIdHelperText;
+
+  /// No description provided for @upiIdHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Upi Id Hint'**
+  String get upiIdHint;
+
+  /// No description provided for @versionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version}'**
+  String versionLabel(String version);
+
+  /// No description provided for @weeklyReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Reminder'**
+  String get weeklyReminder;
+
+  /// No description provided for @yourName.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Name'**
+  String get yourName;
 }
 
 class _AppLocalizationsDelegate

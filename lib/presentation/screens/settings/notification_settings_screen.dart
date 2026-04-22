@@ -9,6 +9,7 @@ import '../../../application/providers/notification_settings_providers.dart';
 import '../../../data/database/tables/notification_setting_table.dart';
 import '../../../services/local_notification_service.dart';
 import 'dart:async';
+import 'package:rent_khata/l10n/app_localizations.dart';
 
 enum _SaveStatus { idle, saving, saved, error }
 
@@ -96,9 +97,10 @@ class _NotificationSettingsScreenState
     } catch (e) {
       if (mounted) {
         setState(() => _saveStatus = _SaveStatus.error);
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error saving settings: $e')));
+        ).showSnackBar(SnackBar(content: Text('${l10n.errorPrefix}$e')));
       }
     }
   }
@@ -212,6 +214,7 @@ class _NotificationSettingsScreenState
   @override
   Widget build(BuildContext context) {
     final providerState = ref.watch(notificationSettingsNotifierProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     // Sync local state with provider state only once when loaded
     if (!_initialized && !providerState.isLoading) {
@@ -222,14 +225,14 @@ class _NotificationSettingsScreenState
     // If completely loading for first time
     if (providerState.isLoading && !_initialized) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Notification Settings')),
+        appBar: AppBar(title: Text(l10n.notificationSettings)),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Notification Settings'),
+        title: Text(l10n.notificationSettings),
         actions: [_buildAppBarStatus(), const SizedBox(width: 16)],
       ),
       body: SingleChildScrollView(
@@ -239,7 +242,7 @@ class _NotificationSettingsScreenState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Changes are saved automatically.',
+              l10n.changesSavedAutomatically,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
@@ -249,13 +252,13 @@ class _NotificationSettingsScreenState
             // Billing Reminders Section
             _buildSectionHeader(
               icon: Icons.calendar_today_outlined,
-              title: 'Billing Reminders',
+              title: l10n.billingReminders,
               color: Theme.of(context).colorScheme.primary,
             ),
             _buildToggleWithSlider(
-              title: 'Billing cycle ending',
+              title: l10n.billingCycleEnding,
               subtitle:
-                  'Remind ${_localState.getDaysBefore(NotificationType.cycleEndingSoon)} days before cycle ends',
+                  l10n.remindDaysBeforeCycleEnds(_localState.getDaysBefore(NotificationType.cycleEndingSoon)),
               value: _localState.isEnabled(NotificationType.cycleEndingSoon),
               onChanged: (v) =>
                   _toggleSetting(NotificationType.cycleEndingSoon, v),
@@ -270,9 +273,9 @@ class _NotificationSettingsScreenState
               ),
             ),
             _buildToggleWithSlider(
-              title: 'Bill due soon',
+              title: l10n.billDueSoon,
               subtitle:
-                  'Remind ${_localState.getDaysBefore(NotificationType.billDueSoon)} days before due date',
+                  l10n.remindDaysBeforeDueDate(_localState.getDaysBefore(NotificationType.billDueSoon)),
               value: _localState.isEnabled(NotificationType.billDueSoon),
               onChanged: (v) => _toggleSetting(NotificationType.billDueSoon, v),
               sliderValue: _localState
@@ -284,8 +287,8 @@ class _NotificationSettingsScreenState
                   _updateDaysBefore(NotificationType.billDueSoon, v.round()),
             ),
             _buildSimpleToggle(
-              title: 'Monthly summary',
-              subtitle: 'Collection status on 1st of each month',
+              title: l10n.monthlySummary,
+              subtitle: l10n.monthlySummarySubtitle,
               value: _localState.isEnabled(NotificationType.monthlySummary),
               onChanged: (v) =>
                   _toggleSetting(NotificationType.monthlySummary, v),
@@ -295,19 +298,19 @@ class _NotificationSettingsScreenState
             // Payment Notifications Section
             _buildSectionHeader(
               icon: Icons.payment_outlined,
-              title: 'Payment Notifications',
+              title: l10n.paymentNotifications,
               color: Theme.of(context).colorScheme.primary,
             ),
             _buildSimpleToggle(
-              title: 'Payment received',
-              subtitle: 'Confirm when payment is recorded',
+              title: l10n.paymentReceived,
+              subtitle: l10n.paymentReceivedSubtitle,
               value: _localState.isEnabled(NotificationType.paymentReceived),
               onChanged: (v) =>
                   _toggleSetting(NotificationType.paymentReceived, v),
             ),
             _buildSimpleToggle(
-              title: 'Bill fully paid',
-              subtitle: 'Celebrate when bill is fully paid',
+              title: l10n.billFullyPaid,
+              subtitle: l10n.billFullyPaidSubtitle,
               value: _localState.isEnabled(NotificationType.billFullyPaid),
               onChanged: (v) =>
                   _toggleSetting(NotificationType.billFullyPaid, v),
@@ -317,32 +320,32 @@ class _NotificationSettingsScreenState
             // Overdue Escalation Section
             _buildSectionHeader(
               icon: Icons.warning_amber_outlined,
-              title: 'Overdue Follow-ups',
+              title: l10n.overdueFollowUps,
               color: Theme.of(context).colorScheme.error,
             ),
             _buildSimpleToggle(
-              title: '1 day overdue',
-              subtitle: 'First reminder after due date',
+              title: l10n.oneDayOverdue,
+              subtitle: l10n.firstReminderAfterDueDate,
               value: _localState.isEnabled(NotificationType.overdue1Day),
               onChanged: (v) => _toggleSetting(NotificationType.overdue1Day, v),
             ),
             _buildSimpleToggle(
-              title: '3 days overdue',
-              subtitle: 'Second reminder',
+              title: l10n.threeDaysOverdue,
+              subtitle: l10n.secondReminder,
               value: _localState.isEnabled(NotificationType.overdue3Days),
               onChanged: (v) =>
                   _toggleSetting(NotificationType.overdue3Days, v),
             ),
             _buildSimpleToggle(
-              title: '1 week overdue',
-              subtitle: 'Weekly reminder',
+              title: l10n.oneWeekOverdue,
+              subtitle: l10n.weeklyReminder,
               value: _localState.isEnabled(NotificationType.overdue7Days),
               onChanged: (v) =>
                   _toggleSetting(NotificationType.overdue7Days, v),
             ),
             _buildSimpleToggle(
-              title: '2 weeks overdue',
-              subtitle: 'Critical - urgent attention needed',
+              title: l10n.twoWeeksOverdue,
+              subtitle: l10n.criticalUrgentAttention,
               value: _localState.isEnabled(NotificationType.overdue14Days),
               onChanged: (v) =>
                   _toggleSetting(NotificationType.overdue14Days, v),
@@ -352,13 +355,13 @@ class _NotificationSettingsScreenState
             // General Settings Section
             _buildSectionHeader(
               icon: Icons.settings_outlined,
-              title: 'General',
+              title: l10n.generalSettingsLabel,
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
             ListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Notification time'),
-              subtitle: Text(_formatHour(_localState.notificationHour)),
+              title: Text(l10n.notificationTime),
+              subtitle: Text(_formatHour(_localState.notificationHour, l10n)),
               trailing: DropdownButton<int>(
                 value: _localState.notificationHour,
                 underline: const SizedBox(),
@@ -366,7 +369,7 @@ class _NotificationSettingsScreenState
                     .map(
                       (h) => DropdownMenuItem(
                         value: h,
-                        child: Text(_formatHour(h)),
+                        child: Text(_formatHour(h, l10n)),
                       ),
                     )
                     .toList(),
@@ -377,12 +380,12 @@ class _NotificationSettingsScreenState
             ),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Quiet hours'),
+              title: Text(l10n.quietHours),
               subtitle: _localState.quietHoursStart != null
                   ? Text(
-                      '${_formatHour(_localState.quietHoursStart!)} - ${_formatHour(_localState.quietHoursEnd!)}',
+                      '${_formatHour(_localState.quietHoursStart!, l10n)} - ${_formatHour(_localState.quietHoursEnd!, l10n)}',
                     )
-                  : const Text('Not enabled'),
+                  : Text(l10n.notEnabled),
               value: _localState.quietHoursStart != null,
               onChanged: _updateQuietHours,
             ),
@@ -396,8 +399,8 @@ class _NotificationSettingsScreenState
                   width: double.infinity,
                   child: OutlinedButton.icon(
                     icon: const Icon(Icons.notifications_active),
-                    label: const Text('Send Test Notification'),
-                    onPressed: _sendTestNotification,
+                    label: Text(l10n.sendTestNotification),
+                    onPressed: () => _sendTestNotification(l10n),
                   ),
                 ),
               ),
@@ -505,14 +508,14 @@ class _NotificationSettingsScreenState
     );
   }
 
-  String _formatHour(int hour) {
+  String _formatHour(int hour, AppLocalizations l10n) {
     if (hour == 0) return '12:00 AM';
     if (hour < 12) return '$hour:00 AM';
     if (hour == 12) return '12:00 PM';
     return '${hour - 12}:00 PM';
   }
 
-  Future<void> _sendTestNotification() async {
+  Future<void> _sendTestNotification(AppLocalizations l10n) async {
     // ... same as before
     try {
       final notificationService = LocalNotificationService();
@@ -523,21 +526,21 @@ class _NotificationSettingsScreenState
         if (mounted) {
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(const SnackBar(content: Text('Permission denied')));
+          ).showSnackBar(SnackBar(content: Text(l10n.permissionDenied)));
         }
         return;
       }
       await notificationService.showNotification(
         id: 12345,
-        title: '🔔 Test Notification',
-        body: 'Notifications are working!',
+        title: l10n.testNotificationTitle,
+        body: l10n.notificationsWorking,
         payload: 'test',
       );
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ).showSnackBar(SnackBar(content: Text('${l10n.errorPrefix}$e')));
       }
     }
   }

@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../application/providers/biometric_providers.dart';
 import '../../../services/biometric_service.dart';
 import '../../widgets/bouncing_scale_wrapper.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
 
 /// Settings screen for biometric app lock configuration.
 class BiometricSettingsScreen extends ConsumerWidget {
@@ -16,12 +17,13 @@ class BiometricSettingsScreen extends ConsumerWidget {
     final biometricSupport = ref.watch(biometricSupportProvider);
     final settingsAsync = ref.watch(biometricSettingsNotifierProvider);
 
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: const Text('App Lock')),
+      appBar: AppBar(title: Text(l10n.appLock)),
       body: biometricSupport.when(
-        data: (support) => _buildContent(context, ref, support, settingsAsync),
+        data: (support) => _buildContent(context, ref, support, settingsAsync, l10n),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, s) => Center(child: Text('Error: $e')),
+        error: (e, s) => Center(child: Text('${l10n.errorPrefix}$e')),
       ),
     );
   }
@@ -31,15 +33,16 @@ class BiometricSettingsScreen extends ConsumerWidget {
     WidgetRef ref,
     BiometricSupport support,
     AsyncValue settingsAsync,
+    AppLocalizations l10n,
   ) {
     final colorScheme = Theme.of(context).colorScheme;
 
     if (support == BiometricSupport.notAvailable) {
-      return _buildNotAvailableContent(context);
+      return _buildNotAvailableContent(context, l10n);
     }
 
     if (support == BiometricSupport.notEnrolled) {
-      return _buildNotEnrolledContent(context);
+      return _buildNotEnrolledContent(context, l10n);
     }
 
     return settingsAsync.when(
@@ -81,13 +84,13 @@ class BiometricSettingsScreen extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Biometric Lock',
+                          l10n.biometricLock,
                           style: Theme.of(context).textTheme.titleMedium
                               ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Protect your rental data with fingerprint or device PIN',
+                          l10n.biometricLockSubtitle,
                           style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(color: colorScheme.onSurfaceVariant),
                         ),
@@ -101,8 +104,8 @@ class BiometricSettingsScreen extends ConsumerWidget {
             // Enable toggle
             BouncingScaleWrapper(
               child: SwitchListTile(
-                title: const Text('Enable App Lock'),
-                subtitle: const Text('Require biometric to open app'),
+                title: Text(l10n.enableAppLock),
+                subtitle: Text(l10n.requireBiometric),
                 value: isEnabled,
                 onChanged: (value) {
                   ref
@@ -125,9 +128,9 @@ class BiometricSettingsScreen extends ConsumerWidget {
                     // Lock on exit
                     BouncingScaleWrapper(
                       child: SwitchListTile(
-                        title: const Text('Lock on Exit'),
-                        subtitle: const Text(
-                          'Lock immediately when app goes to background',
+                        title: Text(l10n.lockOnExit),
+                        subtitle: Text(
+                          l10n.lockOnExitSubtitle,
                         ),
                         value: lockOnExit,
                         onChanged: (value) {
@@ -140,13 +143,14 @@ class BiometricSettingsScreen extends ConsumerWidget {
                     // Lock after inactivity
                     BouncingScaleWrapper(
                       child: ListTile(
-                        title: const Text('Lock After Inactivity'),
-                        subtitle: Text(_getInactivityLabel(lockAfterMinutes)),
+                        title: Text(l10n.lockAfterInactivity),
+                        subtitle: Text(_getInactivityLabel(lockAfterMinutes, l10n)),
                         trailing: const Icon(Icons.chevron_right),
                         onTap: () => _showInactivityPicker(
                           context,
                           ref,
                           lockAfterMinutes,
+                          l10n,
                         ),
                       ),
                     ),
@@ -179,7 +183,7 @@ class BiometricSettingsScreen extends ConsumerWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'When locked, you can also use your device PIN, pattern, or password as a fallback.',
+                        l10n.biometricFallbackInfo,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                         ),
@@ -193,11 +197,11 @@ class BiometricSettingsScreen extends ConsumerWidget {
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, s) => Center(child: Text('Error: $e')),
+      error: (e, s) => Center(child: Text('${l10n.errorPrefix}$e')),
     );
   }
 
-  Widget _buildNotAvailableContent(BuildContext context) {
+  Widget _buildNotAvailableContent(BuildContext context, AppLocalizations l10n) {
     final colorScheme = Theme.of(context).colorScheme;
     return Center(
       child: Padding(
@@ -219,14 +223,14 @@ class BiometricSettingsScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              'Biometrics Not Available',
+              l10n.biometricsNotAvailable,
               style: Theme.of(
                 context,
               ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
-              'Your device does not support biometric authentication.',
+              l10n.deviceDoesNotSupportBiometrics,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
@@ -238,7 +242,7 @@ class BiometricSettingsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildNotEnrolledContent(BuildContext context) {
+  Widget _buildNotEnrolledContent(BuildContext context, AppLocalizations l10n) {
     final colorScheme = Theme.of(context).colorScheme;
     return Center(
       child: Padding(
@@ -260,14 +264,14 @@ class BiometricSettingsScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              'No Biometrics Enrolled',
+              l10n.noBiometricsEnrolled,
               style: Theme.of(
                 context,
               ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
-              'Please set up fingerprint in your device settings first.',
+              l10n.setupFingerprintFirst,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
@@ -279,23 +283,24 @@ class BiometricSettingsScreen extends ConsumerWidget {
     );
   }
 
-  String _getInactivityLabel(int minutes) {
-    if (minutes <= 0) return 'Never';
-    if (minutes == 1) return '1 minute';
-    return '$minutes minutes';
+  String _getInactivityLabel(int minutes, AppLocalizations l10n) {
+    if (minutes <= 0) return l10n.never;
+    if (minutes == 1) return l10n.oneMinute;
+    return l10n.minutes(minutes);
   }
 
   void _showInactivityPicker(
     BuildContext context,
     WidgetRef ref,
     int currentValue,
+    AppLocalizations l10n,
   ) {
     final options = [
-      (0, 'Never'),
-      (1, '1 minute'),
-      (5, '5 minutes'),
-      (15, '15 minutes'),
-      (30, '30 minutes'),
+      (0, l10n.never),
+      (1, l10n.oneMinute),
+      (5, l10n.minutes(5)),
+      (15, l10n.minutes(15)),
+      (30, l10n.minutes(30)),
     ];
 
     showModalBottomSheet(
@@ -317,7 +322,7 @@ class BiometricSettingsScreen extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Text(
-                'Lock After Inactivity',
+                l10n.lockAfterInactivity,
                 style: Theme.of(
                   context,
                 ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),

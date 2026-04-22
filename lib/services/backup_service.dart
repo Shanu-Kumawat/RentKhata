@@ -104,6 +104,28 @@ class BackupService {
     await dbFile.writeAsBytes(dbArchiveFile.content as List<int>);
   }
 
+  /// Restore database from an external backup file (e.g. from File Picker)
+  Future<void> restoreFromExternalFile(File externalZipFile) async {
+    final dbPath = await _databasePath;
+    
+    // Read external backup archive
+    final bytes = await externalZipFile.readAsBytes();
+    final archive = ZipDecoder().decodeBytes(bytes);
+    
+    // Find database file in archive
+    final dbArchiveFile = archive.files.firstWhere(
+      (file) => file.name == DbConstants.databaseName,
+      orElse: () => throw Exception('Invalid backup file: rent_khata.sqlite not found inside.'),
+    );
+    
+    // Close current database
+    await _database.close();
+    
+    // Restore database
+    final dbFile = File(dbPath);
+    await dbFile.writeAsBytes(dbArchiveFile.content as List<int>);
+  }
+
   /// Get list of local backups
   Future<List<File>> getLocalBackups() async {
     final backupDirPath = await _backupDir;

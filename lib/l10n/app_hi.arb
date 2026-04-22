@@ -68,7 +68,7 @@
   "gender": "लिंग",
   "contactInformation": "संपर्क जानकारी",
   "phone": "फोन",
-  "secondaryPhone": "वैकल्पिक फोन",
+  "secondaryPhone": "द्वितीयक फ़ोन",
   "aadhaar": "आधार",
   "permanentAddress": "स्थायी पता",
   "address": "पता",
@@ -76,13 +76,9 @@
   "pincode": "पिन कोड",
   "workDetails": "कार्य विवरण",
   "company": "कंपनी",
-  "pincode": "पिन कोड",
-  "workDetails": "कार्य विवरण",
-  "company": "कंपनी",
   "officeAddress": "कार्यालय का पता",
   "introducerReference": "परिचयकर्ता / संदर्भ",
   "name": "नाम",
-  "reports": "रिपोर्ट्स",
   "overview": "अवलोकन",
   "pending": "लंबित",
   "history": "इतिहास",
@@ -101,7 +97,6 @@
   "billsByType": "प्रकार के अनुसार बिल",
   "properties": "प्रॉपर्टीज",
   "retry": "पुनः प्रयास करें",
-  "addProperty": "प्रॉपर्टी जोड़ें",
   "noPropertiesYet": "अभी तक कोई प्रॉपर्टी नहीं",
   "addYourFirstProperty": "शुरू करने के लिए अपनी पहली प्रॉपर्टी जोड़ें",
   "roomsCount": "{count} कमरे",
@@ -161,13 +156,12 @@
   "tenant": "किरायेदार",
   "created": "बनाया गया",
   "monthlyRent": "मासिक किराया",
-  "electricityBill": "बिजली का बिल",
-  "waterBill": "पानी का बिल",
+  "electricityBill": "बिजली बिल",
+  "waterBill": "पानी बिल",
   "maintenance": "रखरखाव",
   "otherCharges": "अन्य शुल्क",
   "electricityDetails": "बिजली का विवरण",
   "previous": "पिछला",
-  "current": "वर्तमान",
   "meterPhoto": "मीटर की फोटो",
   "tapToViewFullSize": "पूरा आकार देखने के लिए टैप करें",
   "addMeterPhoto": "मीटर की फोटो जोड़ें",
@@ -181,15 +175,14 @@
   "confirmDeletePayment": "क्या {date} को किए गए {amount} के भुगतान को हटा दें?\n\nयह बिल बैलेंस को अपडेट कर देगा।",
   "paymentDeleted": "भुगतान हटा दिया गया",
   "cash": "नकद",
-  "upi": "यूपीआई (UPI)",
-  "bankTransfer": "बैंक का स्थानांतरण",
+  "upi": "यूपीआई",
+  "bankTransfer": "बैंक ट्रांसफर",
   "cheque": "चेक",
   "other": "अन्य",
   "auditHistory": "ऑडिट का इतिहास",
   "noChangesRecorded": "कोई परिवर्तन रिकॉर्ड नहीं किया गया",
   "updated": "अपडेट किया गया",
   "deleted": "हटा दिया गया",
-  "createBill": "बिल बनाएं",
   "billAlreadyExists": "बिल पहले से मौजूद है",
   "duplicateBillMessage": "{month} {year} के लिए {type} बिल पहले से मौजूद है ({number})।\n\nक्या आप फिर भी एक और बिल बनाना चाहते हैं?",
   "createAnyway": "फिर भी बनाएं",
@@ -234,21 +227,13 @@
   "paymentAmountLabel": "भुगतान राशि",
   "paymentModeLabel": "भुगतान का प्रकार",
   "billTotalLabel": "कुल बिल",
-  "paidLabel": "जमा",
+  "paidLabel": "भुगतान किया",
   "balanceLabel": "बचा हुआ",
   "closeLabel": "बंद करें",
-  "monthlyRent": "मासिक किराया",
   "electricity": "बिजली",
   "water": "पानी",
-  "maintenance": "रखरखाव",
-  "other": "अन्य",
-  "cash": "नकद",
-  "upi": "यूपीआई",
-  "bankTransfer": "बैंक ट्रांसफर",
-  "cheque": "चेक",
   "amountCannotExceedMax": "राशि {amount} से अधिक नहीं हो सकती",
   "paymentUpdated": "भुगतान अपडेट किया गया",
-  "editPayment": "भुगतान संपादित करें",
   "originalAmount": "मूल: {amount}",
   "paymentAmountRequiredLabel": "भुगतान राशि (₹) *",
   "paymentDateLabel": "भुगतान की तारीख",
@@ -260,15 +245,10 @@
   "errorSharingPdf": "पीडीएफ साझा करने में त्रुटि: {error}",
   "invoiceNumber": "इनवॉइस {number}",
   "billTo": "बिल प्राप्तकर्ता",
-  "tenant": "किरायेदार",
   "unitsAmount": "{amount} यूनिट",
   "unitsConsumedRate": "{units} यूनिट @ {rate}/यूनिट",
   "scanToPay": "भुगतान के लिए स्कैन करें",
-  "generatedOn": "{date} को जनरेट किया गया",
-  "electricityBill": "बिजली बिल",
-  "waterBill": "पानी बिल",
-  "otherCharges": "अन्य शुल्क",
-  "draft": "ड्राफ्ट",
+  "generatedOn": "जारी तिथि: {date}",
   "sentStatus": "भेजा गया",
   "partialStatus": "आंशिक",
   "paidStatus": "भुगतान किया गया",
@@ -279,7 +259,7 @@
   "unitsConsumed": "उपभोग की गई यूनिट",
   "notesLabel": "नोट",
   "totalAmount": "कुल राशि",
-  "balanceDueLabel": "बकाया शेष",
+  "balanceDueLabel": "बकाया राशि",
   "amount": "राशि",
   "invoiceSavedToDownloads": "इनवॉइस डाउनलोड में सहेजा गया",
   "ok": "ठीक है",
@@ -369,8 +349,6 @@
   "essentialInfo": "आवश्यक जानकारी",
   "nameLabel": "नाम",
   "phoneLabel": "फ़ोन नंबर",
-  "secondaryPhone": "द्वितीयक फ़ोन",
-  "permanentAddress": "स्थायी पता",
   "addressLine": "पता पंक्ति",
   "cityLabel": "शहर",
   "stateLabel": "राज्य",
@@ -390,9 +368,7 @@
   "currentRatePerUnit": "प्रति यूनिट वर्तमान दर",
   "aadhaarFrontPhoto": "आधार के सामने की फोटो",
   "aadhaarBackPhoto": "आधार के पीछे की फोटो",
-  "workDetails": "कार्य विवरण",
   "companyName": "कंपनी का नाम",
-  "officeAddress": "कार्यालय का पता",
   "introducerName": "परिचयकर्ता का नाम",
   "introducerAddress": "परिचयकर्ता का पता",
   "introducerPhone": "परिचयकर्ता का फोन",
@@ -428,18 +404,14 @@
   "overdueByDays": "{days} दिन से बकाया",
   "amountDueSuffix": "{amount} बाकी",
   "khataStatement": "खाता विवरण",
-  "generatedOn": "जारी तिथि: {date}",
   "fromLabel": "प्रेषक:",
   "toLabel": "प्राप्तकर्ता:",
   "roomNoLabel": "कमरा नंबर: {roomNumber}",
   "totalBilledLabel": "कुल बिल",
   "totalPaidLabel": "कुल भुगतान",
-  "balanceDueLabel": "बकाया राशि",
   "dateLabel": "तारीख",
   "descriptionLabel": "विवरण",
   "billedLabel": "बिल हुआ",
-  "paidLabel": "भुगतान किया",
-  "balanceLabel": "बचा हुआ",
   "advanceLabel": "{amount} (अग्रिम)",
   "systemGeneratedMsg": "यह सिस्टम द्वारा तैयार किया गया विवरण है और इसके लिए भौतिक हस्ताक्षर की आवश्यकता नहीं है।",
   "moveOutSettlementTitle": "अंतिम हिसाब",
@@ -453,5 +425,182 @@
   "accountSettledMsg": "हिसाब चुकता - कोई बकाया नहीं",
   "tenantSignature": "किरायेदार के हस्ताक्षर",
   "landlordSignature": "मकान मालिक के हस्ताक्षर",
-  "computerGeneratedMsg": "यह कंप्यूटर द्वारा तैयार किया गया विवरण है और इसके लिए भौतिक हस्ताक्षर की आवश्यकता नहीं है।"
+  "computerGeneratedMsg": "यह कंप्यूटर द्वारा तैयार किया गया विवरण है और इसके लिए भौतिक हस्ताक्षर की आवश्यकता नहीं है।",
+  "aboutLabel": "[HI] About Label",
+  "aboutRentKhataDescription": "[HI] About Rent Khata Description",
+  "alertDaysBeforeCycle": "[HI] Alert {count} days before",
+  "@alertDaysBeforeCycle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "anniversaryBillingByBillType": "[HI] Anniversary Billing By Bill Type",
+  "anniversaryBillingSubtitle": "[HI] Anniversary Billing Subtitle",
+  "backupAndRestoreSubtitle": "[HI] Backup And Restore Subtitle",
+  "backupCreatedShare": "[HI] Backup Created Share",
+  "backupInfoText": "[HI] Backup Info Text",
+  "backupRestoredSuccess": "[HI] Backup Restored Success",
+  "billDueSoon": "[HI] Bill Due Soon",
+  "billFullyPaid": "[HI] Bill Fully Paid",
+  "billFullyPaidSubtitle": "[HI] Bill Fully Paid Subtitle",
+  "billingCycleEnding": "[HI] Billing Cycle Ending",
+  "billingLabel": "[HI] Billing Label",
+  "billingReminders": "[HI] Billing Reminders",
+  "biometricFallbackInfo": "[HI] Biometric Fallback Info",
+  "biometricLock": "[HI] Biometric Lock",
+  "biometricLockSubtitle": "[HI] Biometric Lock Subtitle",
+  "biometricsNotAvailable": "[HI] Biometrics Not Available",
+  "changesSavedAutomatically": "[HI] Changes Saved Automatically",
+  "createBackupToKeepSafe": "[HI] Create Backup To Keep Safe",
+  "createShareBackup": "[HI] Create Share Backup",
+  "criticalUrgentAttention": "[HI] Critical Urgent Attention",
+  "currentRate": "[HI] Current Rate",
+  "dataLabel": "[HI] Data Label",
+  "daysCount": "[HI] {count} days",
+  "@daysCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "deviceDoesNotSupportBiometrics": "[HI] Device Does Not Support Biometrics",
+  "discard": "[HI] Discard",
+  "dueDateOffsetSubtitle": "[HI] Due Date Offset Subtitle",
+  "dueDaysAfterCycle": "[HI] Due {count} days after cycle ends",
+  "@dueDaysAfterCycle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dueSoonAlert": "[HI] Due Soon Alert",
+  "dueSoonAlertSubtitle": "[HI] Due Soon Alert Subtitle",
+  "editProfile": "[HI] Edit Profile",
+  "effectiveFrom": "[HI] Effective from {date}",
+  "@effectiveFrom": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "electricityMeterBills": "[HI] Electricity Meter Bills",
+  "electricityRateInfoText": "[HI] Electricity Rate Info Text",
+  "electricityRatesSubtitle": "[HI] Electricity Rates Subtitle",
+  "enableAppLock": "[HI] Enable App Lock",
+  "enterValidRate": "[HI] Enter Valid Rate",
+  "firstReminderAfterDueDate": "[HI] First Reminder After Due Date",
+  "generalSettingsLabel": "[HI] General Settings Label",
+  "localBackups": "[HI] Local Backups",
+  "lockAfterInactivity": "[HI] Lock After Inactivity",
+  "lockOnExit": "[HI] Lock On Exit",
+  "lockOnExitSubtitle": "[HI] Lock On Exit Subtitle",
+  "maintenanceCharges": "[HI] Maintenance Charges",
+  "messageBody": "[HI] Message Body",
+  "messageTemplatesSubtitle": "[HI] Message Templates Subtitle",
+  "minutes": "[HI] {count} minutes",
+  "@minutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mobileNumberHint": "[HI] Mobile Number Hint",
+  "monthlyRentBills": "[HI] Monthly Rent Bills",
+  "monthlySummary": "[HI] Monthly Summary",
+  "monthlySummarySubtitle": "[HI] Monthly Summary Subtitle",
+  "never": "[HI] Never",
+  "noBiometricsEnrolled": "[HI] No Biometrics Enrolled",
+  "noLocalBackups": "[HI] No Local Backups",
+  "noRateHistory": "[HI] No Rate History",
+  "notEnabled": "[HI] Not Enabled",
+  "notificationSettings": "[HI] Notification Settings",
+  "notificationTime": "[HI] Notification Time",
+  "notificationsWorking": "[HI] Notifications Working",
+  "oneDayOverdue": "[HI] One Day Overdue",
+  "oneMinute": "[HI] One Minute",
+  "oneWeekOverdue": "[HI] One Week Overdue",
+  "overdueFollowUps": "[HI] Overdue Follow Ups",
+  "paymentNotifications": "[HI] Payment Notifications",
+  "paymentReceived": "[HI] Payment Received",
+  "paymentReceivedSubtitle": "[HI] Payment Received Subtitle",
+  "permissionDenied": "[HI] Permission Denied",
+  "profileUpdated": "[HI] Profile Updated",
+  "quietHours": "[HI] Quiet Hours",
+  "rateHistory": "[HI] Rate History",
+  "ratePerUnitLabel": "[HI] Rate Per Unit Label",
+  "rateUpdated": "[HI] Rate Updated",
+  "receiptLabel": "[HI] Receipt Label",
+  "remindDaysBeforeCycleEnds": "[HI] Remind {days} days before cycle ends",
+  "@remindDaysBeforeCycleEnds": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "remindDaysBeforeDueDate": "[HI] Remind {days} days before due date",
+  "@remindDaysBeforeDueDate": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "reminderLabel": "[HI] Reminder Label",
+  "reminderSettingsSubtitle": "[HI] Reminder Settings Subtitle",
+  "requireBiometric": "[HI] Require Biometric",
+  "resetBtn": "[HI] Reset Btn",
+  "resetTemplateWarning": "[HI] Reset Template Warning",
+  "resetToDefault": "[HI] Reset To Default",
+  "restartNowBtn": "[HI] Restart Now Btn",
+  "restoreBackupTitle": "[HI] Restore Backup Title",
+  "restoreBackupWarning": "[HI] Restore Backup Warning",
+  "restoreBtn": "[HI] Restore Btn",
+  "restoreFailedPrefix": "[HI] Restore Failed Prefix",
+  "restoreFromDevice": "[HI] Restore From Device",
+  "restoreFromDeviceSubtitle": "[HI] Restore From Device Subtitle",
+  "restoreSuccessTitle": "[HI] Restore Success Title",
+  "saveDataToFile": "[HI] Save Data To File",
+  "saveProfile": "[HI] Save Profile",
+  "secondReminder": "[HI] Second Reminder",
+  "sendTestNotification": "[HI] Send Test Notification",
+  "setNewRate": "[HI] Set New Rate",
+  "setupFingerprintFirst": "[HI] Setup Fingerprint First",
+  "template": "[HI] Template",
+  "templateAlreadyDefault": "[HI] Template Already Default",
+  "templatePlaceholders": "[HI] Template Placeholders",
+  "templateResetSuccess": "[HI] Template Reset Success",
+  "templateSavedSuccess": "[HI] Template Saved Success",
+  "templateUsedWhenSharing": "[HI] Template used when sharing {type}",
+  "@templateUsedWhenSharing": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "testNotificationTitle": "[HI] Test Notification Title",
+  "threeDaysOverdue": "[HI] Three Days Overdue",
+  "twoWeeksOverdue": "[HI] Two Weeks Overdue",
+  "unit": "[HI] Unit",
+  "updateRate": "[HI] Update Rate",
+  "upiId": "[HI] Upi Id",
+  "upiIdHelperText": "[HI] Upi Id Helper Text",
+  "upiIdHint": "[HI] Upi Id Hint",
+  "versionLabel": "[HI] Version {version}",
+  "@versionLabel": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "weeklyReminder": "[HI] Weekly Reminder",
+  "yourName": "[HI] Your Name"
 }

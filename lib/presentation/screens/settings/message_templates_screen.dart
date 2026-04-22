@@ -8,6 +8,7 @@ import '../../../application/providers/repository_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/message_template.dart';
 import '../../../services/template_service.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
 
 /// Screen to manage message templates for invoices, receipts, and reminders.
 /// Each template type (Invoice, Receipt, Reminder) has exactly ONE editable template.
@@ -16,8 +17,9 @@ class MessageTemplatesScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: const Text('Message Templates')),
+      appBar: AppBar(title: Text(l10n.messageTemplates)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -50,8 +52,7 @@ class MessageTemplatesScreen extends ConsumerWidget {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                'Edit templates used for invoices, receipts, and reminders. '
-                'Use placeholders like {tenantName}, {amount}, etc.',
+                AppLocalizations.of(context)!.messageTemplatesSubtitle,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
@@ -102,11 +103,11 @@ class _TemplateEditorState extends ConsumerState<_TemplateEditor> {
     }
   }
 
-  String _getTypeLabel() {
+  String _getTypeLabel(AppLocalizations l10n) {
     return switch (widget.type) {
-      TemplateType.invoice => 'Invoice',
-      TemplateType.receipt => 'Receipt',
-      TemplateType.reminder => 'Reminder',
+      TemplateType.invoice => l10n.invoiceLabel,
+      TemplateType.receipt => l10n.receiptLabel,
+      TemplateType.reminder => l10n.reminderLabel,
     };
   }
 
@@ -131,6 +132,7 @@ class _TemplateEditorState extends ConsumerState<_TemplateEditor> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final templateAsync = ref.watch(defaultTemplateProvider(widget.type));
@@ -170,13 +172,13 @@ class _TemplateEditorState extends ConsumerState<_TemplateEditor> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '${_getTypeLabel()} Template',
+                        '${_getTypeLabel(l10n)} ${l10n.template}',
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
-                        'Used when sharing ${_getTypeLabel().toLowerCase()}s',
+                        l10n.templateUsedWhenSharing(_getTypeLabel(l10n).toLowerCase()),
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                         ),
@@ -196,7 +198,7 @@ class _TemplateEditorState extends ConsumerState<_TemplateEditor> {
             ),
             error: (e, _) => Padding(
               padding: const EdgeInsets.all(16),
-              child: Text('Error: $e'),
+              child: Text('${l10n.errorPrefix}$e'),
             ),
             data: (template) {
               // Initialize controller with template body
@@ -214,10 +216,9 @@ class _TemplateEditorState extends ConsumerState<_TemplateEditor> {
                       TextFormField(
                         controller: _controller,
                         decoration: InputDecoration(
-                          labelText: 'Message Body',
+                          labelText: l10n.messageBody,
                           alignLabelWithHint: true,
-                          helperText:
-                              'Placeholders: {tenantName}, {landlordName}, {amount}, {billType}, {period}, {dueDate}',
+                          helperText: l10n.templatePlaceholders,
                           helperMaxLines: 2,
                         ),
                         maxLines: 8,
@@ -232,7 +233,7 @@ class _TemplateEditorState extends ConsumerState<_TemplateEditor> {
                           // Reset button
                           TextButton(
                             onPressed: _hasChanges ? _resetToOriginal : null,
-                            child: const Text('Discard'),
+                            child: Text(l10n.discard),
                           ),
                           const Spacer(),
                           // Cancel button
@@ -243,7 +244,7 @@ class _TemplateEditorState extends ConsumerState<_TemplateEditor> {
                                 _controller.text = _originalBody;
                               });
                             },
-                            child: const Text('Cancel'),
+                            child: Text(l10n.cancel),
                           ),
                           const SizedBox(width: 8),
                           // Save button
@@ -260,7 +261,7 @@ class _TemplateEditorState extends ConsumerState<_TemplateEditor> {
                                     ),
                                   )
                                 : const Icon(Icons.check, size: 18),
-                            label: const Text('Save'),
+                            label: Text(l10n.save),
                           ),
                         ],
                       ),
@@ -293,12 +294,12 @@ class _TemplateEditorState extends ConsumerState<_TemplateEditor> {
                           // Reset to default button
                           TextButton.icon(
                             onPressed: () =>
-                                _confirmResetToDefault(template?.body),
+                                _confirmResetToDefault(template?.body, l10n),
                             icon: const Icon(Icons.restart_alt, size: 18),
                             style: TextButton.styleFrom(
                               foregroundColor: AppColors.warning,
                             ),
-                            label: const Text('Reset to Default'),
+                            label: Text(l10n.resetToDefault),
                           ),
                           const Spacer(),
                           // Edit button
@@ -313,7 +314,7 @@ class _TemplateEditorState extends ConsumerState<_TemplateEditor> {
                               });
                             },
                             icon: const Icon(Icons.edit_outlined, size: 18),
-                            label: const Text('Edit'),
+                            label: Text(l10n.editBtn),
                           ),
                         ],
                       ),
@@ -334,11 +335,11 @@ class _TemplateEditorState extends ConsumerState<_TemplateEditor> {
     });
   }
 
-  void _confirmResetToDefault(String? currentBody) {
+  void _confirmResetToDefault(String? currentBody, AppLocalizations l10n) {
     final defaultBody = TemplateService.getDefaultBody(widget.type);
     if (currentBody == defaultBody) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Template is already at default')),
+        SnackBar(content: Text(l10n.templateAlreadyDefault)),
       );
       return;
     }
@@ -346,15 +347,12 @@ class _TemplateEditorState extends ConsumerState<_TemplateEditor> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Reset to Default'),
-        content: const Text(
-          'This will replace your current template with the original default template. '
-          'This action cannot be undone.',
-        ),
+        title: Text(l10n.resetToDefault),
+        content: Text(l10n.resetTemplateWarning),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -365,7 +363,7 @@ class _TemplateEditorState extends ConsumerState<_TemplateEditor> {
               backgroundColor: Theme.of(context).colorScheme.error,
               foregroundColor: Theme.of(context).colorScheme.onError,
             ),
-            child: const Text('Reset'),
+            child: Text(l10n.resetBtn),
           ),
         ],
       ),
@@ -373,6 +371,7 @@ class _TemplateEditorState extends ConsumerState<_TemplateEditor> {
   }
 
   Future<void> _resetToDefault() async {
+    final l10n = AppLocalizations.of(context)!;
     setState(() => _isSaving = true);
     try {
       final templateService = ref.read(templateServiceProvider);
@@ -381,14 +380,14 @@ class _TemplateEditorState extends ConsumerState<_TemplateEditor> {
       ref.invalidate(messageTemplatesProvider);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Template reset to default')),
+          SnackBar(content: Text(l10n.templateResetSuccess)),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ).showSnackBar(SnackBar(content: Text('${l10n.errorPrefix}$e')));
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -396,6 +395,7 @@ class _TemplateEditorState extends ConsumerState<_TemplateEditor> {
   }
 
   Future<void> _saveTemplate() async {
+    final l10n = AppLocalizations.of(context)!;
     setState(() => _isSaving = true);
     try {
       final repo = ref.read(billingRepositoryProvider);
@@ -419,14 +419,14 @@ class _TemplateEditorState extends ConsumerState<_TemplateEditor> {
           _originalBody = _controller.text;
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Template saved successfully')),
+          SnackBar(content: Text(l10n.templateSavedSuccess)),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ).showSnackBar(SnackBar(content: Text('${l10n.errorPrefix}$e')));
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);

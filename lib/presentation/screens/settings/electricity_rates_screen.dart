@@ -9,6 +9,7 @@ import '../../../application/providers/database_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../data/database/app_database.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
 
 /// Provider for electricity rate history.
 final electricityRateHistoryProvider =
@@ -39,10 +40,11 @@ class _ElectricityRatesScreenState
   }
 
   Future<void> _addNewRate() async {
+    final l10n = AppLocalizations.of(context)!;
     final rate = double.tryParse(_rateController.text);
     if (rate == null || rate <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a valid rate')),
+        SnackBar(content: Text(l10n.enterValidRate)),
       );
       return;
     }
@@ -61,13 +63,13 @@ class _ElectricityRatesScreenState
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('Rate updated')));
+        ).showSnackBar(SnackBar(content: Text(l10n.rateUpdated)));
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ).showSnackBar(SnackBar(content: Text('${l10n.errorPrefix}$e')));
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -76,11 +78,12 @@ class _ElectricityRatesScreenState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final currentRateAsync = ref.watch(currentElectricityRateProvider);
     final historyAsync = ref.watch(electricityRateHistoryProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Electricity Rates')),
+      appBar: AppBar(title: Text(l10n.electricityRates)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -104,7 +107,7 @@ class _ElectricityRatesScreenState
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Current Rate',
+                    l10n.currentRate,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: AppColors.onSurfaceVariant,
                     ),
@@ -112,7 +115,7 @@ class _ElectricityRatesScreenState
                   const SizedBox(height: 4),
                   currentRateAsync.when(
                     data: (rate) => Text(
-                      '${formatCurrency(rate)}/unit',
+                      '${formatCurrency(rate)}/${l10n.unit}',
                       style: Theme.of(context).textTheme.headlineMedium
                           ?.copyWith(
                             fontWeight: FontWeight.bold,
@@ -120,7 +123,7 @@ class _ElectricityRatesScreenState
                           ),
                     ),
                     loading: () => const CircularProgressIndicator(),
-                    error: (e, s) => Text('Error: $e'),
+                    error: (e, s) => Text('${l10n.errorPrefix}$e'),
                   ),
                 ],
               ),
@@ -139,7 +142,7 @@ class _ElectricityRatesScreenState
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Update Rate',
+                        l10n.updateRate,
                         style: Theme.of(context).textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -148,7 +151,7 @@ class _ElectricityRatesScreenState
                         TextButton.icon(
                           onPressed: () => setState(() => _isAddingRate = true),
                           icon: const Icon(Icons.add),
-                          label: const Text('Set New Rate'),
+                          label: Text(l10n.setNewRate),
                         ),
                     ],
                   ),
@@ -159,11 +162,11 @@ class _ElectricityRatesScreenState
                         Expanded(
                           child: TextField(
                             controller: _rateController,
-                            decoration: const InputDecoration(
-                              labelText: 'Rate per unit (₹)',
-                              prefixIcon: Icon(Icons.currency_rupee),
+                            decoration: InputDecoration(
+                              labelText: l10n.ratePerUnitLabel,
+                              prefixIcon: const Icon(Icons.currency_rupee),
                             ),
-                            keyboardType: TextInputType.numberWithOptions(
+                            keyboardType: const TextInputType.numberWithOptions(
                               decimal: true,
                             ),
                           ),
@@ -180,7 +183,7 @@ class _ElectricityRatesScreenState
                                     color: Colors.white,
                                   ),
                                 )
-                              : const Text('Save'),
+                              : Text(l10n.save),
                         ),
                       ],
                     ),
@@ -190,7 +193,7 @@ class _ElectricityRatesScreenState
                         _rateController.clear();
                         setState(() => _isAddingRate = false);
                       },
-                      child: const Text('Cancel'),
+                      child: Text(l10n.cancel),
                     ),
                   ],
                 ],
@@ -201,7 +204,7 @@ class _ElectricityRatesScreenState
 
           // Rate History Section
           Text(
-            'Rate History',
+            l10n.rateHistory,
             style: Theme.of(
               context,
             ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
@@ -209,7 +212,7 @@ class _ElectricityRatesScreenState
           const SizedBox(height: 12),
           historyAsync.when(
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, _) => Text('Error: $e'),
+            error: (e, _) => Text('${l10n.errorPrefix}$e'),
             data: (rates) {
               if (rates.isEmpty) {
                 return Container(
@@ -220,7 +223,7 @@ class _ElectricityRatesScreenState
                   ),
                   child: Center(
                     child: Text(
-                      'No rate history available',
+                      l10n.noRateHistory,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: AppColors.onSurfaceVariant,
                       ),
@@ -256,7 +259,7 @@ class _ElectricityRatesScreenState
                         ),
                       ),
                       title: Text(
-                        '${formatCurrency(rate.ratePerUnit)}/unit',
+                        '${formatCurrency(rate.ratePerUnit)}/${l10n.unit}',
                         style: Theme.of(context).textTheme.titleMedium
                             ?.copyWith(
                               fontWeight: isCurrentRate
@@ -266,7 +269,7 @@ class _ElectricityRatesScreenState
                             ),
                       ),
                       subtitle: Text(
-                        'Effective from ${_formatDate(rate.effectiveFrom)}',
+                        l10n.effectiveFrom(_formatDate(rate.effectiveFrom)),
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: AppColors.onSurfaceVariant,
                         ),
@@ -282,7 +285,7 @@ class _ElectricityRatesScreenState
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
-                                'CURRENT',
+                                l10n.currentLabel.toUpperCase(),
                                 style: Theme.of(context).textTheme.labelSmall
                                     ?.copyWith(
                                       color: AppColors.success,
@@ -312,7 +315,7 @@ class _ElectricityRatesScreenState
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'When you create a new electricity bill, the rate at that time is stored with the bill for accurate historical records.',
+                    l10n.electricityRateInfoText,
                     style: Theme.of(
                       context,
                     ).textTheme.bodySmall?.copyWith(color: AppColors.info),

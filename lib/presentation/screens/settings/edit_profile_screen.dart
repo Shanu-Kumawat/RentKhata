@@ -9,6 +9,7 @@ import '../../../application/providers/dashboard_providers.dart';
 import '../../../core/utils/validators.dart';
 import '../../../domain/entities/landlord.dart';
 import '../../widgets/image_picker_widget.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
 
 /// Screen to edit landlord profile.
 class EditProfileScreen extends ConsumerStatefulWidget {
@@ -47,6 +48,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   }
 
   Future<void> _saveProfile() async {
+    final l10n = AppLocalizations.of(context)!;
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
@@ -76,13 +78,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         Navigator.pop(context);
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('Profile updated')));
+        ).showSnackBar(SnackBar(content: Text(l10n.profileUpdated)));
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ).showSnackBar(SnackBar(content: Text('${l10n.errorPrefix}$e')));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -92,9 +94,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final landlordAsync = ref.watch(landlordProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Edit Profile')),
+      appBar: AppBar(title: Text(l10n.editProfile)),
       body: landlordAsync.when(
         data: (landlord) {
           _initializeFromLandlord(landlord);
@@ -121,11 +124,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 // Name
                 TextFormField(
                   controller: _nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Your Name *',
-                    prefixIcon: Icon(Icons.person_outline),
+                  decoration: InputDecoration(
+                    labelText: l10n.yourName,
+                    prefixIcon: const Icon(Icons.person_outline),
                   ),
-                  validator: (v) => validateRequired(v, 'Name'),
+                  validator: (v) => validateRequired(v, l10n.nameLabel),
                   onChanged: (_) => setState(() {}),
                 ),
                 const SizedBox(height: 16),
@@ -133,10 +136,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 // Phone
                 TextFormField(
                   controller: _phoneController,
-                  decoration: const InputDecoration(
-                    labelText: 'Phone Number',
-                    prefixIcon: Icon(Icons.phone_outlined),
-                    hintText: '10-digit mobile number',
+                  decoration: InputDecoration(
+                    labelText: l10n.phoneLabel,
+                    prefixIcon: const Icon(Icons.phone_outlined),
+                    hintText: l10n.mobileNumberHint,
                   ),
                   keyboardType: TextInputType.phone,
                   validator: (v) {
@@ -149,10 +152,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 // UPI ID
                 TextFormField(
                   controller: _upiController,
-                  decoration: const InputDecoration(
-                    labelText: 'UPI ID',
-                    prefixIcon: Icon(Icons.account_balance_wallet_outlined),
-                    hintText: 'yourname@upi',
+                  decoration: InputDecoration(
+                    labelText: l10n.upiId,
+                    prefixIcon: const Icon(Icons.account_balance_wallet_outlined),
+                    hintText: l10n.upiIdHint,
                   ),
                   validator: (v) {
                     if (v == null || v.isEmpty) return null;
@@ -161,7 +164,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Your UPI ID is used to generate QR codes for rent collection.',
+                  l10n.upiIdHelperText,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
@@ -184,7 +187,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                               color: Colors.white,
                             ),
                           )
-                        : const Text('Save Profile'),
+                        : Text(l10n.saveProfile),
                   ),
                 ),
               ],
@@ -192,7 +195,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, s) => Center(child: Text('Error: $e')),
+        error: (e, s) => Center(child: Text('${l10n.errorPrefix}$e')),
       ),
     );
   }

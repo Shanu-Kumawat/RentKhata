@@ -1389,4 +1389,366 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get computerGeneratedMsg =>
       'यह कंप्यूटर द्वारा तैयार किया गया विवरण है और इसके लिए भौतिक हस्ताक्षर की आवश्यकता नहीं है।';
+
+  @override
+  String get aboutLabel => '[HI] About Label';
+
+  @override
+  String get aboutRentKhataDescription => '[HI] About Rent Khata Description';
+
+  @override
+  String alertDaysBeforeCycle(int count) {
+    return '[HI] Alert $count days before';
+  }
+
+  @override
+  String get anniversaryBillingByBillType =>
+      '[HI] Anniversary Billing By Bill Type';
+
+  @override
+  String get anniversaryBillingSubtitle => '[HI] Anniversary Billing Subtitle';
+
+  @override
+  String get backupAndRestoreSubtitle => '[HI] Backup And Restore Subtitle';
+
+  @override
+  String get backupCreatedShare => '[HI] Backup Created Share';
+
+  @override
+  String get backupInfoText => '[HI] Backup Info Text';
+
+  @override
+  String get backupRestoredSuccess => '[HI] Backup Restored Success';
+
+  @override
+  String get billDueSoon => '[HI] Bill Due Soon';
+
+  @override
+  String get billFullyPaid => '[HI] Bill Fully Paid';
+
+  @override
+  String get billFullyPaidSubtitle => '[HI] Bill Fully Paid Subtitle';
+
+  @override
+  String get billingCycleEnding => '[HI] Billing Cycle Ending';
+
+  @override
+  String get billingLabel => '[HI] Billing Label';
+
+  @override
+  String get billingReminders => '[HI] Billing Reminders';
+
+  @override
+  String get biometricFallbackInfo => '[HI] Biometric Fallback Info';
+
+  @override
+  String get biometricLock => '[HI] Biometric Lock';
+
+  @override
+  String get biometricLockSubtitle => '[HI] Biometric Lock Subtitle';
+
+  @override
+  String get biometricsNotAvailable => '[HI] Biometrics Not Available';
+
+  @override
+  String get changesSavedAutomatically => '[HI] Changes Saved Automatically';
+
+  @override
+  String get createBackupToKeepSafe => '[HI] Create Backup To Keep Safe';
+
+  @override
+  String get createShareBackup => '[HI] Create Share Backup';
+
+  @override
+  String get criticalUrgentAttention => '[HI] Critical Urgent Attention';
+
+  @override
+  String get currentRate => '[HI] Current Rate';
+
+  @override
+  String get dataLabel => '[HI] Data Label';
+
+  @override
+  String daysCount(int count) {
+    return '[HI] $count days';
+  }
+
+  @override
+  String get deviceDoesNotSupportBiometrics =>
+      '[HI] Device Does Not Support Biometrics';
+
+  @override
+  String get discard => '[HI] Discard';
+
+  @override
+  String get dueDateOffsetSubtitle => '[HI] Due Date Offset Subtitle';
+
+  @override
+  String dueDaysAfterCycle(int count) {
+    return '[HI] Due $count days after cycle ends';
+  }
+
+  @override
+  String get dueSoonAlert => '[HI] Due Soon Alert';
+
+  @override
+  String get dueSoonAlertSubtitle => '[HI] Due Soon Alert Subtitle';
+
+  @override
+  String get editProfile => '[HI] Edit Profile';
+
+  @override
+  String effectiveFrom(String date) {
+    return '[HI] Effective from $date';
+  }
+
+  @override
+  String get electricityMeterBills => '[HI] Electricity Meter Bills';
+
+  @override
+  String get electricityRateInfoText => '[HI] Electricity Rate Info Text';
+
+  @override
+  String get electricityRatesSubtitle => '[HI] Electricity Rates Subtitle';
+
+  @override
+  String get enableAppLock => '[HI] Enable App Lock';
+
+  @override
+  String get enterValidRate => '[HI] Enter Valid Rate';
+
+  @override
+  String get firstReminderAfterDueDate => '[HI] First Reminder After Due Date';
+
+  @override
+  String get generalSettingsLabel => '[HI] General Settings Label';
+
+  @override
+  String get localBackups => '[HI] Local Backups';
+
+  @override
+  String get lockAfterInactivity => '[HI] Lock After Inactivity';
+
+  @override
+  String get lockOnExit => '[HI] Lock On Exit';
+
+  @override
+  String get lockOnExitSubtitle => '[HI] Lock On Exit Subtitle';
+
+  @override
+  String get maintenanceCharges => '[HI] Maintenance Charges';
+
+  @override
+  String get messageBody => '[HI] Message Body';
+
+  @override
+  String get messageTemplatesSubtitle => '[HI] Message Templates Subtitle';
+
+  @override
+  String minutes(int count) {
+    return '[HI] $count minutes';
+  }
+
+  @override
+  String get mobileNumberHint => '[HI] Mobile Number Hint';
+
+  @override
+  String get monthlyRentBills => '[HI] Monthly Rent Bills';
+
+  @override
+  String get monthlySummary => '[HI] Monthly Summary';
+
+  @override
+  String get monthlySummarySubtitle => '[HI] Monthly Summary Subtitle';
+
+  @override
+  String get never => '[HI] Never';
+
+  @override
+  String get noBiometricsEnrolled => '[HI] No Biometrics Enrolled';
+
+  @override
+  String get noLocalBackups => '[HI] No Local Backups';
+
+  @override
+  String get noRateHistory => '[HI] No Rate History';
+
+  @override
+  String get notEnabled => '[HI] Not Enabled';
+
+  @override
+  String get notificationSettings => '[HI] Notification Settings';
+
+  @override
+  String get notificationTime => '[HI] Notification Time';
+
+  @override
+  String get notificationsWorking => '[HI] Notifications Working';
+
+  @override
+  String get oneDayOverdue => '[HI] One Day Overdue';
+
+  @override
+  String get oneMinute => '[HI] One Minute';
+
+  @override
+  String get oneWeekOverdue => '[HI] One Week Overdue';
+
+  @override
+  String get overdueFollowUps => '[HI] Overdue Follow Ups';
+
+  @override
+  String get paymentNotifications => '[HI] Payment Notifications';
+
+  @override
+  String get paymentReceived => '[HI] Payment Received';
+
+  @override
+  String get paymentReceivedSubtitle => '[HI] Payment Received Subtitle';
+
+  @override
+  String get permissionDenied => '[HI] Permission Denied';
+
+  @override
+  String get profileUpdated => '[HI] Profile Updated';
+
+  @override
+  String get quietHours => '[HI] Quiet Hours';
+
+  @override
+  String get rateHistory => '[HI] Rate History';
+
+  @override
+  String get ratePerUnitLabel => '[HI] Rate Per Unit Label';
+
+  @override
+  String get rateUpdated => '[HI] Rate Updated';
+
+  @override
+  String get receiptLabel => '[HI] Receipt Label';
+
+  @override
+  String remindDaysBeforeCycleEnds(int days) {
+    return '[HI] Remind $days days before cycle ends';
+  }
+
+  @override
+  String remindDaysBeforeDueDate(int days) {
+    return '[HI] Remind $days days before due date';
+  }
+
+  @override
+  String get reminderLabel => '[HI] Reminder Label';
+
+  @override
+  String get reminderSettingsSubtitle => '[HI] Reminder Settings Subtitle';
+
+  @override
+  String get requireBiometric => '[HI] Require Biometric';
+
+  @override
+  String get resetBtn => '[HI] Reset Btn';
+
+  @override
+  String get resetTemplateWarning => '[HI] Reset Template Warning';
+
+  @override
+  String get resetToDefault => '[HI] Reset To Default';
+
+  @override
+  String get restartNowBtn => '[HI] Restart Now Btn';
+
+  @override
+  String get restoreBackupTitle => '[HI] Restore Backup Title';
+
+  @override
+  String get restoreBackupWarning => '[HI] Restore Backup Warning';
+
+  @override
+  String get restoreBtn => '[HI] Restore Btn';
+
+  @override
+  String get restoreFailedPrefix => '[HI] Restore Failed Prefix';
+
+  @override
+  String get restoreFromDevice => '[HI] Restore From Device';
+
+  @override
+  String get restoreFromDeviceSubtitle => '[HI] Restore From Device Subtitle';
+
+  @override
+  String get restoreSuccessTitle => '[HI] Restore Success Title';
+
+  @override
+  String get saveDataToFile => '[HI] Save Data To File';
+
+  @override
+  String get saveProfile => '[HI] Save Profile';
+
+  @override
+  String get secondReminder => '[HI] Second Reminder';
+
+  @override
+  String get sendTestNotification => '[HI] Send Test Notification';
+
+  @override
+  String get setNewRate => '[HI] Set New Rate';
+
+  @override
+  String get setupFingerprintFirst => '[HI] Setup Fingerprint First';
+
+  @override
+  String get template => '[HI] Template';
+
+  @override
+  String get templateAlreadyDefault => '[HI] Template Already Default';
+
+  @override
+  String get templatePlaceholders => '[HI] Template Placeholders';
+
+  @override
+  String get templateResetSuccess => '[HI] Template Reset Success';
+
+  @override
+  String get templateSavedSuccess => '[HI] Template Saved Success';
+
+  @override
+  String templateUsedWhenSharing(String type) {
+    return '[HI] Template used when sharing $type';
+  }
+
+  @override
+  String get testNotificationTitle => '[HI] Test Notification Title';
+
+  @override
+  String get threeDaysOverdue => '[HI] Three Days Overdue';
+
+  @override
+  String get twoWeeksOverdue => '[HI] Two Weeks Overdue';
+
+  @override
+  String get unit => '[HI] Unit';
+
+  @override
+  String get updateRate => '[HI] Update Rate';
+
+  @override
+  String get upiId => '[HI] Upi Id';
+
+  @override
+  String get upiIdHelperText => '[HI] Upi Id Helper Text';
+
+  @override
+  String get upiIdHint => '[HI] Upi Id Hint';
+
+  @override
+  String versionLabel(String version) {
+    return '[HI] Version $version';
+  }
+
+  @override
+  String get weeklyReminder => '[HI] Weekly Reminder';
+
+  @override
+  String get yourName => '[HI] Your Name';
 }

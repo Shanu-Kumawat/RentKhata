@@ -50,21 +50,27 @@
   "tenantsNeedBills": "{count} tenants need bills created",
   "@tenantsNeedBills": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "collectPayments": "Collect Payments",
   "billsAwaitPayment": "{count} generated bills await payment",
   "@billsAwaitPayment": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "renewAgreements": "Renew Agreements",
   "agreementsExpiring": "{count} agreements expiring soon",
   "@agreementsExpiring": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "allCaughtUp": "All caught up!",
@@ -89,7 +95,9 @@
   "years": "{count} years",
   "@years": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "gender": "Gender",
@@ -103,13 +111,9 @@
   "pincode": "Pincode",
   "workDetails": "Work Details",
   "company": "Company",
-  "pincode": "Pincode",
-  "workDetails": "Work Details",
-  "company": "Company",
   "officeAddress": "Office Address",
   "introducerReference": "Introducer / Reference",
   "name": "Name",
-  "reports": "Reports",
   "overview": "Overview",
   "pending": "Pending",
   "history": "History",
@@ -120,23 +124,46 @@
   "overdue": "Overdue",
   "collected": "Collected",
   "urgent": "{count} urgent",
-  "@urgent": { "placeholders": { "count": { "type": "int" } } },
+  "@urgent": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "allOnTime": "All on time",
   "items": "{count} items",
-  "@items": { "placeholders": { "count": { "type": "int" } } },
+  "@items": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "errorLoadingBills": "Error loading bills",
   "errorLoadingExpenses": "Error loading expenses",
   "errorLoadingFinancials": "Error loading financials",
   "billsByType": "Bills by Type",
   "properties": "Properties",
   "retry": "Retry",
-  "addProperty": "Add Property",
   "noPropertiesYet": "No properties yet",
   "addYourFirstProperty": "Add your first property to get started",
   "roomsCount": "{count} rooms",
-  "@roomsCount": { "placeholders": { "count": { "type": "int" } } },
+  "@roomsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "occupiedPercent": "{percent}% occupied",
-  "@occupiedPercent": { "placeholders": { "percent": { "type": "int" } } },
+  "@occupiedPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
   "propertyNotFound": "Property not found",
   "deleteProperty": "Delete Property",
   "noRoomsYet": "No rooms yet",
@@ -144,14 +171,32 @@
   "addRoom": "Add Room",
   "deletePropertyTitle": "Delete Property?",
   "confirmDeleteProperty": "Are you sure you want to delete \"{propertyName}\"? This will also delete all rooms in this property.",
-  "@confirmDeleteProperty": { "placeholders": { "propertyName": { "type": "String" } } },
+  "@confirmDeleteProperty": {
+    "placeholders": {
+      "propertyName": {
+        "type": "String"
+      }
+    }
+  },
   "cancel": "Cancel",
   "delete": "Delete",
   "propertyDeleted": "Property deleted",
   "occupancyCount": "{count} occupied",
-  "@occupancyCount": { "placeholders": { "count": { "type": "int" } } },
+  "@occupancyCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "roomNumber": "Room {number}",
-  "@roomNumber": { "placeholders": { "number": { "type": "String" } } },
+  "@roomNumber": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
   "vacant": "Vacant",
   "perMonth": "/month",
   "billDetails": "Bill Details",
@@ -165,7 +210,13 @@
   "reviewAndSend": "Review & Send",
   "shareInvoice": "Share Invoice",
   "payAmount": "Pay {amount}",
-  "@payAmount": { "placeholders": { "amount": { "type": "String" } } },
+  "@payAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
   "save": "Save",
   "share": "Share",
   "saveInvoicePdf": "Save Invoice PDF",
@@ -176,15 +227,30 @@
   "billMarkedVoid": "Bill marked as Void",
   "deleteBillTitle": "Delete Bill?",
   "confirmDeleteBill": "Are you sure you want to delete this {billType} bill for {period}?\n\nThis action cannot be undone.",
-  "@confirmDeleteBill": { "placeholders": { "billType": { "type": "String" }, "period": { "type": "String" } } },
+  "@confirmDeleteBill": {
+    "placeholders": {
+      "billType": {
+        "type": "String"
+      },
+      "period": {
+        "type": "String"
+      }
+    }
+  },
   "billDeleted": "Bill deleted",
   "errorDeletingBill": "Error deleting bill: {error}",
-  "@errorDeletingBill": { "placeholders": { "error": { "type": "String" } } },
+  "@errorDeletingBill": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "overdueU": "OVERDUE",
   "total": "Total",
   "paid": "Paid",
   "pendingTitle": "Pending",
-  "draft": "Draft",
+  "draft": "DRAFT",
   "sent": "Sent",
   "partiallyPaid": "Partially Paid",
   "overdueBill": "Overdue",
@@ -204,7 +270,6 @@
   "otherCharges": "Other Charges",
   "electricityDetails": "Electricity Details",
   "previous": "Previous",
-  "current": "Current",
   "meterPhoto": "Meter Photo",
   "tapToViewFullSize": "Tap to view full size",
   "addMeterPhoto": "Add Meter Photo",
@@ -212,12 +277,27 @@
   "chooseFromGallery": "Choose from Gallery",
   "meterPhotoAdded": "Meter photo added successfully",
   "errorAddingPhoto": "Error adding photo: {error}",
-  "@errorAddingPhoto": { "placeholders": { "error": { "type": "String" } } },
+  "@errorAddingPhoto": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "editPayment": "Edit Payment",
   "deletePayment": "Delete Payment",
   "deletePaymentTitle": "Delete Payment?",
   "confirmDeletePayment": "Delete payment of {amount} made on {date}?\n\nThis will update the bill balance.",
-  "@confirmDeletePayment": { "placeholders": { "amount": { "type": "String" }, "date": { "type": "String" } } },
+  "@confirmDeletePayment": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "paymentDeleted": "Payment deleted",
   "cash": "Cash",
   "upi": "UPI",
@@ -228,15 +308,22 @@
   "noChangesRecorded": "No changes recorded",
   "updated": "Updated",
   "deleted": "Deleted",
-  "createBill": "Create Bill",
   "billAlreadyExists": "Bill Already Exists",
   "duplicateBillMessage": "A {type} bill for {month} {year} already exists ({number}).\n\nDo you want to create another bill anyway?",
   "@duplicateBillMessage": {
     "placeholders": {
-      "type": {"type": "String"},
-      "month": {"type": "String"},
-      "year": {"type": "int"},
-      "number": {"type": "String"}
+      "type": {
+        "type": "String"
+      },
+      "month": {
+        "type": "String"
+      },
+      "year": {
+        "type": "int"
+      },
+      "number": {
+        "type": "String"
+      }
     }
   },
   "createAnyway": "Create Anyway",
@@ -244,7 +331,9 @@
   "billCreatedWithRate": "Bill created. Global rate updated to ₹{rate}/unit",
   "@billCreatedWithRate": {
     "placeholders": {
-      "rate": {"type": "String"}
+      "rate": {
+        "type": "String"
+      }
     }
   },
   "meterReadings": "Meter Readings",
@@ -255,8 +344,12 @@
   "unitsCalculation": "{units} units × {rate}",
   "@unitsCalculation": {
     "placeholders": {
-      "units": {"type": "String"},
-      "rate": {"type": "String"}
+      "units": {
+        "type": "String"
+      },
+      "rate": {
+        "type": "String"
+      }
     }
   },
   "optionalVerification": "Optional - helps with verification",
@@ -269,34 +362,56 @@
   "cycleExceedsAgreementWarning": "This cycle exceeds the agreement end date ({date})",
   "@cycleExceedsAgreementWarning": {
     "placeholders": {
-      "date": {"type": "String"}
+      "date": {
+        "type": "String"
+      }
     }
   },
   "amountCannotBeLessThanPaid": "Amount cannot be less than paid amount of {amount}",
   "@amountCannotBeLessThanPaid": {
-    "placeholders": { "amount": { "type": "String" } }
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
   },
   "billUpdatedSuccessfully": "Bill updated successfully",
   "partiallyPaidBillWarning": "This bill has received payments. Amount can only be increased. It cannot be less than paid amount.",
   "paidAmount": "Paid: {amount}",
   "@paidAmount": {
-    "placeholders": { "amount": { "type": "String" } }
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
   },
   "minAmount": "Min amount: {amount}",
   "@minAmount": {
-    "placeholders": { "amount": { "type": "String" } }
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
   },
   "notSet": "Not set",
   "saveChanges": "Save Changes",
   "amountLabel": "Amount",
   "amountCannotExceedPendingBalance": "Amount cannot exceed pending balance of {amount}",
   "@amountCannotExceedPendingBalance": {
-    "placeholders": { "amount": { "type": "String" } }
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
   },
   "recordPayment": "Record Payment",
   "dueAmount": "Due: {amount}",
   "@dueAmount": {
-    "placeholders": { "amount": { "type": "String" } }
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
   },
   "enterAmount": "Enter Amount",
   "payFullDue": "Pay Full Due",
@@ -315,24 +430,24 @@
   "paidLabel": "Paid",
   "balanceLabel": "Balance",
   "closeLabel": "Close",
-  "monthlyRent": "Monthly Rent",
   "electricity": "Electricity",
   "water": "Water",
-  "maintenance": "Maintenance",
-  "other": "Other",
-  "cash": "Cash",
-  "upi": "UPI",
-  "bankTransfer": "Bank Transfer",
-  "cheque": "Cheque",
   "amountCannotExceedMax": "Amount cannot exceed {amount}",
   "@amountCannotExceedMax": {
-    "placeholders": { "amount": { "type": "String" } }
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
   },
   "paymentUpdated": "Payment updated",
-  "editPayment": "Edit Payment",
   "originalAmount": "Original: {amount}",
   "@originalAmount": {
-    "placeholders": { "amount": { "type": "String" } }
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
   },
   "paymentAmountRequiredLabel": "Payment Amount (₹) *",
   "paymentDateLabel": "Payment Date",
@@ -342,38 +457,57 @@
   "viewPdf": "View PDF",
   "errorPreviewingPdf": "Error previewing PDF: {error}",
   "@errorPreviewingPdf": {
-    "placeholders": { "error": { "type": "String" } }
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
   },
   "errorSharingPdf": "Error sharing PDF: {error}",
   "@errorSharingPdf": {
-    "placeholders": { "error": { "type": "String" } }
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
   },
   "invoiceNumber": "Invoice {number}",
   "@invoiceNumber": {
-    "placeholders": { "number": { "type": "String" } }
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
   },
   "billTo": "Bill To",
-  "tenant": "Tenant",
   "unitsAmount": "{amount} units",
   "@unitsAmount": {
-    "placeholders": { "amount": { "type": "String" } }
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
   },
   "unitsConsumedRate": "{units} units @ {rate}/unit",
   "@unitsConsumedRate": {
     "placeholders": {
-      "units": { "type": "String" },
-      "rate": { "type": "String" }
+      "units": {
+        "type": "String"
+      },
+      "rate": {
+        "type": "String"
+      }
     }
   },
   "scanToPay": "Scan to Pay",
-  "generatedOn": "Generated on {date}",
+  "generatedOn": "Generated on: {date}",
   "@generatedOn": {
-    "placeholders": { "date": { "type": "String" } }
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
   },
-  "electricityBill": "Electricity Bill",
-  "waterBill": "Water Bill",
-  "otherCharges": "Other Charges",
-  "draft": "DRAFT",
   "sentStatus": "SENT",
   "partialStatus": "PARTIAL",
   "paidStatus": "PAID",
@@ -390,11 +524,19 @@
   "ok": "OK",
   "errorSavingPdf": "Error saving PDF: {error}",
   "@errorSavingPdf": {
-    "placeholders": { "error": { "type": "String" } }
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
   },
   "errorLoadingAuditLogs": "Error loading audit logs: {error}",
   "@errorLoadingAuditLogs": {
-    "placeholders": { "error": { "type": "String" } }
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
   },
   "previousCycle": "Previous cycle",
   "nextCycle": "Next cycle",
@@ -455,7 +597,11 @@
   "sendInvoiceBtn": "Send Invoice",
   "viewBillHistory": "View Bill History ({count})",
   "@viewBillHistory": {
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "otherChargesLabel": "Other Charges",
   "documentTitle": "Document Title",
@@ -483,8 +629,6 @@
   "essentialInfo": "Essential Information",
   "nameLabel": "Name",
   "phoneLabel": "Phone Number",
-  "secondaryPhone": "Secondary Phone",
-  "permanentAddress": "Permanent Address",
   "addressLine": "Address Line",
   "cityLabel": "City",
   "stateLabel": "State",
@@ -504,9 +648,7 @@
   "currentRatePerUnit": "Current Rate per Unit",
   "aadhaarFrontPhoto": "Aadhaar Front Photo",
   "aadhaarBackPhoto": "Aadhaar Back Photo",
-  "workDetails": "Work Details",
   "companyName": "Company Name",
-  "officeAddress": "Office Address",
   "introducerName": "Introducer Name",
   "introducerAddress": "Introducer Address",
   "introducerPhone": "Introducer Phone",
@@ -556,14 +698,6 @@
     }
   },
   "khataStatement": "KHATA STATEMENT",
-  "generatedOn": "Generated on: {date}",
-  "@generatedOn": {
-    "placeholders": {
-      "date": {
-        "type": "String"
-      }
-    }
-  },
   "fromLabel": "From:",
   "toLabel": "To:",
   "roomNoLabel": "Room No: {roomNumber}",
@@ -576,12 +710,9 @@
   },
   "totalBilledLabel": "Total Billed",
   "totalPaidLabel": "Total Paid",
-  "balanceDueLabel": "Balance Due",
   "dateLabel": "Date",
   "descriptionLabel": "Description",
   "billedLabel": "Billed",
-  "paidLabel": "Paid",
-  "balanceLabel": "Balance",
   "advanceLabel": "{amount} (Adv)",
   "@advanceLabel": {
     "placeholders": {
@@ -616,5 +747,182 @@
   "accountSettledMsg": "ACCOUNT SETTLED - NO CURRENT DUES",
   "tenantSignature": "Tenant Signature",
   "landlordSignature": "Landlord Signature",
-  "computerGeneratedMsg": "This is a computer-generated statement and does not require a physical signature."
+  "computerGeneratedMsg": "This is a computer-generated statement and does not require a physical signature.",
+  "aboutLabel": "About Label",
+  "aboutRentKhataDescription": "About Rent Khata Description",
+  "alertDaysBeforeCycle": "Alert {count} days before",
+  "@alertDaysBeforeCycle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "anniversaryBillingByBillType": "Anniversary Billing By Bill Type",
+  "anniversaryBillingSubtitle": "Anniversary Billing Subtitle",
+  "backupAndRestoreSubtitle": "Backup And Restore Subtitle",
+  "backupCreatedShare": "Backup Created Share",
+  "backupInfoText": "Backup Info Text",
+  "backupRestoredSuccess": "Backup Restored Success",
+  "billDueSoon": "Bill Due Soon",
+  "billFullyPaid": "Bill Fully Paid",
+  "billFullyPaidSubtitle": "Bill Fully Paid Subtitle",
+  "billingCycleEnding": "Billing Cycle Ending",
+  "billingLabel": "Billing Label",
+  "billingReminders": "Billing Reminders",
+  "biometricFallbackInfo": "Biometric Fallback Info",
+  "biometricLock": "Biometric Lock",
+  "biometricLockSubtitle": "Biometric Lock Subtitle",
+  "biometricsNotAvailable": "Biometrics Not Available",
+  "changesSavedAutomatically": "Changes Saved Automatically",
+  "createBackupToKeepSafe": "Create Backup To Keep Safe",
+  "createShareBackup": "Create Share Backup",
+  "criticalUrgentAttention": "Critical Urgent Attention",
+  "currentRate": "Current Rate",
+  "dataLabel": "Data Label",
+  "daysCount": "{count} days",
+  "@daysCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "deviceDoesNotSupportBiometrics": "Device Does Not Support Biometrics",
+  "discard": "Discard",
+  "dueDateOffsetSubtitle": "Due Date Offset Subtitle",
+  "dueDaysAfterCycle": "Due {count} days after cycle ends",
+  "@dueDaysAfterCycle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dueSoonAlert": "Due Soon Alert",
+  "dueSoonAlertSubtitle": "Due Soon Alert Subtitle",
+  "editProfile": "Edit Profile",
+  "effectiveFrom": "Effective from {date}",
+  "@effectiveFrom": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "electricityMeterBills": "Electricity Meter Bills",
+  "electricityRateInfoText": "Electricity Rate Info Text",
+  "electricityRatesSubtitle": "Electricity Rates Subtitle",
+  "enableAppLock": "Enable App Lock",
+  "enterValidRate": "Enter Valid Rate",
+  "firstReminderAfterDueDate": "First Reminder After Due Date",
+  "generalSettingsLabel": "General Settings Label",
+  "localBackups": "Local Backups",
+  "lockAfterInactivity": "Lock After Inactivity",
+  "lockOnExit": "Lock On Exit",
+  "lockOnExitSubtitle": "Lock On Exit Subtitle",
+  "maintenanceCharges": "Maintenance Charges",
+  "messageBody": "Message Body",
+  "messageTemplatesSubtitle": "Message Templates Subtitle",
+  "minutes": "{count} minutes",
+  "@minutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mobileNumberHint": "Mobile Number Hint",
+  "monthlyRentBills": "Monthly Rent Bills",
+  "monthlySummary": "Monthly Summary",
+  "monthlySummarySubtitle": "Monthly Summary Subtitle",
+  "never": "Never",
+  "noBiometricsEnrolled": "No Biometrics Enrolled",
+  "noLocalBackups": "No Local Backups",
+  "noRateHistory": "No Rate History",
+  "notEnabled": "Not Enabled",
+  "notificationSettings": "Notification Settings",
+  "notificationTime": "Notification Time",
+  "notificationsWorking": "Notifications Working",
+  "oneDayOverdue": "One Day Overdue",
+  "oneMinute": "One Minute",
+  "oneWeekOverdue": "One Week Overdue",
+  "overdueFollowUps": "Overdue Follow Ups",
+  "paymentNotifications": "Payment Notifications",
+  "paymentReceived": "Payment Received",
+  "paymentReceivedSubtitle": "Payment Received Subtitle",
+  "permissionDenied": "Permission Denied",
+  "profileUpdated": "Profile Updated",
+  "quietHours": "Quiet Hours",
+  "rateHistory": "Rate History",
+  "ratePerUnitLabel": "Rate Per Unit Label",
+  "rateUpdated": "Rate Updated",
+  "receiptLabel": "Receipt Label",
+  "remindDaysBeforeCycleEnds": "Remind {days} days before cycle ends",
+  "@remindDaysBeforeCycleEnds": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "remindDaysBeforeDueDate": "Remind {days} days before due date",
+  "@remindDaysBeforeDueDate": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "reminderLabel": "Reminder Label",
+  "reminderSettingsSubtitle": "Reminder Settings Subtitle",
+  "requireBiometric": "Require Biometric",
+  "resetBtn": "Reset Btn",
+  "resetTemplateWarning": "Reset Template Warning",
+  "resetToDefault": "Reset To Default",
+  "restartNowBtn": "Restart Now Btn",
+  "restoreBackupTitle": "Restore Backup Title",
+  "restoreBackupWarning": "Restore Backup Warning",
+  "restoreBtn": "Restore Btn",
+  "restoreFailedPrefix": "Restore Failed Prefix",
+  "restoreFromDevice": "Restore From Device",
+  "restoreFromDeviceSubtitle": "Restore From Device Subtitle",
+  "restoreSuccessTitle": "Restore Success Title",
+  "saveDataToFile": "Save Data To File",
+  "saveProfile": "Save Profile",
+  "secondReminder": "Second Reminder",
+  "sendTestNotification": "Send Test Notification",
+  "setNewRate": "Set New Rate",
+  "setupFingerprintFirst": "Setup Fingerprint First",
+  "template": "Template",
+  "templateAlreadyDefault": "Template Already Default",
+  "templatePlaceholders": "Template Placeholders",
+  "templateResetSuccess": "Template Reset Success",
+  "templateSavedSuccess": "Template Saved Success",
+  "templateUsedWhenSharing": "Template used when sharing {type}",
+  "@templateUsedWhenSharing": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "testNotificationTitle": "Test Notification Title",
+  "threeDaysOverdue": "Three Days Overdue",
+  "twoWeeksOverdue": "Two Weeks Overdue",
+  "unit": "Unit",
+  "updateRate": "Update Rate",
+  "upiId": "Upi Id",
+  "upiIdHelperText": "Upi Id Helper Text",
+  "upiIdHint": "Upi Id Hint",
+  "versionLabel": "Version {version}",
+  "@versionLabel": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "weeklyReminder": "Weekly Reminder",
+  "yourName": "Your Name"
 }

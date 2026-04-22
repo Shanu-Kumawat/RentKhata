@@ -6,8 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../services/backup_service.dart';
 import '../../../application/providers/database_provider.dart';
-
 import '../../../core/extensions/date_extensions.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/services.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
 
 /// Backup and restore screen.
 class BackupScreen extends ConsumerStatefulWidget {
@@ -35,6 +37,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
   }
 
   Future<void> _createBackup() async {
+    final l10n = AppLocalizations.of(context)!;
     setState(() => _isCreatingBackup = true);
     try {
       final db = ref.read(appDatabaseProvider);
@@ -43,14 +46,14 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
       await _loadBackups();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Backup created and ready to share')),
+          SnackBar(content: Text(l10n.backupCreatedShare)),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ).showSnackBar(SnackBar(content: Text('${l10n.errorPrefix}$e')));
       }
     } finally {
       if (mounted) setState(() => _isCreatingBackup = false);
@@ -58,25 +61,23 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
   }
 
   Future<void> _confirmRestore(File file) async {
+    final l10n = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Restore Backup?'),
-        content: const Text(
-          'This will replace all current data with the backup data. '
-          'This action cannot be undone.',
-        ),
+        title: Text(l10n.restoreBackupTitle),
+        content: Text(l10n.restoreBackupWarning),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.error,
             ),
-            child: const Text('Restore'),
+            child: Text(l10n.restoreBtn),
           ),
         ],
       ),
@@ -89,25 +90,91 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
       final service = BackupService(db);
       await service.restoreBackup(file);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Backup restored. Please restart the app.'),
-          ),
-        );
+        _showRestartDialog(l10n);
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Restore failed: $e')));
+        ).showSnackBar(SnackBar(content: Text('${l10n.restoreFailedPrefix}: $e')));
       }
     }
   }
 
+  Future<void> _restoreFromExternalFile() async {
+    final l10n = AppLocalizations.of(context)!;
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['zip'],
+      );
+
+      if (result != null && result.files.single.path != null) {
+        File file = File(result.files.single.path!);
+        
+        if (!mounted) return;
+        final confirmed = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(l10n.restoreBackupTitle),
+            content: Text(l10n.restoreBackupWarning),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text(l10n.cancel),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: FilledButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.error,
+                ),
+                child: Text(l10n.restoreBtn),
+              ),
+            ],
+          ),
+        );
+
+        if (confirmed != true) return;
+
+        final db = ref.read(appDatabaseProvider);
+        final service = BackupService(db);
+        await service.restoreFromExternalFile(file);
+        
+        if (mounted) {
+           _showRestartDialog(l10n);
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${l10n.restoreFailedPrefix}: $e')));
+      }
+    }
+  }
+
+  void _showRestartDialog(AppLocalizations l10n) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.restoreSuccessTitle),
+        content: Text(l10n.backupRestoredSuccess),
+        actions: [
+          FilledButton(
+            onPressed: () {
+               SystemNavigator.pop();
+            },
+            child: Text(l10n.restartNowBtn),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: const Text('Backup & Restore')),
+      appBar: AppBar(title: Text(l10n.backupAndRestore)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -134,7 +201,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Backups include all your data: properties, tenants, bills, and payments.',
+                    l10n.backupInfoText,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Theme.of(context).colorScheme.primary,
                     ),
@@ -159,8 +226,8 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
                   color: Theme.of(context).colorScheme.onPrimaryContainer,
                 ),
               ),
-              title: const Text('Create & Share Backup'),
-              subtitle: const Text('Save your data to a file and share'),
+              title: Text(l10n.createShareBackup),
+              subtitle: Text(l10n.saveDataToFile),
               trailing: _isCreatingBackup
                   ? const SizedBox(
                       width: 24,
@@ -171,12 +238,34 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
               onTap: _isCreatingBackup ? null : _createBackup,
             ),
           ),
+          const SizedBox(height: 12),
+          
+          // Restore from Device
+          Card(
+            child: ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.secondaryContainer,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.file_upload_outlined,
+                  color: Theme.of(context).colorScheme.onSecondaryContainer,
+                ),
+              ),
+              title: Text(l10n.restoreFromDevice),
+              subtitle: Text(l10n.restoreFromDeviceSubtitle),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: _isCreatingBackup ? null : _restoreFromExternalFile,
+            ),
+          ),
           const SizedBox(height: 24),
 
           // Local backups section
           if (_localBackups.isNotEmpty) ...[
             Text(
-              'Local Backups',
+              l10n.localBackups,
               style: Theme.of(
                 context,
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
@@ -207,12 +296,12 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'No local backups',
+                      l10n.noLocalBackups,
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Create a backup to keep your data safe',
+                      l10n.createBackupToKeepSafe,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
