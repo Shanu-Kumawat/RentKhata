@@ -15,16 +15,12 @@ class NotificationSettingsState {
   final Map<NotificationType, bool> enabledSettings;
   final Map<NotificationType, int> daysBeforeSettings;
   final int notificationHour;
-  final int? quietHoursStart;
-  final int? quietHoursEnd;
   final bool isLoading;
 
   const NotificationSettingsState({
     this.enabledSettings = const {},
     this.daysBeforeSettings = const {},
     this.notificationHour = 9,
-    this.quietHoursStart,
-    this.quietHoursEnd,
     this.isLoading = true,
   });
 
@@ -32,16 +28,12 @@ class NotificationSettingsState {
     Map<NotificationType, bool>? enabledSettings,
     Map<NotificationType, int>? daysBeforeSettings,
     int? notificationHour,
-    int? quietHoursStart,
-    int? quietHoursEnd,
     bool? isLoading,
   }) {
     return NotificationSettingsState(
       enabledSettings: enabledSettings ?? this.enabledSettings,
       daysBeforeSettings: daysBeforeSettings ?? this.daysBeforeSettings,
       notificationHour: notificationHour ?? this.notificationHour,
-      quietHoursStart: quietHoursStart ?? this.quietHoursStart,
-      quietHoursEnd: quietHoursEnd ?? this.quietHoursEnd,
       isLoading: isLoading ?? this.isLoading,
     );
   }
@@ -72,23 +64,17 @@ class NotificationSettingsNotifier extends _$NotificationSettingsNotifier {
       final enabledMap = <NotificationType, bool>{};
       final daysMap = <NotificationType, int>{};
       int? hour;
-      int? quietStart;
-      int? quietEnd;
 
       for (final setting in settings) {
         enabledMap[setting.notificationType] = setting.enabled;
         daysMap[setting.notificationType] = setting.daysBefore;
         hour ??= setting.notificationHour;
-        quietStart ??= setting.quietHoursStart;
-        quietEnd ??= setting.quietHoursEnd;
       }
 
       state = state.copyWith(
         enabledSettings: enabledMap,
         daysBeforeSettings: daysMap,
         notificationHour: hour ?? 9,
-        quietHoursStart: quietStart,
-        quietHoursEnd: quietEnd,
         isLoading: false,
       );
     } catch (e) {
@@ -142,23 +128,6 @@ class NotificationSettingsNotifier extends _$NotificationSettingsNotifier {
         .write(NotificationSettingsCompanion(notificationHour: Value(hour)));
   }
 
-  Future<void> setQuietHours(int? start, int? end) async {
-    final db = _db;
-    if (db == null) return;
-
-    state = state.copyWith(quietHoursStart: start, quietHoursEnd: end);
-
-    // Update all existing settings
-    await db
-        .update(db.notificationSettings)
-        .write(
-          NotificationSettingsCompanion(
-            quietHoursStart: Value(start),
-            quietHoursEnd: Value(end),
-          ),
-        );
-  }
-
   Future<void> _upsertSetting(
     NotificationType type, {
     required bool enabled,
@@ -199,8 +168,6 @@ class NotificationSettingsNotifier extends _$NotificationSettingsNotifier {
     required Map<NotificationType, bool> enabledSettings,
     required Map<NotificationType, int> daysBeforeSettings,
     required int notificationHour,
-    int? quietHoursStart,
-    int? quietHoursEnd,
   }) async {
     final db = _db;
     if (db == null) return;
@@ -209,8 +176,6 @@ class NotificationSettingsNotifier extends _$NotificationSettingsNotifier {
       enabledSettings: enabledSettings,
       daysBeforeSettings: daysBeforeSettings,
       notificationHour: notificationHour,
-      quietHoursStart: quietHoursStart,
-      quietHoursEnd: quietHoursEnd,
     );
 
     // Persist all settings

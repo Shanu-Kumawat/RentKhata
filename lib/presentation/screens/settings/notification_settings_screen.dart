@@ -2,11 +2,16 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:drift/drift.dart' hide Column;
 import '../../../application/providers/billing_providers.dart';
 import '../../../application/providers/billing_cycle_providers.dart';
+import '../../../application/providers/database_provider.dart';
+import '../../../application/providers/repository_providers.dart';
 import '../../../application/providers/tenant_providers.dart';
 import '../../../application/providers/notification_settings_providers.dart';
 import '../../../data/database/tables/notification_setting_table.dart';
+import '../../../domain/entities/bill.dart';
+import '../../../domain/entities/billing_status.dart';
 import '../../../services/local_notification_service.dart';
 import 'dart:async';
 import 'package:rent_khata/l10n/app_localizations.dart';
@@ -38,8 +43,6 @@ class _NotificationSettingsScreenState
       enabledSettings: {},
       daysBeforeSettings: {},
       notificationHour: 9,
-      quietHoursStart: null,
-      quietHoursEnd: null,
     );
   }
 
@@ -74,8 +77,6 @@ class _NotificationSettingsScreenState
             enabledSettings: _localState.enabledSettings,
             daysBeforeSettings: _localState.daysBeforeSettings,
             notificationHour: _localState.notificationHour,
-            quietHoursStart: _localState.quietHoursStart,
-            quietHoursEnd: _localState.quietHoursEnd,
           );
 
       // Re-schedule based on new settings
@@ -117,10 +118,12 @@ class _NotificationSettingsScreenState
     bool billDueSoon = _localState.isEnabled(NotificationType.billDueSoon);
     int dueSoonDays = _localState.getDaysBefore(NotificationType.billDueSoon);
 
-    bool overdue1Day = _localState.isEnabled(NotificationType.overdue1Day);
-    bool overdue3Days = _localState.isEnabled(NotificationType.overdue3Days);
-    bool overdue7Days = _localState.isEnabled(NotificationType.overdue7Days);
-    bool overdue14Days = _localState.isEnabled(NotificationType.overdue14Days);
+    final enabledOverdueDays = <int>{
+      if (_localState.isEnabled(NotificationType.overdue1Day)) 1,
+      if (_localState.isEnabled(NotificationType.overdue3Days)) 3,
+      if (_localState.isEnabled(NotificationType.overdue7Days)) 7,
+      if (_localState.isEnabled(NotificationType.overdue14Days)) 14,
+    };
 
     for (final bill in bills) {
       if (bill.dueDate == null) continue;
@@ -130,12 +133,21 @@ class _NotificationSettingsScreenState
         await service.scheduleDueBillReminder(
           bill: bill,
           daysBefore: dueSoonDays,
+          notificationHour: _localState.notificationHour,
         );
       }
 
       // Schedule overdue escalation
-      if (overdue1Day || overdue3Days || overdue7Days || overdue14Days) {
-        await service.scheduleOverdueEscalation(bill: bill);
+      if (enabledOverdueDays.isNotEmpty) {
+        await service.scheduleOverdueEscalation(
+          bill: bill,
+          escalationDays: enabledOverdueDays,
+          notificationHour: _localState.notificationHour,
+          pauseOnPartialPayment: _localState.isEnabled(
+            NotificationType.overdue,
+          ),
+          partialPaymentThresholdRatio: 0.5,
+        );
       }
     }
 
@@ -165,7 +177,183 @@ class _NotificationSettingsScreenState
       await service.scheduleAllCycleReminders(
         occupancies: cycleData,
         daysBefore: _localState.getDaysBefore(NotificationType.cycleEndingSoon),
+        notificationHour: _localState.notificationHour,
       );
+    }
+
+    // Reuse monthlySummary setting slot for agreement expiry reminders.
+    if (_localState.isEnabled(NotificationType.monthlySummary)) {
+      final occupancies = await ref.read(activeOccupanciesProvider.future);
+      final agreementData =
+          <
+            ({
+              int occupancyId,
+              String tenantName,
+              String roomNumber,
+              DateTime agreementEndDate,
+            })
+          >[];
+
+      for (final occupancy in occupancies) {
+        final endDate = occupancy.agreementEndDate;
+        if (endDate == null) continue;
+
+        agreementData.add((
+          occupancyId: occupancy.id,
+          tenantName: occupancy.tenantName ?? 'Tenant',
+          roomNumber: occupancy.roomNumber ?? 'Room',
+          agreementEndDate: endDate,
+        ));
+      }
+
+      await service.scheduleAllAgreementExpiryReminders(
+        occupancies: agreementData,
+        daysBefore: _localState.getDaysBefore(NotificationType.monthlySummary),
+        notificationHour: _localState.notificationHour,
+      );
+    }
+
+    // Agreement already expired reminders (legacy key: paymentReceived).
+    if (_localState.isEnabled(NotificationType.paymentReceived)) {
+      final graceDays = _localState
+          .getDaysBefore(NotificationType.paymentReceived)
+          .clamp(0, 30);
+      final occupancies = await ref.read(activeOccupanciesProvider.future);
+
+      for (final occupancy in occupancies) {
+        final endDate = occupancy.agreementEndDate;
+        if (endDate == null) continue;
+
+        await service.scheduleAgreementExpiredReminder(
+          occupancyId: occupancy.id,
+          tenantName: occupancy.tenantName ?? 'Tenant',
+          roomNumber: occupancy.roomNumber ?? 'Room',
+          agreementEndDate: endDate,
+          graceDays: graceDays,
+          notificationHour: _localState.notificationHour,
+        );
+      }
+    }
+
+    // Bill generation reminders for due-soon/overdue cycles.
+    if (_localState.isEnabled(NotificationType.billsReadyToGenerate)) {
+      final leadDays = _localState
+          .getDaysBefore(NotificationType.billsReadyToGenerate)
+          .clamp(0, 14);
+      final attentionItems = await ref.read(
+        billingAttentionListProvider.future,
+      );
+      final scheduledKeys = <String>{};
+
+      for (final item in attentionItems) {
+        final shouldAlert =
+            item.status == BillingCycleStatus.overdue ||
+            item.daysUntilCycleEnd <= leadDays;
+        if (!shouldAlert) continue;
+
+        final key = '${item.occupancyId}-${item.billType.index}';
+        if (!scheduledKeys.add(key)) continue;
+
+        await service.scheduleBillGenerationReminder(
+          occupancyId: item.occupancyId,
+          billType: item.billType,
+          tenantName: item.tenantName,
+          roomNumber: item.roomNumber,
+          cycleEndDate: item.cycleEnd,
+          daysUntilCycleEnd: item.daysUntilCycleEnd,
+          notificationHour: _localState.notificationHour,
+        );
+      }
+    }
+
+    // Deposit settlement reminders after move-out.
+    if (_localState.isEnabled(NotificationType.depositPending)) {
+      final daysAfterMoveOut = _localState
+          .getDaysBefore(NotificationType.depositPending)
+          .clamp(1, 30);
+      final db = ref.read(appDatabaseProvider);
+      final unsettled =
+          await (db.select(db.occupancies)..where(
+                (o) =>
+                    o.isActive.equals(false) &
+                    o.moveOutDate.isNotNull() &
+                    o.isSettled.equals(false),
+              ))
+              .get();
+
+      for (final occupancy in unsettled) {
+        if (occupancy.securityDeposit <= 0 || occupancy.moveOutDate == null) {
+          continue;
+        }
+
+        final tenant = await db.tenantDao.getTenantById(occupancy.tenantId);
+        final room = await db.propertyDao.getRoomById(occupancy.roomId);
+
+        await service.scheduleDepositSettlementDueReminder(
+          occupancyId: occupancy.id,
+          tenantName: tenant?.name ?? 'Tenant',
+          roomNumber: room?.roomNumber ?? 'Room',
+          moveOutDate: occupancy.moveOutDate!,
+          daysAfterMoveOut: daysAfterMoveOut,
+          notificationHour: _localState.notificationHour,
+        );
+      }
+    }
+
+    // High utility usage anomaly reminders.
+    if (_localState.isEnabled(NotificationType.rentCollectionDay)) {
+      final occupancies = await ref.read(activeOccupanciesProvider.future);
+      final billingRepo = ref.read(billingRepositoryProvider);
+
+      for (final occupancy in occupancies) {
+        final bills = await billingRepo.getBillsForOccupancy(occupancy.id);
+        final electricityBills = bills
+            .where(
+              (b) =>
+                  b.billType == BillType.electricity &&
+                  b.electricityPrevReading != null &&
+                  b.electricityCurrReading != null &&
+                  b.electricityCurrReading! >= b.electricityPrevReading!,
+            )
+            .toList();
+
+        if (electricityBills.length < 2) continue;
+
+        electricityBills.sort((a, b) {
+          final aDate = a.periodEndDate ?? a.createdAt;
+          final bDate = b.periodEndDate ?? b.createdAt;
+          return aDate.compareTo(bDate);
+        });
+
+        final latest = electricityBills[electricityBills.length - 1];
+        final previous = electricityBills[electricityBills.length - 2];
+
+        final latestUnits =
+            (latest.electricityCurrReading! - latest.electricityPrevReading!)
+                .round();
+        final previousUnits =
+            (previous.electricityCurrReading! -
+                    previous.electricityPrevReading!)
+                .round();
+
+        if (latestUnits <= 0 || previousUnits <= 0) continue;
+
+        final increasePercent =
+            ((latestUnits - previousUnits) / previousUnits) * 100;
+        final hasSpike =
+            increasePercent >= 35 && (latestUnits - previousUnits) >= 25;
+        if (!hasSpike) continue;
+
+        await service.scheduleUtilityUsageAnomalyReminder(
+          occupancyId: occupancy.id,
+          tenantName: occupancy.tenantName ?? 'Tenant',
+          roomNumber: occupancy.roomNumber ?? 'Room',
+          currentUnits: latestUnits,
+          previousUnits: previousUnits,
+          increasePercent: increasePercent,
+          notificationHour: _localState.notificationHour,
+        );
+      }
     }
   }
 
@@ -195,20 +383,6 @@ class _NotificationSettingsScreenState
   void _updateHour(int hour) {
     HapticFeedback.lightImpact();
     _updateLocalState(_localState.copyWith(notificationHour: hour));
-  }
-
-  // Helper to update quiet hours
-  void _updateQuietHours(bool enabled) {
-    HapticFeedback.lightImpact();
-    if (enabled) {
-      _updateLocalState(
-        _localState.copyWith(quietHoursStart: 22, quietHoursEnd: 7),
-      );
-    } else {
-      _updateLocalState(
-        _localState.copyWithSimple(quietHoursStart: null, quietHoursEnd: null),
-      );
-    }
   }
 
   @override
@@ -257,8 +431,9 @@ class _NotificationSettingsScreenState
             ),
             _buildToggleWithSlider(
               title: l10n.billingCycleEnding,
-              subtitle:
-                  l10n.remindDaysBeforeCycleEnds(_localState.getDaysBefore(NotificationType.cycleEndingSoon)),
+              subtitle: l10n.remindDaysBeforeCycleEnds(
+                _localState.getDaysBefore(NotificationType.cycleEndingSoon),
+              ),
               value: _localState.isEnabled(NotificationType.cycleEndingSoon),
               onChanged: (v) =>
                   _toggleSetting(NotificationType.cycleEndingSoon, v),
@@ -274,8 +449,9 @@ class _NotificationSettingsScreenState
             ),
             _buildToggleWithSlider(
               title: l10n.billDueSoon,
-              subtitle:
-                  l10n.remindDaysBeforeDueDate(_localState.getDaysBefore(NotificationType.billDueSoon)),
+              subtitle: l10n.remindDaysBeforeDueDate(
+                _localState.getDaysBefore(NotificationType.billDueSoon),
+              ),
               value: _localState.isEnabled(NotificationType.billDueSoon),
               onChanged: (v) => _toggleSetting(NotificationType.billDueSoon, v),
               sliderValue: _localState
@@ -286,34 +462,24 @@ class _NotificationSettingsScreenState
               onSliderChanged: (v) =>
                   _updateDaysBefore(NotificationType.billDueSoon, v.round()),
             ),
-            _buildSimpleToggle(
-              title: l10n.monthlySummary,
-              subtitle: l10n.monthlySummarySubtitle,
+            _buildToggleWithSlider(
+              title: l10n.renewAgreements,
+              subtitle: l10n.remindDaysBeforeCycleEnds(
+                _localState
+                    .getDaysBefore(NotificationType.monthlySummary)
+                    .clamp(7, 60),
+              ),
               value: _localState.isEnabled(NotificationType.monthlySummary),
               onChanged: (v) =>
                   _toggleSetting(NotificationType.monthlySummary, v),
-            ),
-            const Divider(height: 32),
-
-            // Payment Notifications Section
-            _buildSectionHeader(
-              icon: Icons.payment_outlined,
-              title: l10n.paymentNotifications,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            _buildSimpleToggle(
-              title: l10n.paymentReceived,
-              subtitle: l10n.paymentReceivedSubtitle,
-              value: _localState.isEnabled(NotificationType.paymentReceived),
-              onChanged: (v) =>
-                  _toggleSetting(NotificationType.paymentReceived, v),
-            ),
-            _buildSimpleToggle(
-              title: l10n.billFullyPaid,
-              subtitle: l10n.billFullyPaidSubtitle,
-              value: _localState.isEnabled(NotificationType.billFullyPaid),
-              onChanged: (v) =>
-                  _toggleSetting(NotificationType.billFullyPaid, v),
+              sliderValue: _localState
+                  .getDaysBefore(NotificationType.monthlySummary)
+                  .clamp(7, 60)
+                  .toDouble(),
+              sliderMin: 7,
+              sliderMax: 60,
+              onSliderChanged: (v) =>
+                  _updateDaysBefore(NotificationType.monthlySummary, v.round()),
             ),
             const Divider(height: 32),
 
@@ -352,6 +518,81 @@ class _NotificationSettingsScreenState
             ),
             const Divider(height: 32),
 
+            // Smart Alerts Section
+            _buildSectionHeader(
+              icon: Icons.auto_awesome_outlined,
+              title: 'Smart Alerts',
+              color: Theme.of(context).colorScheme.tertiary,
+            ),
+            _buildToggleWithSlider(
+              title: 'Agreement already expired',
+              subtitle:
+                  'Remind after ${_localState.getDaysBefore(NotificationType.paymentReceived).clamp(0, 30)} day(s) past agreement end date',
+              value: _localState.isEnabled(NotificationType.paymentReceived),
+              onChanged: (v) =>
+                  _toggleSetting(NotificationType.paymentReceived, v),
+              sliderValue: _localState
+                  .getDaysBefore(NotificationType.paymentReceived)
+                  .clamp(0, 30)
+                  .toDouble(),
+              sliderMin: 0,
+              sliderMax: 30,
+              onSliderChanged: (v) => _updateDaysBefore(
+                NotificationType.paymentReceived,
+                v.round(),
+              ),
+            ),
+            _buildToggleWithSlider(
+              title: 'Bill not generated reminder',
+              subtitle:
+                  'Alert when cycle is overdue or within ${_localState.getDaysBefore(NotificationType.billsReadyToGenerate).clamp(0, 14)} day(s) of ending',
+              value: _localState.isEnabled(
+                NotificationType.billsReadyToGenerate,
+              ),
+              onChanged: (v) =>
+                  _toggleSetting(NotificationType.billsReadyToGenerate, v),
+              sliderValue: _localState
+                  .getDaysBefore(NotificationType.billsReadyToGenerate)
+                  .clamp(0, 14)
+                  .toDouble(),
+              sliderMin: 0,
+              sliderMax: 14,
+              onSliderChanged: (v) => _updateDaysBefore(
+                NotificationType.billsReadyToGenerate,
+                v.round(),
+              ),
+            ),
+            _buildSimpleToggle(
+              title: 'Pause overdue follow-ups after partial payment',
+              subtitle: 'Pauses escalations once paid amount reaches 50%',
+              value: _localState.isEnabled(NotificationType.overdue),
+              onChanged: (v) => _toggleSetting(NotificationType.overdue, v),
+            ),
+            _buildToggleWithSlider(
+              title: 'Deposit settlement due after move-out',
+              subtitle:
+                  'Remind after ${_localState.getDaysBefore(NotificationType.depositPending).clamp(1, 30)} day(s) if settlement is pending',
+              value: _localState.isEnabled(NotificationType.depositPending),
+              onChanged: (v) =>
+                  _toggleSetting(NotificationType.depositPending, v),
+              sliderValue: _localState
+                  .getDaysBefore(NotificationType.depositPending)
+                  .clamp(1, 30)
+                  .toDouble(),
+              sliderMin: 1,
+              sliderMax: 30,
+              onSliderChanged: (v) =>
+                  _updateDaysBefore(NotificationType.depositPending, v.round()),
+            ),
+            _buildSimpleToggle(
+              title: 'High utility usage anomaly',
+              subtitle: 'Alerts when latest electricity usage spikes sharply',
+              value: _localState.isEnabled(NotificationType.rentCollectionDay),
+              onChanged: (v) =>
+                  _toggleSetting(NotificationType.rentCollectionDay, v),
+            ),
+            const Divider(height: 32),
+
             // General Settings Section
             _buildSectionHeader(
               icon: Icons.settings_outlined,
@@ -377,17 +618,6 @@ class _NotificationSettingsScreenState
                   if (v != null) _updateHour(v);
                 },
               ),
-            ),
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text(l10n.quietHours),
-              subtitle: _localState.quietHoursStart != null
-                  ? Text(
-                      '${_formatHour(_localState.quietHoursStart!, l10n)} - ${_formatHour(_localState.quietHoursEnd!, l10n)}',
-                    )
-                  : Text(l10n.notEnabled),
-              value: _localState.quietHoursStart != null,
-              onChanged: _updateQuietHours,
             ),
             const SizedBox(height: 24),
 
@@ -483,6 +713,8 @@ class _NotificationSettingsScreenState
     required double sliderMax,
     required ValueChanged<double> onSliderChanged,
   }) {
+    final safeValue = sliderValue.clamp(sliderMin, sliderMax).toDouble();
+
     return Column(
       children: [
         SwitchListTile(
@@ -496,11 +728,11 @@ class _NotificationSettingsScreenState
           Padding(
             padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
             child: Slider(
-              value: sliderValue,
+              value: safeValue,
               min: sliderMin,
               max: sliderMax,
               divisions: (sliderMax - sliderMin).round(),
-              label: '${sliderValue.round()} days',
+              label: '${safeValue.round()} days',
               onChanged: onSliderChanged,
             ),
           ),
@@ -543,26 +775,5 @@ class _NotificationSettingsScreenState
         ).showSnackBar(SnackBar(content: Text('${l10n.errorPrefix}$e')));
       }
     }
-  }
-}
-
-// Extension to help with simple copyWith since State might not have it if it's not freezed
-extension on NotificationSettingsState {
-  NotificationSettingsState copyWithSimple({
-    Map<NotificationType, bool>? enabledSettings,
-    Map<NotificationType, int>? daysBeforeSettings,
-    int? notificationHour,
-    int? quietHoursStart,
-    int? quietHoursEnd,
-  }) {
-    // Use the existing copyWith but handle nulls manually if needed
-    return copyWith(
-      enabledSettings: enabledSettings ?? this.enabledSettings,
-      daysBeforeSettings: daysBeforeSettings ?? this.daysBeforeSettings,
-      notificationHour: notificationHour ?? this.notificationHour,
-      quietHoursStart:
-          quietHoursStart, // Directly pass since we might want to set it to null
-      quietHoursEnd: quietHoursEnd,
-    );
   }
 }

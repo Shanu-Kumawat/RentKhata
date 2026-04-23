@@ -64,34 +64,4 @@ class NotificationService {
   static String getRentCollectionBody(int roomCount) {
     return 'Today is rent collection day. You have $roomCount occupied rooms.';
   }
-
-  /// Check if quiet hours apply.
-  static bool isQuietHours({
-    required DateTime time,
-    required int quietStart,
-    required int quietEnd,
-  }) {
-    final hour = time.hour;
-    if (quietStart < quietEnd) {
-      return hour >= quietStart && hour < quietEnd;
-    } else {
-      // Wraps around midnight
-      return hour >= quietStart || hour < quietEnd;
-    }
-  }
-
-  /// Get next non-quiet hour time.
-  static DateTime getNextNonQuietTime({
-    required DateTime from,
-    required int quietStart,
-    required int quietEnd,
-  }) {
-    if (!isQuietHours(time: from, quietStart: quietStart, quietEnd: quietEnd)) {
-      return from;
-    }
-    // Move to end of quiet hours
-    final next = DateTime(from.year, from.month, from.day, quietEnd, 0);
-    if (next.isAfter(from)) return next;
-    return next.add(const Duration(days: 1));
-  }
 }

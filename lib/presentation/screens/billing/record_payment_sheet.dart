@@ -6,12 +6,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../application/providers/repository_providers.dart';
 import '../../../application/providers/billing_providers.dart';
 import '../../../application/providers/dashboard_providers.dart';
+import '../../../application/providers/notification_settings_providers.dart';
 
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/validators.dart';
 import '../../../core/utils/l10n_helpers.dart';
+import '../../../data/database/tables/notification_setting_table.dart';
 import '../../../domain/entities/bill.dart';
 import '../../../domain/entities/payment.dart';
+import '../../../services/local_notification_service.dart';
 import 'receipt_dialog.dart';
 import 'package:rent_khata/l10n/app_localizations.dart';
 
@@ -71,7 +74,9 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            AppLocalizations.of(context)!.amountCannotExceedPendingBalance(formatCurrency(widget.bill.pendingAmount)),
+            AppLocalizations.of(context)!.amountCannotExceedPendingBalance(
+              formatCurrency(widget.bill.pendingAmount),
+            ),
           ),
         ),
       );
@@ -122,6 +127,66 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
           paymentDate: _paymentDate,
         );
 
+        final notificationService = LocalNotificationService();
+        final notificationSettings = ref.read(
+          notificationSettingsNotifierProvider,
+        );
+
+        await notificationService.showPaymentRecordedConfirmation(
+          roomNumber:
+              updatedBill.roomNumber ?? widget.bill.roomNumber ?? 'Room',
+          tenantName:
+              updatedBill.tenantName ?? widget.bill.tenantName ?? 'Tenant',
+          amount: amount,
+          isFullyPaid: updatedBill.isFullyPaid,
+        );
+
+        if (updatedBill.isFullyPaid) {
+          await notificationService.cancelBillNotifications(updatedBill.id);
+          await notificationService.cancelOverdueEscalation(updatedBill.id);
+        } else {
+          final pauseEnabled = notificationSettings.isEnabled(
+            NotificationType.overdue,
+          );
+          final paidRatio = updatedBill.amount > 0
+              ? updatedBill.paidAmount / updatedBill.amount
+              : 0.0;
+
+          if (pauseEnabled && paidRatio >= 0.5) {
+            await notificationService.cancelOverdueEscalation(updatedBill.id);
+            await notificationService.showPartialPaymentPauseNotice(
+              roomNumber:
+                  updatedBill.roomNumber ?? widget.bill.roomNumber ?? 'Room',
+              tenantName:
+                  updatedBill.tenantName ?? widget.bill.tenantName ?? 'Tenant',
+              paidRatio: paidRatio,
+            );
+          } else {
+            final overdueDays = <int>{
+              if (notificationSettings.isEnabled(NotificationType.overdue1Day))
+                1,
+              if (notificationSettings.isEnabled(NotificationType.overdue3Days))
+                3,
+              if (notificationSettings.isEnabled(NotificationType.overdue7Days))
+                7,
+              if (notificationSettings.isEnabled(
+                NotificationType.overdue14Days,
+              ))
+                14,
+            };
+
+            if (overdueDays.isNotEmpty) {
+              await notificationService.scheduleOverdueEscalation(
+                bill: updatedBill,
+                escalationDays: overdueDays,
+                notificationHour: notificationSettings.notificationHour,
+                pauseOnPartialPayment: pauseEnabled,
+                partialPaymentThresholdRatio: 0.5,
+              );
+            }
+          }
+        }
+
         if (!mounted) return;
         Navigator.pop(context);
 
@@ -135,9 +200,11 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.error(e.toString()))));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.error(e.toString())),
+          ),
+        );
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -228,7 +295,9 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        AppLocalizations.of(context)!.dueAmount(formatCurrency(pending)),
+                        AppLocalizations.of(
+                          context,
+                        )!.dueAmount(formatCurrency(pending)),
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.primary,
                           fontWeight: FontWeight.bold,
@@ -316,7 +385,12 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
                       final isSelected = _paymentMode == mode;
                       return ChoiceChip(
                         showCheckmark: false,
-                        label: Text(getPaymentModeLabel(AppLocalizations.of(context)!, mode).toUpperCase()),
+                        label: Text(
+                          getPaymentModeLabel(
+                            AppLocalizations.of(context)!,
+                            mode,
+                          ).toUpperCase(),
+                        ),
                         avatar: isSelected
                             ? Icon(
                                 Icons.check,
@@ -394,7 +468,9 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
                       TextFormField(
                         controller: _notesController,
                         decoration: InputDecoration(
-                          hintText: AppLocalizations.of(context)!.addNoteOptional,
+                          hintText: AppLocalizations.of(
+                            context,
+                          )!.addNoteOptional,
                           prefixIcon: const Icon(Icons.edit_note),
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.symmetric(

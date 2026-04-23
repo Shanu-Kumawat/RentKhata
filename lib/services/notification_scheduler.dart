@@ -4,14 +4,19 @@
 /// are scheduled, even after device reboots or app reinstalls.
 library;
 
+import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../application/providers/billing_providers.dart';
 import '../application/providers/billing_cycle_providers.dart';
+import '../application/providers/database_provider.dart';
+import '../application/providers/repository_providers.dart';
 import '../application/providers/tenant_providers.dart';
 import '../application/providers/notification_settings_providers.dart';
 import '../data/database/tables/notification_setting_table.dart';
+import '../domain/entities/bill.dart';
+import '../domain/entities/billing_status.dart';
 import 'local_notification_service.dart';
 
 part 'notification_scheduler.g.dart';
@@ -45,6 +50,13 @@ Future<void> scheduleAllNotifications(Ref ref) async {
   // Cancel all existing notifications first to avoid duplicates
   await notificationService.cancelAll();
 
+  final enabledOverdueDays = <int>{
+    if (settings.isEnabled(NotificationType.overdue1Day)) 1,
+    if (settings.isEnabled(NotificationType.overdue3Days)) 3,
+    if (settings.isEnabled(NotificationType.overdue7Days)) 7,
+    if (settings.isEnabled(NotificationType.overdue14Days)) 14,
+  };
+
   // Schedule bill-related notifications
   final bills = await ref.read(unpaidBillsProvider.future);
 
@@ -57,15 +69,19 @@ Future<void> scheduleAllNotifications(Ref ref) async {
       await notificationService.scheduleDueBillReminder(
         bill: bill,
         daysBefore: daysBefore,
+        notificationHour: settings.notificationHour,
       );
     }
 
     // Schedule overdue escalation if any overdue type is enabled
-    if (settings.isEnabled(NotificationType.overdue1Day) ||
-        settings.isEnabled(NotificationType.overdue3Days) ||
-        settings.isEnabled(NotificationType.overdue7Days) ||
-        settings.isEnabled(NotificationType.overdue14Days)) {
-      await notificationService.scheduleOverdueEscalation(bill: bill);
+    if (enabledOverdueDays.isNotEmpty) {
+      await notificationService.scheduleOverdueEscalation(
+        bill: bill,
+        escalationDays: enabledOverdueDays,
+        notificationHour: settings.notificationHour,
+        pauseOnPartialPayment: settings.isEnabled(NotificationType.overdue),
+        partialPaymentThresholdRatio: 0.5,
+      );
     }
   }
 
@@ -97,7 +113,180 @@ Future<void> scheduleAllNotifications(Ref ref) async {
     await notificationService.scheduleAllCycleReminders(
       occupancies: cycleData,
       daysBefore: daysBefore,
+      notificationHour: settings.notificationHour,
     );
+  }
+
+  // Reuse monthlySummary slot as Agreement Expiry Reminder for compatibility.
+  if (settings.isEnabled(NotificationType.monthlySummary)) {
+    final occupancies = await ref.read(activeOccupanciesProvider.future);
+    final daysBefore = settings.getDaysBefore(NotificationType.monthlySummary);
+
+    final agreementData =
+        <
+          ({
+            int occupancyId,
+            String tenantName,
+            String roomNumber,
+            DateTime agreementEndDate,
+          })
+        >[];
+
+    for (final occupancy in occupancies) {
+      final endDate = occupancy.agreementEndDate;
+      if (endDate == null) continue;
+
+      agreementData.add((
+        occupancyId: occupancy.id,
+        tenantName: occupancy.tenantName ?? 'Tenant',
+        roomNumber: occupancy.roomNumber ?? 'Room',
+        agreementEndDate: endDate,
+      ));
+    }
+
+    await notificationService.scheduleAllAgreementExpiryReminders(
+      occupancies: agreementData,
+      daysBefore: daysBefore,
+      notificationHour: settings.notificationHour,
+    );
+  }
+
+  // Agreement already expired reminder (uses legacy paymentReceived slot).
+  if (settings.isEnabled(NotificationType.paymentReceived)) {
+    final graceDays = settings.getDaysBefore(NotificationType.paymentReceived);
+    final occupancies = await ref.read(activeOccupanciesProvider.future);
+
+    for (final occupancy in occupancies) {
+      final endDate = occupancy.agreementEndDate;
+      if (endDate == null) continue;
+
+      await notificationService.scheduleAgreementExpiredReminder(
+        occupancyId: occupancy.id,
+        tenantName: occupancy.tenantName ?? 'Tenant',
+        roomNumber: occupancy.roomNumber ?? 'Room',
+        agreementEndDate: endDate,
+        graceDays: graceDays.clamp(0, 30),
+        notificationHour: settings.notificationHour,
+      );
+    }
+  }
+
+  // Bill generation reminders for due-soon/overdue cycles.
+  if (settings.isEnabled(NotificationType.billsReadyToGenerate)) {
+    final leadDays = settings
+        .getDaysBefore(NotificationType.billsReadyToGenerate)
+        .clamp(0, 14);
+    final attentionItems = await ref.read(billingAttentionListProvider.future);
+    final scheduledKeys = <String>{};
+
+    for (final item in attentionItems) {
+      final shouldAlert =
+          item.status == BillingCycleStatus.overdue ||
+          item.daysUntilCycleEnd <= leadDays;
+      if (!shouldAlert) continue;
+
+      // Avoid duplicate alerts for multiple missed cycles of same type.
+      final key = '${item.occupancyId}-${item.billType.index}';
+      if (!scheduledKeys.add(key)) continue;
+
+      await notificationService.scheduleBillGenerationReminder(
+        occupancyId: item.occupancyId,
+        billType: item.billType,
+        tenantName: item.tenantName,
+        roomNumber: item.roomNumber,
+        cycleEndDate: item.cycleEnd,
+        daysUntilCycleEnd: item.daysUntilCycleEnd,
+        notificationHour: settings.notificationHour,
+      );
+    }
+  }
+
+  // Deposit settlement reminders after move-out (uses legacy depositPending).
+  if (settings.isEnabled(NotificationType.depositPending)) {
+    final daysAfterMoveOut = settings
+        .getDaysBefore(NotificationType.depositPending)
+        .clamp(1, 30);
+    final db = ref.read(appDatabaseProvider);
+    final unsettled =
+        await (db.select(db.occupancies)..where(
+              (o) =>
+                  o.isActive.equals(false) &
+                  o.moveOutDate.isNotNull() &
+                  o.isSettled.equals(false),
+            ))
+            .get();
+
+    for (final occupancy in unsettled) {
+      if (occupancy.securityDeposit <= 0) continue;
+      if (occupancy.moveOutDate == null) continue;
+
+      final tenant = await db.tenantDao.getTenantById(occupancy.tenantId);
+      final room = await db.propertyDao.getRoomById(occupancy.roomId);
+
+      await notificationService.scheduleDepositSettlementDueReminder(
+        occupancyId: occupancy.id,
+        tenantName: tenant?.name ?? 'Tenant',
+        roomNumber: room?.roomNumber ?? 'Room',
+        moveOutDate: occupancy.moveOutDate!,
+        daysAfterMoveOut: daysAfterMoveOut,
+        notificationHour: settings.notificationHour,
+      );
+    }
+  }
+
+  // Utility usage anomaly reminders (uses legacy rentCollectionDay slot).
+  if (settings.isEnabled(NotificationType.rentCollectionDay)) {
+    final occupancies = await ref.read(activeOccupanciesProvider.future);
+    final billingRepo = ref.read(billingRepositoryProvider);
+
+    for (final occupancy in occupancies) {
+      final bills = await billingRepo.getBillsForOccupancy(occupancy.id);
+      final electricityBills = bills
+          .where(
+            (b) =>
+                b.billType == BillType.electricity &&
+                b.electricityPrevReading != null &&
+                b.electricityCurrReading != null &&
+                b.electricityCurrReading! >= b.electricityPrevReading!,
+          )
+          .toList();
+
+      if (electricityBills.length < 2) continue;
+
+      electricityBills.sort((a, b) {
+        final aDate = a.periodEndDate ?? a.createdAt;
+        final bDate = b.periodEndDate ?? b.createdAt;
+        return aDate.compareTo(bDate);
+      });
+
+      final latest = electricityBills[electricityBills.length - 1];
+      final previous = electricityBills[electricityBills.length - 2];
+
+      final latestUnits =
+          (latest.electricityCurrReading! - latest.electricityPrevReading!)
+              .round();
+      final previousUnits =
+          (previous.electricityCurrReading! - previous.electricityPrevReading!)
+              .round();
+
+      if (latestUnits <= 0 || previousUnits <= 0) continue;
+
+      final increasePercent =
+          ((latestUnits - previousUnits) / previousUnits) * 100;
+      final hasSpike =
+          increasePercent >= 35 && (latestUnits - previousUnits) >= 25;
+      if (!hasSpike) continue;
+
+      await notificationService.scheduleUtilityUsageAnomalyReminder(
+        occupancyId: occupancy.id,
+        tenantName: occupancy.tenantName ?? 'Tenant',
+        roomNumber: occupancy.roomNumber ?? 'Room',
+        currentUnits: latestUnits,
+        previousUnits: previousUnits,
+        increasePercent: increasePercent,
+        notificationHour: settings.notificationHour,
+      );
+    }
   }
 }
 
