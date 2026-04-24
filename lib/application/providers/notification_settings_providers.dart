@@ -47,27 +47,6 @@ class NotificationSettingsState {
 class NotificationSettingsNotifier extends _$NotificationSettingsNotifier {
   AppDatabase? _db;
 
-  static const Set<NotificationType> _legacyTypes = {
-    NotificationType.dueSoon,
-    NotificationType.overdue,
-    NotificationType.rentCollectionDay,
-    NotificationType.depositPending,
-    NotificationType.billsReadyToGenerate,
-    NotificationType.paymentReceived,
-    NotificationType.billFullyPaid,
-    NotificationType.monthlySummary,
-  };
-
-  static const Map<NotificationType, NotificationType> _legacyAliases = {
-    NotificationType.billDueSoon: NotificationType.dueSoon,
-    NotificationType.agreementExpiringSoon: NotificationType.monthlySummary,
-    NotificationType.agreementExpired: NotificationType.paymentReceived,
-    NotificationType.billNotGenerated: NotificationType.billsReadyToGenerate,
-    NotificationType.partialPaymentPause: NotificationType.overdue,
-    NotificationType.depositSettlementDue: NotificationType.depositPending,
-    NotificationType.utilityUsageAnomaly: NotificationType.rentCollectionDay,
-  };
-
   @override
   NotificationSettingsState build() {
     _db = ref.watch(appDatabaseProvider);
@@ -92,57 +71,14 @@ class NotificationSettingsNotifier extends _$NotificationSettingsNotifier {
         hour ??= setting.notificationHour;
       }
 
-      final safeHour = hour ?? 9;
-      await _applyLegacySmartAlertFallback(enabledMap, daysMap, safeHour);
-
-      // Keep legacy keys migration-only and out of active settings state.
-      for (final legacyType in _legacyTypes) {
-        enabledMap.remove(legacyType);
-        daysMap.remove(legacyType);
-      }
-
       state = state.copyWith(
         enabledSettings: enabledMap,
         daysBeforeSettings: daysMap,
-        notificationHour: safeHour,
+        notificationHour: hour ?? 9,
         isLoading: false,
       );
     } catch (e) {
       state = state.copyWith(isLoading: false);
-    }
-  }
-
-  Future<void> _applyLegacySmartAlertFallback(
-    Map<NotificationType, bool> enabledMap,
-    Map<NotificationType, int> daysMap,
-    int notificationHour,
-  ) async {
-    for (final entry in _legacyAliases.entries) {
-      final newType = entry.key;
-      final legacyType = entry.value;
-
-      if (!enabledMap.containsKey(newType) &&
-          enabledMap.containsKey(legacyType)) {
-        enabledMap[newType] = enabledMap[legacyType] ?? true;
-      }
-
-      if (!daysMap.containsKey(newType) && daysMap.containsKey(legacyType)) {
-        daysMap[newType] = _normalizeDaysForType(
-          newType,
-          daysMap[legacyType] ?? 3,
-        );
-      }
-
-      if (!enabledMap.containsKey(newType) && !daysMap.containsKey(newType)) {
-        continue;
-      }
-
-      await _upsertSettingWithHour(
-        newType,
-        enabled: enabledMap[newType] ?? true,
-        daysBefore: _normalizeDaysForType(newType, daysMap[newType] ?? 3),
-        notificationHour: notificationHour,
-      );
     }
   }
 

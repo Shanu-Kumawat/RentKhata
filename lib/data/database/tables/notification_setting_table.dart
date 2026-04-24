@@ -8,11 +8,6 @@ enum NotificationType {
   // Billing reminders
   cycleEndingSoon,
   billDueSoon,
-  monthlySummary,
-
-  // Payment notifications
-  paymentReceived,
-  billFullyPaid,
 
   // Overdue escalation
   overdue1Day,
@@ -27,13 +22,6 @@ enum NotificationType {
   partialPaymentPause,
   depositSettlementDue,
   utilityUsageAnomaly,
-
-  // Legacy (kept for backwards compatibility)
-  dueSoon,
-  overdue,
-  rentCollectionDay,
-  depositPending,
-  billsReadyToGenerate,
 }
 
 /// Table for storing notification preferences.
