@@ -146,7 +146,7 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
           await notificationService.cancelOverdueEscalation(updatedBill.id);
         } else {
           final pauseEnabled = notificationSettings.isEnabled(
-            NotificationType.overdue,
+            NotificationType.partialPaymentPause,
           );
           final paidRatio = updatedBill.amount > 0
               ? updatedBill.paidAmount / updatedBill.amount

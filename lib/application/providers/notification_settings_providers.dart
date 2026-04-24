@@ -47,6 +47,15 @@ class NotificationSettingsState {
 class NotificationSettingsNotifier extends _$NotificationSettingsNotifier {
   AppDatabase? _db;
 
+  static const Map<NotificationType, NotificationType> _legacyAliases = {
+    NotificationType.agreementExpiringSoon: NotificationType.monthlySummary,
+    NotificationType.agreementExpired: NotificationType.paymentReceived,
+    NotificationType.billNotGenerated: NotificationType.billsReadyToGenerate,
+    NotificationType.partialPaymentPause: NotificationType.overdue,
+    NotificationType.depositSettlementDue: NotificationType.depositPending,
+    NotificationType.utilityUsageAnomaly: NotificationType.rentCollectionDay,
+  };
+
   @override
   NotificationSettingsState build() {
     _db = ref.watch(appDatabaseProvider);
@@ -71,14 +80,66 @@ class NotificationSettingsNotifier extends _$NotificationSettingsNotifier {
         hour ??= setting.notificationHour;
       }
 
+      final safeHour = hour ?? 9;
+      await _applyLegacySmartAlertFallback(enabledMap, daysMap, safeHour);
+
       state = state.copyWith(
         enabledSettings: enabledMap,
         daysBeforeSettings: daysMap,
-        notificationHour: hour ?? 9,
+        notificationHour: safeHour,
         isLoading: false,
       );
     } catch (e) {
       state = state.copyWith(isLoading: false);
+    }
+  }
+
+  Future<void> _applyLegacySmartAlertFallback(
+    Map<NotificationType, bool> enabledMap,
+    Map<NotificationType, int> daysMap,
+    int notificationHour,
+  ) async {
+    for (final entry in _legacyAliases.entries) {
+      final newType = entry.key;
+      final legacyType = entry.value;
+
+      if (!enabledMap.containsKey(newType) &&
+          enabledMap.containsKey(legacyType)) {
+        enabledMap[newType] = enabledMap[legacyType] ?? true;
+      }
+
+      if (!daysMap.containsKey(newType) && daysMap.containsKey(legacyType)) {
+        daysMap[newType] = _normalizeDaysForType(
+          newType,
+          daysMap[legacyType] ?? 3,
+        );
+      }
+
+      if (!enabledMap.containsKey(newType) && !daysMap.containsKey(newType)) {
+        continue;
+      }
+
+      await _upsertSettingWithHour(
+        newType,
+        enabled: enabledMap[newType] ?? true,
+        daysBefore: _normalizeDaysForType(newType, daysMap[newType] ?? 3),
+        notificationHour: notificationHour,
+      );
+    }
+  }
+
+  int _normalizeDaysForType(NotificationType type, int days) {
+    switch (type) {
+      case NotificationType.agreementExpiringSoon:
+        return days.clamp(7, 60);
+      case NotificationType.agreementExpired:
+        return days.clamp(0, 30);
+      case NotificationType.billNotGenerated:
+        return days.clamp(0, 14);
+      case NotificationType.depositSettlementDue:
+        return days.clamp(1, 30);
+      default:
+        return days;
     }
   }
 
@@ -112,7 +173,7 @@ class NotificationSettingsNotifier extends _$NotificationSettingsNotifier {
     await _upsertSetting(
       type,
       enabled: state.isEnabled(type),
-      daysBefore: days,
+      daysBefore: _normalizeDaysForType(type, days),
     );
   }
 
@@ -133,6 +194,20 @@ class NotificationSettingsNotifier extends _$NotificationSettingsNotifier {
     required bool enabled,
     required int daysBefore,
   }) async {
+    await _upsertSettingWithHour(
+      type,
+      enabled: enabled,
+      daysBefore: daysBefore,
+      notificationHour: state.notificationHour,
+    );
+  }
+
+  Future<void> _upsertSettingWithHour(
+    NotificationType type, {
+    required bool enabled,
+    required int daysBefore,
+    required int notificationHour,
+  }) async {
     final db = _db;
     if (db == null) return;
 
@@ -147,7 +222,7 @@ class NotificationSettingsNotifier extends _$NotificationSettingsNotifier {
         NotificationSettingsCompanion(
           enabled: Value(enabled),
           daysBefore: Value(daysBefore),
-          notificationHour: Value(state.notificationHour),
+          notificationHour: Value(notificationHour),
         ),
       );
     } else {
@@ -158,7 +233,7 @@ class NotificationSettingsNotifier extends _$NotificationSettingsNotifier {
               notificationType: type,
               enabled: Value(enabled),
               daysBefore: Value(daysBefore),
-              notificationHour: Value(state.notificationHour),
+              notificationHour: Value(notificationHour),
             ),
           );
     }
@@ -183,7 +258,7 @@ class NotificationSettingsNotifier extends _$NotificationSettingsNotifier {
       await _upsertSetting(
         type,
         enabled: enabledSettings[type] ?? true,
-        daysBefore: daysBeforeSettings[type] ?? 3,
+        daysBefore: _normalizeDaysForType(type, daysBeforeSettings[type] ?? 3),
       );
     }
   }

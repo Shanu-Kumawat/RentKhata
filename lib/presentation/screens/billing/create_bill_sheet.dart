@@ -777,14 +777,14 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
               escalationDays: overdueDays,
               notificationHour: notificationSettings.notificationHour,
               pauseOnPartialPayment: notificationSettings.isEnabled(
-                NotificationType.overdue,
+                NotificationType.partialPaymentPause,
               ),
               partialPaymentThresholdRatio: 0.5,
             );
           }
 
           if (notificationSettings.isEnabled(
-                NotificationType.rentCollectionDay,
+                NotificationType.utilityUsageAnomaly,
               ) &&
               createdBill.billType == BillType.electricity) {
             final electricityBills = createdBills

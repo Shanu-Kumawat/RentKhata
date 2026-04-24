@@ -20,6 +20,14 @@ enum NotificationType {
   overdue7Days,
   overdue14Days,
 
+  // Smart alerts
+  agreementExpiringSoon,
+  agreementExpired,
+  billNotGenerated,
+  partialPaymentPause,
+  depositSettlementDue,
+  utilityUsageAnomaly,
+
   // Legacy (kept for backwards compatibility)
   dueSoon,
   overdue,

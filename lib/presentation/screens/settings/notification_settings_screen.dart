@@ -144,7 +144,7 @@ class _NotificationSettingsScreenState
           escalationDays: enabledOverdueDays,
           notificationHour: _localState.notificationHour,
           pauseOnPartialPayment: _localState.isEnabled(
-            NotificationType.overdue,
+            NotificationType.partialPaymentPause,
           ),
           partialPaymentThresholdRatio: 0.5,
         );
@@ -181,8 +181,7 @@ class _NotificationSettingsScreenState
       );
     }
 
-    // Reuse monthlySummary setting slot for agreement expiry reminders.
-    if (_localState.isEnabled(NotificationType.monthlySummary)) {
+    if (_localState.isEnabled(NotificationType.agreementExpiringSoon)) {
       final occupancies = await ref.read(activeOccupanciesProvider.future);
       final agreementData =
           <
@@ -208,15 +207,16 @@ class _NotificationSettingsScreenState
 
       await service.scheduleAllAgreementExpiryReminders(
         occupancies: agreementData,
-        daysBefore: _localState.getDaysBefore(NotificationType.monthlySummary),
+        daysBefore: _localState.getDaysBefore(
+          NotificationType.agreementExpiringSoon,
+        ),
         notificationHour: _localState.notificationHour,
       );
     }
 
-    // Agreement already expired reminders (legacy key: paymentReceived).
-    if (_localState.isEnabled(NotificationType.paymentReceived)) {
+    if (_localState.isEnabled(NotificationType.agreementExpired)) {
       final graceDays = _localState
-          .getDaysBefore(NotificationType.paymentReceived)
+          .getDaysBefore(NotificationType.agreementExpired)
           .clamp(0, 30);
       final occupancies = await ref.read(activeOccupanciesProvider.future);
 
@@ -236,9 +236,9 @@ class _NotificationSettingsScreenState
     }
 
     // Bill generation reminders for due-soon/overdue cycles.
-    if (_localState.isEnabled(NotificationType.billsReadyToGenerate)) {
+    if (_localState.isEnabled(NotificationType.billNotGenerated)) {
       final leadDays = _localState
-          .getDaysBefore(NotificationType.billsReadyToGenerate)
+          .getDaysBefore(NotificationType.billNotGenerated)
           .clamp(0, 14);
       final attentionItems = await ref.read(
         billingAttentionListProvider.future,
@@ -267,9 +267,9 @@ class _NotificationSettingsScreenState
     }
 
     // Deposit settlement reminders after move-out.
-    if (_localState.isEnabled(NotificationType.depositPending)) {
+    if (_localState.isEnabled(NotificationType.depositSettlementDue)) {
       final daysAfterMoveOut = _localState
-          .getDaysBefore(NotificationType.depositPending)
+          .getDaysBefore(NotificationType.depositSettlementDue)
           .clamp(1, 30);
       final db = ref.read(appDatabaseProvider);
       final unsettled =
@@ -301,7 +301,7 @@ class _NotificationSettingsScreenState
     }
 
     // High utility usage anomaly reminders.
-    if (_localState.isEnabled(NotificationType.rentCollectionDay)) {
+    if (_localState.isEnabled(NotificationType.utilityUsageAnomaly)) {
       final occupancies = await ref.read(activeOccupanciesProvider.future);
       final billingRepo = ref.read(billingRepositoryProvider);
 
@@ -466,20 +466,24 @@ class _NotificationSettingsScreenState
               title: l10n.renewAgreements,
               subtitle: l10n.remindDaysBeforeCycleEnds(
                 _localState
-                    .getDaysBefore(NotificationType.monthlySummary)
+                    .getDaysBefore(NotificationType.agreementExpiringSoon)
                     .clamp(7, 60),
               ),
-              value: _localState.isEnabled(NotificationType.monthlySummary),
+              value: _localState.isEnabled(
+                NotificationType.agreementExpiringSoon,
+              ),
               onChanged: (v) =>
-                  _toggleSetting(NotificationType.monthlySummary, v),
+                  _toggleSetting(NotificationType.agreementExpiringSoon, v),
               sliderValue: _localState
-                  .getDaysBefore(NotificationType.monthlySummary)
+                  .getDaysBefore(NotificationType.agreementExpiringSoon)
                   .clamp(7, 60)
                   .toDouble(),
               sliderMin: 7,
               sliderMax: 60,
-              onSliderChanged: (v) =>
-                  _updateDaysBefore(NotificationType.monthlySummary, v.round()),
+              onSliderChanged: (v) => _updateDaysBefore(
+                NotificationType.agreementExpiringSoon,
+                v.round(),
+              ),
             ),
             const Divider(height: 32),
 
@@ -527,69 +531,76 @@ class _NotificationSettingsScreenState
             _buildToggleWithSlider(
               title: 'Agreement already expired',
               subtitle:
-                  'Remind after ${_localState.getDaysBefore(NotificationType.paymentReceived).clamp(0, 30)} day(s) past agreement end date',
-              value: _localState.isEnabled(NotificationType.paymentReceived),
+                  'Remind after ${_localState.getDaysBefore(NotificationType.agreementExpired).clamp(0, 30)} day(s) past agreement end date',
+              value: _localState.isEnabled(NotificationType.agreementExpired),
               onChanged: (v) =>
-                  _toggleSetting(NotificationType.paymentReceived, v),
+                  _toggleSetting(NotificationType.agreementExpired, v),
               sliderValue: _localState
-                  .getDaysBefore(NotificationType.paymentReceived)
+                  .getDaysBefore(NotificationType.agreementExpired)
                   .clamp(0, 30)
                   .toDouble(),
               sliderMin: 0,
               sliderMax: 30,
               onSliderChanged: (v) => _updateDaysBefore(
-                NotificationType.paymentReceived,
+                NotificationType.agreementExpired,
                 v.round(),
               ),
             ),
             _buildToggleWithSlider(
               title: 'Bill not generated reminder',
               subtitle:
-                  'Alert when cycle is overdue or within ${_localState.getDaysBefore(NotificationType.billsReadyToGenerate).clamp(0, 14)} day(s) of ending',
-              value: _localState.isEnabled(
-                NotificationType.billsReadyToGenerate,
-              ),
+                  'Alert when cycle is overdue or within ${_localState.getDaysBefore(NotificationType.billNotGenerated).clamp(0, 14)} day(s) of ending',
+              value: _localState.isEnabled(NotificationType.billNotGenerated),
               onChanged: (v) =>
-                  _toggleSetting(NotificationType.billsReadyToGenerate, v),
+                  _toggleSetting(NotificationType.billNotGenerated, v),
               sliderValue: _localState
-                  .getDaysBefore(NotificationType.billsReadyToGenerate)
+                  .getDaysBefore(NotificationType.billNotGenerated)
                   .clamp(0, 14)
                   .toDouble(),
               sliderMin: 0,
               sliderMax: 14,
               onSliderChanged: (v) => _updateDaysBefore(
-                NotificationType.billsReadyToGenerate,
+                NotificationType.billNotGenerated,
                 v.round(),
               ),
             ),
             _buildSimpleToggle(
               title: 'Pause overdue follow-ups after partial payment',
               subtitle: 'Pauses escalations once paid amount reaches 50%',
-              value: _localState.isEnabled(NotificationType.overdue),
-              onChanged: (v) => _toggleSetting(NotificationType.overdue, v),
+              value: _localState.isEnabled(
+                NotificationType.partialPaymentPause,
+              ),
+              onChanged: (v) =>
+                  _toggleSetting(NotificationType.partialPaymentPause, v),
             ),
             _buildToggleWithSlider(
               title: 'Deposit settlement due after move-out',
               subtitle:
-                  'Remind after ${_localState.getDaysBefore(NotificationType.depositPending).clamp(1, 30)} day(s) if settlement is pending',
-              value: _localState.isEnabled(NotificationType.depositPending),
+                  'Remind after ${_localState.getDaysBefore(NotificationType.depositSettlementDue).clamp(1, 30)} day(s) if settlement is pending',
+              value: _localState.isEnabled(
+                NotificationType.depositSettlementDue,
+              ),
               onChanged: (v) =>
-                  _toggleSetting(NotificationType.depositPending, v),
+                  _toggleSetting(NotificationType.depositSettlementDue, v),
               sliderValue: _localState
-                  .getDaysBefore(NotificationType.depositPending)
+                  .getDaysBefore(NotificationType.depositSettlementDue)
                   .clamp(1, 30)
                   .toDouble(),
               sliderMin: 1,
               sliderMax: 30,
-              onSliderChanged: (v) =>
-                  _updateDaysBefore(NotificationType.depositPending, v.round()),
+              onSliderChanged: (v) => _updateDaysBefore(
+                NotificationType.depositSettlementDue,
+                v.round(),
+              ),
             ),
             _buildSimpleToggle(
               title: 'High utility usage anomaly',
               subtitle: 'Alerts when latest electricity usage spikes sharply',
-              value: _localState.isEnabled(NotificationType.rentCollectionDay),
+              value: _localState.isEnabled(
+                NotificationType.utilityUsageAnomaly,
+              ),
               onChanged: (v) =>
-                  _toggleSetting(NotificationType.rentCollectionDay, v),
+                  _toggleSetting(NotificationType.utilityUsageAnomaly, v),
             ),
             const Divider(height: 32),
 

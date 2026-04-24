@@ -79,7 +79,9 @@ Future<void> scheduleAllNotifications(Ref ref) async {
         bill: bill,
         escalationDays: enabledOverdueDays,
         notificationHour: settings.notificationHour,
-        pauseOnPartialPayment: settings.isEnabled(NotificationType.overdue),
+        pauseOnPartialPayment: settings.isEnabled(
+          NotificationType.partialPaymentPause,
+        ),
         partialPaymentThresholdRatio: 0.5,
       );
     }
@@ -117,10 +119,11 @@ Future<void> scheduleAllNotifications(Ref ref) async {
     );
   }
 
-  // Reuse monthlySummary slot as Agreement Expiry Reminder for compatibility.
-  if (settings.isEnabled(NotificationType.monthlySummary)) {
+  if (settings.isEnabled(NotificationType.agreementExpiringSoon)) {
     final occupancies = await ref.read(activeOccupanciesProvider.future);
-    final daysBefore = settings.getDaysBefore(NotificationType.monthlySummary);
+    final daysBefore = settings.getDaysBefore(
+      NotificationType.agreementExpiringSoon,
+    );
 
     final agreementData =
         <
@@ -151,9 +154,8 @@ Future<void> scheduleAllNotifications(Ref ref) async {
     );
   }
 
-  // Agreement already expired reminder (uses legacy paymentReceived slot).
-  if (settings.isEnabled(NotificationType.paymentReceived)) {
-    final graceDays = settings.getDaysBefore(NotificationType.paymentReceived);
+  if (settings.isEnabled(NotificationType.agreementExpired)) {
+    final graceDays = settings.getDaysBefore(NotificationType.agreementExpired);
     final occupancies = await ref.read(activeOccupanciesProvider.future);
 
     for (final occupancy in occupancies) {
@@ -172,9 +174,9 @@ Future<void> scheduleAllNotifications(Ref ref) async {
   }
 
   // Bill generation reminders for due-soon/overdue cycles.
-  if (settings.isEnabled(NotificationType.billsReadyToGenerate)) {
+  if (settings.isEnabled(NotificationType.billNotGenerated)) {
     final leadDays = settings
-        .getDaysBefore(NotificationType.billsReadyToGenerate)
+        .getDaysBefore(NotificationType.billNotGenerated)
         .clamp(0, 14);
     final attentionItems = await ref.read(billingAttentionListProvider.future);
     final scheduledKeys = <String>{};
@@ -201,10 +203,9 @@ Future<void> scheduleAllNotifications(Ref ref) async {
     }
   }
 
-  // Deposit settlement reminders after move-out (uses legacy depositPending).
-  if (settings.isEnabled(NotificationType.depositPending)) {
+  if (settings.isEnabled(NotificationType.depositSettlementDue)) {
     final daysAfterMoveOut = settings
-        .getDaysBefore(NotificationType.depositPending)
+        .getDaysBefore(NotificationType.depositSettlementDue)
         .clamp(1, 30);
     final db = ref.read(appDatabaseProvider);
     final unsettled =
@@ -234,8 +235,7 @@ Future<void> scheduleAllNotifications(Ref ref) async {
     }
   }
 
-  // Utility usage anomaly reminders (uses legacy rentCollectionDay slot).
-  if (settings.isEnabled(NotificationType.rentCollectionDay)) {
+  if (settings.isEnabled(NotificationType.utilityUsageAnomaly)) {
     final occupancies = await ref.read(activeOccupanciesProvider.future);
     final billingRepo = ref.read(billingRepositoryProvider);
 
