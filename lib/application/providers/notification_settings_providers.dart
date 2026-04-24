@@ -47,7 +47,19 @@ class NotificationSettingsState {
 class NotificationSettingsNotifier extends _$NotificationSettingsNotifier {
   AppDatabase? _db;
 
+  static const Set<NotificationType> _legacyTypes = {
+    NotificationType.dueSoon,
+    NotificationType.overdue,
+    NotificationType.rentCollectionDay,
+    NotificationType.depositPending,
+    NotificationType.billsReadyToGenerate,
+    NotificationType.paymentReceived,
+    NotificationType.billFullyPaid,
+    NotificationType.monthlySummary,
+  };
+
   static const Map<NotificationType, NotificationType> _legacyAliases = {
+    NotificationType.billDueSoon: NotificationType.dueSoon,
     NotificationType.agreementExpiringSoon: NotificationType.monthlySummary,
     NotificationType.agreementExpired: NotificationType.paymentReceived,
     NotificationType.billNotGenerated: NotificationType.billsReadyToGenerate,
@@ -82,6 +94,12 @@ class NotificationSettingsNotifier extends _$NotificationSettingsNotifier {
 
       final safeHour = hour ?? 9;
       await _applyLegacySmartAlertFallback(enabledMap, daysMap, safeHour);
+
+      // Keep legacy keys migration-only and out of active settings state.
+      for (final legacyType in _legacyTypes) {
+        enabledMap.remove(legacyType);
+        daysMap.remove(legacyType);
+      }
 
       state = state.copyWith(
         enabledSettings: enabledMap,
