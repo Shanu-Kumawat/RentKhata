@@ -1751,4 +1751,25 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get yourName => '[HI] Your Name';
+
+  @override
+  String get documentPdf => 'document.pdf';
+
+  @override
+  String errorSharingMessage(String error) {
+    return '[HI] संदेश साझा करने में विफल: $error';
+  }
+
+  @override
+  String get downloadsFolder => 'Downloads';
+
+  @override
+  String get savedToDownloads => 'डाउनलोड में सहेजा गया';
+
+  @override
+  String get couldNotSavePdf =>
+      '[HI] PDF सहेजने में विफल। कृपया पुन: प्रयास करें।';
+
+  @override
+  String get unableToLoadPdfPreview => '[HI] PDF प्रीव्यू लोड करने में असमर्थ';
 }

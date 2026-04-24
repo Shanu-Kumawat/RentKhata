@@ -3342,6 +3342,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your Name'**
   String get yourName;
+
+  /// No description provided for @documentPdf.
+  ///
+  /// In en, this message translates to:
+  /// **'document.pdf'**
+  String get documentPdf;
+
+  /// No description provided for @errorSharingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to share message: {error}'**
+  String errorSharingMessage(String error);
+
+  /// No description provided for @downloadsFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloads'**
+  String get downloadsFolder;
+
+  /// No description provided for @savedToDownloads.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to Downloads'**
+  String get savedToDownloads;
+
+  /// No description provided for @couldNotSavePdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save the PDF. Please try again.'**
+  String get couldNotSavePdf;
+
+  /// No description provided for @unableToLoadPdfPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load PDF preview'**
+  String get unableToLoadPdfPreview;
 }
 
 class _AppLocalizationsDelegate

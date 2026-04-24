@@ -1747,4 +1747,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get yourName => 'Your Name';
+
+  @override
+  String get documentPdf => 'document.pdf';
+
+  @override
+  String errorSharingMessage(String error) {
+    return 'Failed to share message: $error';
+  }
+
+  @override
+  String get downloadsFolder => 'Downloads';
+
+  @override
+  String get savedToDownloads => 'Saved to Downloads';
+
+  @override
+  String get couldNotSavePdf => 'Could not save the PDF. Please try again.';
+
+  @override
+  String get unableToLoadPdfPreview => 'Unable to load PDF preview';
 }

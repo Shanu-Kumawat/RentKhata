@@ -924,5 +924,18 @@
     }
   },
   "weeklyReminder": "Weekly Reminder",
-  "yourName": "Your Name"
+  "yourName": "Your Name",
+  "documentPdf": "document.pdf",
+  "errorSharingMessage": "Failed to share message: {error}",
+  "@errorSharingMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadsFolder": "Downloads",
+  "savedToDownloads": "Saved to Downloads",
+  "couldNotSavePdf": "Could not save the PDF. Please try again.",
+  "unableToLoadPdfPreview": "Unable to load PDF preview"
 }
