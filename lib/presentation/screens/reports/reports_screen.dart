@@ -15,6 +15,7 @@ import '../../../domain/entities/payment.dart';
 import '../../../services/share_service.dart';
 import '../../../services/invoice_pdf_service.dart';
 import '../../../core/utils/l10n_helpers.dart';
+import '../pdf/pdf_preview_screen.dart';
 import '../billing/record_payment_sheet.dart';
 import '../../widgets/bouncing_scale_wrapper.dart';
 import '../../widgets/staggered_fade_in.dart';
@@ -107,15 +108,28 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
             labelPadding: EdgeInsets.zero,
             indicatorPadding: EdgeInsets.zero,
             tabs: [
-              Tab(text: l10n.overview, icon: const Icon(Icons.bar_chart_rounded, size: 16)),
-              Tab(text: l10n.pending, icon: const Icon(Icons.schedule_rounded, size: 16)),
-              Tab(text: l10n.history, icon: const Icon(Icons.history_rounded, size: 16)),
-              Tab(text: l10n.expenses, icon: const Icon(Icons.receipt_long_rounded, size: 16)),
+              Tab(
+                text: l10n.overview,
+                icon: const Icon(Icons.bar_chart_rounded, size: 16),
+              ),
+              Tab(
+                text: l10n.pending,
+                icon: const Icon(Icons.schedule_rounded, size: 16),
+              ),
+              Tab(
+                text: l10n.history,
+                icon: const Icon(Icons.history_rounded, size: 16),
+              ),
+              Tab(
+                text: l10n.expenses,
+                icon: const Icon(Icons.receipt_long_rounded, size: 16),
+              ),
             ],
           ),
         ),
       ),
-      floatingActionButton: (_tabController.index == 0 || _tabController.index == 3)
+      floatingActionButton:
+          (_tabController.index == 0 || _tabController.index == 3)
           ? FloatingActionButton.extended(
               onPressed: () {
                 HapticFeedback.mediumImpact();
@@ -132,7 +146,12 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
           : null,
       body: TabBarView(
         controller: _tabController,
-        children: const [_OverviewTab(), _PendingBillsTab(), _HistoryTab(), _ExpensesTab()],
+        children: const [
+          _OverviewTab(),
+          _PendingBillsTab(),
+          _HistoryTab(),
+          _ExpensesTab(),
+        ],
       ),
     );
   }
@@ -167,7 +186,10 @@ class _OverviewTab extends ConsumerWidget {
                 delay: const Duration(milliseconds: 0),
                 child: Text(
                   AppLocalizations.of(context)!.financialSummary,
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ],
@@ -186,18 +208,25 @@ class _OverviewTab extends ConsumerWidget {
                     final unpaidInYear = unpaidBills.where((b) {
                       final bStart = b.periodStartDate ?? b.createdAt;
                       final bEnd = b.periodEndDate ?? b.createdAt;
-                      return bStart.isBefore(endDate) && bEnd.isAfter(startDate);
+                      return bStart.isBefore(endDate) &&
+                          bEnd.isAfter(startDate);
                     }).toList();
 
                     final overdueAmount = unpaidInYear
                         .where((b) => b.isOverdue)
                         .fold(0.0, (sum, b) => sum + b.pendingAmount);
-                    final overdueCount = unpaidInYear.where((b) => b.isOverdue).length;
+                    final overdueCount = unpaidInYear
+                        .where((b) => b.isOverdue)
+                        .length;
 
                     final expensesInYear = allExpenses.where((e) {
-                      return e.date.isBefore(endDate) && e.date.isAfter(startDate);
+                      return e.date.isBefore(endDate) &&
+                          e.date.isAfter(startDate);
                     }).toList();
-                    final totalExpenses = expensesInYear.fold(0.0, (sum, e) => sum + e.amount);
+                    final totalExpenses = expensesInYear.fold(
+                      0.0,
+                      (sum, e) => sum + e.amount,
+                    );
                     final netProfit = data.collected - totalExpenses;
                     final isProfitable = netProfit >= 0;
 
@@ -215,7 +244,9 @@ class _OverviewTab extends ConsumerWidget {
                           children: [
                             Expanded(
                               child: _SummaryCard(
-                                label: AppLocalizations.of(context)!.outstanding,
+                                label: AppLocalizations.of(
+                                  context,
+                                )!.outstanding,
                                 amount: data.pending,
                                 icon: Icons.schedule_rounded,
                                 accentColor: AppColors.warning,
@@ -231,7 +262,9 @@ class _OverviewTab extends ConsumerWidget {
                                 icon: Icons.warning_amber_rounded,
                                 accentColor: AppColors.error,
                                 subtitle: overdueCount > 0
-                                    ? AppLocalizations.of(context)!.urgent(overdueCount)
+                                    ? AppLocalizations.of(
+                                        context,
+                                      )!.urgent(overdueCount)
                                     : AppLocalizations.of(context)!.allOnTime,
                                 isUrgent: overdueCount > 0,
                               ),
@@ -258,7 +291,9 @@ class _OverviewTab extends ConsumerWidget {
                                 amount: totalExpenses,
                                 icon: Icons.upload_rounded,
                                 accentColor: Colors.orange,
-                                subtitle: AppLocalizations.of(context)!.items(expensesInYear.length),
+                                subtitle: AppLocalizations.of(
+                                  context,
+                                )!.items(expensesInYear.length),
                               ),
                             ),
                           ],
@@ -267,13 +302,19 @@ class _OverviewTab extends ConsumerWidget {
                     );
                   },
                   loading: () => _buildLoadingCards(),
-                  error: (_, __) => _buildErrorCard(AppLocalizations.of(context)!.errorLoadingBills),
+                  error: (_, __) => _buildErrorCard(
+                    AppLocalizations.of(context)!.errorLoadingBills,
+                  ),
                 ),
                 loading: () => _buildLoadingCards(),
-                error: (_, __) => _buildErrorCard(AppLocalizations.of(context)!.errorLoadingExpenses),
+                error: (_, __) => _buildErrorCard(
+                  AppLocalizations.of(context)!.errorLoadingExpenses,
+                ),
               ),
               loading: () => _buildLoadingCards(),
-              error: (_, __) => _buildErrorCard(AppLocalizations.of(context)!.errorLoadingFinancials),
+              error: (_, __) => _buildErrorCard(
+                AppLocalizations.of(context)!.errorLoadingFinancials,
+              ),
             ),
           ),
 
@@ -316,7 +357,9 @@ class _OverviewTab extends ConsumerWidget {
                     color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.5),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.outlineVariant.withValues(alpha: 0.5),
                       width: 1,
                     ),
                   ),
@@ -480,7 +523,10 @@ class _NetProfitCard extends StatelessWidget {
                       curve: Curves.easeOutQuart,
                       builder: (_, val, __) {
                         final formatter = NumberFormat.currency(
-                          locale: 'en_IN', symbol: '₹', decimalDigits: 0);
+                          locale: 'en_IN',
+                          symbol: '₹',
+                          decimalDigits: 0,
+                        );
                         return Text(
                           formatter.format(val),
                           style: const TextStyle(
@@ -495,7 +541,10 @@ class _NetProfitCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       'FY $yearStr',
-                      style: const TextStyle(color: Colors.white60, fontSize: 13),
+                      style: const TextStyle(
+                        color: Colors.white60,
+                        fontSize: 13,
+                      ),
                     ),
                   ],
                 ),
@@ -521,7 +570,6 @@ class _NetProfitCard extends StatelessWidget {
     );
   }
 }
-
 
 /// Premium summary card with accent border.
 class _SummaryCard extends StatelessWidget {
@@ -561,7 +609,9 @@ class _SummaryCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
+          border: Border.all(
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -886,7 +936,9 @@ class _PremiumBillCard extends ConsumerWidget {
       }
     }
 
-    final double progress = bill.amount > 0 ? (bill.paidAmount / bill.amount).clamp(0.0, 1.0) : 0.0;
+    final double progress = bill.amount > 0
+        ? (bill.paidAmount / bill.amount).clamp(0.0, 1.0)
+        : 0.0;
 
     return BouncingScaleWrapper(
       child: Container(
@@ -914,319 +966,377 @@ class _PremiumBillCard extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // --- HEADER ---
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: _getBillTypeColor(bill.billType).withValues(alpha: 0.1),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                _getBillTypeIcon(bill.billType),
-                                color: _getBillTypeColor(bill.billType),
-                                size: 22,
-                              ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: _getBillTypeColor(
+                          bill.billType,
+                        ).withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        _getBillTypeIcon(bill.billType),
+                        color: _getBillTypeColor(bill.billType),
+                        size: 22,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            bill.tenantName ?? 'No Tenant',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: -0.3,
                             ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    bill.tenantName ?? 'No Tenant',
-                                    style: theme.textTheme.titleMedium?.copyWith(
-                                      fontWeight: FontWeight.w800,
-                                      letterSpacing: -0.3,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    '${bill.propertyName ?? 'Unit'} • Room ${bill.roomNumber ?? '—'}',
-                                    style: theme.textTheme.bodyMedium?.copyWith(
-                                      color: theme.colorScheme.onSurfaceVariant,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            // Status Pill
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: statusColor.withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                              child: Text(
-                                bill.isFullyPaid ? 'PAID' : bill.isOverdue ? 'OVERDUE' : 'PENDING',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w900,
-                                  letterSpacing: 1.0,
-                                  color: statusColor,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        
-                        const SizedBox(height: 24),
-                        
-                        // --- PROGRESS & AMOUNTS ---
-                        if (!bill.isFullyPaid && bill.paidAmount > 0) ...[
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Total Billed',
-                                    style: theme.textTheme.bodyMedium?.copyWith(
-                                      color: theme.colorScheme.onSurfaceVariant,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    formatCurrency(bill.amount),
-                                    style: theme.textTheme.titleMedium?.copyWith(
-                                      fontWeight: FontWeight.w700,
-                                      decoration: TextDecoration.lineThrough,
-                                      color: theme.colorScheme.onSurfaceVariant,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    'Pending',
-                                    style: theme.textTheme.bodyMedium?.copyWith(
-                                      color: theme.colorScheme.onSurfaceVariant,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  AnimatedCounterText(
-                                    value: bill.pendingAmount,
-                                    style: theme.textTheme.headlineMedium?.copyWith(
-                                      fontWeight: FontWeight.w900,
-                                      color: statusColor,
-                                      letterSpacing: -1.0,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          const SizedBox(height: 16),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Stack(
-                                  children: [
-                                    Container(
-                                      height: 8,
-                                      decoration: BoxDecoration(
-                                        color: theme.colorScheme.surfaceContainerHighest,
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                    ),
-                                    FractionallySizedBox(
-                                      widthFactor: progress,
-                                      child: Container(
-                                        height: 8,
-                                        decoration: BoxDecoration(
-                                          color: statusColor,
-                                          borderRadius: BorderRadius.circular(4),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              if (dueInfo != null) ...[
-                                const SizedBox(width: 12),
-                                Icon(Icons.timer_outlined, size: 14, color: AppColors.error),
-                                const SizedBox(width: 4),
-                                Text(
-                                  dueInfo,
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.error,
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ] else ...[
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    bill.isFullyPaid ? 'Amount Settled' : 'Amount Due',
-                                    style: theme.textTheme.bodyMedium?.copyWith(
-                                      color: theme.colorScheme.onSurfaceVariant,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  if (dueInfo != null) ...[
-                                    const SizedBox(height: 6),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.error.withValues(alpha: 0.1),
-                                        borderRadius: BorderRadius.circular(6),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Icon(Icons.timer_outlined, size: 12, color: AppColors.error),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            dueInfo,
-                                            style: theme.textTheme.bodySmall?.copyWith(
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.bold,
-                                              color: AppColors.error,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ],
-                              ),
-                              AnimatedCounterText(
-                                value: bill.isFullyPaid ? bill.paidAmount : bill.pendingAmount,
-                                style: theme.textTheme.headlineLarge?.copyWith(
-                                  fontWeight: FontWeight.w900,
-                                  color: bill.isFullyPaid ? AppColors.success : theme.colorScheme.onSurface,
-                                  letterSpacing: -1.0,
-                                ),
-                              ),
-                            ],
+                          const SizedBox(height: 4),
+                          Text(
+                            '${bill.propertyName ?? 'Unit'} • Room ${bill.roomNumber ?? '—'}',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ],
-                        
-                        const SizedBox(height: 24),
-                        
-                        // Dashed Divider Built Properly without span
-                        LayoutBuilder(
-                          builder: (context, constraints) {
-                            return Flex(
-                              direction: Axis.horizontal,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              mainAxisSize: MainAxisSize.max,
-                              children: List.generate(
-                                (constraints.constrainWidth() / 10).floor(),
-                                (index) => SizedBox(
-                                  width: 5,
-                                  height: 1.5,
-                                  child: DecoratedBox(
-                                    decoration: BoxDecoration(color: theme.colorScheme.outlineVariant),
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
+                      ),
+                    ),
+                    // Status Pill
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: statusColor.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: Text(
+                        bill.isFullyPaid
+                            ? 'PAID'
+                            : bill.isOverdue
+                            ? 'OVERDUE'
+                            : 'PENDING',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 1.0,
+                          color: statusColor,
                         ),
-                        
-                        const SizedBox(height: 16),
-                        
-                        // --- ACTION BAR ---
-                        Row(
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 24),
+
+                // --- PROGRESS & AMOUNTS ---
+                if (!bill.isFullyPaid && bill.paidAmount > 0) ...[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Total Billed',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            formatCurrency(bill.amount),
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              decoration: TextDecoration.lineThrough,
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            'Pending',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          AnimatedCounterText(
+                            value: bill.pendingAmount,
+                            style: theme.textTheme.headlineMedium?.copyWith(
+                              fontWeight: FontWeight.w900,
+                              color: statusColor,
+                              letterSpacing: -1.0,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Stack(
                           children: [
-                            PopupMenuButton<String>(
-                              icon: Container(
-                                padding: const EdgeInsets.all(8),
+                            Container(
+                              height: 8,
+                              decoration: BoxDecoration(
+                                color:
+                                    theme.colorScheme.surfaceContainerHighest,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                            FractionallySizedBox(
+                              widthFactor: progress,
+                              child: Container(
+                                height: 8,
                                 decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                                  color: statusColor,
+                                  borderRadius: BorderRadius.circular(4),
                                 ),
-                                child: Icon(Icons.share_outlined, size: 18, color: theme.colorScheme.onSurfaceVariant),
                               ),
-                              tooltip: 'Share',
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                              onSelected: (value) {
-                                HapticFeedback.lightImpact();
-                                _handleShare(context, ref, bill, value);
-                              },
-                              itemBuilder: (context) => [
-                                const PopupMenuItem(
-                                  value: 'text',
-                                  child: Row(
-                                    children: [
-                                      Icon(Icons.message_outlined, color: Colors.blue, size: 20),
-                                      SizedBox(width: 12),
-                                      Text('Share Text'),
-                                    ],
-                                  ),
-                                ),
-                                const PopupMenuItem(
-                                  value: 'pdf',
-                                  child: Row(
-                                    children: [
-                                      Icon(Icons.picture_as_pdf_outlined, color: Colors.red, size: 20),
-                                      SizedBox(width: 12),
-                                      Text('PDF Invoice'),
-                                    ],
-                                  ),
-                                ),
-                              ],
                             ),
-                            
-                            const Spacer(),
-                            
-                            TextButton(
-                              onPressed: () {
-                                HapticFeedback.lightImpact();
-                                _showBillDetails(context, ref, bill);
-                              },
-                              style: TextButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                foregroundColor: theme.colorScheme.onSurface,
-                              ),
-                              child: const Text('Details', style: TextStyle(fontWeight: FontWeight.w600)),
-                            ),
-                            
-                            if (!bill.isFullyPaid) ...[
-                              const SizedBox(width: 8),
-                              FilledButton.icon(
-                                onPressed: () {
-                                  HapticFeedback.mediumImpact();
-                                  _showRecordPayment(context, bill);
-                                },
-                                style: FilledButton.styleFrom(
-                                  backgroundColor: statusColor,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                  elevation: 0,
-                                ),
-                                icon: const Icon(Icons.payments_outlined, size: 18),
-                                label: const Text('Pay', style: TextStyle(fontWeight: FontWeight.w700)),
-                              ),
-                            ],
                           ],
+                        ),
+                      ),
+                      if (dueInfo != null) ...[
+                        const SizedBox(width: 12),
+                        Icon(
+                          Icons.timer_outlined,
+                          size: 14,
+                          color: AppColors.error,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          dueInfo,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.error,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ] else ...[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            bill.isFullyPaid ? 'Amount Settled' : 'Amount Due',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          if (dueInfo != null) ...[
+                            const SizedBox(height: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.error.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.timer_outlined,
+                                    size: 12,
+                                    color: AppColors.error,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    dueInfo,
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.error,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                      AnimatedCounterText(
+                        value: bill.isFullyPaid
+                            ? bill.paidAmount
+                            : bill.pendingAmount,
+                        style: theme.textTheme.headlineLarge?.copyWith(
+                          fontWeight: FontWeight.w900,
+                          color: bill.isFullyPaid
+                              ? AppColors.success
+                              : theme.colorScheme.onSurface,
+                          letterSpacing: -1.0,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+
+                const SizedBox(height: 24),
+
+                // Dashed Divider Built Properly without span
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    return Flex(
+                      direction: Axis.horizontal,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisSize: MainAxisSize.max,
+                      children: List.generate(
+                        (constraints.constrainWidth() / 10).floor(),
+                        (index) => SizedBox(
+                          width: 5,
+                          height: 1.5,
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.outlineVariant,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+
+                const SizedBox(height: 16),
+
+                // --- ACTION BAR ---
+                Row(
+                  children: [
+                    PopupMenuButton<String>(
+                      icon: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: theme.colorScheme.surfaceContainerHighest
+                              .withValues(alpha: 0.5),
+                        ),
+                        child: Icon(
+                          Icons.share_outlined,
+                          size: 18,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      tooltip: 'Share',
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      onSelected: (value) {
+                        HapticFeedback.lightImpact();
+                        _handleShare(context, ref, bill, value);
+                      },
+                      itemBuilder: (context) => [
+                        const PopupMenuItem(
+                          value: 'text',
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.message_outlined,
+                                color: Colors.blue,
+                                size: 20,
+                              ),
+                              SizedBox(width: 12),
+                              Text('Share Text'),
+                            ],
+                          ),
+                        ),
+                        const PopupMenuItem(
+                          value: 'pdf',
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.picture_as_pdf_outlined,
+                                color: Colors.red,
+                                size: 20,
+                              ),
+                              SizedBox(width: 12),
+                              Text('PDF Invoice'),
+                            ],
+                          ),
                         ),
                       ],
                     ),
-                  ),
+
+                    const Spacer(),
+
+                    TextButton(
+                      onPressed: () {
+                        HapticFeedback.lightImpact();
+                        _showBillDetails(context, ref, bill);
+                      },
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 10,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        foregroundColor: theme.colorScheme.onSurface,
+                      ),
+                      child: const Text(
+                        'Details',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+
+                    if (!bill.isFullyPaid) ...[
+                      const SizedBox(width: 8),
+                      FilledButton.icon(
+                        onPressed: () {
+                          HapticFeedback.mediumImpact();
+                          _showRecordPayment(context, bill);
+                        },
+                        style: FilledButton.styleFrom(
+                          backgroundColor: statusColor,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 10,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
+                        ),
+                        icon: const Icon(Icons.payments_outlined, size: 18),
+                        label: const Text(
+                          'Pay',
+                          style: TextStyle(fontWeight: FontWeight.w700),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
+      ),
     );
   }
 
@@ -1287,7 +1397,17 @@ class _PremiumBillCard extends ConsumerWidget {
           landlordUpiId: landlord?.upiId,
         );
         if (context.mounted) {
-          await pdfService.sharePdf(pdfFile, 'Invoice - $period');
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => PdfPreviewScreen(
+                pdfFile: pdfFile,
+                title: 'Invoice Preview',
+                shareSubject: 'Invoice - $period',
+                suggestedFileName: pdfFile.path.split('/').last,
+              ),
+            ),
+          );
         }
       } catch (e) {
         if (context.mounted) {
@@ -1692,7 +1812,12 @@ class _EditPaymentSheetState extends ConsumerState<_EditPaymentSheet> {
                 .map(
                   (mode) => DropdownMenuItem(
                     value: mode,
-                    child: Text(getPaymentModeLabel(AppLocalizations.of(context)!, mode).toUpperCase()),
+                    child: Text(
+                      getPaymentModeLabel(
+                        AppLocalizations.of(context)!,
+                        mode,
+                      ).toUpperCase(),
+                    ),
                   ),
                 )
                 .toList(),
@@ -1787,12 +1912,12 @@ class _ExpensesTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final expensesAsync = ref.watch(expensesProvider);
     final year = ref.watch(reportsFinancialYearProvider);
-    
+
     return expensesAsync.when(
       data: (expenses) {
         final startDate = DateTime(year, 4, 1);
         final endDate = DateTime(year + 1, 3, 31, 23, 59, 59);
-        
+
         final filteredExpenses = expenses.where((e) {
           return e.date.isBefore(endDate) && e.date.isAfter(startDate);
         }).toList();
@@ -1802,11 +1927,18 @@ class _ExpensesTab extends ConsumerWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.money_off, size: 64, color: Theme.of(context).disabledColor),
+                Icon(
+                  Icons.money_off,
+                  size: 64,
+                  color: Theme.of(context).disabledColor,
+                ),
                 const SizedBox(height: 16),
                 Text(
                   'No expenses recorded',
-                  style: TextStyle(color: Theme.of(context).disabledColor, fontSize: 16),
+                  style: TextStyle(
+                    color: Theme.of(context).disabledColor,
+                    fontSize: 16,
+                  ),
                 ),
               ],
             ),
@@ -1827,19 +1959,32 @@ class _ExpensesTab extends ConsumerWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                   side: BorderSide(
-                    color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.5),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.outlineVariant.withValues(alpha: 0.5),
                     width: 1,
                   ),
                 ),
                 elevation: 0,
                 color: Theme.of(context).colorScheme.surface,
                 child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  leading: CircleAvatar(
-                    backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                    child: Icon(Icons.outbound, color: Theme.of(context).colorScheme.error),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
                   ),
-                  title: Text(expense.category.name[0].toUpperCase() + expense.category.name.substring(1)),
+                  leading: CircleAvatar(
+                    backgroundColor: Theme.of(
+                      context,
+                    ).colorScheme.errorContainer,
+                    child: Icon(
+                      Icons.outbound,
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                  ),
+                  title: Text(
+                    expense.category.name[0].toUpperCase() +
+                        expense.category.name.substring(1),
+                  ),
                   subtitle: Text(
                     '${DateFormat('dd MMM').format(expense.date)}${expense.description != null ? ' - ${expense.description}' : ''}',
                   ),

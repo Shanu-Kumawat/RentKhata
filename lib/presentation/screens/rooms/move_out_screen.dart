@@ -15,7 +15,7 @@ import '../../../core/utils/l10n_helpers.dart';
 import '../../../domain/entities/room.dart';
 import '../../../domain/entities/settlement_statement.dart';
 import '../../../services/pdf_service.dart';
-import '../../../services/share_service.dart';
+import '../pdf/pdf_preview_screen.dart';
 
 /// Screen for processing move out with deposit settlement
 class MoveOutScreen extends ConsumerStatefulWidget {
@@ -109,7 +109,8 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
                               ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         Text(
-                          widget.occupancy.tenantName ?? AppLocalizations.of(context)!.tenant,
+                          widget.occupancy.tenantName ??
+                              AppLocalizations.of(context)!.tenant,
                           style: Theme.of(context).textTheme.bodyMedium
                               ?.copyWith(color: AppColors.onSurfaceVariant),
                         ),
@@ -168,7 +169,11 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(AppLocalizations.of(context)!.securityDepositLabel),
+                              Text(
+                                AppLocalizations.of(
+                                  context,
+                                )!.securityDepositLabel,
+                              ),
                               Text(
                                 formatCurrency(deposit),
                                 style: const TextStyle(
@@ -190,8 +195,12 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
                         ),
                         const SizedBox(height: 8),
                         ...pendingBills.map((bill) {
-                          final isDeducting = _selectedBillIdsToDeduct.contains(bill.id);
-                          final isVoiding = _selectedBillIdsToVoid.contains(bill.id);
+                          final isDeducting = _selectedBillIdsToDeduct.contains(
+                            bill.id,
+                          );
+                          final isVoiding = _selectedBillIdsToVoid.contains(
+                            bill.id,
+                          );
 
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
@@ -211,7 +220,9 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
                                 title: Text(
                                   '${getBillTypeLabel(AppLocalizations.of(context)!, bill.billType).toUpperCase()} - ${bill.billingPeriod}',
                                   style: TextStyle(
-                                    decoration: isVoiding ? TextDecoration.lineThrough : null,
+                                    decoration: isVoiding
+                                        ? TextDecoration.lineThrough
+                                        : null,
                                   ),
                                 ),
                                 subtitle: Text(
@@ -244,10 +255,18 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
                                   },
                                   style: TextButton.styleFrom(
                                     visualDensity: VisualDensity.compact,
-                                    foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
+                                    foregroundColor: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
                                     textStyle: const TextStyle(fontSize: 12),
                                   ),
-                                  child: Text(isVoiding ? AppLocalizations.of(context)!.undoVoid : AppLocalizations.of(context)!.markAsVoid),
+                                  child: Text(
+                                    isVoiding
+                                        ? AppLocalizations.of(context)!.undoVoid
+                                        : AppLocalizations.of(
+                                            context,
+                                          )!.markAsVoid,
+                                  ),
                                 ),
                             ],
                           );
@@ -312,7 +331,9 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
                               ),
                             if (_manualDeduction > 0)
                               _SettlementRow(
-                                AppLocalizations.of(context)!.otherDeductionsTitle,
+                                AppLocalizations.of(
+                                  context,
+                                )!.otherDeductionsTitle,
                                 '- ${formatCurrency(_manualDeduction)}',
                                 isDeduction: true,
                               ),
@@ -326,7 +347,9 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
                                 Text(
                                   isNegative
                                       ? AppLocalizations.of(context)!.tenantOwes
-                                      : AppLocalizations.of(context)!.refundableAmount,
+                                      : AppLocalizations.of(
+                                          context,
+                                        )!.refundableAmount,
                                   style: Theme.of(
                                     context,
                                   ).textTheme.titleMedium,
@@ -375,7 +398,13 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
                                 ),
                               )
                             : Text(
-                                isNegative ? AppLocalizations.of(context)!.confirmMoveOutRecord : AppLocalizations.of(context)!.confirmMoveOutSettle,
+                                isNegative
+                                    ? AppLocalizations.of(
+                                        context,
+                                      )!.confirmMoveOutRecord
+                                    : AppLocalizations.of(
+                                        context,
+                                      )!.confirmMoveOutSettle,
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -401,6 +430,7 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
     double totalDeduction,
   ) async {
     final l10n = AppLocalizations.of(context)!;
+    final rootNavigator = Navigator.of(context, rootNavigator: true);
     setState(() => _isLoading = true);
 
     try {
@@ -423,12 +453,15 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
         if (bill.pendingAmount > 0) {
           billDeductions.add(
             SettlementBillDeduction(
-              billTypeLabel: getBillTypeLabel(l10n, bill.billType).toUpperCase(),
+              billTypeLabel: getBillTypeLabel(
+                l10n,
+                bill.billType,
+              ).toUpperCase(),
               period: bill.billingPeriod,
               amount: bill.pendingAmount,
             ),
           );
-          
+
           await billingRepo.recordPayment(
             billId: billId,
             amount: bill.pendingAmount,
@@ -445,18 +478,18 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
           .endOccupancy(
             widget.occupancy.id,
             _moveOutDate,
-            deductionAmount: _manualDeduction, 
+            deductionAmount: _manualDeduction,
             deductionReason: _reasonController.text,
             settlementNotes:
                 'Bill Deductions: ${formatCurrency(totalDeduction - _manualDeduction)}; Refund: ${formatCurrency(refundAmount)}',
-            isSettled: true, 
+            isSettled: true,
             depositReturnedAmount: refundAmount > 0 ? refundAmount : 0,
           );
 
       // 3. Generate Settlement PDF
       final landlordRepo = ref.read(landlordRepositoryProvider);
       final landlord = await landlordRepo.getLandlord();
-      
+
       final statement = SettlementStatement(
         occupancyId: widget.occupancy.id,
         tenantName: widget.occupancy.tenantName ?? l10n.tenant,
@@ -468,7 +501,9 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
         securityDeposit: widget.occupancy.securityDeposit,
         billDeductions: billDeductions,
         manualDeduction: _manualDeduction,
-        manualDeductionReason: _reasonController.text.trim().isEmpty ? null : _reasonController.text.trim(),
+        manualDeductionReason: _reasonController.text.trim().isEmpty
+            ? null
+            : _reasonController.text.trim(),
         totalDeductions: totalDeduction,
         refundAmount: refundAmount,
       );
@@ -487,12 +522,21 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
         ref.invalidate(dashboardSummaryProvider); // Refresh dashboard
 
         Navigator.pop(context); // Close sheet
-        Navigator.pop(context); // Close Room Detail 
+        Navigator.pop(context); // Close Room Detail
       }
 
-      // 4. Automatically trigger share flow with the PDF
-      final shareService = ShareService();
-      await shareService.shareSettlementPdf(pdfFile, tenantName: statement.tenantName);
+      await rootNavigator.push(
+        MaterialPageRoute(
+          builder: (_) => PdfPreviewScreen(
+            pdfFile: pdfFile,
+            title: l10n.moveOutSettlementTitle,
+            shareSubject: 'Move-Out Settlement Receipt',
+            shareText:
+                'Dear ${statement.tenantName},\n\nYour Move-Out Settlement is complete. Please find the detailed Settlement Receipt attached.',
+            suggestedFileName: pdfFile.path.split('/').last,
+          ),
+        ),
+      );
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(

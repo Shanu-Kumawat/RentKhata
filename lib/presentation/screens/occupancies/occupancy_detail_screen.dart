@@ -14,8 +14,8 @@ import 'package:rent_khata/l10n/app_localizations.dart';
 import '../../../domain/entities/occupancy.dart';
 import '../../../domain/entities/settlement_statement.dart';
 import '../../../services/pdf_service.dart';
-import '../../../services/share_service.dart';
 import '../../../application/providers/repository_providers.dart';
+import '../pdf/pdf_preview_screen.dart';
 import '../billing/bill_detail_screen.dart';
 
 /// Screen showing complete historical details of an occupancy period.
@@ -767,7 +767,10 @@ class _DepositSettlementCard extends StatelessWidget {
     );
   }
 
-  Future<void> _shareSettlementReceipt(BuildContext context, WidgetRef ref) async {
+  Future<void> _shareSettlementReceipt(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
     // Show loading
     showDialog(
       context: context,
@@ -780,9 +783,10 @@ class _DepositSettlementCard extends StatelessWidget {
     try {
       final landlordRepo = ref.read(landlordRepositoryProvider);
       final landlord = await landlordRepo.getLandlord();
-      
-      final totalDeductionCalc = occupancy.securityDeposit - (occupancy.depositReturnedAmount ?? 0);
-      
+
+      final totalDeductionCalc =
+          occupancy.securityDeposit - (occupancy.depositReturnedAmount ?? 0);
+
       final statement = SettlementStatement(
         occupancyId: occupancy.id,
         tenantName: occupancy.tenantName ?? 'Tenant',
@@ -792,7 +796,7 @@ class _DepositSettlementCard extends StatelessWidget {
         moveInDate: occupancy.moveInDate,
         moveOutDate: occupancy.moveOutDate ?? DateTime.now(),
         securityDeposit: occupancy.securityDeposit,
-        billDeductions: [], 
+        billDeductions: [],
         manualDeduction: totalDeductionCalc > 0 ? totalDeductionCalc : 0,
         manualDeductionReason: occupancy.deductionReason ?? 'Prior Deductions',
         totalDeductions: totalDeductionCalc > 0 ? totalDeductionCalc : 0,
@@ -803,14 +807,26 @@ class _DepositSettlementCard extends StatelessWidget {
 
       if (context.mounted) Navigator.pop(context); // Hide loading
 
-      final shareService = ShareService();
-      await shareService.shareSettlementPdf(pdfFile, tenantName: statement.tenantName);
+      if (!context.mounted) return;
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => PdfPreviewScreen(
+            pdfFile: pdfFile,
+            title: l10n.moveOutSettlement,
+            shareSubject: l10n.moveOutSettlement,
+            shareText:
+                'Dear ${statement.tenantName},\n\nPlease find your Settlement Receipt attached.',
+            suggestedFileName: pdfFile.path.split('/').last,
+          ),
+        ),
+      );
     } catch (e) {
       if (context.mounted) {
         Navigator.pop(context); // Hide loading
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error generating receipt: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error generating receipt: $e')));
       }
     }
   }

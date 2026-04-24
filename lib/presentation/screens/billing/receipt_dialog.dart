@@ -6,6 +6,10 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../domain/entities/bill.dart';
 import '../../../domain/entities/payment.dart';
+import '../../../services/invoice_pdf_service.dart';
+import '../../../services/share_service.dart';
+import '../pdf/pdf_preview_screen.dart';
+import '../../widgets/share_bottom_sheet.dart';
 import 'package:rent_khata/l10n/app_localizations.dart';
 
 /// Dialog to show payment receipt after successful payment.
@@ -13,12 +17,14 @@ class ReceiptDialog extends StatelessWidget {
   final Bill bill;
   final Payment? latestPayment;
   final String? landlordName;
+  final String? landlordPhone;
 
   const ReceiptDialog({
     super.key,
     required this.bill,
     this.latestPayment,
     this.landlordName,
+    this.landlordPhone,
   });
 
   /// Show the receipt dialog.
@@ -27,6 +33,7 @@ class ReceiptDialog extends StatelessWidget {
     required Bill bill,
     Payment? latestPayment,
     String? landlordName,
+    String? landlordPhone,
   }) {
     return showDialog(
       context: context,
@@ -34,6 +41,7 @@ class ReceiptDialog extends StatelessWidget {
         bill: bill,
         latestPayment: latestPayment,
         landlordName: landlordName,
+        landlordPhone: landlordPhone,
       ),
     );
   }
@@ -84,8 +92,8 @@ class ReceiptDialog extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        isFullyPaid 
-                            ? AppLocalizations.of(context)!.paymentComplete 
+                        isFullyPaid
+                            ? AppLocalizations.of(context)!.paymentComplete
                             : AppLocalizations.of(context)!.paymentRecorded,
                         style: theme.textTheme.headlineSmall?.copyWith(
                           color: Colors.white,
@@ -96,7 +104,9 @@ class ReceiptDialog extends StatelessWidget {
                       Text(
                         isFullyPaid
                             ? AppLocalizations.of(context)!.billFullyPaidLabel
-                            : AppLocalizations.of(context)!.partialPaymentRecorded,
+                            : AppLocalizations.of(
+                                context,
+                              )!.partialPaymentRecorded,
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: Colors.white70,
                         ),
@@ -114,16 +124,24 @@ class ReceiptDialog extends StatelessWidget {
                 children: [
                   // Bill info
                   if (bill.billNumber != null)
-                    _ReceiptRow(label: AppLocalizations.of(context)!.invoiceLabel, value: bill.billNumber!),
+                    _ReceiptRow(
+                      label: AppLocalizations.of(context)!.invoiceLabel,
+                      value: bill.billNumber!,
+                    ),
                   _ReceiptRow(
                     label: AppLocalizations.of(context)!.type,
                     value: _getBillTypeLabel(context, bill.billType),
                   ),
-                  _ReceiptRow(label: AppLocalizations.of(context)!.periodLabel, value: bill.billingPeriod),
+                  _ReceiptRow(
+                    label: AppLocalizations.of(context)!.periodLabel,
+                    value: bill.billingPeriod,
+                  ),
                   if (bill.roomNumber != null)
                     _ReceiptRow(
                       label: AppLocalizations.of(context)!.roomLabel,
-                      value: AppLocalizations.of(context)!.roomNumber(bill.roomNumber!),
+                      value: AppLocalizations.of(
+                        context,
+                      )!.roomNumber(bill.roomNumber!),
                     ),
 
                   const Divider(height: 24),
@@ -137,7 +155,10 @@ class ReceiptDialog extends StatelessWidget {
                     ),
                     _ReceiptRow(
                       label: AppLocalizations.of(context)!.paymentModeLabel,
-                      value: _getPaymentModeLabel(context, latestPayment!.paymentMode),
+                      value: _getPaymentModeLabel(
+                        context,
+                        latestPayment!.paymentMode,
+                      ),
                     ),
                     _ReceiptRow(
                       label: AppLocalizations.of(context)!.date,
@@ -166,7 +187,18 @@ class ReceiptDialog extends StatelessWidget {
 
                   const SizedBox(height: 24),
 
-                  // Actions - Close button only
+                  // Actions
+                  if (latestPayment != null) ...[
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () => _openReceiptPdf(context),
+                        icon: const Icon(Icons.picture_as_pdf_outlined),
+                        label: Text(AppLocalizations.of(context)!.viewPdf),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -185,6 +217,54 @@ class ReceiptDialog extends StatelessWidget {
 
   String _formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year}';
+  }
+
+  Future<void> _openReceiptPdf(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    final payment = latestPayment;
+    if (payment == null) return;
+
+    try {
+      final pdfService = InvoicePdfService();
+      final file = await pdfService.generateReceipt(
+        bill: bill,
+        payment: payment,
+        landlordName: landlordName ?? l10n.landlord,
+        landlordPhone: landlordPhone ?? '',
+      );
+
+      if (!context.mounted) return;
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => PdfPreviewScreen(
+            pdfFile: file,
+            title: 'Payment Receipt',
+            shareSubject: 'Payment Receipt',
+            suggestedFileName: file.path.split('/').last,
+            shareContentType: ShareContentType.receipt,
+            onShareAsMessage: () => _shareReceiptAsMessage(context, payment),
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error generating PDF: $e')));
+    }
+  }
+
+  Future<void> _shareReceiptAsMessage(
+    BuildContext context,
+    Payment payment,
+  ) async {
+    final shareService = ShareService();
+    await shareService.shareReceipt(
+      bill: bill,
+      payment: payment,
+      landlordName: landlordName ?? AppLocalizations.of(context)!.landlord,
+    );
   }
 
   String _getBillTypeLabel(BuildContext context, BillType type) {

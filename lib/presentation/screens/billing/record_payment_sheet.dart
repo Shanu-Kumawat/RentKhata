@@ -107,6 +107,7 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
         // Get landlord name for receipt
         final landlord = await ref.read(landlordProvider.future);
         final landlordName = landlord?.name;
+        final landlordPhone = landlord?.phone;
 
         // Create updated bill with new payment amounts for receipt
         final updatedBill = widget.bill.copyWith(
@@ -196,6 +197,7 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
           bill: updatedBill,
           latestPayment: payment,
           landlordName: landlordName,
+          landlordPhone: landlordPhone,
         );
       }
     } catch (e) {

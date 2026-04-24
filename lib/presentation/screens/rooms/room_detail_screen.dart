@@ -19,6 +19,7 @@ import '../../../services/share_service.dart';
 import '../../../services/billing_cycle_service.dart';
 import '../../../services/ledger_service.dart';
 import '../../../services/pdf_service.dart';
+import '../pdf/pdf_preview_screen.dart';
 import '../billing/create_bill_sheet.dart';
 import '../billing/bill_detail_screen.dart';
 import 'move_in_sheet.dart';
@@ -58,8 +59,12 @@ class RoomDetailScreen extends ConsumerWidget {
       data: (room) {
         if (room == null) {
           return Scaffold(
-            appBar: AppBar(title: Text(AppLocalizations.of(context)!.roomTitle)),
-            body: Center(child: Text(AppLocalizations.of(context)!.roomNotFound)),
+            appBar: AppBar(
+              title: Text(AppLocalizations.of(context)!.roomTitle),
+            ),
+            body: Center(
+              child: Text(AppLocalizations.of(context)!.roomNotFound),
+            ),
           );
         }
         return _RoomDetailContent(
@@ -75,7 +80,9 @@ class RoomDetailScreen extends ConsumerWidget {
         body: const Center(child: CircularProgressIndicator()),
       ),
       error: (e, s) => Scaffold(
-        appBar: AppBar(title: Text(AppLocalizations.of(context)!.errorPrefix.trim())),
+        appBar: AppBar(
+          title: Text(AppLocalizations.of(context)!.errorPrefix.trim()),
+        ),
         body: Center(child: Text('Error: $e')),
       ),
     );
@@ -175,9 +182,15 @@ class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: () => _generateAndShareKhataStatement(context, ref, occupancy.id),
+                          onPressed: () => _generateAndShareKhataStatement(
+                            context,
+                            ref,
+                            occupancy.id,
+                          ),
                           icon: const Icon(Icons.picture_as_pdf_outlined),
-                          label: Text(AppLocalizations.of(context)!.statementLabel),
+                          label: Text(
+                            AppLocalizations.of(context)!.statementLabel,
+                          ),
                         ),
                       ),
                     ],
@@ -310,7 +323,11 @@ class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
     );
   }
 
-  Future<void> _generateAndShareKhataStatement(BuildContext context, WidgetRef ref, int occupancyId) async {
+  Future<void> _generateAndShareKhataStatement(
+    BuildContext context,
+    WidgetRef ref,
+    int occupancyId,
+  ) async {
     final l10n = AppLocalizations.of(context)!;
     // Show loading indicator
     showDialog(
@@ -320,20 +337,37 @@ class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
     );
 
     try {
-      final ledgerStatement = await ref.read(ledgerStatementProvider(occupancyId).future);
+      final ledgerStatement = await ref.read(
+        ledgerStatementProvider(occupancyId).future,
+      );
       if (ledgerStatement == null) throw Exception(l10n.ledgerNotFound);
 
-      final pdfFile = await PdfService.generateTenantLedgerPdf(ledgerStatement, l10n);
+      final pdfFile = await PdfService.generateTenantLedgerPdf(
+        ledgerStatement,
+        l10n,
+      );
 
       // Hide loading
       if (context.mounted) Navigator.pop(context);
 
-      final shareService = ShareService(ref.read(billingRepositoryProvider));
-      await shareService.sharePdfStatement(pdfFile, tenantName: ledgerStatement.tenantName);
+      if (!context.mounted) return;
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => PdfPreviewScreen(
+            pdfFile: pdfFile,
+            title: l10n.khataStatement,
+            shareSubject: l10n.khataStatement,
+            shareText:
+                'Dear ${ledgerStatement.tenantName},\n\nPlease find your generated Khata Statement attached.',
+            suggestedFileName: pdfFile.path.split('/').last,
+          ),
+        ),
+      );
     } catch (e) {
       // Hide loading
       if (context.mounted) Navigator.pop(context);
-      
+
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -385,13 +419,16 @@ class _RoomInfoCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        room.propertyName ?? AppLocalizations.of(context)!.property,
+                        room.propertyName ??
+                            AppLocalizations.of(context)!.property,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
                       Text(
-                        room.isOccupied ? AppLocalizations.of(context)!.occupiedStatus : AppLocalizations.of(context)!.vacant,
+                        room.isOccupied
+                            ? AppLocalizations.of(context)!.occupiedStatus
+                            : AppLocalizations.of(context)!.vacant,
                         style: Theme.of(context).textTheme.titleMedium
                             ?.copyWith(
                               fontWeight: FontWeight.bold,
@@ -485,7 +522,9 @@ class _OccupancyCard extends ConsumerWidget {
                       context,
                     ).colorScheme.primary.withValues(alpha: 0.1),
                     child: Text(
-                      (occupancy.tenantName ?? AppLocalizations.of(context)!.tenantT)[0].toUpperCase(),
+                      (occupancy.tenantName ??
+                              AppLocalizations.of(context)!.tenantT)[0]
+                          .toUpperCase(),
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -499,7 +538,8 @@ class _OccupancyCard extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          occupancy.tenantName ?? AppLocalizations.of(context)!.tenant,
+                          occupancy.tenantName ??
+                              AppLocalizations.of(context)!.tenant,
                           style: Theme.of(context).textTheme.titleMedium
                               ?.copyWith(fontWeight: FontWeight.w600),
                         ),
@@ -662,7 +702,9 @@ class _OccupancyCard extends ConsumerWidget {
       } else if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)!.failedToUpdateBillingStart),
+            content: Text(
+              AppLocalizations.of(context)!.failedToUpdateBillingStart,
+            ),
             behavior: SnackBarBehavior.floating,
             backgroundColor: AppColors.error,
           ),
@@ -833,7 +875,9 @@ class _BillsSection extends ConsumerWidget {
                     child: ExpansionTile(
                       tilePadding: EdgeInsets.zero,
                       title: Text(
-                        AppLocalizations.of(context)!.viewBillHistory(olderHistory.length),
+                        AppLocalizations.of(
+                          context,
+                        )!.viewBillHistory(olderHistory.length),
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.primary,
                           fontWeight: FontWeight.w600,
@@ -933,7 +977,9 @@ class _BillTile extends ConsumerWidget {
                           Padding(
                             padding: const EdgeInsets.only(top: 4.0),
                             child: Text(
-                              AppLocalizations.of(context)!.overdueByDays(_getDaysOverdue(bill.dueDate!)),
+                              AppLocalizations.of(
+                                context,
+                              )!.overdueByDays(_getDaysOverdue(bill.dueDate!)),
                               style: theme.textTheme.labelSmall?.copyWith(
                                 color: AppColors.error,
                                 fontWeight: FontWeight.bold,
@@ -973,7 +1019,9 @@ class _BillTile extends ConsumerWidget {
                         )
                       else if (isPartial)
                         Text(
-                          AppLocalizations.of(context)!.amountDueSuffix(formatCurrency(bill.pendingAmount)),
+                          AppLocalizations.of(context)!.amountDueSuffix(
+                            formatCurrency(bill.pendingAmount),
+                          ),
                           style: theme.textTheme.labelMedium?.copyWith(
                             color: Colors.orange.shade800,
                             fontWeight: FontWeight.w600,
@@ -981,7 +1029,9 @@ class _BillTile extends ConsumerWidget {
                         )
                       else
                         Text(
-                          isPaid ? AppLocalizations.of(context)!.paidCaps : AppLocalizations.of(context)!.dueCaps,
+                          isPaid
+                              ? AppLocalizations.of(context)!.paidCaps
+                              : AppLocalizations.of(context)!.dueCaps,
                           style: theme.textTheme.labelSmall?.copyWith(
                             color: statusColor,
                             fontWeight: FontWeight.bold,
@@ -1164,7 +1214,9 @@ class _BillTile extends ConsumerWidget {
   String _getBillLabel(BuildContext context, BillType type) {
     return switch (type) {
       BillType.rent => AppLocalizations.of(context)!.monthlyRentLabel,
-      BillType.electricity => AppLocalizations.of(context)!.electricityBillLabel,
+      BillType.electricity => AppLocalizations.of(
+        context,
+      )!.electricityBillLabel,
       BillType.water => AppLocalizations.of(context)!.waterBillLabel,
       BillType.maintenance => AppLocalizations.of(context)!.maintenanceLabel,
       BillType.other => AppLocalizations.of(context)!.otherChargesLabel,
@@ -1238,7 +1290,9 @@ class _BillTile extends ConsumerWidget {
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           elevation: 0,
                         ),
-                        child: Text(AppLocalizations.of(context)!.sendInvoiceBtn),
+                        child: Text(
+                          AppLocalizations.of(context)!.sendInvoiceBtn,
+                        ),
                       ),
                     ),
                   ],
