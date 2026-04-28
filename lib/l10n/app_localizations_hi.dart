@@ -1772,4 +1772,30 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get unableToLoadPdfPreview => '[HI] PDF प्रीव्यू लोड करने में असमर्थ';
+
+  @override
+  String get shareReceipt => '[HI] रसीद साझा करें';
+
+  @override
+  String get chooseHowToShare => '[HI] चुनें कि आप कैसे साझा करना चाहते हैं';
+
+  @override
+  String get sendAsMessage => '[HI] संदेश के रूप में भेजें';
+
+  @override
+  String get quickTextWithDetails => '[HI] विवरण के साथ त्वरित पाठ';
+
+  @override
+  String get sharePdf => '[HI] PDF साझा करें';
+
+  @override
+  String get formalDocument => '[HI] औपचारिक दस्तावेज़';
+
+  @override
+  String errorGeneratingPdf(String error) {
+    return '[HI] PDF जनरेट करने में त्रुटि: $error';
+  }
+
+  @override
+  String get paymentReceipt => '[HI] भुगतान रसीद';
 }

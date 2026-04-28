@@ -149,17 +149,17 @@ class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
           // Auto-open bill sheet if requested via navigation
           _maybeAutoOpenBillSheet(occupancy);
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Room info card
-                _RoomInfoCard(room: widget.room),
-                const SizedBox(height: 16),
+          if (occupancy != null) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Room info card
+                  _RoomInfoCard(room: widget.room),
+                  const SizedBox(height: 16),
 
-                // Occupancy section
-                if (occupancy != null) ...[
+                  // Occupancy section
                   _OccupancyCard(
                     occupancy: occupancy,
                     room: widget.room,
@@ -168,7 +168,6 @@ class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Actions - Create Bill button (full width)
                   // Actions - Create Bill & Khata Statement
                   Row(
                     children: [
@@ -199,15 +198,31 @@ class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
 
                   // Bills section
                   _BillsSection(occupancyId: occupancy.id),
-                ] else ...[
-                  // Vacant room
-                  _VacantRoomCard(
-                    onMoveIn: () => _showMoveIn(context, widget.room),
+                ],
+              ),
+            );
+          } else {
+            return Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  _RoomInfoCard(room: widget.room),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        const Spacer(flex: 3),
+                        _VacantRoomCard(
+                          onMoveIn: () => _showMoveIn(context, widget.room),
+                        ),
+                        const Spacer(flex: 7),
+                      ],
+                    ),
                   ),
                 ],
-              ],
-            ),
-          );
+              ),
+            );
+          }
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, s) => Center(child: Text('Error: $e')),
@@ -753,6 +768,7 @@ class _VacantRoomCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Container(
               padding: const EdgeInsets.all(16),
@@ -769,6 +785,7 @@ class _VacantRoomCard extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               AppLocalizations.of(context)!.roomIsVacant,
+              textAlign: TextAlign.center,
               style: Theme.of(
                 context,
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
@@ -776,6 +793,7 @@ class _VacantRoomCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               AppLocalizations.of(context)!.assignTenantToStartCollecting,
+              textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),

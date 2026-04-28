@@ -389,6 +389,10 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final foregroundColor = color.computeLuminance() > 0.5
+        ? AppColors.light.heading
+        : AppColors.dark.heading;
+
     return Container(
       height: 120, // Keep height constraints
       padding: const EdgeInsets.all(12),
@@ -411,12 +415,12 @@ class _StatCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(
+                  color: foregroundColor.withValues(
                     alpha: 0.2,
                   ), // Frosted glass effect for icon bg
                   shape: BoxShape.circle,
                 ),
-                child: Icon(icon, size: 16, color: Colors.white),
+                child: Icon(icon, size: 16, color: foregroundColor),
               ),
               const Spacer(),
             ],
@@ -426,7 +430,7 @@ class _StatCard extends StatelessWidget {
             value,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
-              color: Colors.white, // White text
+              color: foregroundColor,
               fontSize: 16,
             ),
             maxLines: 1,
@@ -436,9 +440,7 @@ class _StatCard extends StatelessWidget {
           Text(
             label,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Colors.white.withValues(
-                alpha: 0.8,
-              ), // Slightly transparent white
+              color: foregroundColor.withValues(alpha: 0.8),
               fontWeight: FontWeight.w600,
             ),
           ),

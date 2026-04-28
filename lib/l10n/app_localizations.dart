@@ -3378,6 +3378,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unable to load PDF preview'**
   String get unableToLoadPdfPreview;
+
+  /// No description provided for @shareReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Receipt'**
+  String get shareReceipt;
+
+  /// No description provided for @chooseHowToShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose how you want to share'**
+  String get chooseHowToShare;
+
+  /// No description provided for @sendAsMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Send as Message'**
+  String get sendAsMessage;
+
+  /// No description provided for @quickTextWithDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick text with details'**
+  String get quickTextWithDetails;
+
+  /// No description provided for @sharePdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Share PDF'**
+  String get sharePdf;
+
+  /// No description provided for @formalDocument.
+  ///
+  /// In en, this message translates to:
+  /// **'Formal document'**
+  String get formalDocument;
+
+  /// No description provided for @errorGeneratingPdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Error generating PDF: {error}'**
+  String errorGeneratingPdf(String error);
+
+  /// No description provided for @paymentReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Receipt'**
+  String get paymentReceipt;
 }
 
 class _AppLocalizationsDelegate

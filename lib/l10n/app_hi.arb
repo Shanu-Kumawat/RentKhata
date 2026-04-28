@@ -615,5 +615,20 @@
   "downloadsFolder": "Downloads",
   "savedToDownloads": "डाउनलोड में सहेजा गया",
   "couldNotSavePdf": "[HI] PDF सहेजने में विफल। कृपया पुन: प्रयास करें।",
-  "unableToLoadPdfPreview": "[HI] PDF प्रीव्यू लोड करने में असमर्थ"
+  "unableToLoadPdfPreview": "[HI] PDF प्रीव्यू लोड करने में असमर्थ",
+  "shareReceipt": "[HI] रसीद साझा करें",
+  "chooseHowToShare": "[HI] चुनें कि आप कैसे साझा करना चाहते हैं",
+  "sendAsMessage": "[HI] संदेश के रूप में भेजें",
+  "quickTextWithDetails": "[HI] विवरण के साथ त्वरित पाठ",
+  "sharePdf": "[HI] PDF साझा करें",
+  "formalDocument": "[HI] औपचारिक दस्तावेज़",
+  "errorGeneratingPdf": "[HI] PDF जनरेट करने में त्रुटि: {error}",
+  "@errorGeneratingPdf": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "paymentReceipt": "[HI] भुगतान रसीद"
 }

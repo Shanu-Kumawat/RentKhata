@@ -237,10 +237,10 @@ class ReceiptDialog extends StatelessWidget {
       await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => PdfPreviewScreen(
+          builder: (innerContext) => PdfPreviewScreen(
             pdfFile: file,
-            title: 'Payment Receipt',
-            shareSubject: 'Payment Receipt',
+            title: AppLocalizations.of(context)!.paymentReceipt,
+            shareSubject: AppLocalizations.of(context)!.paymentReceipt,
             suggestedFileName: file.path.split('/').last,
             shareContentType: ShareContentType.receipt,
             onShareAsMessage: () => _shareReceiptAsMessage(context, payment),
@@ -249,9 +249,11 @@ class ReceiptDialog extends StatelessWidget {
       );
     } catch (e) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error generating PDF: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.errorGeneratingPdf(e.toString())), 
+        ),
+      );
     }
   }
 

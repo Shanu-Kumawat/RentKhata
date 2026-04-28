@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
 
 /// Type of content being shared.
 enum ShareContentType { invoice, receipt }
@@ -48,9 +49,10 @@ class ShareBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final contentLabel = contentType == ShareContentType.invoice
-        ? 'Invoice'
-        : 'Receipt';
+        ? l10n.shareInvoice
+        : l10n.shareReceipt;
 
     return SafeArea(
       child: Padding(
@@ -81,13 +83,13 @@ class ShareBottomSheet extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Share $contentLabel',
+                        contentLabel,
                         style: theme.textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
-                        'Choose how you want to share',
+                        l10n.chooseHowToShare,
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
@@ -102,8 +104,8 @@ class ShareBottomSheet extends StatelessWidget {
             // Send as Message (Recommended)
             _ShareOption(
               icon: Icons.message_outlined,
-              title: 'Send as Message',
-              subtitle: 'Quick text with details',
+              title: l10n.sendAsMessage,
+              subtitle: l10n.quickTextWithDetails,
               isRecommended: true,
               onTap: onShareAsMessage,
             ),
@@ -112,8 +114,8 @@ class ShareBottomSheet extends StatelessWidget {
             // Share PDF
             _ShareOption(
               icon: Icons.picture_as_pdf_outlined,
-              title: 'Share PDF',
-              subtitle: 'Formal document',
+              title: l10n.sharePdf,
+              subtitle: l10n.formalDocument,
               isRecommended: false,
               onTap: onShareAsPdf,
             ),

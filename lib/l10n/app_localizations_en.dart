@@ -1767,4 +1767,30 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unableToLoadPdfPreview => 'Unable to load PDF preview';
+
+  @override
+  String get shareReceipt => 'Share Receipt';
+
+  @override
+  String get chooseHowToShare => 'Choose how you want to share';
+
+  @override
+  String get sendAsMessage => 'Send as Message';
+
+  @override
+  String get quickTextWithDetails => 'Quick text with details';
+
+  @override
+  String get sharePdf => 'Share PDF';
+
+  @override
+  String get formalDocument => 'Formal document';
+
+  @override
+  String errorGeneratingPdf(String error) {
+    return 'Error generating PDF: $error';
+  }
+
+  @override
+  String get paymentReceipt => 'Payment Receipt';
 }

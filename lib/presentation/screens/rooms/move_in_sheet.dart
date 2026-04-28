@@ -43,7 +43,7 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
   bool _useSeparateBillingDate = false; // User chose to customize
   Tenant? _selectedTenant;
   bool _isLoading = false;
-  bool _createNewTenant = false;
+  bool _createNewTenant = true;
 
   // New tenant fields - FULL FORM matching edit screen
   final _newNameController = TextEditingController();
@@ -248,9 +248,11 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
     if (!_formKey.currentState!.validate()) return;
 
     if (!_createNewTenant && _selectedTenant == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.pleaseSelectTenant)));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.pleaseSelectTenant),
+        ),
+      );
       return;
     }
 
@@ -370,14 +372,19 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
     if (_newFatherNameController.text.isEmpty) {
       missingFields.add('Father\'s Name');
     }
-    if (_newPhoneController.text.isEmpty) missingFields.add(AppLocalizations.of(context)!.phoneLabel);
-    if (_newAadharController.text.isEmpty) missingFields.add(AppLocalizations.of(context)!.aadhaarNumber);
+    if (_newPhoneController.text.isEmpty)
+      missingFields.add(AppLocalizations.of(context)!.phoneLabel);
+    if (_newAadharController.text.isEmpty)
+      missingFields.add(AppLocalizations.of(context)!.aadhaarNumber);
     if (_addressLineController.text.isEmpty) {
       missingFields.add(AppLocalizations.of(context)!.permanentAddress);
     }
-    if (_cityController.text.isEmpty) missingFields.add(AppLocalizations.of(context)!.cityLabel);
-    if (_aadhaarFrontPath == null) missingFields.add(AppLocalizations.of(context)!.aadhaarFrontPhoto);
-    if (_aadhaarBackPath == null) missingFields.add(AppLocalizations.of(context)!.aadhaarBackPhoto);
+    if (_cityController.text.isEmpty)
+      missingFields.add(AppLocalizations.of(context)!.cityLabel);
+    if (_aadhaarFrontPath == null)
+      missingFields.add(AppLocalizations.of(context)!.aadhaarFrontPhoto);
+    if (_aadhaarBackPath == null)
+      missingFields.add(AppLocalizations.of(context)!.aadhaarBackPhoto);
 
     return showDialog<bool>(
       context: context,
@@ -555,16 +562,17 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
                 children: [
                   Expanded(
                     child: DropdownButtonFormField<String>(
-                      decoration: InputDecoration(
-                        labelText: 'Relationship *',
-                      ),
+                      decoration: InputDecoration(labelText: 'Relationship *'),
                       initialValue: relationship,
                       items: [
                         DropdownMenuItem(
                           value: 'spouse',
                           child: Text(AppLocalizations.of(context)!.spouse),
                         ),
-                        DropdownMenuItem(value: 'child', child: Text(AppLocalizations.of(context)!.child)),
+                        DropdownMenuItem(
+                          value: 'child',
+                          child: Text(AppLocalizations.of(context)!.child),
+                        ),
                         DropdownMenuItem(
                           value: 'parent',
                           child: Text(AppLocalizations.of(context)!.parent),
@@ -573,7 +581,12 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
                           value: 'sibling',
                           child: Text(AppLocalizations.of(context)!.sibling),
                         ),
-                        DropdownMenuItem(value: 'other', child: Text(AppLocalizations.of(context)!.otherRelation)),
+                        DropdownMenuItem(
+                          value: 'other',
+                          child: Text(
+                            AppLocalizations.of(context)!.otherRelation,
+                          ),
+                        ),
                       ],
                       onChanged: (v) => setLocalState(() => relationship = v),
                     ),
@@ -586,22 +599,36 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
                   Expanded(
                     child: TextFormField(
                       controller: ageController,
-                      decoration: InputDecoration(labelText: AppLocalizations.of(context)!.ageLabel),
+                      decoration: InputDecoration(
+                        labelText: AppLocalizations.of(context)!.ageLabel,
+                      ),
                       keyboardType: TextInputType.number,
                     ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
                     child: DropdownButtonFormField<String>(
-                      decoration: InputDecoration(labelText: AppLocalizations.of(context)!.genderLabel),
+                      decoration: InputDecoration(
+                        labelText: AppLocalizations.of(context)!.genderLabel,
+                      ),
                       initialValue: gender,
                       items: [
-                        DropdownMenuItem(value: 'male', child: Text(AppLocalizations.of(context)!.maleLabel)),
+                        DropdownMenuItem(
+                          value: 'male',
+                          child: Text(AppLocalizations.of(context)!.maleLabel),
+                        ),
                         DropdownMenuItem(
                           value: 'female',
-                          child: Text(AppLocalizations.of(context)!.femaleLabel),
+                          child: Text(
+                            AppLocalizations.of(context)!.femaleLabel,
+                          ),
                         ),
-                        DropdownMenuItem(value: 'other', child: Text(AppLocalizations.of(context)!.otherRelation)),
+                        DropdownMenuItem(
+                          value: 'other',
+                          child: Text(
+                            AppLocalizations.of(context)!.otherRelation,
+                          ),
+                        ),
                       ],
                       onChanged: (v) => setLocalState(() => gender = v),
                     ),
@@ -634,7 +661,11 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
                             relationship == null) {
                           ScaffoldMessenger.of(ctx).showSnackBar(
                             SnackBar(
-                              content: Text(AppLocalizations.of(context)!.nameAndRelRequired),
+                              content: Text(
+                                AppLocalizations.of(
+                                  context,
+                                )!.nameAndRelRequired,
+                              ),
                             ),
                           );
                           return;
@@ -783,10 +814,11 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
       children: [
         Expanded(
           child: _ToggleButton(
-            label: AppLocalizations.of(context)!.existingTenant,
-            isSelected: !_createNewTenant,
+            label: AppLocalizations.of(context)!.newTenant,
+            isSelected: _createNewTenant,
             onTap: () => setState(() {
-              _createNewTenant = false;
+              _createNewTenant = true;
+              _selectedTenant = null;
               _selectedFamilyMemberIds.clear();
             }),
           ),
@@ -794,11 +826,10 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
         const SizedBox(width: 12),
         Expanded(
           child: _ToggleButton(
-            label: AppLocalizations.of(context)!.newTenant,
-            isSelected: _createNewTenant,
+            label: AppLocalizations.of(context)!.existingTenant,
+            isSelected: !_createNewTenant,
             onTap: () => setState(() {
-              _createNewTenant = true;
-              _selectedTenant = null;
+              _createNewTenant = false;
               _selectedFamilyMemberIds.clear();
             }),
           ),
@@ -811,193 +842,229 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
     return Column(
       children: [
         // Essential Info Section
-        _buildSection(AppLocalizations.of(context)!.essentialInfo, Icons.person_outline, [
-          TextFormField(
-            controller: _newNameController,
-            decoration: InputDecoration(
-              labelText: 'Full Name *',
-              prefixIcon: Icon(Icons.person_outline),
-            ),
-            textCapitalization: TextCapitalization.words,
-            validator: (v) => validateRequired(v, AppLocalizations.of(context)!.nameLabel),
-          ),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: _newFatherNameController,
-            decoration: InputDecoration(
-              labelText: 'Father\'s Name',
-              prefixIcon: Icon(Icons.person_outline),
-            ),
-            textCapitalization: TextCapitalization.words,
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: TextFormField(
-                  controller: _newAgeController,
-                  decoration: InputDecoration(labelText: AppLocalizations.of(context)!.ageLabel),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                ),
+        _buildSection(
+          AppLocalizations.of(context)!.essentialInfo,
+          Icons.person_outline,
+          [
+            TextFormField(
+              controller: _newNameController,
+              decoration: InputDecoration(
+                labelText: 'Full Name *',
+                prefixIcon: Icon(Icons.person_outline),
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: DropdownButtonFormField<String>(
-                  initialValue: _selectedGender,
-                  decoration: InputDecoration(labelText: AppLocalizations.of(context)!.genderLabel),
-                  items: [
-                    DropdownMenuItem(value: 'male', child: Text(AppLocalizations.of(context)!.maleLabel)),
-                    DropdownMenuItem(value: 'female', child: Text(AppLocalizations.of(context)!.femaleLabel)),
-                    DropdownMenuItem(value: 'other', child: Text(AppLocalizations.of(context)!.otherRelation)),
-                  ],
-                  onChanged: (v) => setState(() => _selectedGender = v),
-                ),
+              textCapitalization: TextCapitalization.words,
+              validator: (v) =>
+                  validateRequired(v, AppLocalizations.of(context)!.nameLabel),
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _newFatherNameController,
+              decoration: InputDecoration(
+                labelText: 'Father\'s Name',
+                prefixIcon: Icon(Icons.person_outline),
               ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: _newPhoneController,
-            decoration: InputDecoration(
-              labelText: AppLocalizations.of(context)!.phoneLabel,
-              prefixIcon: Icon(Icons.phone_outlined),
+              textCapitalization: TextCapitalization.words,
             ),
-            keyboardType: TextInputType.phone,
-          ),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: _newSecondaryPhoneController,
-            decoration: InputDecoration(
-              labelText: AppLocalizations.of(context)!.secondaryPhone,
-              prefixIcon: Icon(Icons.phone_outlined),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    controller: _newAgeController,
+                    decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context)!.ageLabel,
+                    ),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: DropdownButtonFormField<String>(
+                    initialValue: _selectedGender,
+                    decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context)!.genderLabel,
+                    ),
+                    items: [
+                      DropdownMenuItem(
+                        value: 'male',
+                        child: Text(AppLocalizations.of(context)!.maleLabel),
+                      ),
+                      DropdownMenuItem(
+                        value: 'female',
+                        child: Text(AppLocalizations.of(context)!.femaleLabel),
+                      ),
+                      DropdownMenuItem(
+                        value: 'other',
+                        child: Text(
+                          AppLocalizations.of(context)!.otherRelation,
+                        ),
+                      ),
+                    ],
+                    onChanged: (v) => setState(() => _selectedGender = v),
+                  ),
+                ),
+              ],
             ),
-            keyboardType: TextInputType.phone,
-          ),
-        ]),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _newPhoneController,
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.phoneLabel,
+                prefixIcon: Icon(Icons.phone_outlined),
+              ),
+              keyboardType: TextInputType.phone,
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _newSecondaryPhoneController,
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.secondaryPhone,
+                prefixIcon: Icon(Icons.phone_outlined),
+              ),
+              keyboardType: TextInputType.phone,
+            ),
+          ],
+        ),
         const SizedBox(height: 16),
 
         // Permanent Address Section
-        _buildSection(AppLocalizations.of(context)!.permanentAddress, Icons.home_outlined, [
-          TextFormField(
-            controller: _addressLineController,
-            decoration: InputDecoration(
-              labelText: AppLocalizations.of(context)!.addressLine,
-              prefixIcon: Icon(Icons.location_on_outlined),
-            ),
-            maxLines: 2,
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: TextFormField(
-                  controller: _cityController,
-                  decoration: InputDecoration(labelText: AppLocalizations.of(context)!.cityLabel),
-                ),
+        _buildSection(
+          AppLocalizations.of(context)!.permanentAddress,
+          Icons.home_outlined,
+          [
+            TextFormField(
+              controller: _addressLineController,
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.addressLine,
+                prefixIcon: Icon(Icons.location_on_outlined),
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: TextFormField(
-                  controller: _stateController,
-                  decoration: InputDecoration(labelText: AppLocalizations.of(context)!.stateLabel),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: _pincodeController,
-            decoration: InputDecoration(
-              labelText: AppLocalizations.of(context)!.pincodeLabel,
-              prefixIcon: Icon(Icons.pin_drop_outlined),
+              maxLines: 2,
             ),
-            keyboardType: TextInputType.number,
-          ),
-        ]),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    controller: _cityController,
+                    decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context)!.cityLabel,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: TextFormField(
+                    controller: _stateController,
+                    decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context)!.stateLabel,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _pincodeController,
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.pincodeLabel,
+                prefixIcon: Icon(Icons.pin_drop_outlined),
+              ),
+              keyboardType: TextInputType.number,
+            ),
+          ],
+        ),
         const SizedBox(height: 16),
 
         // ID Documents Section
-        _buildSection(AppLocalizations.of(context)!.idDocuments, Icons.badge_outlined, [
-          TextFormField(
-            controller: _newAadharController,
-            decoration: InputDecoration(
-              labelText: AppLocalizations.of(context)!.aadhaarNumber,
-              hintText: '12-digit number',
-              prefixIcon: Icon(Icons.credit_card_outlined),
+        _buildSection(
+          AppLocalizations.of(context)!.idDocuments,
+          Icons.badge_outlined,
+          [
+            TextFormField(
+              controller: _newAadharController,
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.aadhaarNumber,
+                hintText: '12-digit number',
+                prefixIcon: Icon(Icons.credit_card_outlined),
+              ),
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             ),
-            keyboardType: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          ),
-          const SizedBox(height: 20),
-          Text(
-            AppLocalizations.of(context)!.aadhaarCardPhotos,
-            style: Theme.of(context).textTheme.titleSmall,
-          ),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Column(
-                children: [
-                  ImagePickerWidget(
-                    initialImagePath: _aadhaarFrontPath,
-                    placeholderIcon: Icons.credit_card,
-                    size: 100,
-                    onImageSelected: (p) =>
-                        setState(() => _aadhaarFrontPath = p),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    AppLocalizations.of(context)!.frontLabel,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.onSurfaceVariant,
+            const SizedBox(height: 20),
+            Text(
+              AppLocalizations.of(context)!.aadhaarCardPhotos,
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Column(
+                  children: [
+                    ImagePickerWidget(
+                      initialImagePath: _aadhaarFrontPath,
+                      placeholderIcon: Icons.credit_card,
+                      size: 100,
+                      onImageSelected: (p) =>
+                          setState(() => _aadhaarFrontPath = p),
                     ),
-                  ),
-                ],
-              ),
-              Column(
-                children: [
-                  ImagePickerWidget(
-                    initialImagePath: _aadhaarBackPath,
-                    placeholderIcon: Icons.credit_card,
-                    size: 100,
-                    onImageSelected: (p) =>
-                        setState(() => _aadhaarBackPath = p),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    AppLocalizations.of(context)!.backLabel,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.onSurfaceVariant,
+                    const SizedBox(height: 8),
+                    Text(
+                      AppLocalizations.of(context)!.frontLabel,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColors.onSurfaceVariant,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ]),
+                  ],
+                ),
+                Column(
+                  children: [
+                    ImagePickerWidget(
+                      initialImagePath: _aadhaarBackPath,
+                      placeholderIcon: Icons.credit_card,
+                      size: 100,
+                      onImageSelected: (p) =>
+                          setState(() => _aadhaarBackPath = p),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      AppLocalizations.of(context)!.backLabel,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColors.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
         const SizedBox(height: 16),
 
         // Work Details Section
-        _buildSection(AppLocalizations.of(context)!.workDetails, Icons.work_outline, [
-          TextFormField(
-            controller: _companyNameController,
-            decoration: InputDecoration(
-              labelText: AppLocalizations.of(context)!.companyName,
-              prefixIcon: Icon(Icons.business_outlined),
+        _buildSection(
+          AppLocalizations.of(context)!.workDetails,
+          Icons.work_outline,
+          [
+            TextFormField(
+              controller: _companyNameController,
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.companyName,
+                prefixIcon: Icon(Icons.business_outlined),
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: _officeAddressController,
-            decoration: InputDecoration(
-              labelText: AppLocalizations.of(context)!.officeAddress,
-              prefixIcon: Icon(Icons.location_city_outlined),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _officeAddressController,
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.officeAddress,
+                prefixIcon: Icon(Icons.location_city_outlined),
+              ),
+              maxLines: 2,
             ),
-            maxLines: 2,
-          ),
-        ]),
+          ],
+        ),
         const SizedBox(height: 16),
 
         // Introducer Section
@@ -1031,42 +1098,46 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
         const SizedBox(height: 16),
 
         // Additional Documents Section
-        _buildSection(AppLocalizations.of(context)!.additionalDocuments, Icons.folder_outlined, [
-          if (_documents.isEmpty)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: Text(
-                'No documents added yet.',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+        _buildSection(
+          AppLocalizations.of(context)!.additionalDocuments,
+          Icons.folder_outlined,
+          [
+            if (_documents.isEmpty)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Text(
+                  'No documents added yet.',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ),
+            ..._documents.asMap().entries.map((entry) {
+              final index = entry.key;
+              final doc = entry.value;
+              return ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.description_outlined),
+                title: Text(doc['title'] ?? ''),
+                subtitle: Text(
+                  doc['path']?.split('/').last ?? '',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                trailing: IconButton(
+                  icon: const Icon(Icons.close, size: 20),
+                  onPressed: () => setState(() => _documents.removeAt(index)),
+                ),
+              );
+            }),
+            const SizedBox(height: 8),
+            OutlinedButton.icon(
+              onPressed: _pickDocument,
+              icon: const Icon(Icons.add),
+              label: Text(AppLocalizations.of(context)!.addDocumentBtn),
             ),
-          ..._documents.asMap().entries.map((entry) {
-            final index = entry.key;
-            final doc = entry.value;
-            return ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.description_outlined),
-              title: Text(doc['title'] ?? ''),
-              subtitle: Text(
-                doc['path']?.split('/').last ?? '',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              trailing: IconButton(
-                icon: const Icon(Icons.close, size: 20),
-                onPressed: () => setState(() => _documents.removeAt(index)),
-              ),
-            );
-          }),
-          const SizedBox(height: 8),
-          OutlinedButton.icon(
-            onPressed: _pickDocument,
-            icon: const Icon(Icons.add),
-            label: Text(AppLocalizations.of(context)!.addDocumentBtn),
-          ),
-        ]),
+          ],
+        ),
         const SizedBox(height: 16),
 
         // Family Members
@@ -1386,7 +1457,8 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
             helperText: 'Base: ${formatCurrency(widget.room.baseRent)}',
           ),
           keyboardType: TextInputType.number,
-          validator: (v) => validatePositiveNumber(v, AppLocalizations.of(context)!.rent),
+          validator: (v) =>
+              validatePositiveNumber(v, AppLocalizations.of(context)!.rent),
         ),
         const SizedBox(height: 16),
         TextFormField(
@@ -1633,20 +1705,25 @@ class _ToggleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final primaryColor = AppColors.primaryOf(context);
+    final outlineColor = AppColors.outlineOf(context);
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : AppColors.surfaceVariant,
+          color: isSelected ? primaryColor : null,
           borderRadius: BorderRadius.circular(12),
+          border: isSelected ? null : Border.all(color: outlineColor),
         ),
         child: Center(
           child: Text(
             label,
             style: TextStyle(
-              color: isSelected ? Colors.white : AppColors.onSurface,
+              color: isSelected ? colorScheme.onPrimary : primaryColor,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
             ),
           ),

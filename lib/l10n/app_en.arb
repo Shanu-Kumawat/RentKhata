@@ -937,5 +937,20 @@
   "downloadsFolder": "Downloads",
   "savedToDownloads": "Saved to Downloads",
   "couldNotSavePdf": "Could not save the PDF. Please try again.",
-  "unableToLoadPdfPreview": "Unable to load PDF preview"
+  "unableToLoadPdfPreview": "Unable to load PDF preview",
+  "shareReceipt": "Share Receipt",
+  "chooseHowToShare": "Choose how you want to share",
+  "sendAsMessage": "Send as Message",
+  "quickTextWithDetails": "Quick text with details",
+  "sharePdf": "Share PDF",
+  "formalDocument": "Formal document",
+  "errorGeneratingPdf": "Error generating PDF: {error}",
+  "@errorGeneratingPdf": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "paymentReceipt": "Payment Receipt"
 }
