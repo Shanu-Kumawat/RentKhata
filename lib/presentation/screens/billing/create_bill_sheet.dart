@@ -22,6 +22,7 @@ import '../../../services/billing_cycle_service.dart';
 import '../../../services/local_notification_service.dart';
 import 'package:rent_khata/l10n/app_localizations.dart';
 import '../../../core/utils/l10n_helpers.dart';
+import 'widgets/contextual_profile_sheet.dart';
 
 /// Bottom sheet to create a new bill.
 class CreateBillSheet extends ConsumerStatefulWidget {
@@ -596,6 +597,10 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
 
   Future<void> _saveBill() async {
     if (!_formKey.currentState!.validate()) return;
+
+    // Check if Landlord profile is complete
+    final isProfileComplete = await ContextualProfileSheet.ensureProfile(context, ref);
+    if (!isProfileComplete) return; 
 
     setState(() => _isLoading = true);
 

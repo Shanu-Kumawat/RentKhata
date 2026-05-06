@@ -14,7 +14,7 @@ dependencies:
 
   # UI
   cupertino_icons: ^1.0.8
-  google_fonts: ^6.2.1
+  google_fonts: ^8.1.0
   
   # State Management
   flutter_riverpod: ^2.6.1
@@ -65,6 +65,9 @@ dependencies:
   shared_preferences: ^2.5.4
   open_file: ^3.5.11
   file_picker: ^10.3.10
+  flutter_animate: ^4.5.2
+  flutter_svg: ^2.2.4
+  lottie: ^3.3.3
 
 dev_dependencies:
   flutter_test:

@@ -12,6 +12,8 @@ import '../../../application/providers/dashboard_providers.dart';
 import '../../../application/providers/billing_providers.dart';
 import '../../../application/providers/billing_cycle_providers.dart';
 import '../../../application/providers/tenant_providers.dart';
+import '../../../application/providers/property_providers.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'widgets/attention_bottom_sheet.dart';
 import 'widgets/unpaid_bills_bottom_sheet.dart';
 import 'widgets/expiring_agreements_bottom_sheet.dart';
@@ -490,7 +492,7 @@ class _LivePropertyStatusList extends ConsumerWidget {
     return statusListAsync.when(
       data: (items) {
         if (items.isEmpty) {
-          return Center(child: Text(AppLocalizations.of(context)!.noActiveRooms));
+          return const _SmartEmptyState();
         }
         return ListView.builder(
           shrinkWrap: true,
@@ -508,6 +510,156 @@ class _LivePropertyStatusList extends ConsumerWidget {
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, __) => Text('Error: $e'),
     );
+  }
+}
+
+class _SmartEmptyState extends ConsumerWidget {
+  const _SmartEmptyState();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final allRoomsAsync = ref.watch(allRoomsProvider);
+    final propertiesAsync = ref.watch(propertiesStreamProvider);
+
+    if (allRoomsAsync.isLoading || propertiesAsync.isLoading) {
+      return const SizedBox(
+        height: 120,
+        child: Center(
+          child: SizedBox(
+            width: 24,
+            height: 24,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+        ),
+      );
+    }
+
+    final properties = propertiesAsync.valueOrNull ?? [];
+    final rooms = allRoomsAsync.valueOrNull ?? [];
+
+    if (properties.isEmpty) {
+      return _buildCard(
+        context,
+        icon: Icons.domain_add_rounded,
+        title: "Let's Get Started",
+        subtitle: "Add your first property to begin managing your tenants.",
+        actionLabel: "Add Property",
+        onAction: () => context.push('/properties/add'),
+      );
+    }
+
+    if (rooms.isEmpty) {
+      return _buildCard(
+        context,
+        icon: Icons.door_front_door_outlined,
+        title: "Property Ready! \u{1F389}",
+        subtitle: "Your property is set up. Let's add your first room to start tracking rent.",
+        actionLabel: "Add a Room",
+        onAction: () => context.push('/properties/${properties.first.id}'),
+      );
+    }
+
+    return _buildCard(
+      context,
+      icon: Icons.person_add_alt_1_rounded,
+      title: "Rooms Available",
+      subtitle: "You have empty rooms waiting for tenants. Add a tenant to start tracking.",
+      actionLabel: "Add Tenant",
+      onAction: () => context.push('/tenants/add'),
+    );
+  }
+
+  Widget _buildCard(BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required String actionLabel,
+    required VoidCallback onAction,
+  }) {
+    final theme = Theme.of(context);
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: theme.colorScheme.primary.withValues(alpha: 0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+        border: Border.all(
+          color: theme.colorScheme.primary.withValues(alpha: 0.15),
+          width: 1.5,
+        ),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onAction,
+          borderRadius: BorderRadius.circular(24),
+          child: Padding(
+            padding: const EdgeInsets.all(32.0),
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primaryContainer,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    icon,
+                    size: 36,
+                    color: theme.colorScheme.primary,
+                  ),
+                ).animate(onPlay: (controller) => controller.repeat(reverse: true))
+                 .scaleXY(begin: 1.0, end: 1.05, duration: 1500.ms, curve: Curves.easeInOut)
+                 .shimmer(duration: 2000.ms, color: theme.colorScheme.onPrimaryContainer.withValues(alpha: 0.2)),
+                const SizedBox(height: 24),
+                Text(
+                  title,
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.5,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                  textAlign: TextAlign.center,
+                ).animate().fadeIn(duration: 600.ms).slideY(begin: 0.2, end: 0),
+                const SizedBox(height: 12),
+                Text(
+                  subtitle,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                    height: 1.5,
+                    fontSize: 15,
+                  ),
+                ).animate().fadeIn(duration: 600.ms, delay: 100.ms).slideY(begin: 0.2, end: 0),
+                const SizedBox(height: 32),
+                FilledButton.icon(
+                  onPressed: onAction,
+                  icon: const Icon(Icons.arrow_forward_rounded, size: 20),
+                  label: Text(
+                    actionLabel,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                ).animate().fadeIn(duration: 600.ms, delay: 200.ms).slideY(begin: 0.2, end: 0),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ).animate().fadeIn(duration: 800.ms, curve: Curves.easeOutCubic);
   }
 }
 

@@ -8,6 +8,8 @@ import 'repository_providers.dart';
 import 'property_providers.dart';
 import 'billing_providers.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 part 'dashboard_providers.g.dart';
 
 /// Dashboard summary data.
@@ -91,11 +93,26 @@ Stream<Landlord?> landlordStream(Ref ref) {
   return repo.watchLandlord();
 }
 
-/// Check if is first launch (no landlord profile).
+/// Check if is first launch (onboarding not completed).
 @riverpod
 Future<bool> isFirstLaunch(Ref ref) async {
-  final repo = ref.watch(landlordRepositoryProvider);
-  return !(await repo.hasLandlordProfile());
+  final prefs = await SharedPreferences.getInstance();
+  bool complete = prefs.getBool('onboarding_complete') ?? false;
+
+  if (!complete) {
+    // Legacy migration check: Not a new user if they have created properties or landlord.
+    final landlordRepo = ref.read(landlordRepositoryProvider);
+    final propertyRepo = ref.read(propertyRepositoryProvider);
+    final hasLandlord = await landlordRepo.hasLandlordProfile();
+    final hasProperties = (await propertyRepo.getAllProperties()).isNotEmpty;
+
+    if (hasLandlord || hasProperties) {
+      await prefs.setBool('onboarding_complete', true);
+      complete = true;
+    }
+  }
+
+  return !complete;
 }
 
 /// Get landlord profile.
