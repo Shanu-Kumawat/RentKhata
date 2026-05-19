@@ -17,6 +17,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'widgets/attention_bottom_sheet.dart';
 import 'widgets/unpaid_bills_bottom_sheet.dart';
 import 'widgets/expiring_agreements_bottom_sheet.dart';
+import 'widgets/premium_animated_orb.dart';
 import '../../../core/theme/app_colors.dart';
 
 import '../../widgets/bouncing_scale_wrapper.dart';
@@ -449,11 +450,19 @@ class _EmptyAttentionCard extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            CircleAvatar(
-              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-              child: Icon(
-                Icons.check_circle_outline,
-                color: Theme.of(context).colorScheme.primary,
+            Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Icon(
+                  Icons.check_circle_outline,
+                  color: Theme.of(context).colorScheme.primary,
+                ).animate(onPlay: (controller) => controller.repeat(reverse: true))
+                 .scaleXY(begin: 1.0, end: 1.1, duration: 2.seconds)
+                 .shimmer(delay: 2.seconds, duration: 1.5.seconds, color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5)),
               ),
             ),
             const SizedBox(width: 16),
@@ -604,20 +613,12 @@ class _SmartEmptyState extends ConsumerWidget {
             padding: const EdgeInsets.all(32.0),
             child: Column(
               children: [
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primaryContainer,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    icon,
-                    size: 36,
-                    color: theme.colorScheme.primary,
-                  ),
-                ).animate(onPlay: (controller) => controller.repeat(reverse: true))
-                 .scaleXY(begin: 1.0, end: 1.05, duration: 1500.ms, curve: Curves.easeInOut)
-                 .shimmer(duration: 2000.ms, color: theme.colorScheme.onPrimaryContainer.withValues(alpha: 0.2)),
+                PremiumAnimatedOrb(
+                  icon: icon,
+                  primaryColor: theme.colorScheme.primary,
+                  secondaryColor: theme.colorScheme.secondary,
+                  size: 130,
+                ),
                 const SizedBox(height: 24),
                 Text(
                   title,
@@ -641,7 +642,11 @@ class _SmartEmptyState extends ConsumerWidget {
                 const SizedBox(height: 32),
                 FilledButton.icon(
                   onPressed: onAction,
-                  icon: const Icon(Icons.arrow_forward_rounded, size: 20),
+                  icon: const Icon(Icons.arrow_forward_rounded, size: 20)
+                    .animate(onPlay: (controller) => controller.repeat())
+                    .moveX(begin: 0, end: 4, duration: 1.seconds, curve: Curves.easeInOut)
+                    .then()
+                    .moveX(begin: 4, end: 0, duration: 1.seconds, curve: Curves.easeInOut),
                   label: Text(
                     actionLabel,
                     style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),

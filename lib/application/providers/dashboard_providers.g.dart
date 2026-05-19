@@ -46,9 +46,9 @@ final landlordStreamProvider = AutoDisposeStreamProvider<Landlord?>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef LandlordStreamRef = AutoDisposeStreamProviderRef<Landlord?>;
-String _$isFirstLaunchHash() => r'6af86bc237555f753eb2df364dc3273420052b72';
+String _$isFirstLaunchHash() => r'2c48befbb3e58277d3e7b6db3952058d5345e417';
 
-/// Check if is first launch (no landlord profile).
+/// Check if is first launch (onboarding not completed).
 ///
 /// Copied from [isFirstLaunch].
 @ProviderFor(isFirstLaunch)

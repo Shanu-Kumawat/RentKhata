@@ -3,6 +3,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -104,63 +105,41 @@ class WelcomeScreen extends StatelessWidget {
 
                           // Front card (Ledger/Bills)
                           Positioned(
-                            right: 20,
-                            bottom: 30,
-                            child: Transform.rotate(
-                              angle: 0.15,
-                              child:
-                                  _FloatingCard(
-                                        icon: Icons.receipt_long_rounded,
-                                        color: colorScheme.secondaryContainer,
-                                        iconColor: colorScheme.secondary,
-                                      )
-                                      .animate(
-                                        onPlay: (controller) =>
-                                            controller.repeat(reverse: true),
-                                      )
-                                      .slideY(
-                                        begin: 0,
-                                        end: -0.05,
-                                        duration: 3.seconds,
-                                        curve: Curves.easeInOutSine,
-                                      ),
-                            ),
-                          ).animate().scale(
-                            delay: 400.ms,
-                            duration: 600.ms,
-                            curve: Curves.easeOutBack,
-                          ),
-
-                          // Main card (Property)
-                          Positioned(
-                            left: 20,
-                            top: 20,
-                            child: Transform.rotate(
-                              angle: -0.1,
-                              child:
-                                  _FloatingCard(
-                                        icon: Icons.apartment_rounded,
-                                        color: colorScheme.primaryContainer,
-                                        iconColor: colorScheme.primary,
-                                        size: 100,
-                                        iconSize: 52,
-                                      )
-                                      .animate(
-                                        onPlay: (controller) =>
-                                            controller.repeat(reverse: true),
-                                      )
-                                      .slideY(
-                                        begin: 0,
-                                        end: 0.04,
-                                        duration: 2.5.seconds,
-                                        curve: Curves.easeInOutSine,
-                                      ),
-                            ),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(32),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: colorScheme.primary.withValues(alpha: 0.3),
+                                    blurRadius: 20,
+                                    offset: const Offset(0, 10),
+                                  ),
+                                ],
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(32),
+                                child: Image.asset(
+                                  'assets/logo/logo_primary_with_bg.png',
+                                  width: 140,
+                                  height: 140,
+                                ),
+                              ),
+                            )
+                                .animate(onPlay: (controller) => controller.repeat(reverse: true))
+                                .slideY(
+                                  begin: -0.05,
+                                  end: 0.05,
+                                  duration: 3.seconds,
+                                  curve: Curves.easeInOutSine,
+                                ),
                           ).animate().scale(
                             delay: 200.ms,
-                            duration: 600.ms,
+                            duration: 800.ms,
                             curve: Curves.easeOutBack,
-                          ),
+                          ).shimmer(
+                              delay: 1.seconds,
+                              duration: 2.seconds,
+                              color: colorScheme.primary.withValues(alpha: 0.3)),
                         ],
                       ),
                     ),

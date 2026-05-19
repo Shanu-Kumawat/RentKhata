@@ -6,6 +6,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz_data;
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart' show Color;
 import '../domain/entities/bill.dart';
 
 /// Service for managing local notifications.
@@ -74,7 +75,7 @@ class LocalNotificationService {
 
     // Android settings
     const androidSettings = AndroidInitializationSettings(
-      '@mipmap/ic_launcher',
+      '@drawable/ic_notification',
     );
 
     // Initialize plugin
@@ -93,15 +94,22 @@ class LocalNotificationService {
 
     await androidPlugin?.createNotificationChannel(_billChannel);
 
-    // Auto-request notification permission on Android 13+
-    final granted = await androidPlugin?.requestNotificationsPermission();
-    debugPrint('Notification permission granted: $granted');
-
-    // Also request exact alarm permission for scheduled notifications
-    await androidPlugin?.requestExactAlarmsPermission();
-
     _isInitialized = true;
-    debugPrint('LocalNotificationService initialized');
+    debugPrint('LocalNotificationService initialized (Permissions deferred)');
+  }
+
+  /// Request notification permissions explicitly when needed
+  Future<bool> requestExactPermissions() async {
+    final androidPlugin = _plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
+    if (androidPlugin != null) {
+      final granted = await androidPlugin.requestNotificationsPermission();
+      await androidPlugin.requestExactAlarmsPermission();
+      return granted ?? false;
+    }
+    return true;
   }
 
   /// Handle notification tap
@@ -139,7 +147,8 @@ class LocalNotificationService {
       channelDescription: 'Notifications for due and overdue bills',
       importance: Importance.high,
       priority: Priority.high,
-      icon: '@mipmap/ic_launcher',
+      icon: '@drawable/ic_notification',
+      color: Color(0xFF3580FF),
     );
 
     const details = NotificationDetails(android: androidDetails);
@@ -163,7 +172,8 @@ class LocalNotificationService {
       channelDescription: 'Notifications for due and overdue bills',
       importance: Importance.high,
       priority: Priority.high,
-      icon: '@mipmap/ic_launcher',
+      icon: '@drawable/ic_notification',
+      color: Color(0xFF3580FF),
     );
 
     const details = NotificationDetails(android: androidDetails);
