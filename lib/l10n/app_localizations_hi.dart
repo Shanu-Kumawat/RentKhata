@@ -115,9 +115,6 @@ class AppLocalizationsHi extends AppLocalizations {
   String get livePropertyStatus => 'लाइव प्रॉपर्टी स्थिति';
 
   @override
-  String get quickAdd => 'त्वरित जोड़ें';
-
-  @override
   String get addProperty => 'प्रॉपर्टी जोड़ें';
 
   @override

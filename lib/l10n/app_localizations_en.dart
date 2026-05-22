@@ -115,9 +115,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get livePropertyStatus => 'Live Property Status';
 
   @override
-  String get quickAdd => 'Quick Add';
-
-  @override
   String get addProperty => 'Add Property';
 
   @override

@@ -302,12 +302,6 @@ abstract class AppLocalizations {
   /// **'Live Property Status'**
   String get livePropertyStatus;
 
-  /// No description provided for @quickAdd.
-  ///
-  /// In en, this message translates to:
-  /// **'Quick Add'**
-  String get quickAdd;
-
   /// No description provided for @addProperty.
   ///
   /// In en, this message translates to:

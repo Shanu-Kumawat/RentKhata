@@ -2,7 +2,6 @@
 library;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -22,7 +21,6 @@ import '../../../core/theme/app_colors.dart';
 
 import '../../widgets/bouncing_scale_wrapper.dart';
 import '../../widgets/staggered_fade_in.dart';
-
 
 /// Main dashboard screen showing financial overview and actionable items.
 class DashboardScreen extends ConsumerWidget {
@@ -101,108 +99,13 @@ class DashboardScreen extends ConsumerWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 80), // Bottom padding for FAB
             ],
           ),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          HapticFeedback.mediumImpact();
-          _showQuickActions(context);
-        },
-        icon: const Icon(Icons.add),
-        label: Text(l10n.quickAdd),
-      ),
-    );
-  }
-
-  void _showQuickActions(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 8),
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(height: 16),
-            ListTile(
-              leading: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  Icons.home_work_outlined,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              ),
-              title: Text(l10n.addProperty),
-              onTap: () {
-                Navigator.pop(context);
-                context.push('/properties/add');
-              },
-            ),
-            ListTile(
-              leading: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.secondary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  Icons.person_add_outlined,
-                  color: Theme.of(context).colorScheme.secondary,
-                ),
-              ),
-              title: Text(l10n.addTenant),
-              onTap: () {
-                Navigator.pop(context);
-                context.push('/tenants/add');
-              },
-            ),
-            ListTile(
-              leading: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.error, // Warning context
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  Icons.receipt_long_outlined,
-                  color: Theme.of(context).colorScheme.error,
-                ),
-              ),
-              title: Text(l10n.createBill),
-              subtitle: Text(l10n.goToRoomToCreateBills),
-              onTap: () {
-                Navigator.pop(context);
-                context.push('/properties');
-              },
-            ),
-            const SizedBox(height: 16),
-          ],
         ),
       ),
     );
   }
 }
-
-
 
 class _ActionRequiredSection extends ConsumerWidget {
   const _ActionRequiredSection();
@@ -222,12 +125,21 @@ class _ActionRequiredSection extends ConsumerWidget {
     final expiring = expiringAgreementsAsync.valueOrNull ?? [];
 
     // If completely empty and finished loading, show empty state
-    final isLoading = billingAttentionAsync.isLoading || unpaidBillsAsync.isLoading || expiringAgreementsAsync.isLoading;
-    if (!isLoading && attentionItems.isEmpty && unpaidBills.isEmpty && expiring.isEmpty) {
+    final isLoading =
+        billingAttentionAsync.isLoading ||
+        unpaidBillsAsync.isLoading ||
+        expiringAgreementsAsync.isLoading;
+    if (!isLoading &&
+        attentionItems.isEmpty &&
+        unpaidBills.isEmpty &&
+        expiring.isEmpty) {
       return _EmptyAttentionCard();
     }
 
-    if (isLoading && attentionItems.isEmpty && unpaidBills.isEmpty && expiring.isEmpty) {
+    if (isLoading &&
+        attentionItems.isEmpty &&
+        unpaidBills.isEmpty &&
+        expiring.isEmpty) {
       return const Card(
         child: Padding(
           padding: EdgeInsets.all(16.0),
@@ -247,7 +159,9 @@ class _ActionRequiredSection extends ConsumerWidget {
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3)),
+        side: BorderSide(
+          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+        ),
       ),
       child: Column(
         children: [
@@ -263,7 +177,9 @@ class _ActionRequiredSection extends ConsumerWidget {
                   context: context,
                   isScrollControlled: true,
                   shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(20),
+                    ),
                   ),
                   builder: (context) => DraggableScrollableSheet(
                     initialChildSize: 0.6,
@@ -272,14 +188,17 @@ class _ActionRequiredSection extends ConsumerWidget {
                     expand: false,
                     builder: (_, scrollController) => SingleChildScrollView(
                       controller: scrollController,
-                      child: AttentionBottomSheet(attentionItems: attentionItems),
+                      child: AttentionBottomSheet(
+                        attentionItems: attentionItems,
+                      ),
                     ),
                   ),
                 );
               },
             ),
-          
-          if (attentionItems.isNotEmpty && (unpaidBills.isNotEmpty || expiring.isNotEmpty))
+
+          if (attentionItems.isNotEmpty &&
+              (unpaidBills.isNotEmpty || expiring.isNotEmpty))
             const Divider(height: 1, indent: 64),
 
           if (unpaidBills.isNotEmpty)
@@ -294,7 +213,9 @@ class _ActionRequiredSection extends ConsumerWidget {
                   context: context,
                   isScrollControlled: true,
                   shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(20),
+                    ),
                   ),
                   builder: (context) => DraggableScrollableSheet(
                     initialChildSize: 0.6,
@@ -325,7 +246,9 @@ class _ActionRequiredSection extends ConsumerWidget {
                   context: context,
                   isScrollControlled: true,
                   shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(20),
+                    ),
                   ),
                   builder: (context) => DraggableScrollableSheet(
                     initialChildSize: 0.6,
@@ -334,7 +257,9 @@ class _ActionRequiredSection extends ConsumerWidget {
                     expand: false,
                     builder: (_, scrollController) => SingleChildScrollView(
                       controller: scrollController,
-                      child: ExpiringAgreementsBottomSheet(expiringAgreements: expiring),
+                      child: ExpiringAgreementsBottomSheet(
+                        expiringAgreements: expiring,
+                      ),
                     ),
                   ),
                 );
@@ -421,7 +346,9 @@ class _ActionTile extends StatelessWidget {
               ),
               Icon(
                 Icons.chevron_right_rounded,
-                color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
               ),
             ],
           ),
@@ -453,16 +380,29 @@ class _EmptyAttentionCard extends StatelessWidget {
             Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                color: Theme.of(
+                  context,
+                ).colorScheme.primary.withValues(alpha: 0.1),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Icon(
-                  Icons.check_circle_outline,
-                  color: Theme.of(context).colorScheme.primary,
-                ).animate(onPlay: (controller) => controller.repeat(reverse: true))
-                 .scaleXY(begin: 1.0, end: 1.1, duration: 2.seconds)
-                 .shimmer(delay: 2.seconds, duration: 1.5.seconds, color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5)),
+                child:
+                    Icon(
+                          Icons.check_circle_outline,
+                          color: Theme.of(context).colorScheme.primary,
+                        )
+                        .animate(
+                          onPlay: (controller) =>
+                              controller.repeat(reverse: true),
+                        )
+                        .scaleXY(begin: 1.0, end: 1.1, duration: 2.seconds)
+                        .shimmer(
+                          delay: 2.seconds,
+                          duration: 1.5.seconds,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.primary.withValues(alpha: 0.5),
+                        ),
               ),
             ),
             const SizedBox(width: 16),
@@ -472,7 +412,10 @@ class _EmptyAttentionCard extends StatelessWidget {
                 children: [
                   Text(
                     AppLocalizations.of(context)!.allCaughtUp,
-                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
                   ),
                   Text(
                     AppLocalizations.of(context)!.noBillingCyclesEnding,
@@ -490,8 +433,6 @@ class _EmptyAttentionCard extends StatelessWidget {
     );
   }
 }
-
-
 
 class _LivePropertyStatusList extends ConsumerWidget {
   @override
@@ -562,7 +503,8 @@ class _SmartEmptyState extends ConsumerWidget {
         context,
         icon: Icons.door_front_door_outlined,
         title: "Property Ready! \u{1F389}",
-        subtitle: "Your property is set up. Let's add your first room to start tracking rent.",
+        subtitle:
+            "Your property is set up. Let's add your first room to start tracking rent.",
         actionLabel: "Add a Room",
         onAction: () => context.push('/properties/${properties.first.id}'),
       );
@@ -572,13 +514,15 @@ class _SmartEmptyState extends ConsumerWidget {
       context,
       icon: Icons.person_add_alt_1_rounded,
       title: "Rooms Available",
-      subtitle: "You have empty rooms waiting for tenants. Add a tenant to start tracking.",
+      subtitle:
+          "You have empty rooms waiting for tenants. Add a tenant to start tracking.",
       actionLabel: "Add Tenant",
       onAction: () => context.push('/tenants/add'),
     );
   }
 
-  Widget _buildCard(BuildContext context, {
+  Widget _buildCard(
+    BuildContext context, {
     required IconData icon,
     required String title,
     required String subtitle,
@@ -631,34 +575,56 @@ class _SmartEmptyState extends ConsumerWidget {
                 ).animate().fadeIn(duration: 600.ms).slideY(begin: 0.2, end: 0),
                 const SizedBox(height: 12),
                 Text(
-                  subtitle,
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                    height: 1.5,
-                    fontSize: 15,
-                  ),
-                ).animate().fadeIn(duration: 600.ms, delay: 100.ms).slideY(begin: 0.2, end: 0),
+                      subtitle,
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                        height: 1.5,
+                        fontSize: 15,
+                      ),
+                    )
+                    .animate()
+                    .fadeIn(duration: 600.ms, delay: 100.ms)
+                    .slideY(begin: 0.2, end: 0),
                 const SizedBox(height: 32),
                 FilledButton.icon(
-                  onPressed: onAction,
-                  icon: const Icon(Icons.arrow_forward_rounded, size: 20)
-                    .animate(onPlay: (controller) => controller.repeat())
-                    .moveX(begin: 0, end: 4, duration: 1.seconds, curve: Curves.easeInOut)
-                    .then()
-                    .moveX(begin: 4, end: 0, duration: 1.seconds, curve: Curves.easeInOut),
-                  label: Text(
-                    actionLabel,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                ).animate().fadeIn(duration: 600.ms, delay: 200.ms).slideY(begin: 0.2, end: 0),
+                      onPressed: onAction,
+                      icon: const Icon(Icons.arrow_forward_rounded, size: 20)
+                          .animate(onPlay: (controller) => controller.repeat())
+                          .moveX(
+                            begin: 0,
+                            end: 4,
+                            duration: 1.seconds,
+                            curve: Curves.easeInOut,
+                          )
+                          .then()
+                          .moveX(
+                            begin: 4,
+                            end: 0,
+                            duration: 1.seconds,
+                            curve: Curves.easeInOut,
+                          ),
+                      label: Text(
+                        actionLabel,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      style: FilledButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 28,
+                          vertical: 16,
+                        ),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                    )
+                    .animate()
+                    .fadeIn(duration: 600.ms, delay: 200.ms)
+                    .slideY(begin: 0.2, end: 0),
               ],
             ),
           ),
@@ -685,13 +651,17 @@ class _RoomStatusTile extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.05),
+              color: Theme.of(
+                context,
+              ).colorScheme.shadow.withValues(alpha: 0.05),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
           ],
           border: Border.all(
-            color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.3),
+            color: Theme.of(
+              context,
+            ).colorScheme.outlineVariant.withValues(alpha: 0.3),
             width: 1,
           ),
         ),
@@ -714,7 +684,9 @@ class _RoomStatusTile extends StatelessWidget {
                       item.roomNumber,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.onSecondaryContainer,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSecondaryContainer,
                         fontSize: 14,
                       ),
                     ),
@@ -735,7 +707,10 @@ class _RoomStatusTile extends StatelessWidget {
                 ),
                 // Trailing Status Pill
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
@@ -773,7 +748,7 @@ class _RoomStatusTile extends StatelessWidget {
               ],
             ),
           ),
-      ),
+        ),
       ),
     );
   }
