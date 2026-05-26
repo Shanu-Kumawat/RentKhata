@@ -15,73 +15,81 @@ class PremiumSuccessCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 24,
-            offset: const Offset(0, 8),
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.03),
+                blurRadius: 24,
+                offset: const Offset(0, 8),
+              ),
+            ],
+            border: Border.all(
+              color: theme.colorScheme.outline.withValues(alpha: 0.1),
+              width: 0.5,
+            ),
           ),
-        ],
-        border: Border.all(
-          color: theme.colorScheme.outline.withValues(alpha: 0.1),
-          width: 0.5,
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-        child: Row(
-          children: [
-            // Elegant check icon
-            Container(
-              width: 52,
-              height: 52,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primary.withValues(alpha: 0.08),
-                shape: BoxShape.circle,
-              ),
-              child: Center(
-                child: Icon(
-                  Icons.check_rounded,
-                  color: theme.colorScheme.primary,
-                  size: 28,
-                ).animate()
-                 .scale(begin: const Offset(0, 0), end: const Offset(1, 1), duration: 600.ms, curve: Curves.easeOutBack),
-              ),
-            ),
-            const SizedBox(width: 20),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.3,
-                      color: theme.colorScheme.onSurface,
-                    ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+            child: Row(
+              children: [
+                // Elegant check icon
+                Container(
+                  width: 52,
+                  height: 52,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary.withValues(alpha: 0.08),
+                    shape: BoxShape.circle,
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                      height: 1.4,
-                    ),
+                  child: Center(
+                    child:
+                        Icon(
+                          Icons.check_rounded,
+                          color: theme.colorScheme.primary,
+                          size: 28,
+                        ).animate().scale(
+                          begin: const Offset(0, 0),
+                          end: const Offset(1, 1),
+                          duration: 600.ms,
+                          curve: Curves.easeOutBack,
+                        ),
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(width: 20),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.3,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        subtitle,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                          height: 1.4,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
-    ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1, end: 0, curve: Curves.easeOutCubic);
+          ),
+        )
+        .animate()
+        .fadeIn(duration: 400.ms)
+        .slideY(begin: 0.1, end: 0, curve: Curves.easeOutCubic);
   }
 }
 
@@ -105,7 +113,7 @@ class PremiumActionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.symmetric(vertical: 8),
@@ -153,11 +161,13 @@ class PremiumActionCard extends StatelessWidget {
                     height: 150,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: theme.colorScheme.secondary.withValues(alpha: 0.05),
+                      color: theme.colorScheme.secondary.withValues(
+                        alpha: 0.05,
+                      ),
                     ),
                   ),
                 ),
-                
+
                 // Content
                 Padding(
                   padding: const EdgeInsets.all(40.0),
@@ -171,7 +181,9 @@ class PremiumActionCard extends StatelessWidget {
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: theme.colorScheme.primary.withValues(alpha: 0.08),
+                              color: theme.colorScheme.primary.withValues(
+                                alpha: 0.08,
+                              ),
                               blurRadius: 30,
                               offset: const Offset(0, 15),
                             ),
@@ -187,68 +199,104 @@ class PremiumActionCard extends StatelessWidget {
                           size: 32,
                           color: theme.colorScheme.primary,
                         ),
-                      ).animate()
-                        .scale(begin: const Offset(0.8, 0.8), end: const Offset(1, 1), duration: 800.ms, curve: Curves.elasticOut),
+                      ).animate().scale(
+                        begin: const Offset(0.8, 0.8),
+                        end: const Offset(1, 1),
+                        duration: 800.ms,
+                        curve: Curves.elasticOut,
+                      ),
                       const SizedBox(height: 32),
 
                       Text(
-                        title,
-                        style: theme.textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: -0.7,
-                          color: theme.colorScheme.onSurface,
-                        ),
-                        textAlign: TextAlign.center,
-                      ).animate().fadeIn(duration: 600.ms).slideY(begin: 0.2, end: 0, curve: Curves.easeOutQuart),
-                      
+                            title,
+                            style: theme.textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: -0.7,
+                              color: theme.colorScheme.onSurface,
+                            ),
+                            textAlign: TextAlign.center,
+                          )
+                          .animate()
+                          .fadeIn(duration: 600.ms)
+                          .slideY(
+                            begin: 0.2,
+                            end: 0,
+                            curve: Curves.easeOutQuart,
+                          ),
+
                       const SizedBox(height: 12),
-                      
+
                       Text(
-                        subtitle,
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                          height: 1.6,
-                          fontSize: 15,
-                        ),
-                      ).animate().fadeIn(duration: 600.ms, delay: 100.ms).slideY(begin: 0.2, end: 0, curve: Curves.easeOutQuart),
-                      
+                            subtitle,
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                              height: 1.6,
+                              fontSize: 15,
+                            ),
+                          )
+                          .animate()
+                          .fadeIn(duration: 600.ms, delay: 100.ms)
+                          .slideY(
+                            begin: 0.2,
+                            end: 0,
+                            curve: Curves.easeOutQuart,
+                          ),
+
                       const SizedBox(height: 40),
 
                       // Premium subtle button
                       Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(100),
-                          boxShadow: [
-                            BoxShadow(
-                              color: theme.colorScheme.primary.withValues(alpha: 0.2),
-                              blurRadius: 20,
-                              offset: const Offset(0, 8),
-                            ),
-                          ],
-                        ),
-                        child: FilledButton(
-                          onPressed: onAction,
-                          style: FilledButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
+                            decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(100),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: theme.colorScheme.primary.withValues(
+                                    alpha: 0.2,
+                                  ),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 8),
+                                ),
+                              ],
                             ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                actionLabel,
-                                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+                            child: FilledButton(
+                              onPressed: onAction,
+                              style: FilledButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 32,
+                                  vertical: 20,
+                                ),
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(100),
+                                ),
                               ),
-                              const SizedBox(width: 8),
-                              const Icon(Icons.arrow_forward_rounded, size: 18),
-                            ],
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    actionLabel,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Icon(
+                                    Icons.arrow_forward_rounded,
+                                    size: 18,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                          .animate()
+                          .fadeIn(duration: 600.ms, delay: 200.ms)
+                          .slideY(
+                            begin: 0.2,
+                            end: 0,
+                            curve: Curves.easeOutQuart,
                           ),
-                        ),
-                      ).animate().fadeIn(duration: 600.ms, delay: 200.ms).slideY(begin: 0.2, end: 0, curve: Curves.easeOutQuart),
                     ],
                   ),
                 ),

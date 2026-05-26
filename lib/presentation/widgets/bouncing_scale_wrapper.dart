@@ -48,8 +48,6 @@ class _BouncingScaleWrapperState extends State<BouncingScaleWrapper>
     super.dispose();
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(

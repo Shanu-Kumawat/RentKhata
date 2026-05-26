@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -41,23 +42,7 @@ class DashboardScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.appTitle),
-        actions: [
-          // Prominent Reports button
-          Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: TextButton.icon(
-              onPressed: () => context.push('/reports'),
-              icon: const Icon(Icons.assessment_outlined, size: 20),
-              label: Text(l10n.reports),
-              style: TextButton.styleFrom(
-                foregroundColor: Theme.of(context).colorScheme.primary,
-              ),
-            ),
-          ),
-        ],
-      ),
+      appBar: AppBar(title: Text(l10n.appTitle)),
       body: RefreshIndicator(
         onRefresh: () async {
           _refresh(ref);
@@ -291,70 +276,80 @@ class _ActionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: iconColor.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(icon, color: iconColor, size: 24),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 15,
-                      ),
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: iconColor.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
+                    child: Icon(icon, color: iconColor, size: 24),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 15,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          subtitle,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-              Container(
-                width: 8,
-                height: 8,
-                margin: const EdgeInsets.only(right: 8),
-                decoration: BoxDecoration(
-                  color: badgeColor,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: badgeColor.withValues(alpha: 0.4),
-                      blurRadius: 4,
+                  ),
+                  Container(
+                    width: 8,
+                    height: 8,
+                    margin: const EdgeInsets.only(right: 8),
+                    decoration: BoxDecoration(
+                      color: badgeColor,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: badgeColor.withValues(alpha: 0.4),
+                          blurRadius: 4,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                  ),
+                ],
               ),
-              Icon(
-                Icons.chevron_right_rounded,
-                color: Theme.of(
-                  context,
-                ).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
-    );
+        )
+        .animate()
+        .fadeIn(duration: 400.ms)
+        .slideX(
+          begin: 0.05,
+          end: 0,
+          curve: Curves.easeOutCubic,
+          duration: 400.ms,
+        );
   }
 }
 
@@ -363,74 +358,105 @@ class _EmptyAttentionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 0,
-      color: Theme.of(
-        context,
-      ).colorScheme.primaryContainer.withValues(alpha: 0.3),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(
-          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Theme.of(
-                  context,
-                ).colorScheme.primary.withValues(alpha: 0.1),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child:
-                    Icon(
-                          Icons.check_circle_outline,
-                          color: Theme.of(context).colorScheme.primary,
-                        )
-                        .animate(
-                          onPlay: (controller) =>
-                              controller.repeat(reverse: true),
-                        )
-                        .scaleXY(begin: 1.0, end: 1.1, duration: 2.seconds)
-                        .shimmer(
-                          delay: 2.seconds,
-                          duration: 1.5.seconds,
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.primary.withValues(alpha: 0.5),
+          elevation: 0,
+          color: Theme.of(
+            context,
+          ).colorScheme.primaryContainer.withValues(alpha: 0.3),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.2),
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.1),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child:
+                        Icon(
+                              Icons.check_rounded,
+                              size: 28,
+                              color: Theme.of(context).colorScheme.primary,
+                            )
+                            .animate(
+                              onPlay: (controller) =>
+                                  controller.repeat(reverse: true),
+                            )
+                            .scaleXY(
+                              begin: 1.0,
+                              end: 1.15,
+                              duration: 2.seconds,
+                              curve: Curves.easeInOutSine,
+                            )
+                            .shimmer(
+                              delay: 2.seconds,
+                              duration: 1.5.seconds,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.primary.withValues(alpha: 0.5),
+                            ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        AppLocalizations.of(context)!.allCaughtUp,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
                         ),
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    AppLocalizations.of(context)!.allCaughtUp,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                    ),
+                      ),
+                      Text(
+                        AppLocalizations.of(context)!.noBillingCyclesEnding,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
                   ),
-                  Text(
-                    AppLocalizations.of(context)!.noBillingCyclesEnding,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
-    );
+          ),
+        )
+        .animate()
+        .fadeIn(duration: 500.ms)
+        .slideY(
+          begin: 0.1,
+          end: 0,
+          duration: 500.ms,
+          curve: Curves.easeOutCubic,
+        )
+        .then()
+        .animate(onPlay: (controller) => controller.repeat(reverse: true))
+        .moveY(
+          begin: -2,
+          end: 2,
+          duration: 3.seconds,
+          curve: Curves.easeInOutSine,
+        )
+        .shimmer(
+          delay: 2.seconds,
+          duration: 2.seconds,
+          color: Theme.of(
+            context,
+          ).colorScheme.primaryContainer.withValues(alpha: 0.8),
+        );
   }
 }
 
@@ -451,9 +477,17 @@ class _LivePropertyStatusList extends ConsumerWidget {
           itemBuilder: (context, index) {
             final item = items[index];
             return Padding(
-              padding: const EdgeInsets.only(bottom: 12.0),
-              child: _RoomStatusTile(item: item),
-            );
+                  padding: const EdgeInsets.only(bottom: 12.0),
+                  child: _RoomStatusTile(item: item),
+                )
+                .animate()
+                .fadeIn(delay: (100 + (index * 100)).ms, duration: 400.ms)
+                .slideY(
+                  begin: 0.1,
+                  end: 0,
+                  curve: Curves.easeOutCubic,
+                  duration: 400.ms,
+                );
           },
         );
       },
@@ -785,15 +819,28 @@ class _SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Icon(icon, size: 18, color: Theme.of(context).primaryColor),
-        const SizedBox(width: 8),
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(
+            icon,
+            size: 20,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ),
+        const SizedBox(width: 12),
         Text(
           title,
-          style: TextStyle(
+          style: GoogleFonts.plusJakartaSans(
             color: Theme.of(context).colorScheme.onSurface,
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
+            fontWeight: FontWeight.w800,
+            fontSize: 22,
+            letterSpacing: -0.5,
           ),
         ),
       ],

@@ -20,7 +20,9 @@ class AttentionBottomSheet extends StatelessWidget {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -35,12 +37,18 @@ class AttentionBottomSheet extends StatelessWidget {
                     color: Colors.blue.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.receipt_long_outlined, color: Colors.blue, size: 20),
+                  child: const Icon(
+                    Icons.receipt_long_outlined,
+                    color: Colors.blue,
+                    size: 20,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Text(
                   'Pending Invoices',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -50,7 +58,9 @@ class AttentionBottomSheet extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Text(
               'Select a tenant below to generate their upcoming or overdue bill.',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.onSurfaceVariant),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: AppColors.onSurfaceVariant,
+              ),
             ),
           ),
           const SizedBox(height: 16),
@@ -58,7 +68,8 @@ class AttentionBottomSheet extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
             itemCount: attentionItems.length,
-            separatorBuilder: (context, index) => const Divider(height: 1, indent: 20, endIndent: 20),
+            separatorBuilder: (context, index) =>
+                const Divider(height: 1, indent: 20, endIndent: 20),
             itemBuilder: (context, index) {
               final item = attentionItems[index];
               return _BillingAttentionTile(item: item);
@@ -97,7 +108,7 @@ class _BillingAttentionTile extends StatelessWidget {
     final isOverdue = item.status == BillingCycleStatus.overdue;
     final statusColor = isOverdue
         ? Theme.of(context).colorScheme.error
-        : AppColors.warning; 
+        : AppColors.warning;
     final statusTextColor = isOverdue
         ? Theme.of(context).colorScheme.error
         : AppColors.warning;
@@ -173,9 +184,14 @@ class _BillingAttentionTile extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           foregroundColor: Colors.blue,
           side: BorderSide(color: Colors.blue.withValues(alpha: 0.5)),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
         ),
-        child: const Text('Create', style: TextStyle(fontWeight: FontWeight.bold)),
+        child: const Text(
+          'Create',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }

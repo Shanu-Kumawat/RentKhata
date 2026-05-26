@@ -20,7 +20,9 @@ class UnpaidBillsBottomSheet extends StatelessWidget {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -32,15 +34,23 @@ class UnpaidBillsBottomSheet extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.error.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(Icons.account_balance_wallet_outlined, color: Theme.of(context).colorScheme.error, size: 20),
+                  child: Icon(
+                    Icons.account_balance_wallet_outlined,
+                    color: Theme.of(context).colorScheme.error,
+                    size: 20,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Text(
                   'Collect Payments',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -50,7 +60,9 @@ class UnpaidBillsBottomSheet extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Text(
               'Select a bill below to review it and collect its pending payment.',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.onSurfaceVariant),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: AppColors.onSurfaceVariant,
+              ),
             ),
           ),
           const SizedBox(height: 16),
@@ -58,7 +70,8 @@ class UnpaidBillsBottomSheet extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
             itemCount: unpaidBills.length,
-            separatorBuilder: (context, index) => const Divider(height: 1, indent: 20, endIndent: 20),
+            separatorBuilder: (context, index) =>
+                const Divider(height: 1, indent: 20, endIndent: 20),
             itemBuilder: (context, index) {
               final bill = unpaidBills[index];
               return _UnpaidBillTile(bill: bill);
@@ -108,7 +121,9 @@ class _UnpaidBillTile extends StatelessWidget {
         ],
       ),
       subtitle: Text(
-        isOverdue ? 'Overdue since ${bill.dueDate?.day ?? ''}/${bill.dueDate?.month ?? ''}' : 'Awaiting payment',
+        isOverdue
+            ? 'Overdue since ${bill.dueDate?.day ?? ''}/${bill.dueDate?.month ?? ''}'
+            : 'Awaiting payment',
         style: TextStyle(
           fontSize: 12,
           color: statusColor,
@@ -124,10 +139,17 @@ class _UnpaidBillTile extends StatelessWidget {
           visualDensity: VisualDensity.compact,
           padding: const EdgeInsets.symmetric(horizontal: 16),
           foregroundColor: theme.colorScheme.error,
-          side: BorderSide(color: theme.colorScheme.error.withValues(alpha: 0.5)),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          side: BorderSide(
+            color: theme.colorScheme.error.withValues(alpha: 0.5),
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
         ),
-        child: const Text('Collect', style: TextStyle(fontWeight: FontWeight.bold)),
+        child: const Text(
+          'Collect',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }

@@ -36,10 +36,7 @@ class AnimatedCounterText extends StatelessWidget {
         if (suffix != null) {
           displayValue += suffix!;
         }
-        return Text(
-          displayValue,
-          style: style,
-        );
+        return Text(displayValue, style: style);
       },
     );
   }
