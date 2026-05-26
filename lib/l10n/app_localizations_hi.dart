@@ -12,6 +12,16 @@ class AppLocalizationsHi extends AppLocalizations {
   String get appTitle => 'रेंटखाता';
 
   @override
+  String get welcomeTitle => 'सुगम किराया प्रबंधन';
+
+  @override
+  String get welcomeSubtitle =>
+      'एक सुंदर सुरक्षित, ऑफ़लाइन बहीखाता में किरायेदारों, बिलों और भुगतानों को ट्रैक करें।';
+
+  @override
+  String get startOrganizing => 'व्यवस्थित करना शुरू करें';
+
+  @override
   String get settings => 'सेटिंग्स';
 
   @override

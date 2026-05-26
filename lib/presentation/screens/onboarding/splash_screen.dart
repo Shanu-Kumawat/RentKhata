@@ -36,7 +36,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     if (!mounted) return;
 
     if (isFirstLaunch) {
-      context.go('/welcome');
+      context.go('/language');
       return;
     }
 
@@ -70,30 +70,46 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
           Positioned(
             top: -100,
             left: -100,
-            child: Container(
-              width: 300,
-              height: 300,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: colorScheme.primary.withValues(alpha: 0.15),
-              ),
-            )
-            .animate(onPlay: (controller) => controller.repeat(reverse: true))
-            .scaleXY(begin: 1.0, end: 1.2, duration: 4.seconds, curve: Curves.easeInOut),
+            child:
+                Container(
+                      width: 300,
+                      height: 300,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: colorScheme.primary.withValues(alpha: 0.15),
+                      ),
+                    )
+                    .animate(
+                      onPlay: (controller) => controller.repeat(reverse: true),
+                    )
+                    .scaleXY(
+                      begin: 1.0,
+                      end: 1.2,
+                      duration: 4.seconds,
+                      curve: Curves.easeInOut,
+                    ),
           ),
           Positioned(
             bottom: -50,
             right: -100,
-            child: Container(
-              width: 400,
-              height: 400,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: colorScheme.secondary.withValues(alpha: 0.1),
-              ),
-            )
-            .animate(onPlay: (controller) => controller.repeat(reverse: true))
-            .scaleXY(begin: 1.0, end: 1.3, duration: 5.seconds, curve: Curves.easeInOut),
+            child:
+                Container(
+                      width: 400,
+                      height: 400,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: colorScheme.secondary.withValues(alpha: 0.1),
+                      ),
+                    )
+                    .animate(
+                      onPlay: (controller) => controller.repeat(reverse: true),
+                    )
+                    .scaleXY(
+                      begin: 1.0,
+                      end: 1.3,
+                      duration: 5.seconds,
+                      curve: Curves.easeInOut,
+                    ),
           ),
 
           Center(
@@ -102,61 +118,69 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
               children: [
                 // Logo Container
                 Container(
-                  width: 140,
-                  height: 140,
-                  decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                        color: colorScheme.primary.withValues(alpha: 0.25),
-                        blurRadius: 40,
-                        spreadRadius: 10,
-                        offset: const Offset(0, 10),
+                      width: 140,
+                      height: 140,
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            color: colorScheme.primary.withValues(alpha: 0.25),
+                            blurRadius: 40,
+                            spreadRadius: 10,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
+                        borderRadius: BorderRadius.circular(32),
                       ),
-                    ],
-                    borderRadius: BorderRadius.circular(32), 
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(32),
-                    child: Image.asset(
-                      'assets/logo/logo_primary_with_bg.png',
-                      fit: BoxFit.cover,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(32),
+                        child: Image.asset(
+                          'assets/logo/logo_primary_with_bg.png',
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    )
+                    .animate()
+                    .scale(
+                      delay: 200.ms,
+                      duration: 800.ms,
+                      curve: Curves.elasticOut,
+                    )
+                    .shimmer(
+                      delay: 1.seconds,
+                      duration: 1500.ms,
+                      color: Colors.white.withValues(alpha: 0.5),
                     ),
-                  ),
-                )
-                .animate()
-                .scale(delay: 200.ms, duration: 800.ms, curve: Curves.elasticOut)
-                .shimmer(delay: 1.seconds, duration: 1500.ms, color: Colors.white.withValues(alpha: 0.5)),
-                
+
                 const SizedBox(height: 32),
-                
+
                 // Title
                 Text(
-                  'RentKhata',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 38,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: -0.5,
-                    color: colorScheme.onSurface,
-                  ),
-                )
-                .animate()
-                .fadeIn(delay: 600.ms, duration: 600.ms)
-                .slideY(begin: 0.3, end: 0, curve: Curves.easeOutCubic),
-                
+                      'RentKhata',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 38,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: -0.5,
+                        color: colorScheme.onSurface,
+                      ),
+                    )
+                    .animate()
+                    .fadeIn(delay: 600.ms, duration: 600.ms)
+                    .slideY(begin: 0.3, end: 0, curve: Curves.easeOutCubic),
+
                 const SizedBox(height: 12),
-                
+
                 // Subtitle
                 Text(
-                  'Manage your rentals with ease',
-                  style: GoogleFonts.inter(
-                    fontSize: 16,
-                    color: colorScheme.onSurfaceVariant,
-                    letterSpacing: 0.2,
-                  ),
-                )
-                .animate()
-                .fadeIn(delay: 800.ms, duration: 600.ms)
-                .slideY(begin: 0.3, end: 0, curve: Curves.easeOutCubic),
+                      'Manage your rentals with ease',
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        color: colorScheme.onSurfaceVariant,
+                        letterSpacing: 0.2,
+                      ),
+                    )
+                    .animate()
+                    .fadeIn(delay: 800.ms, duration: 600.ms)
+                    .slideY(begin: 0.3, end: 0, curve: Curves.easeOutCubic),
               ],
             ),
           ),

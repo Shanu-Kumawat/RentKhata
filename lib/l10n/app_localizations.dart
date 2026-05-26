@@ -104,6 +104,24 @@ abstract class AppLocalizations {
   /// **'RentKhata'**
   String get appTitle;
 
+  /// No description provided for @welcomeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Effortless Rent Management'**
+  String get welcomeTitle;
+
+  /// No description provided for @welcomeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Track tenants, bills, and payments in one beautifully secure, offline ledger.'**
+  String get welcomeSubtitle;
+
+  /// No description provided for @startOrganizing.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Organizing'**
+  String get startOrganizing;
+
   /// No description provided for @settings.
   ///
   /// In en, this message translates to:

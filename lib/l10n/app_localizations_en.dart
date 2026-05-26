@@ -12,6 +12,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTitle => 'RentKhata';
 
   @override
+  String get welcomeTitle => 'Effortless Rent Management';
+
+  @override
+  String get welcomeSubtitle =>
+      'Track tenants, bills, and payments in one beautifully secure, offline ledger.';
+
+  @override
+  String get startOrganizing => 'Start Organizing';
+
+  @override
   String get settings => 'Settings';
 
   @override

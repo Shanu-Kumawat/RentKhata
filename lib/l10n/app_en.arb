@@ -1,6 +1,9 @@
 {
   "@@locale": "en",
   "appTitle": "RentKhata",
+  "welcomeTitle": "Effortless Rent Management",
+  "welcomeSubtitle": "Track tenants, bills, and payments in one beautifully secure, offline ledger.",
+  "startOrganizing": "Start Organizing",
   "settings": "Settings",
   "setUpProfile": "Set up profile",
   "loading": "Loading...",

@@ -17,6 +17,11 @@ class LocaleNotifier extends StateNotifier<Locale> {
     }
   }
 
+  Future<bool> hasUserSelectedLocale() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.containsKey(_localeKey);
+  }
+
   Future<void> setLocale(Locale newLocale) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_localeKey, newLocale.languageCode);
@@ -24,7 +29,8 @@ class LocaleNotifier extends StateNotifier<Locale> {
   }
 }
 
-final localeNotifierProvider =
-    StateNotifierProvider<LocaleNotifier, Locale>((ref) {
+final localeNotifierProvider = StateNotifierProvider<LocaleNotifier, Locale>((
+  ref,
+) {
   return LocaleNotifier();
 });

@@ -2,16 +2,17 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
 
-class WelcomeScreen extends StatelessWidget {
+class WelcomeScreen extends ConsumerWidget {
   const WelcomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -105,41 +106,56 @@ class WelcomeScreen extends StatelessWidget {
 
                           // Front card (Ledger/Bills)
                           Positioned(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(32),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: colorScheme.primary.withValues(alpha: 0.3),
-                                    blurRadius: 20,
-                                    offset: const Offset(0, 10),
-                                  ),
-                                ],
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(32),
-                                child: Image.asset(
-                                  'assets/logo/logo_primary_with_bg.png',
-                                  width: 140,
-                                  height: 140,
+                                child:
+                                    Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(
+                                              32,
+                                            ),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: colorScheme.primary
+                                                    .withValues(alpha: 0.3),
+                                                blurRadius: 20,
+                                                offset: const Offset(0, 10),
+                                              ),
+                                            ],
+                                          ),
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(
+                                              32,
+                                            ),
+                                            child: Image.asset(
+                                              'assets/logo/logo_primary_with_bg.png',
+                                              width: 140,
+                                              height: 140,
+                                            ),
+                                          ),
+                                        )
+                                        .animate(
+                                          onPlay: (controller) =>
+                                              controller.repeat(reverse: true),
+                                        )
+                                        .slideY(
+                                          begin: -0.05,
+                                          end: 0.05,
+                                          duration: 3.seconds,
+                                          curve: Curves.easeInOutSine,
+                                        ),
+                              )
+                              .animate()
+                              .scale(
+                                delay: 200.ms,
+                                duration: 800.ms,
+                                curve: Curves.easeOutBack,
+                              )
+                              .shimmer(
+                                delay: 1.seconds,
+                                duration: 2.seconds,
+                                color: colorScheme.primary.withValues(
+                                  alpha: 0.3,
                                 ),
                               ),
-                            )
-                                .animate(onPlay: (controller) => controller.repeat(reverse: true))
-                                .slideY(
-                                  begin: -0.05,
-                                  end: 0.05,
-                                  duration: 3.seconds,
-                                  curve: Curves.easeInOutSine,
-                                ),
-                          ).animate().scale(
-                            delay: 200.ms,
-                            duration: 800.ms,
-                            curve: Curves.easeOutBack,
-                          ).shimmer(
-                              delay: 1.seconds,
-                              duration: 2.seconds,
-                              color: colorScheme.primary.withValues(alpha: 0.3)),
                         ],
                       ),
                     ),
@@ -151,7 +167,7 @@ class WelcomeScreen extends StatelessWidget {
                   Column(
                     children: [
                       Text(
-                            'Effortless Rent Management',
+                            AppLocalizations.of(context)!.welcomeTitle,
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 34,
                               fontWeight: FontWeight.w800,
@@ -173,7 +189,7 @@ class WelcomeScreen extends StatelessWidget {
                       const SizedBox(height: 16),
 
                       Text(
-                            'Track tenants, bills, and payments in one beautifully secure, offline ledger.',
+                            AppLocalizations.of(context)!.welcomeSubtitle,
                             style: GoogleFonts.inter(
                               fontSize: 16,
                               fontWeight: FontWeight.w400,
@@ -209,7 +225,7 @@ class WelcomeScreen extends StatelessWidget {
                           ),
                           onPressed: () => context.go('/add-first-property'),
                           child: Text(
-                            'Start Organizing',
+                            AppLocalizations.of(context)!.startOrganizing,
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
@@ -238,48 +254,6 @@ class WelcomeScreen extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _FloatingCard extends StatelessWidget {
-  final IconData icon;
-  final Color color;
-  final Color iconColor;
-  final double size;
-  final double iconSize;
-
-  const _FloatingCard({
-    required this.icon,
-    required this.color,
-    required this.iconColor,
-    this.size = 80,
-    this.iconSize = 40,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.5),
-          width: 1.5,
-        ),
-      ),
-      child: Center(
-        child: Icon(icon, size: iconSize, color: iconColor),
       ),
     );
   }
