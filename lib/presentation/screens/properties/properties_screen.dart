@@ -3,6 +3,8 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'widgets/animated_property_graphic.dart';
 import 'package:go_router/go_router.dart';
 import '../../../application/providers/property_providers.dart';
 import '../../../core/theme/app_colors.dart';
@@ -41,11 +43,13 @@ class PropertiesScreen extends ConsumerWidget {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/properties/add'),
-        icon: const Icon(Icons.add),
-        label: Text(AppLocalizations.of(context)!.addProperty),
-      ),
+      floatingActionButton: (propertiesAsync.valueOrNull?.isNotEmpty == true)
+          ? FloatingActionButton.extended(
+              onPressed: () => context.push('/properties/add'),
+              icon: const Icon(Icons.add),
+              label: Text(AppLocalizations.of(context)!.addProperty),
+            )
+          : null,
     );
   }
 
@@ -56,35 +60,28 @@ class PropertiesScreen extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: Theme.of(
-                  context,
-                ).colorScheme.primary.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.home_work_outlined,
-                size: 64,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            ),
+            const AnimatedPropertyGraphic(),
             const SizedBox(height: 24),
             Text(
-              AppLocalizations.of(context)!.noPropertiesYet,
-              style: Theme.of(
-                context,
-              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-            ),
+                  AppLocalizations.of(context)!.noPropertiesYet,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                )
+                .animate()
+                .fadeIn(delay: 200.ms)
+                .slideY(begin: 0.1, end: 0, curve: Curves.easeOutCubic),
             const SizedBox(height: 8),
             Text(
-              AppLocalizations.of(context)!.addYourFirstProperty,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-              textAlign: TextAlign.center,
-            ),
+                  AppLocalizations.of(context)!.addYourFirstProperty,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                  textAlign: TextAlign.center,
+                )
+                .animate()
+                .fadeIn(delay: 300.ms)
+                .slideY(begin: 0.1, end: 0, curve: Curves.easeOutCubic),
             const SizedBox(height: 32),
             ElevatedButton.icon(
               onPressed: () => context.push('/properties/add'),
@@ -103,7 +100,15 @@ class PropertiesScreen extends ConsumerWidget {
       itemCount: properties.length,
       itemBuilder: (context, index) {
         final property = properties[index];
-        return _PropertyCard(property: property);
+        return _PropertyCard(property: property)
+            .animate()
+            .fadeIn(delay: (index * 50).ms, duration: 400.ms)
+            .slideX(
+              begin: 0.1,
+              end: 0,
+              curve: Curves.easeOutCubic,
+              duration: 400.ms,
+            );
       },
     );
   }
@@ -173,12 +178,16 @@ class _PropertyCard extends StatelessWidget {
                       children: [
                         _StatChip(
                           icon: Icons.meeting_room_outlined,
-                          label: AppLocalizations.of(context)!.roomsCount(property.roomCount),
+                          label: AppLocalizations.of(
+                            context,
+                          )!.roomsCount(property.roomCount),
                         ),
                         const SizedBox(width: 12),
                         _StatChip(
                           icon: Icons.people_outline,
-                          label: AppLocalizations.of(context)!.occupiedPercent(occupancyPercent),
+                          label: AppLocalizations.of(
+                            context,
+                          )!.occupiedPercent(occupancyPercent),
                           color: occupancyPercent >= 80
                               ? AppColors.success
                               : occupancyPercent >= 50

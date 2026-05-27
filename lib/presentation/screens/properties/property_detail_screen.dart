@@ -3,6 +3,8 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'widgets/animated_room_graphic.dart';
 import 'package:go_router/go_router.dart';
 import '../../../application/providers/property_providers.dart';
 import '../../../application/providers/repository_providers.dart';
@@ -29,8 +31,12 @@ class PropertyDetailScreen extends ConsumerWidget {
       data: (property) {
         if (property == null) {
           return Scaffold(
-            appBar: AppBar(title: Text(AppLocalizations.of(context)!.properties)),
-            body: Center(child: Text(AppLocalizations.of(context)!.propertyNotFound)),
+            appBar: AppBar(
+              title: Text(AppLocalizations.of(context)!.properties),
+            ),
+            body: Center(
+              child: Text(AppLocalizations.of(context)!.propertyNotFound),
+            ),
           );
         }
         return Scaffold(
@@ -83,11 +89,13 @@ class PropertyDetailScreen extends ConsumerWidget {
               ),
             ],
           ),
-          floatingActionButton: FloatingActionButton.extended(
-            onPressed: () => _showAddRoom(context, property),
-            icon: const Icon(Icons.add),
-            label: Text(AppLocalizations.of(context)!.addRoom),
-          ),
+          floatingActionButton: (roomsAsync.valueOrNull?.isNotEmpty == true)
+              ? FloatingActionButton.extended(
+                  onPressed: () => _showAddRoom(context, property),
+                  icon: const Icon(Icons.add),
+                  label: Text(AppLocalizations.of(context)!.addRoom),
+                )
+              : null,
         );
       },
       loading: () => Scaffold(
@@ -95,8 +103,12 @@ class PropertyDetailScreen extends ConsumerWidget {
         body: const Center(child: CircularProgressIndicator()),
       ),
       error: (e, s) => Scaffold(
-        appBar: AppBar(title: Text(AppLocalizations.of(context)!.error(e.toString()))),
-        body: Center(child: Text(AppLocalizations.of(context)!.error(e.toString()))),
+        appBar: AppBar(
+          title: Text(AppLocalizations.of(context)!.error(e.toString())),
+        ),
+        body: Center(
+          child: Text(AppLocalizations.of(context)!.error(e.toString())),
+        ),
       ),
     );
   }
@@ -108,27 +120,17 @@ class PropertyDetailScreen extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Theme.of(
-                  context,
-                ).colorScheme.secondary.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.meeting_room_outlined,
-                size: 48,
-                color: Theme.of(context).colorScheme.secondary,
-              ),
-            ),
+            const AnimatedRoomGraphic(),
             const SizedBox(height: 24),
             Text(
-              AppLocalizations.of(context)!.noRoomsYet,
-              style: Theme.of(
-                context,
-              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-            ),
+                  AppLocalizations.of(context)!.noRoomsYet,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                )
+                .animate()
+                .fadeIn(delay: 200.ms)
+                .slideY(begin: 0.1, end: 0, curve: Curves.easeOutCubic),
             const SizedBox(height: 8),
             Text(
               AppLocalizations.of(context)!.addRoomsToStartManaging,
@@ -176,7 +178,9 @@ class PropertyDetailScreen extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(AppLocalizations.of(context)!.deletePropertyTitle),
-        content: Text(AppLocalizations.of(context)!.confirmDeleteProperty(property.name)),
+        content: Text(
+          AppLocalizations.of(context)!.confirmDeleteProperty(property.name),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -191,7 +195,11 @@ class PropertyDetailScreen extends ConsumerWidget {
               if (context.mounted) {
                 context.pop();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(AppLocalizations.of(context)!.propertyDeleted)),
+                  SnackBar(
+                    content: Text(
+                      AppLocalizations.of(context)!.propertyDeleted,
+                    ),
+                  ),
                 );
               }
             },
@@ -267,12 +275,16 @@ class _PropertyHeader extends StatelessWidget {
                   children: [
                     _InfoChip(
                       icon: Icons.meeting_room_outlined,
-                      label: AppLocalizations.of(context)!.roomsCount(property.roomCount),
+                      label: AppLocalizations.of(
+                        context,
+                      )!.roomsCount(property.roomCount),
                     ),
                     const SizedBox(width: 12),
                     _InfoChip(
                       icon: Icons.people_outline,
-                      label: AppLocalizations.of(context)!.occupancyCount(property.occupiedRoomCount),
+                      label: AppLocalizations.of(
+                        context,
+                      )!.occupancyCount(property.occupiedRoomCount),
                       color: Theme.of(context).colorScheme.secondary,
                     ),
                   ],

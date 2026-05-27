@@ -3,6 +3,8 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'widgets/animated_vacant_graphic.dart';
 import 'package:go_router/go_router.dart';
 import '../../../application/providers/property_providers.dart';
 import '../../../application/providers/tenant_providers.dart';
@@ -764,48 +766,44 @@ class _VacantRoomCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.person_add_outlined,
-                size: 32,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              AppLocalizations.of(context)!.roomIsVacant,
-              textAlign: TextAlign.center,
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              AppLocalizations.of(context)!.assignTenantToStartCollecting,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 16),
-            FilledButton.icon(
-              onPressed: onMoveIn,
-              icon: const Icon(Icons.person_add),
-              label: Text(AppLocalizations.of(context)!.moveInTenantBtn),
-            ),
-          ],
-        ),
+    return Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const AnimatedVacantGraphic(),
+          const SizedBox(height: 24),
+          Text(
+                AppLocalizations.of(context)!.roomIsVacant,
+                textAlign: TextAlign.center,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              )
+              .animate()
+              .fadeIn(delay: 200.ms)
+              .slideY(begin: 0.1, end: 0, curve: Curves.easeOutCubic),
+          const SizedBox(height: 8),
+          Text(
+                AppLocalizations.of(context)!.assignTenantToStartCollecting,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              )
+              .animate()
+              .fadeIn(delay: 300.ms)
+              .slideY(begin: 0.1, end: 0, curve: Curves.easeOutCubic),
+          const SizedBox(height: 24),
+          FilledButton.icon(
+                onPressed: onMoveIn,
+                icon: const Icon(Icons.person_add),
+                label: Text(AppLocalizations.of(context)!.moveInTenantBtn),
+              )
+              .animate()
+              .fadeIn(delay: 400.ms)
+              .slideY(begin: 0.1, end: 0, curve: Curves.easeOutCubic),
+        ],
       ),
     );
   }

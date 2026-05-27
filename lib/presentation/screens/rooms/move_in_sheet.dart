@@ -372,19 +372,24 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
     if (_newFatherNameController.text.isEmpty) {
       missingFields.add('Father\'s Name');
     }
-    if (_newPhoneController.text.isEmpty)
+    if (_newPhoneController.text.isEmpty) {
       missingFields.add(AppLocalizations.of(context)!.phoneLabel);
-    if (_newAadharController.text.isEmpty)
+    }
+    if (_newAadharController.text.isEmpty) {
       missingFields.add(AppLocalizations.of(context)!.aadhaarNumber);
+    }
     if (_addressLineController.text.isEmpty) {
       missingFields.add(AppLocalizations.of(context)!.permanentAddress);
     }
-    if (_cityController.text.isEmpty)
+    if (_cityController.text.isEmpty) {
       missingFields.add(AppLocalizations.of(context)!.cityLabel);
-    if (_aadhaarFrontPath == null)
+    }
+    if (_aadhaarFrontPath == null) {
       missingFields.add(AppLocalizations.of(context)!.aadhaarFrontPhoto);
-    if (_aadhaarBackPath == null)
+    }
+    if (_aadhaarBackPath == null) {
       missingFields.add(AppLocalizations.of(context)!.aadhaarBackPhoto);
+    }
 
     return showDialog<bool>(
       context: context,

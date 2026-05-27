@@ -77,17 +77,15 @@ class _AddPropertyScreenState extends ConsumerState<AddPropertyScreen> {
         context.pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              isEditing ? 'Property updated' : 'Property added',
-            ),
+            content: Text(isEditing ? 'Property updated' : 'Property added'),
           ),
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -97,9 +95,7 @@ class _AddPropertyScreenState extends ConsumerState<AddPropertyScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(isEditing ? 'Edit Property' : 'Add Property'),
-      ),
+      appBar: AppBar(title: Text(isEditing ? 'Edit Property' : 'Add Property')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Form(
