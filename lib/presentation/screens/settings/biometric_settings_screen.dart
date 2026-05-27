@@ -21,7 +21,8 @@ class BiometricSettingsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: Text(l10n.appLock)),
       body: biometricSupport.when(
-        data: (support) => _buildContent(context, ref, support, settingsAsync, l10n),
+        data: (support) =>
+            _buildContent(context, ref, support, settingsAsync, l10n),
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, s) => Center(child: Text('${l10n.errorPrefix}$e')),
       ),
@@ -129,9 +130,7 @@ class BiometricSettingsScreen extends ConsumerWidget {
                     BouncingScaleWrapper(
                       child: SwitchListTile(
                         title: Text(l10n.lockOnExit),
-                        subtitle: Text(
-                          l10n.lockOnExitSubtitle,
-                        ),
+                        subtitle: Text(l10n.lockOnExitSubtitle),
                         value: lockOnExit,
                         onChanged: (value) {
                           ref
@@ -144,7 +143,9 @@ class BiometricSettingsScreen extends ConsumerWidget {
                     BouncingScaleWrapper(
                       child: ListTile(
                         title: Text(l10n.lockAfterInactivity),
-                        subtitle: Text(_getInactivityLabel(lockAfterMinutes, l10n)),
+                        subtitle: Text(
+                          _getInactivityLabel(lockAfterMinutes, l10n),
+                        ),
                         trailing: const Icon(Icons.chevron_right),
                         onTap: () => _showInactivityPicker(
                           context,
@@ -201,7 +202,10 @@ class BiometricSettingsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildNotAvailableContent(BuildContext context, AppLocalizations l10n) {
+  Widget _buildNotAvailableContent(
+    BuildContext context,
+    AppLocalizations l10n,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
     return Center(
       child: Padding(

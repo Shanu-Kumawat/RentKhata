@@ -79,7 +79,11 @@ class _EditPaymentSheetState extends ConsumerState<EditPaymentSheet> {
     if (amount > maxAllowed) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(AppLocalizations.of(context)!.amountCannotExceedMax(formatCurrency(maxAllowed))),
+          content: Text(
+            AppLocalizations.of(
+              context,
+            )!.amountCannotExceedMax(formatCurrency(maxAllowed)),
+          ),
         ),
       );
       return;
@@ -106,15 +110,17 @@ class _EditPaymentSheetState extends ConsumerState<EditPaymentSheet> {
         ref.invalidate(dashboardSummaryProvider);
 
         Navigator.pop(context);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.paymentUpdated)));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.paymentUpdated)),
+        );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.error(e.toString()))));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.error(e.toString())),
+          ),
+        );
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -171,7 +177,9 @@ class _EditPaymentSheetState extends ConsumerState<EditPaymentSheet> {
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
                         Text(
-                          AppLocalizations.of(context)!.originalAmount(formatCurrency(widget.payment.amount)),
+                          AppLocalizations.of(context)!.originalAmount(
+                            formatCurrency(widget.payment.amount),
+                          ),
                           style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(color: AppColors.onSurfaceVariant),
                         ),
@@ -186,7 +194,9 @@ class _EditPaymentSheetState extends ConsumerState<EditPaymentSheet> {
               TextFormField(
                 controller: _amountController,
                 decoration: InputDecoration(
-                  labelText: AppLocalizations.of(context)!.paymentAmountRequiredLabel,
+                  labelText: AppLocalizations.of(
+                    context,
+                  )!.paymentAmountRequiredLabel,
                   prefixIcon: Icon(Icons.currency_rupee),
                 ),
                 keyboardType: TextInputType.number,
@@ -219,7 +229,9 @@ class _EditPaymentSheetState extends ConsumerState<EditPaymentSheet> {
                   }
                   return ChoiceChip(
                     avatar: Icon(icon, size: 18),
-                    label: Text(_getPaymentModeLabel(context, mode).toUpperCase()),
+                    label: Text(
+                      _getPaymentModeLabel(context, mode).toUpperCase(),
+                    ),
                     selected: isSelected,
                     onSelected: (_) => setState(() => _paymentMode = mode),
                   );

@@ -120,7 +120,9 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            AppLocalizations.of(context)!.amountCannotBeLessThanPaid(formatCurrency(_minimumAmount)),
+            AppLocalizations.of(
+              context,
+            )!.amountCannotBeLessThanPaid(formatCurrency(_minimumAmount)),
           ),
         ),
       );
@@ -138,7 +140,8 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
         notes: _notesController.text.isEmpty ? null : _notesController.text,
         dueDate: _dueDate,
         meterPhotoPath:
-            _meterPhoto ?? _existingPhotoPath, // Use filename stored from new pick or existing
+            _meterPhoto ??
+            _existingPhotoPath, // Use filename stored from new pick or existing
         // Recalculate pending amount if amount changed
         pendingAmount: _canEditAmount
             ? amount - widget.bill.paidAmount
@@ -159,14 +162,20 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
 
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.billUpdatedSuccessfully)),
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context)!.billUpdatedSuccessfully,
+            ),
+          ),
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.error(e.toString()))));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.error(e.toString())),
+          ),
+        );
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -231,7 +240,9 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            AppLocalizations.of(context)!.partiallyPaidBillWarning,
+                            AppLocalizations.of(
+                              context,
+                            )!.partiallyPaidBillWarning,
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: Colors.orange.shade900,
                             ),
@@ -264,7 +275,9 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
                       if (_hasPayments) ...[
                         const SizedBox(height: 4),
                         Text(
-                          AppLocalizations.of(context)!.paidAmount(formatCurrency(widget.bill.paidAmount)),
+                          AppLocalizations.of(
+                            context,
+                          )!.paidAmount(formatCurrency(widget.bill.paidAmount)),
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: Theme.of(context).colorScheme.tertiary,
                           ),
@@ -277,7 +290,10 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
 
                 // Meter Photo Section (Only for electricity bills)
                 if (widget.bill.billType == BillType.electricity) ...[
-                  Text(AppLocalizations.of(context)!.meterPhoto, style: theme.textTheme.titleSmall),
+                  Text(
+                    AppLocalizations.of(context)!.meterPhoto,
+                    style: theme.textTheme.titleSmall,
+                  ),
                   const SizedBox(height: 8),
                   if (hasPhoto)
                     Stack(
@@ -286,13 +302,21 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
                           borderRadius: BorderRadius.circular(8),
                           child: _meterPhoto != null
                               ? Image.file(
-                                  File(ImageService.resolveImagePathSync(_meterPhoto!)),
+                                  File(
+                                    ImageService.resolveImagePathSync(
+                                      _meterPhoto!,
+                                    ),
+                                  ),
                                   height: 150,
                                   width: double.infinity,
                                   fit: BoxFit.cover,
                                 )
                               : Image.file(
-                                  File(ImageService.resolveImagePathSync(_existingPhotoPath!)),
+                                  File(
+                                    ImageService.resolveImagePathSync(
+                                      _existingPhotoPath!,
+                                    ),
+                                  ),
                                   height: 150,
                                   width: double.infinity,
                                   fit: BoxFit.cover,
@@ -368,11 +392,16 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
                     labelText: AppLocalizations.of(context)!.billAmountLabel,
                     prefixIcon: const Icon(Icons.currency_rupee),
                     helperText: _hasPayments
-                        ? AppLocalizations.of(context)!.minAmount(formatCurrency(widget.bill.paidAmount))
+                        ? AppLocalizations.of(
+                            context,
+                          )!.minAmount(formatCurrency(widget.bill.paidAmount))
                         : null,
                   ),
                   keyboardType: TextInputType.number,
-                  validator: (v) => validatePositiveNumber(v, AppLocalizations.of(context)!.amountLabel),
+                  validator: (v) => validatePositiveNumber(
+                    v,
+                    AppLocalizations.of(context)!.amountLabel,
+                  ),
                 ),
                 const SizedBox(height: 16),
 

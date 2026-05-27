@@ -43,9 +43,9 @@ class _ElectricityRatesScreenState
     final l10n = AppLocalizations.of(context)!;
     final rate = double.tryParse(_rateController.text);
     if (rate == null || rate <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.enterValidRate)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.enterValidRate)));
       return;
     }
 

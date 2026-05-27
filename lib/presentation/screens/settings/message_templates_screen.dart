@@ -178,7 +178,9 @@ class _TemplateEditorState extends ConsumerState<_TemplateEditor> {
                         ),
                       ),
                       Text(
-                        l10n.templateUsedWhenSharing(_getTypeLabel(l10n).toLowerCase()),
+                        l10n.templateUsedWhenSharing(
+                          _getTypeLabel(l10n).toLowerCase(),
+                        ),
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                         ),
@@ -338,9 +340,9 @@ class _TemplateEditorState extends ConsumerState<_TemplateEditor> {
   void _confirmResetToDefault(String? currentBody, AppLocalizations l10n) {
     final defaultBody = TemplateService.getDefaultBody(widget.type);
     if (currentBody == defaultBody) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.templateAlreadyDefault)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.templateAlreadyDefault)));
       return;
     }
 
@@ -379,9 +381,9 @@ class _TemplateEditorState extends ConsumerState<_TemplateEditor> {
       ref.invalidate(defaultTemplateProvider(widget.type));
       ref.invalidate(messageTemplatesProvider);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.templateResetSuccess)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.templateResetSuccess)));
       }
     } catch (e) {
       if (mounted) {
@@ -418,9 +420,9 @@ class _TemplateEditorState extends ConsumerState<_TemplateEditor> {
           _isEditing = false;
           _originalBody = _controller.text;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.templateSavedSuccess)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.templateSavedSuccess)));
       }
     } catch (e) {
       if (mounted) {

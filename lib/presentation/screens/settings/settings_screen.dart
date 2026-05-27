@@ -106,9 +106,14 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                   ),
                   title: Text(l10n.language),
-                  subtitle: Text(currentLocale.languageCode == 'hi' ? 'हिंदी (Hindi)' : 'English'),
+                  subtitle: Text(
+                    currentLocale.languageCode == 'hi'
+                        ? 'हिंदी (Hindi)'
+                        : 'English',
+                  ),
                   trailing: const Icon(Icons.chevron_right),
-                  onTap: () => _showLanguageSheet(context, ref, currentLocale, l10n),
+                  onTap: () =>
+                      _showLanguageSheet(context, ref, currentLocale, l10n),
                 ),
               ),
             ],
@@ -225,9 +230,7 @@ class SettingsScreen extends ConsumerWidget {
                         color: Colors.white,
                       ),
                     ),
-                    children: [
-                      Text(l10n.aboutRentKhataDescription),
-                    ],
+                    children: [Text(l10n.aboutRentKhataDescription)],
                   );
                 },
               ),
@@ -316,40 +319,43 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 8),
-            ...AppTheme.values.map(
-              (theme) {
-                final isSelected = currentTheme == theme;
-                return ListTile(
-                  onTap: () {
-                    ref.read(themeSettingsProvider.notifier).setTheme(theme);
-                    Navigator.pop(context);
-                  },
-                  title: Text(theme.displayName),
-                  subtitle: Text(theme.subtitle),
-                  leading: Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      color: theme.previewColor,
-                      borderRadius: BorderRadius.circular(8),
-                      border: theme == AppTheme.system
-                          ? Border.all(
-                              color: Theme.of(context).colorScheme.outline,
-                            )
-                          : null,
-                    ),
-                    child: theme == AppTheme.system
-                        ? Icon(Icons.brightness_auto, size: 18,
-                            color: Theme.of(context).colorScheme.onSurface)
+            ...AppTheme.values.map((theme) {
+              final isSelected = currentTheme == theme;
+              return ListTile(
+                onTap: () {
+                  ref.read(themeSettingsProvider.notifier).setTheme(theme);
+                  Navigator.pop(context);
+                },
+                title: Text(theme.displayName),
+                subtitle: Text(theme.subtitle),
+                leading: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: theme.previewColor,
+                    borderRadius: BorderRadius.circular(8),
+                    border: theme == AppTheme.system
+                        ? Border.all(
+                            color: Theme.of(context).colorScheme.outline,
+                          )
                         : null,
                   ),
-                  trailing: isSelected
-                      ? Icon(Icons.check_circle,
-                          color: Theme.of(context).colorScheme.primary)
-                      : const Icon(Icons.circle_outlined, color: Colors.grey),
-                );
-              },
-            ),
+                  child: theme == AppTheme.system
+                      ? Icon(
+                          Icons.brightness_auto,
+                          size: 18,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        )
+                      : null,
+                ),
+                trailing: isSelected
+                    ? Icon(
+                        Icons.check_circle,
+                        color: Theme.of(context).colorScheme.primary,
+                      )
+                    : const Icon(Icons.circle_outlined, color: Colors.grey),
+              );
+            }),
             const SizedBox(height: 16),
           ],
         ),
@@ -391,24 +397,34 @@ class SettingsScreen extends ConsumerWidget {
             const SizedBox(height: 8),
             ListTile(
               onTap: () {
-                ref.read(localeNotifierProvider.notifier).setLocale(const Locale('en'));
+                ref
+                    .read(localeNotifierProvider.notifier)
+                    .setLocale(const Locale('en'));
                 Navigator.pop(context);
               },
               title: const Text('English (English)'),
               leading: const Icon(Icons.language),
               trailing: currentLocale.languageCode == 'en'
-                  ? Icon(Icons.check_circle, color: Theme.of(context).colorScheme.primary)
+                  ? Icon(
+                      Icons.check_circle,
+                      color: Theme.of(context).colorScheme.primary,
+                    )
                   : const Icon(Icons.circle_outlined, color: Colors.grey),
             ),
             ListTile(
               onTap: () {
-                ref.read(localeNotifierProvider.notifier).setLocale(const Locale('hi'));
+                ref
+                    .read(localeNotifierProvider.notifier)
+                    .setLocale(const Locale('hi'));
                 Navigator.pop(context);
               },
               title: const Text('हिंदी (Hindi)'),
               leading: const Icon(Icons.language),
               trailing: currentLocale.languageCode == 'hi'
-                  ? Icon(Icons.check_circle, color: Theme.of(context).colorScheme.primary)
+                  ? Icon(
+                      Icons.check_circle,
+                      color: Theme.of(context).colorScheme.primary,
+                    )
                   : const Icon(Icons.circle_outlined, color: Colors.grey),
             ),
             const SizedBox(height: 16),
@@ -445,10 +461,18 @@ class _ProfileTile extends StatelessWidget {
           backgroundColor: Theme.of(
             context,
           ).colorScheme.primary.withValues(alpha: 0.1),
-          backgroundImage: photoPath != null && File(ImageService.resolveImagePathSync(photoPath!)).existsSync()
+          backgroundImage:
+              photoPath != null &&
+                  File(
+                    ImageService.resolveImagePathSync(photoPath!),
+                  ).existsSync()
               ? FileImage(File(ImageService.resolveImagePathSync(photoPath!)))
               : null,
-          child: photoPath == null || !File(ImageService.resolveImagePathSync(photoPath!)).existsSync()
+          child:
+              photoPath == null ||
+                  !File(
+                    ImageService.resolveImagePathSync(photoPath!),
+                  ).existsSync()
               ? Text(
                   name.isNotEmpty ? name[0].toUpperCase() : '?',
                   style: TextStyle(

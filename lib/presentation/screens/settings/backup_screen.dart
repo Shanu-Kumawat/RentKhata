@@ -45,9 +45,9 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
       await service.shareBackup();
       await _loadBackups();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.backupCreatedShare)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.backupCreatedShare)));
       }
     } catch (e) {
       if (mounted) {
@@ -94,9 +94,9 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('${l10n.restoreFailedPrefix}: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${l10n.restoreFailedPrefix}: $e')),
+        );
       }
     }
   }
@@ -111,7 +111,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
 
       if (result != null && result.files.single.path != null) {
         File file = File(result.files.single.path!);
-        
+
         if (!mounted) return;
         final confirmed = await showDialog<bool>(
           context: context,
@@ -139,14 +139,16 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
         final db = ref.read(appDatabaseProvider);
         final service = BackupService(db);
         await service.restoreFromExternalFile(file);
-        
+
         if (mounted) {
-           _showRestartDialog(l10n);
+          _showRestartDialog(l10n);
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${l10n.restoreFailedPrefix}: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${l10n.restoreFailedPrefix}: $e')),
+        );
       }
     }
   }
@@ -161,7 +163,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
         actions: [
           FilledButton(
             onPressed: () {
-               SystemNavigator.pop();
+              SystemNavigator.pop();
             },
             child: Text(l10n.restartNowBtn),
           ),
@@ -239,7 +241,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
             ),
           ),
           const SizedBox(height: 12),
-          
+
           // Restore from Device
           Card(
             child: ListTile(

@@ -109,7 +109,11 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
               ), // Rounded square
               image: _currentImagePath != null
                   ? DecorationImage(
-                      image: FileImage(File(ImageService.resolveImagePathSync(_currentImagePath!))),
+                      image: FileImage(
+                        File(
+                          ImageService.resolveImagePathSync(_currentImagePath!),
+                        ),
+                      ),
                       fit: BoxFit.cover,
                     )
                   : null,

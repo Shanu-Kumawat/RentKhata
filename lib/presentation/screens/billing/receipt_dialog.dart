@@ -251,7 +251,9 @@ class ReceiptDialog extends StatelessWidget {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(AppLocalizations.of(context)!.errorGeneratingPdf(e.toString())), 
+          content: Text(
+            AppLocalizations.of(context)!.errorGeneratingPdf(e.toString()),
+          ),
         ),
       );
     }

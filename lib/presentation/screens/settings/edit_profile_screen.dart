@@ -154,7 +154,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   controller: _upiController,
                   decoration: InputDecoration(
                     labelText: l10n.upiId,
-                    prefixIcon: const Icon(Icons.account_balance_wallet_outlined),
+                    prefixIcon: const Icon(
+                      Icons.account_balance_wallet_outlined,
+                    ),
                     hintText: l10n.upiIdHint,
                   ),
                   validator: (v) {

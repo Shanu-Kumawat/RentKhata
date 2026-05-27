@@ -599,8 +599,11 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
     if (!_formKey.currentState!.validate()) return;
 
     // Check if Landlord profile is complete
-    final isProfileComplete = await ContextualProfileSheet.ensureProfile(context, ref);
-    if (!isProfileComplete) return; 
+    final isProfileComplete = await ContextualProfileSheet.ensureProfile(
+      context,
+      ref,
+    );
+    if (!isProfileComplete) return;
 
     setState(() => _isLoading = true);
 

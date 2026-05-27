@@ -61,9 +61,13 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
       );
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.errorSharingPdf(e.toString()))));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context)!.errorSharingPdf(e.toString()),
+          ),
+        ),
+      );
     } finally {
       if (mounted) setState(() => _isSharing = false);
     }
@@ -79,9 +83,13 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
       await onShareAsMessage();
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.errorSharingMessage(e.toString()))));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context)!.errorSharingMessage(e.toString()),
+          ),
+        ),
+      );
     } finally {
       if (mounted) setState(() => _isSharing = false);
     }
@@ -159,10 +167,17 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
     }
   }
 
-  Future<File> _saveToDownloads(String defaultName, String defaultPdfName) async {
+  Future<File> _saveToDownloads(
+    String defaultName,
+    String defaultPdfName,
+  ) async {
     final targetDir = await _resolveDownloadDirectory();
     await targetDir.create(recursive: true);
-    final targetFile = await _createUniqueTargetFile(targetDir, defaultName, defaultPdfName);
+    final targetFile = await _createUniqueTargetFile(
+      targetDir,
+      defaultName,
+      defaultPdfName,
+    );
     final bytes = await widget.pdfFile.readAsBytes();
     await targetFile.writeAsBytes(bytes, flush: true);
     return targetFile;
@@ -214,7 +229,9 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
           }
 
           if (snapshot.hasError || !snapshot.hasData) {
-            return Center(child: Text(AppLocalizations.of(context)!.unableToLoadPdfPreview));
+            return Center(
+              child: Text(AppLocalizations.of(context)!.unableToLoadPdfPreview),
+            );
           }
 
           final bytes = snapshot.data!;

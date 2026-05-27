@@ -66,10 +66,7 @@ class RentKhataApp extends ConsumerWidget {
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
-        supportedLocales: const [
-          Locale('en'),
-          Locale('hi'),
-        ],
+        supportedLocales: const [Locale('en'), Locale('hi')],
         routerConfig: router,
       ),
     );
