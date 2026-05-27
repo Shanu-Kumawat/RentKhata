@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../domain/entities/bill.dart';
 import '../screens/onboarding/splash_screen.dart';
+import '../screens/onboarding/language_selection_screen.dart';
 import '../screens/onboarding/welcome_screen.dart';
 import '../screens/onboarding/profile_setup_screen.dart';
 import '../screens/onboarding/add_first_property_screen.dart';
@@ -27,6 +28,7 @@ import '../widgets/main_shell.dart';
 /// Route paths
 class AppRoutes {
   static const String splash = '/';
+  static const String language = '/language';
   static const String welcome = '/welcome';
   static const String profileSetup = '/profile-setup';
   static const String addFirstProperty = '/add-first-property';
@@ -51,6 +53,28 @@ class AppRoutes {
 // Navigation keys for shell routes
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
+CustomTransitionPage<void> _onboardingTransition(Widget child) {
+  return CustomTransitionPage<void>(
+    child: child,
+    transitionDuration: const Duration(milliseconds: 600),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      return FadeTransition(
+        opacity: animation,
+        child: SlideTransition(
+          position:
+              Tween<Offset>(
+                begin: const Offset(0.05, 0.0),
+                end: Offset.zero,
+              ).animate(
+                CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
+              ),
+          child: child,
+        ),
+      );
+    },
+  );
+}
+
 /// Router provider
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -60,19 +84,28 @@ final routerProvider = Provider<GoRouter>((ref) {
       // ========== Onboarding Routes (outside shell) ==========
       GoRoute(
         path: AppRoutes.splash,
-        builder: (context, state) => const SplashScreen(),
+        pageBuilder: (context, state) =>
+            _onboardingTransition(const SplashScreen()),
+      ),
+      GoRoute(
+        path: AppRoutes.language,
+        pageBuilder: (context, state) =>
+            _onboardingTransition(const LanguageSelectionScreen()),
       ),
       GoRoute(
         path: AppRoutes.welcome,
-        builder: (context, state) => const WelcomeScreen(),
+        pageBuilder: (context, state) =>
+            _onboardingTransition(const WelcomeScreen()),
       ),
       GoRoute(
         path: AppRoutes.profileSetup,
-        builder: (context, state) => const ProfileSetupScreen(),
+        pageBuilder: (context, state) =>
+            _onboardingTransition(const ProfileSetupScreen()),
       ),
       GoRoute(
         path: AppRoutes.addFirstProperty,
-        builder: (context, state) => const AddFirstPropertyScreen(),
+        pageBuilder: (context, state) =>
+            _onboardingTransition(const AddFirstPropertyScreen()),
       ),
 
       // ========== Lock Screen (outside shell) ==========
@@ -190,6 +223,16 @@ final routerProvider = Provider<GoRouter>((ref) {
             ],
           ),
 
+          // Reports branch
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.reports,
+                builder: (context, state) => const ReportsScreen(),
+              ),
+            ],
+          ),
+
           // Settings branch
           StatefulShellBranch(
             routes: [
@@ -209,10 +252,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
 
       // ========== Modal Routes (outside shell) ==========
-      GoRoute(
-        path: AppRoutes.reports,
-        builder: (context, state) => const ReportsScreen(),
-      ),
     ],
   );
 });

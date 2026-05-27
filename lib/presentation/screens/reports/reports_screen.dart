@@ -4,6 +4,10 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'widgets/animated_pending_graphic.dart';
+import 'widgets/animated_history_graphic.dart';
+import 'widgets/animated_expense_graphic.dart';
 import 'package:intl/intl.dart';
 import '../../../application/providers/billing_providers.dart';
 import '../../../application/providers/dashboard_providers.dart';
@@ -816,9 +820,22 @@ class _PendingBillsTab extends ConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 64, color: AppColors.success),
-          const SizedBox(height: 16),
-          Text(message, style: Theme.of(context).textTheme.titleMedium),
+          if (icon == Icons.check_circle_outline)
+            const AnimatedPendingGraphic()
+          else if (icon == Icons.history_outlined)
+            const AnimatedHistoryGraphic()
+          else
+            Icon(
+              icon,
+              size: 64,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+
+          const SizedBox(height: 24),
+          Text(message, style: Theme.of(context).textTheme.titleMedium)
+              .animate()
+              .fadeIn(delay: 200.ms)
+              .slideY(begin: 0.1, end: 0, curve: Curves.easeOutCubic),
         ],
       ),
     );
@@ -878,13 +895,20 @@ class _HistoryTab extends ConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            icon,
-            size: 64,
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-          ),
-          const SizedBox(height: 16),
-          Text(message, style: Theme.of(context).textTheme.titleMedium),
+          if (icon == Icons.history_outlined)
+            const AnimatedHistoryGraphic()
+          else
+            Icon(
+              icon,
+              size: 64,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+
+          const SizedBox(height: 24),
+          Text(message, style: Theme.of(context).textTheme.titleMedium)
+              .animate()
+              .fadeIn(delay: 200.ms)
+              .slideY(begin: 0.1, end: 0, curve: Curves.easeOutCubic),
         ],
       ),
     );
@@ -1927,19 +1951,18 @@ class _ExpensesTab extends ConsumerWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.money_off,
-                  size: 64,
-                  color: Theme.of(context).disabledColor,
-                ),
-                const SizedBox(height: 16),
+                const AnimatedExpenseGraphic(),
+                const SizedBox(height: 24),
                 Text(
-                  'No expenses recorded',
-                  style: TextStyle(
-                    color: Theme.of(context).disabledColor,
-                    fontSize: 16,
-                  ),
-                ),
+                      'No expenses recorded',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        fontSize: 16,
+                      ),
+                    )
+                    .animate()
+                    .fadeIn(delay: 200.ms)
+                    .slideY(begin: 0.1, end: 0, curve: Curves.easeOutCubic),
               ],
             ),
           );

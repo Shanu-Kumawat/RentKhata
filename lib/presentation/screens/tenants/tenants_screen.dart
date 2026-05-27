@@ -3,6 +3,8 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'widgets/animated_tenant_graphic.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:rent_khata/l10n/app_localizations.dart';
@@ -85,35 +87,34 @@ class _TenantsScreenState extends ConsumerState<TenantsScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.secondaryContainer,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.people_outline,
-                size: 64,
-                color: Theme.of(context).colorScheme.onSecondaryContainer,
-              ),
-            ),
+            const AnimatedTenantGraphic(),
             const SizedBox(height: 24),
             Text(
-              _searchQuery.isEmpty ? AppLocalizations.of(context)!.noTenantsYet : AppLocalizations.of(context)!.noTenantsFound,
-              style: Theme.of(
-                context,
-              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-            ),
+                  _searchQuery.isEmpty
+                      ? AppLocalizations.of(context)!.noTenantsYet
+                      : AppLocalizations.of(context)!.noTenantsFound,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                )
+                .animate()
+                .fadeIn(delay: 200.ms)
+                .slideY(begin: 0.1, end: 0, curve: Curves.easeOutCubic),
             const SizedBox(height: 8),
             Text(
-              _searchQuery.isEmpty
-                  ? AppLocalizations.of(context)!.tenantsAppearHereAfterMoveIn
-                  : AppLocalizations.of(context)!.tryDifferentSearchTerm,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-              textAlign: TextAlign.center,
-            ),
+                  _searchQuery.isEmpty
+                      ? AppLocalizations.of(
+                          context,
+                        )!.tenantsAppearHereAfterMoveIn
+                      : AppLocalizations.of(context)!.tryDifferentSearchTerm,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                  textAlign: TextAlign.center,
+                )
+                .animate()
+                .fadeIn(delay: 300.ms)
+                .slideY(begin: 0.1, end: 0, curve: Curves.easeOutCubic),
           ],
         ),
       ),
@@ -138,7 +139,15 @@ class _TenantsScreenState extends ConsumerState<TenantsScreen> {
       itemCount: sortedTenants.length,
       itemBuilder: (context, index) {
         final tenant = sortedTenants[index];
-        return _TenantCard(tenant: tenant);
+        return _TenantCard(tenant: tenant)
+            .animate()
+            .fadeIn(delay: (index * 50).ms, duration: 300.ms)
+            .slideY(
+              begin: 0.1,
+              end: 0,
+              duration: 300.ms,
+              curve: Curves.easeOutCubic,
+            );
       },
     );
   }

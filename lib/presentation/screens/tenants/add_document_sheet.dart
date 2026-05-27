@@ -210,7 +210,10 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
                     ),
                   ],
                 )
-              : Image.file(File(ImageService.resolveImagePathSync(_selectedFile!.path)), fit: BoxFit.cover),
+              : Image.file(
+                  File(ImageService.resolveImagePathSync(_selectedFile!.path)),
+                  fit: BoxFit.cover,
+                ),
         ),
         Positioned(
           top: 8,

@@ -5,7 +5,6 @@ import 'package:intl/intl.dart';
 import '../../../../application/providers/expense_providers.dart';
 import '../../../../domain/entities/expense.dart';
 
-
 class AddExpenseSheet extends ConsumerStatefulWidget {
   const AddExpenseSheet({super.key});
 
@@ -51,13 +50,15 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
 
     try {
       final amount = double.parse(_amountController.text.trim());
-      
+
       final expense = Expense(
         id: 0,
         amount: amount,
         category: _selectedCategory,
         date: _date,
-        description: _noteController.text.trim().isEmpty ? null : _noteController.text.trim(),
+        description: _noteController.text.trim().isEmpty
+            ? null
+            : _noteController.text.trim(),
         createdAt: DateTime.now(),
       );
 
@@ -71,9 +72,9 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
         setState(() => _isLoading = false);
       }
     }
@@ -118,7 +119,9 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
             // Amount Input
             TextFormField(
               controller: _amountController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
               ],
@@ -157,20 +160,27 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
                     decoration: InputDecoration(
                       labelText: 'Category',
                       filled: true,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
                       ),
                     ),
-                    items: _categories.map((c) => DropdownMenuItem(
-                      value: c,
-                      child: Text(
-                        c.name[0].toUpperCase() + c.name.substring(1),
-                        style: const TextStyle(fontSize: 14),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    )).toList(),
+                    items: _categories
+                        .map(
+                          (c) => DropdownMenuItem(
+                            value: c,
+                            child: Text(
+                              c.name[0].toUpperCase() + c.name.substring(1),
+                              style: const TextStyle(fontSize: 14),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        )
+                        .toList(),
                     onChanged: (v) {
                       if (v != null) {
                         setState(() => _selectedCategory = v);

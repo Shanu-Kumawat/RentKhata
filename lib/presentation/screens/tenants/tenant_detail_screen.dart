@@ -40,8 +40,12 @@ class TenantDetailScreen extends ConsumerWidget {
       data: (tenant) {
         if (tenant == null) {
           return Scaffold(
-            appBar: AppBar(title: Text(AppLocalizations.of(context)!.tenantDetail)),
-            body: Center(child: Text(AppLocalizations.of(context)!.tenantNotFound)),
+            appBar: AppBar(
+              title: Text(AppLocalizations.of(context)!.tenantDetail),
+            ),
+            body: Center(
+              child: Text(AppLocalizations.of(context)!.tenantNotFound),
+            ),
           );
         }
         return _TenantDetailContent(tenant: tenant);
@@ -51,8 +55,12 @@ class TenantDetailScreen extends ConsumerWidget {
         body: const Center(child: CircularProgressIndicator()),
       ),
       error: (e, s) => Scaffold(
-        appBar: AppBar(title: Text(AppLocalizations.of(context)!.error(e.toString()))),
-        body: Center(child: Text(AppLocalizations.of(context)!.error(e.toString()))),
+        appBar: AppBar(
+          title: Text(AppLocalizations.of(context)!.error(e.toString())),
+        ),
+        body: Center(
+          child: Text(AppLocalizations.of(context)!.error(e.toString())),
+        ),
       ),
     );
   }
@@ -510,7 +518,11 @@ class _ProfileCard extends StatelessWidget {
               radius: 36,
               backgroundColor: Theme.of(context).colorScheme.primaryContainer,
               backgroundImage: tenant.photoPath != null
-                  ? FileImage(File(ImageService.resolveImagePathSync(tenant.photoPath!)))
+                  ? FileImage(
+                      File(
+                        ImageService.resolveImagePathSync(tenant.photoPath!),
+                      ),
+                    )
                   : null,
               child: tenant.photoPath == null
                   ? Text(
@@ -1736,7 +1748,11 @@ class _DocumentsSection extends ConsumerWidget {
                             ? ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
                                 child: Image.file(
-                                  File(ImageService.resolveImagePathSync(doc.filePath)),
+                                  File(
+                                    ImageService.resolveImagePathSync(
+                                      doc.filePath,
+                                    ),
+                                  ),
                                   fit: BoxFit.cover,
                                   errorBuilder: (_, __, ___) =>
                                       const Icon(Icons.broken_image, size: 20),
