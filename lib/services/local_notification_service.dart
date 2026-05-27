@@ -132,6 +132,20 @@ class LocalNotificationService {
     return true;
   }
 
+  /// Check if notification permissions are granted without requesting them
+  Future<bool> checkPermission() async {
+    final androidPlugin = _plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
+
+    if (androidPlugin != null) {
+      final granted = await androidPlugin.areNotificationsEnabled();
+      return granted ?? false;
+    }
+    return true;
+  }
+
   /// Show immediate notification
   Future<void> showNotification({
     required int id,

@@ -10,26 +10,25 @@ class ExpenseDao extends DatabaseAccessor<AppDatabase> with _$ExpenseDaoMixin {
 
   /// Get all expenses, ordered by date descending
   Future<List<ExpenseEntity>> getAllExpenses() {
-    return (select(expenses)
-          ..orderBy([
-            (t) => OrderingTerm(expression: t.date, mode: OrderingMode.desc)
-          ]))
+    return (select(expenses)..orderBy([
+          (t) => OrderingTerm(expression: t.date, mode: OrderingMode.desc),
+        ]))
         .get();
   }
 
   /// Watch all expenses
   Stream<List<ExpenseEntity>> watchAllExpenses() {
-    return (select(expenses)
-          ..orderBy([
-            (t) => OrderingTerm(expression: t.date, mode: OrderingMode.desc)
-          ]))
+    return (select(expenses)..orderBy([
+          (t) => OrderingTerm(expression: t.date, mode: OrderingMode.desc),
+        ]))
         .watch();
   }
 
   /// Get expenses for a specific property
   Future<List<ExpenseEntity>> getExpensesForProperty(int propertyId) {
-    return (select(expenses)..where((t) => t.propertyId.equals(propertyId)))
-        .get();
+    return (select(
+      expenses,
+    )..where((t) => t.propertyId.equals(propertyId))).get();
   }
 
   /// Insert a new expense
@@ -49,11 +48,13 @@ class ExpenseDao extends DatabaseAccessor<AppDatabase> with _$ExpenseDaoMixin {
 
   /// Get expenses within a date range
   Future<List<ExpenseEntity>> getExpensesInDateRange(
-      DateTime start, DateTime end) {
+    DateTime start,
+    DateTime end,
+  ) {
     return (select(expenses)
           ..where((t) => t.date.isBetweenValues(start, end))
           ..orderBy([
-            (t) => OrderingTerm(expression: t.date, mode: OrderingMode.desc)
+            (t) => OrderingTerm(expression: t.date, mode: OrderingMode.desc),
           ]))
         .get();
   }

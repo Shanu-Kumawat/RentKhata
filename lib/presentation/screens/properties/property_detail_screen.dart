@@ -133,11 +133,23 @@ class PropertyDetailScreen extends ConsumerWidget {
                 .slideY(begin: 0.1, end: 0, curve: Curves.easeOutCubic),
             const SizedBox(height: 8),
             Text(
-              AppLocalizations.of(context)!.addRoomsToStartManaging,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-            ),
+                  AppLocalizations.of(context)!.addRoomsToStartManaging,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                )
+                .animate()
+                .fadeIn(delay: 300.ms)
+                .slideY(begin: 0.1, end: 0, curve: Curves.easeOutCubic),
+            const SizedBox(height: 24),
+            FilledButton.icon(
+                  onPressed: () => _showAddRoom(context, property),
+                  icon: const Icon(Icons.add),
+                  label: Text(AppLocalizations.of(context)!.addRoom),
+                )
+                .animate()
+                .fadeIn(delay: 400.ms)
+                .slideY(begin: 0.1, end: 0, curve: Curves.easeOutCubic),
           ],
         ),
       ),

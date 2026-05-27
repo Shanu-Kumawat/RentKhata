@@ -65,7 +65,14 @@ part 'app_database.g.dart';
     BiometricSettings,
     Expenses,
   ],
-  daos: [LandlordDao, PropertyDao, TenantDao, BillingDao, DocumentDao, ExpenseDao],
+  daos: [
+    LandlordDao,
+    PropertyDao,
+    TenantDao,
+    BillingDao,
+    DocumentDao,
+    ExpenseDao,
+  ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());

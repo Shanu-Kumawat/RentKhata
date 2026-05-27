@@ -7,13 +7,7 @@ part 'payment.freezed.dart';
 part 'payment.g.dart';
 
 /// Payment mode enumeration.
-enum PaymentMode {
-  cash,
-  upi,
-  bankTransfer,
-  cheque,
-  other,
-}
+enum PaymentMode { cash, upi, bankTransfer, cheque, other }
 
 /// Represents a payment against a bill.
 @freezed

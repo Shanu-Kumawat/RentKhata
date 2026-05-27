@@ -35,55 +35,53 @@ class BackupService {
   Future<File> createBackup() async {
     final dbPath = await _databasePath;
     final backupDirPath = await _backupDir;
-    
+
     // Generate backup filename with timestamp
     final timestamp = DateTime.now().toIso8601String().replaceAll(':', '-');
     final backupFileName = 'rentkhata_backup_$timestamp.zip';
     final backupPath = '$backupDirPath/$backupFileName';
-    
+
     // Close database before backup
     await _database.close();
-    
+
     try {
       // Read database file
       final dbFile = File(dbPath);
       if (!await dbFile.exists()) {
         throw Exception('Database file not found');
       }
-      
+
       final dbBytes = await dbFile.readAsBytes();
-      
+
       final archive = Archive();
-      archive.addFile(ArchiveFile(
-        DbConstants.databaseName,
-        dbBytes.length,
-        dbBytes,
-      ));
-      
+      archive.addFile(
+        ArchiveFile(DbConstants.databaseName, dbBytes.length, dbBytes),
+      );
+
       // Add images directory if it exists
       final appDir = await getApplicationDocumentsDirectory();
       final imagesDir = Directory(p.join(appDir.path, 'images'));
       if (await imagesDir.exists()) {
-        final List<FileSystemEntity> imageFiles = await imagesDir.list().toList();
+        final List<FileSystemEntity> imageFiles = await imagesDir
+            .list()
+            .toList();
         for (var entity in imageFiles) {
           if (entity is File) {
             final fileBytes = await entity.readAsBytes();
             final fileName = p.basename(entity.path);
-            archive.addFile(ArchiveFile(
-              'images/$fileName',
-              fileBytes.length,
-              fileBytes,
-            ));
+            archive.addFile(
+              ArchiveFile('images/$fileName', fileBytes.length, fileBytes),
+            );
           }
         }
       }
-      
+
       // Write zip file
       final zipBytes = ZipEncoder().encode(archive);
-      
+
       final backupFile = File(backupPath);
       await backupFile.writeAsBytes(zipBytes);
-      
+
       return backupFile;
     } finally {
       // Note: Database will be reopened when needed via provider system
@@ -103,31 +101,31 @@ class BackupService {
   /// Restore database from backup file
   Future<void> restoreBackup(File backupFile) async {
     final dbPath = await _databasePath;
-    
+
     // Read backup archive
     final bytes = await backupFile.readAsBytes();
     final archive = ZipDecoder().decodeBytes(bytes);
-    
+
     // Find database file in archive
     final dbArchiveFile = archive.files.firstWhere(
       (file) => file.name == DbConstants.databaseName,
       orElse: () => throw Exception('Invalid backup file'),
     );
-    
+
     // Close current database
     await _database.close();
-    
+
     // Restore database
     final dbFile = File(dbPath);
     await dbFile.writeAsBytes(dbArchiveFile.content as List<int>);
-    
+
     // Restore images
     final appDir = await getApplicationDocumentsDirectory();
     final imagesDir = Directory(p.join(appDir.path, 'images'));
     if (!await imagesDir.exists()) {
       await imagesDir.create(recursive: true);
     }
-    
+
     for (final file in archive.files) {
       if (file.name.startsWith('images/') && file.isFile) {
         final fileName = p.basename(file.name);
@@ -140,20 +138,22 @@ class BackupService {
   /// Restore database from an external backup file (e.g. from File Picker)
   Future<void> restoreFromExternalFile(File externalZipFile) async {
     final dbPath = await _databasePath;
-    
+
     // Read external backup archive
     final bytes = await externalZipFile.readAsBytes();
     final archive = ZipDecoder().decodeBytes(bytes);
-    
+
     // Find database file in archive
     final dbArchiveFile = archive.files.firstWhere(
       (file) => file.name == DbConstants.databaseName,
-      orElse: () => throw Exception('Invalid backup file: rent_khata.sqlite not found inside.'),
+      orElse: () => throw Exception(
+        'Invalid backup file: rent_khata.sqlite not found inside.',
+      ),
     );
-    
+
     // Close current database
     await _database.close();
-    
+
     // Restore database
     final dbFile = File(dbPath);
     await dbFile.writeAsBytes(dbArchiveFile.content as List<int>);
@@ -164,7 +164,7 @@ class BackupService {
     if (!await imagesDir.exists()) {
       await imagesDir.create(recursive: true);
     }
-    
+
     for (final file in archive.files) {
       if (file.name.startsWith('images/') && file.isFile) {
         final fileName = p.basename(file.name);
@@ -178,11 +178,11 @@ class BackupService {
   Future<List<File>> getLocalBackups() async {
     final backupDirPath = await _backupDir;
     final backupDir = Directory(backupDirPath);
-    
+
     if (!await backupDir.exists()) {
       return [];
     }
-    
+
     final files = await backupDir.list().toList();
     return files
         .whereType<File>()

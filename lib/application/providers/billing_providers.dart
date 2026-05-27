@@ -231,7 +231,7 @@ Future<List<Bill>> billsByFinancialYear(Ref ref) async {
 
   // Auto-refresh via unpaidBillsProvider
   ref.watch(unpaidBillsProvider);
-  
+
   final allBills = await repo.getAllBills();
   return allBills.where((b) {
     final bStart = b.periodStartDate ?? b.createdAt;
@@ -260,12 +260,15 @@ Future<YearlyFinancialSummary> yearlyFinancials(Ref ref) async {
   final year = ref.watch(reportsFinancialYearProvider);
   final billingRepo = ref.watch(billingRepositoryProvider);
   final allBills = await ref.watch(billsByFinancialYearProvider.future);
-  
+
   final startYearDate = DateTime(year, 4, 1);
   final endYearDate = DateTime(year + 1, 3, 31, 23, 59, 59);
 
   // Payments collected within this FY
-  final payments = await billingRepo.getPaymentsInDateRange(startYearDate, endYearDate);
+  final payments = await billingRepo.getPaymentsInDateRange(
+    startYearDate,
+    endYearDate,
+  );
   final totalCollected = payments.fold<double>(0, (sum, p) => sum + p.amount);
 
   // Pending strictly from bills generated in this FY

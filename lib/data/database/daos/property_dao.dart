@@ -68,7 +68,7 @@ class PropertyDao extends DatabaseAccessor<AppDatabase>
 
   /// Get property with room count
   Future<List<({PropertyEntity property, int roomCount})>>
-      getPropertiesWithRoomCount() async {
+  getPropertiesWithRoomCount() async {
     final propertyList = await getAllProperties();
     final result = <({PropertyEntity property, int roomCount})>[];
 

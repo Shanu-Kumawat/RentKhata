@@ -25,13 +25,13 @@ class SettlementStatement with _$SettlementStatement {
     required String roomNumber,
     required DateTime moveInDate,
     required DateTime moveOutDate,
-    
+
     // Financials
     required double securityDeposit,
     @Default([]) List<SettlementBillDeduction> billDeductions,
     required double manualDeduction,
     String? manualDeductionReason,
-    
+
     // Totals
     required double totalDeductions,
     required double refundAmount, // Negative means tenant owes

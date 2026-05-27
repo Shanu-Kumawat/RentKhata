@@ -34,7 +34,9 @@ class ExpenseRepositoryImpl implements ExpenseRepository {
       description: Value(expense.description),
       propertyId: Value(expense.propertyId),
       roomId: Value(expense.roomId),
-      createdAt: expense.id == 0 ? const Value.absent() : Value(expense.createdAt),
+      createdAt: expense.id == 0
+          ? const Value.absent()
+          : Value(expense.createdAt),
     );
   }
 
@@ -52,7 +54,9 @@ class ExpenseRepositoryImpl implements ExpenseRepository {
 
   @override
   Stream<List<Expense>> watchAllExpenses() {
-    return _dao.watchAllExpenses().map((list) => list.map(_mapExpense).toList());
+    return _dao.watchAllExpenses().map(
+      (list) => list.map(_mapExpense).toList(),
+    );
   }
 
   @override
@@ -81,7 +85,10 @@ class ExpenseRepositoryImpl implements ExpenseRepository {
   }
 
   @override
-  Future<List<Expense>> getExpensesInDateRange(DateTime start, DateTime end) async {
+  Future<List<Expense>> getExpensesInDateRange(
+    DateTime start,
+    DateTime end,
+  ) async {
     final expenses = await _dao.getExpensesInDateRange(start, end);
     return expenses.map(_mapExpense).toList();
   }

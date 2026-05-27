@@ -20,12 +20,12 @@ class PropertyRepositoryImpl implements PropertyRepository {
   Future<Property> _propertyToDomain(PropertyEntity entity) async {
     final rooms = await _propertyDao.getRoomsForProperty(entity.id);
     int occupiedCount = 0;
-    
+
     for (final room in rooms) {
       final occupancy = await _tenantDao.getActiveOccupancyForRoom(room.id);
       if (occupancy != null) occupiedCount++;
     }
-    
+
     return Property(
       id: entity.id,
       name: entity.name,
@@ -41,12 +41,12 @@ class PropertyRepositoryImpl implements PropertyRepository {
   Future<Room> _roomToDomain(RoomEntity entity, {String? propertyName}) async {
     final occupancy = await _tenantDao.getActiveOccupancyForRoom(entity.id);
     String? tenantName;
-    
+
     if (occupancy != null) {
       final tenant = await _tenantDao.getTenantById(occupancy.tenantId);
       tenantName = tenant?.name;
     }
-    
+
     return Room(
       id: entity.id,
       propertyId: entity.propertyId,
@@ -73,8 +73,8 @@ class PropertyRepositoryImpl implements PropertyRepository {
   @override
   Stream<List<Property>> watchAllProperties() {
     return _propertyDao.watchAllProperties().asyncMap(
-          (entities) => Future.wait(entities.map(_propertyToDomain)),
-        );
+      (entities) => Future.wait(entities.map(_propertyToDomain)),
+    );
   }
 
   @override
@@ -128,21 +128,21 @@ class PropertyRepositoryImpl implements PropertyRepository {
 
   @override
   Stream<List<Room>> watchRoomsForProperty(int propertyId) {
-    return _propertyDao.watchRoomsForProperty(propertyId).asyncMap(
-          (entities) async {
-            final property = await _propertyDao.getPropertyById(propertyId);
-            return Future.wait(
-              entities.map((e) => _roomToDomain(e, propertyName: property?.name)),
-            );
-          },
-        );
+    return _propertyDao.watchRoomsForProperty(propertyId).asyncMap((
+      entities,
+    ) async {
+      final property = await _propertyDao.getPropertyById(propertyId);
+      return Future.wait(
+        entities.map((e) => _roomToDomain(e, propertyName: property?.name)),
+      );
+    });
   }
 
   @override
   Future<Room?> getRoomById(int id) async {
     final entity = await _propertyDao.getRoomById(id);
     if (entity == null) return null;
-    
+
     final property = await _propertyDao.getPropertyById(entity.propertyId);
     return _roomToDomain(entity, propertyName: property?.name);
   }

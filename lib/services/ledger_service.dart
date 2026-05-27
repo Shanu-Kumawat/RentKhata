@@ -16,8 +16,10 @@ final ledgerServiceProvider = Provider<LedgerService>((ref) {
 });
 
 /// Future provider to fetch the Ledger Statement for a specific occupancy.
-final ledgerStatementProvider =
-    FutureProvider.family<LedgerStatement?, int>((ref, occupancyId) async {
+final ledgerStatementProvider = FutureProvider.family<LedgerStatement?, int>((
+  ref,
+  occupancyId,
+) async {
   final service = ref.watch(ledgerServiceProvider);
   return await service.generateStatement(occupancyId);
 });
@@ -41,20 +43,23 @@ class LedgerService {
     // 3. Fetch Bills & Payments
     final bills = await _billingRepo.getBillsForOccupancy(occupancyId);
     final allEntries = <LedgerEntry>[];
-    
+
     double totalBilled = 0;
     double totalPaid = 0;
 
     for (final bill in bills) {
-      if (bill.status == BillStatus.voided) continue; // Skip voided bills completely
-      
+      if (bill.status == BillStatus.voided) {
+        continue;
+      } // Skip voided bills completely
+
       // Add Bill as Debit
       totalBilled += bill.amount;
       allEntries.add(
         LedgerEntry(
           date: bill.createdAt, // Or bill.periodStartDate ?? bill.createdAt
           type: LedgerEntryType.billGenerated,
-          description: '${bill.billType.name.toUpperCase()} - ${bill.billingPeriod}',
+          description:
+              '${bill.billType.name.toUpperCase()} - ${bill.billingPeriod}',
           debit: bill.amount,
           credit: 0,
           balance: 0, // Computed later
@@ -88,7 +93,7 @@ class LedgerService {
     // 5. Calculate Running Balance
     double runningBalance = 0;
     final structuredEntries = <LedgerEntry>[];
-    
+
     for (final entry in allEntries) {
       runningBalance += entry.debit;
       runningBalance -= entry.credit;

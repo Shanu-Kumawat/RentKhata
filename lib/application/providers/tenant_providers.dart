@@ -146,7 +146,7 @@ class AgreementExpirationStatus {
 Future<List<AgreementExpirationStatus>> expiringAgreements(Ref ref) async {
   // Use the stream's future to guarantee we get the latest real-time emitted value
   final occupancies = await ref.watch(activeOccupanciesStreamProvider.future);
-  
+
   final now = DateTime.now();
   // Strip time for accurate day calculation
   final today = DateTime(now.year, now.month, now.day);
@@ -158,14 +158,16 @@ Future<List<AgreementExpirationStatus>> expiringAgreements(Ref ref) async {
       final end = o.agreementEndDate!;
       final endDate = DateTime(end.year, end.month, end.day);
       final days = endDate.difference(today).inDays;
-      
+
       // If expired or expiring within 30 days
       if (days <= 30) {
-        expiring.add(AgreementExpirationStatus(
-          occupancy: o,
-          isExpired: days < 0,
-          daysRemaining: days,
-        ));
+        expiring.add(
+          AgreementExpirationStatus(
+            occupancy: o,
+            isExpired: days < 0,
+            daysRemaining: days,
+          ),
+        );
       }
     }
   }

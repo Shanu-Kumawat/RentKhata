@@ -32,8 +32,8 @@ Future<void> scheduleAllNotifications(Ref ref) async {
   // Ensure notification service is initialized
   await notificationService.initialize();
 
-  // Check if we have notification permission
-  final hasPermission = await notificationService.requestPermission();
+  // Check if we have notification permission without requesting
+  final hasPermission = await notificationService.checkPermission();
   if (!hasPermission) {
     return; // Can't schedule without permission
   }
