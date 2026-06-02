@@ -632,5 +632,49 @@
       }
     }
   },
-  "paymentReceipt": "[HI] भुगतान रसीद"
+  "paymentReceipt": "[HI] भुगतान रसीद",
+  "notificationPermissionTitle": "भुगतान कभी न भूलें",
+  "notificationPermissionBody": "कभी भी भुगतान न भूलें! क्या आप चाहते हैं कि किराया देय होने पर हम आपको याद दिलाएं?",
+  "biometricPermissionTitle": "लेज़र सुरक्षित रखें",
+  "biometricPermissionBody": "अपने लेज़र को सुरक्षित रखें। क्या आप फिंगरप्रिंट के साथ रेंटखाता को लॉक करना चाहते हैं?",
+  "yesBtn": "हाँ",
+  "noBtn": "नहीं",
+  "notNowBtn": "अभी नहीं",
+  "systemNotificationsDisabledTitle": "सिस्टम सूचनाएं अक्षम हैं",
+  "systemNotificationsDisabledBody": "किराया अलर्ट और भुगतान अनुस्मारक प्राप्त करने के लिए अनुमतियां सक्षम करें।",
+  "enableBtn": "सक्षम करें",
+  "appLockEnabledSuccess": "ऐप लॉक सफलतापूर्वक सक्षम किया गया!",
+  "appLockSetupFailed": "ऐप लॉक सत्यापन विफल रहा।",
+  "smartAlerts": "स्मार्ट अलर्ट",
+  "agreementExpiredAlert": "अनुबंध पहले ही समाप्त हो चुका है",
+  "agreementExpiredAlertSubtitle": "अनुबंध की समाप्ति तिथि के {days} दिन बाद याद दिलाएं",
+  "@agreementExpiredAlertSubtitle": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "billNotGeneratedAlert": "बिल जनरेट नहीं होने का अनुस्मारक",
+  "billNotGeneratedAlertSubtitle": "चक्र अतिदेय होने पर या समाप्त होने के {days} दिनों के भीतर अलर्ट करें",
+  "@billNotGeneratedAlertSubtitle": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "partialPaymentPauseAlert": "आंशिक भुगतान के बाद अतिदेय अनुवर्ती कार्रवाई रोकें",
+  "partialPaymentPauseAlertSubtitle": "भुगतान की गई राशि 50% तक पहुँचने पर रिमाइंडर्स रोकें",
+  "depositSettlementAlert": "निकासी के बाद सुरक्षा जमा निपटान देय",
+  "depositSettlementAlertSubtitle": "निपटान लंबित होने पर {days} दिन बाद याद दिलाएं",
+  "@depositSettlementAlertSubtitle": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "utilityAnomalyAlert": "असामान्य उच्च उपयोगिता खपत",
+  "utilityAnomalyAlertSubtitle": "नवीनतम बिजली उपयोग में तीव्र वृद्धि होने पर सचेत करें"
 }

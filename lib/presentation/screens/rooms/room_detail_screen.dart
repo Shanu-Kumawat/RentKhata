@@ -24,6 +24,7 @@ import '../../../services/pdf_service.dart';
 import '../pdf/pdf_preview_screen.dart';
 import '../billing/create_bill_sheet.dart';
 import '../billing/bill_detail_screen.dart';
+import '../onboarding/widgets/premium_permission_sheet.dart';
 import 'move_in_sheet.dart';
 import 'add_room_screen.dart';
 import 'move_out_screen.dart';
@@ -215,7 +216,7 @@ class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
                       children: [
                         const Spacer(flex: 3),
                         _VacantRoomCard(
-                          onMoveIn: () => _showMoveIn(context, widget.room),
+                          onMoveIn: () => _showMoveIn(widget.room),
                         ),
                         const Spacer(flex: 7),
                       ],
@@ -232,13 +233,17 @@ class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
     );
   }
 
-  void _showMoveIn(BuildContext context, Room room) {
-    showModalBottomSheet(
+  Future<void> _showMoveIn(Room room) async {
+    final result = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      builder: (context) => MoveInSheet(roomId: room.id, room: room),
+      builder: (ctx) => MoveInSheet(roomId: room.id, room: room),
     );
+
+    if (result == true && mounted) {
+      await PremiumPermissionSheet.showBiometrics(context, ref);
+    }
   }
 
   Future<void> _showCreateBill(
@@ -296,7 +301,7 @@ class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
 
     if (!mounted) return;
 
-    showModalBottomSheet(
+    final result = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
@@ -314,6 +319,16 @@ class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
         agreementEndDate: occupancy.agreementEndDate,
       ),
     );
+
+    if (result == true) {
+      if (!mounted) return;
+      final billingRepo = ref.read(billingRepositoryProvider);
+      final allBills = await billingRepo.getAllBills();
+      if (!mounted) return;
+      if (allBills.length == 1) {
+        await PremiumPermissionSheet.showNotifications(context, ref);
+      }
+    }
   }
 
   void _showEditRoom(BuildContext context, Room room) {

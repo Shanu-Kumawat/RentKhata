@@ -717,7 +717,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
         ref.invalidate(unpaidBillsProvider);
         ref.invalidate(dashboardSummaryProvider);
         ref.invalidate(billingAttentionListProvider); // Refresh attention list!
-        Navigator.pop(context);
+        Navigator.pop(context, true);
 
         // Show appropriate message
         if (_selectedBillType == BillType.electricity &&

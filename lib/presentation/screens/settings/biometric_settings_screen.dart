@@ -108,10 +108,40 @@ class BiometricSettingsScreen extends ConsumerWidget {
                 title: Text(l10n.enableAppLock),
                 subtitle: Text(l10n.requireBiometric),
                 value: isEnabled,
-                onChanged: (value) {
-                  ref
-                      .read(biometricSettingsNotifierProvider.notifier)
-                      .setEnabled(value);
+                onChanged: (value) async {
+                  if (value) {
+                    final biometricService = ref.read(biometricServiceProvider);
+                    final result = await biometricService.authenticate(
+                      reason: l10n.biometricPermissionBody,
+                    );
+                    if (result == BiometricResult.success) {
+                      await ref
+                          .read(biometricSettingsNotifierProvider.notifier)
+                          .setEnabled(true);
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(l10n.appLockEnabledSuccess),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      }
+                    } else {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(l10n.appLockSetupFailed),
+                            behavior: SnackBarBehavior.floating,
+                            backgroundColor: Theme.of(context).colorScheme.error,
+                          ),
+                        );
+                      }
+                    }
+                  } else {
+                    await ref
+                        .read(biometricSettingsNotifierProvider.notifier)
+                        .setEnabled(false);
+                  }
                 },
               ),
             ),

@@ -1805,4 +1805,85 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get paymentReceipt => '[HI] भुगतान रसीद';
+
+  @override
+  String get notificationPermissionTitle => 'भुगतान कभी न भूलें';
+
+  @override
+  String get notificationPermissionBody =>
+      'कभी भी भुगतान न भूलें! क्या आप चाहते हैं कि किराया देय होने पर हम आपको याद दिलाएं?';
+
+  @override
+  String get biometricPermissionTitle => 'लेज़र सुरक्षित रखें';
+
+  @override
+  String get biometricPermissionBody =>
+      'अपने लेज़र को सुरक्षित रखें। क्या आप फिंगरप्रिंट के साथ रेंटखाता को लॉक करना चाहते हैं?';
+
+  @override
+  String get yesBtn => 'हाँ';
+
+  @override
+  String get noBtn => 'नहीं';
+
+  @override
+  String get notNowBtn => 'अभी नहीं';
+
+  @override
+  String get systemNotificationsDisabledTitle => 'सिस्टम सूचनाएं अक्षम हैं';
+
+  @override
+  String get systemNotificationsDisabledBody =>
+      'किराया अलर्ट और भुगतान अनुस्मारक प्राप्त करने के लिए अनुमतियां सक्षम करें।';
+
+  @override
+  String get enableBtn => 'सक्षम करें';
+
+  @override
+  String get appLockEnabledSuccess => 'ऐप लॉक सफलतापूर्वक सक्षम किया गया!';
+
+  @override
+  String get appLockSetupFailed => 'ऐप लॉक सत्यापन विफल रहा।';
+
+  @override
+  String get smartAlerts => 'स्मार्ट अलर्ट';
+
+  @override
+  String get agreementExpiredAlert => 'अनुबंध पहले ही समाप्त हो चुका है';
+
+  @override
+  String agreementExpiredAlertSubtitle(int days) {
+    return 'अनुबंध की समाप्ति तिथि के $days दिन बाद याद दिलाएं';
+  }
+
+  @override
+  String get billNotGeneratedAlert => 'बिल जनरेट नहीं होने का अनुस्मारक';
+
+  @override
+  String billNotGeneratedAlertSubtitle(int days) {
+    return 'चक्र अतिदेय होने पर या समाप्त होने के $days दिनों के भीतर अलर्ट करें';
+  }
+
+  @override
+  String get partialPaymentPauseAlert =>
+      'आंशिक भुगतान के बाद अतिदेय अनुवर्ती कार्रवाई रोकें';
+
+  @override
+  String get partialPaymentPauseAlertSubtitle =>
+      'भुगतान की गई राशि 50% तक पहुँचने पर रिमाइंडर्स रोकें';
+
+  @override
+  String get depositSettlementAlert => 'निकासी के बाद सुरक्षा जमा निपटान देय';
+
+  @override
+  String depositSettlementAlertSubtitle(int days) {
+    return 'निपटान लंबित होने पर $days दिन बाद याद दिलाएं';
+  }
+
+  @override
+  String get utilityAnomalyAlert => 'असामान्य उच्च उपयोगिता खपत';
+
+  @override
+  String get utilityAnomalyAlertSubtitle =>
+      'नवीनतम बिजली उपयोग में तीव्र वृद्धि होने पर सचेत करें';
 }

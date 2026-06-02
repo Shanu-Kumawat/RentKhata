@@ -1800,4 +1800,86 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get paymentReceipt => 'Payment Receipt';
+
+  @override
+  String get notificationPermissionTitle => 'Never Miss a Payment';
+
+  @override
+  String get notificationPermissionBody =>
+      'Never miss a payment! Want us to remind you when rent is due?';
+
+  @override
+  String get biometricPermissionTitle => 'Keep Ledger Secure';
+
+  @override
+  String get biometricPermissionBody =>
+      'Keep your ledger secure. Would you like to lock RentKhata with your Fingerprint?';
+
+  @override
+  String get yesBtn => 'Yes';
+
+  @override
+  String get noBtn => 'No';
+
+  @override
+  String get notNowBtn => 'Not Now';
+
+  @override
+  String get systemNotificationsDisabledTitle =>
+      'System Notifications Disabled';
+
+  @override
+  String get systemNotificationsDisabledBody =>
+      'Enable notifications to receive rent alerts and payment reminders.';
+
+  @override
+  String get enableBtn => 'Enable';
+
+  @override
+  String get appLockEnabledSuccess => 'App Lock enabled successfully!';
+
+  @override
+  String get appLockSetupFailed => 'App Lock verification failed.';
+
+  @override
+  String get smartAlerts => 'Smart Alerts';
+
+  @override
+  String get agreementExpiredAlert => 'Agreement already expired';
+
+  @override
+  String agreementExpiredAlertSubtitle(int days) {
+    return 'Remind after $days day(s) past agreement end date';
+  }
+
+  @override
+  String get billNotGeneratedAlert => 'Bill not generated reminder';
+
+  @override
+  String billNotGeneratedAlertSubtitle(int days) {
+    return 'Alert when cycle is overdue or within $days day(s) of ending';
+  }
+
+  @override
+  String get partialPaymentPauseAlert =>
+      'Pause overdue follow-ups after partial payment';
+
+  @override
+  String get partialPaymentPauseAlertSubtitle =>
+      'Pauses escalations once paid amount reaches 50%';
+
+  @override
+  String get depositSettlementAlert => 'Deposit settlement due after move-out';
+
+  @override
+  String depositSettlementAlertSubtitle(int days) {
+    return 'Remind after $days day(s) if settlement is pending';
+  }
+
+  @override
+  String get utilityAnomalyAlert => 'High utility usage anomaly';
+
+  @override
+  String get utilityAnomalyAlertSubtitle =>
+      'Alerts when latest electricity usage spikes sharply';
 }

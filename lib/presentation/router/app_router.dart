@@ -51,7 +51,7 @@ class AppRoutes {
 }
 
 // Navigation keys for shell routes
-final _rootNavigatorKey = GlobalKey<NavigatorState>();
+final rootNavigatorKey = GlobalKey<NavigatorState>();
 
 CustomTransitionPage<void> _onboardingTransition(Widget child) {
   return CustomTransitionPage<void>(
@@ -78,7 +78,7 @@ CustomTransitionPage<void> _onboardingTransition(Widget child) {
 /// Router provider
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    navigatorKey: _rootNavigatorKey,
+    navigatorKey: rootNavigatorKey,
     initialLocation: AppRoutes.splash,
     routes: [
       // ========== Onboarding Routes (outside shell) ==========

@@ -115,42 +115,45 @@ class PropertyDetailScreen extends ConsumerWidget {
 
   Widget _buildEmptyRooms(BuildContext context, Property property) {
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const AnimatedRoomGraphic(),
-            const SizedBox(height: 24),
-            Text(
-                  AppLocalizations.of(context)!.noRoomsYet,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                )
-                .animate()
-                .fadeIn(delay: 200.ms)
-                .slideY(begin: 0.1, end: 0, curve: Curves.easeOutCubic),
-            const SizedBox(height: 8),
-            Text(
-                  AppLocalizations.of(context)!.addRoomsToStartManaging,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                )
-                .animate()
-                .fadeIn(delay: 300.ms)
-                .slideY(begin: 0.1, end: 0, curve: Curves.easeOutCubic),
-            const SizedBox(height: 24),
-            FilledButton.icon(
-                  onPressed: () => _showAddRoom(context, property),
-                  icon: const Icon(Icons.add),
-                  label: Text(AppLocalizations.of(context)!.addRoom),
-                )
-                .animate()
-                .fadeIn(delay: 400.ms)
-                .slideY(begin: 0.1, end: 0, curve: Curves.easeOutCubic),
-          ],
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const AnimatedRoomGraphic(),
+              const SizedBox(height: 24),
+              Text(
+                    AppLocalizations.of(context)!.noRoomsYet,
+                    style: Theme.of(
+                      context,
+                    ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                  )
+                  .animate()
+                  .fadeIn(delay: 200.ms)
+                  .slideY(begin: 0.1, end: 0, curve: Curves.easeOutCubic),
+              const SizedBox(height: 8),
+              Text(
+                    AppLocalizations.of(context)!.addRoomsToStartManaging,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  )
+                  .animate()
+                  .fadeIn(delay: 300.ms)
+                  .slideY(begin: 0.1, end: 0, curve: Curves.easeOutCubic),
+              const SizedBox(height: 24),
+              FilledButton.icon(
+                    onPressed: () => _showAddRoom(context, property),
+                    icon: const Icon(Icons.add),
+                    label: Text(AppLocalizations.of(context)!.addRoom),
+                  )
+                  .animate()
+                  .fadeIn(delay: 400.ms)
+                  .slideY(begin: 0.1, end: 0, curve: Curves.easeOutCubic),
+            ],
+          ),
         ),
       ),
     );

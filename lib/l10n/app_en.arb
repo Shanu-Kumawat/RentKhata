@@ -954,5 +954,49 @@
       }
     }
   },
-  "paymentReceipt": "Payment Receipt"
+  "paymentReceipt": "Payment Receipt",
+  "notificationPermissionTitle": "Never Miss a Payment",
+  "notificationPermissionBody": "Never miss a payment! Want us to remind you when rent is due?",
+  "biometricPermissionTitle": "Keep Ledger Secure",
+  "biometricPermissionBody": "Keep your ledger secure. Would you like to lock RentKhata with your Fingerprint?",
+  "yesBtn": "Yes",
+  "noBtn": "No",
+  "notNowBtn": "Not Now",
+  "systemNotificationsDisabledTitle": "System Notifications Disabled",
+  "systemNotificationsDisabledBody": "Enable notifications to receive rent alerts and payment reminders.",
+  "enableBtn": "Enable",
+  "appLockEnabledSuccess": "App Lock enabled successfully!",
+  "appLockSetupFailed": "App Lock verification failed.",
+  "smartAlerts": "Smart Alerts",
+  "agreementExpiredAlert": "Agreement already expired",
+  "agreementExpiredAlertSubtitle": "Remind after {days} day(s) past agreement end date",
+  "@agreementExpiredAlertSubtitle": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "billNotGeneratedAlert": "Bill not generated reminder",
+  "billNotGeneratedAlertSubtitle": "Alert when cycle is overdue or within {days} day(s) of ending",
+  "@billNotGeneratedAlertSubtitle": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "partialPaymentPauseAlert": "Pause overdue follow-ups after partial payment",
+  "partialPaymentPauseAlertSubtitle": "Pauses escalations once paid amount reaches 50%",
+  "depositSettlementAlert": "Deposit settlement due after move-out",
+  "depositSettlementAlertSubtitle": "Remind after {days} day(s) if settlement is pending",
+  "@depositSettlementAlertSubtitle": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "utilityAnomalyAlert": "High utility usage anomaly",
+  "utilityAnomalyAlertSubtitle": "Alerts when latest electricity usage spikes sharply"
 }

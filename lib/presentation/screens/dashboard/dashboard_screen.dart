@@ -18,6 +18,7 @@ import 'widgets/attention_bottom_sheet.dart';
 import 'widgets/unpaid_bills_bottom_sheet.dart';
 import 'widgets/expiring_agreements_bottom_sheet.dart';
 import 'widgets/premium_animated_orb.dart';
+import '../onboarding/widgets/premium_permission_sheet.dart';
 import '../../../core/theme/app_colors.dart';
 
 import '../../widgets/bouncing_scale_wrapper.dart';
@@ -551,7 +552,13 @@ class _SmartEmptyState extends ConsumerWidget {
       subtitle:
           "You have empty rooms waiting for tenants. Add a tenant to start tracking.",
       actionLabel: "Add Tenant",
-      onAction: () => context.push('/tenants/add'),
+      onAction: () async {
+        final result = await context.push('/tenants/add');
+        if (result == true) {
+          if (!context.mounted) return;
+          await PremiumPermissionSheet.showBiometrics(context, ref);
+        }
+      },
     );
   }
 

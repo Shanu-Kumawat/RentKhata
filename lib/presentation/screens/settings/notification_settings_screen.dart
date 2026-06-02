@@ -15,6 +15,7 @@ import '../../../domain/entities/billing_status.dart';
 import '../../../services/local_notification_service.dart';
 import 'dart:async';
 import 'package:rent_khata/l10n/app_localizations.dart';
+import '../../../core/utils/app_settings_helper.dart';
 
 enum _SaveStatus { idle, saving, saved, error }
 
@@ -28,28 +29,48 @@ class NotificationSettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _NotificationSettingsScreenState
-    extends ConsumerState<NotificationSettingsScreen> {
+    extends ConsumerState<NotificationSettingsScreen> with WidgetsBindingObserver {
   // Local state for immediate UI feedback
   late NotificationSettingsState _localState;
   Timer? _debounceTimer;
   bool _initialized = false;
   _SaveStatus _saveStatus = _SaveStatus.idle;
+  bool _systemNotificationsEnabled = true;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     // Initialize with default/empty state, will be updated from provider
     _localState = const NotificationSettingsState(
       enabledSettings: {},
       daysBeforeSettings: {},
       notificationHour: 9,
     );
+    _checkSystemPermission();
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _debounceTimer?.cancel();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _checkSystemPermission();
+    }
+  }
+
+  Future<void> _checkSystemPermission() async {
+    final enabled = await LocalNotificationService().checkPermission();
+    if (mounted) {
+      setState(() {
+        _systemNotificationsEnabled = enabled;
+      });
+    }
   }
 
   void _updateLocalState(NotificationSettingsState newState) {
@@ -81,6 +102,7 @@ class _NotificationSettingsScreenState
 
       // Re-schedule based on new settings
       final hasPermission = await notificationService.requestPermission();
+      await _checkSystemPermission();
       if (hasPermission) {
         await _rescheduleNotifications(notificationService);
       }
@@ -415,6 +437,61 @@ class _NotificationSettingsScreenState
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (!_systemNotificationsEnabled) ...[
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.errorContainer.withValues(alpha: 0.7),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.error.withValues(alpha: 0.2),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.notifications_off_rounded,
+                      color: Theme.of(context).colorScheme.error,
+                      size: 28,
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.systemNotificationsDisabledTitle,
+                            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.onErrorContainer,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            l10n.systemNotificationsDisabledBody,
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context).colorScheme.onErrorContainer.withValues(alpha: 0.8),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    FilledButton(
+                      style: FilledButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        visualDensity: VisualDensity.compact,
+                        backgroundColor: Theme.of(context).colorScheme.error,
+                        foregroundColor: Theme.of(context).colorScheme.onError,
+                      ),
+                      onPressed: () => AppSettingsHelper.openSettings(),
+                      child: Text(l10n.enableBtn),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
             Text(
               l10n.changesSavedAutomatically,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -525,13 +602,14 @@ class _NotificationSettingsScreenState
             // Smart Alerts Section
             _buildSectionHeader(
               icon: Icons.auto_awesome_outlined,
-              title: 'Smart Alerts',
+              title: l10n.smartAlerts,
               color: Theme.of(context).colorScheme.tertiary,
             ),
             _buildToggleWithSlider(
-              title: 'Agreement already expired',
-              subtitle:
-                  'Remind after ${_localState.getDaysBefore(NotificationType.agreementExpired).clamp(0, 30)} day(s) past agreement end date',
+              title: l10n.agreementExpiredAlert,
+              subtitle: l10n.agreementExpiredAlertSubtitle(
+                _localState.getDaysBefore(NotificationType.agreementExpired).clamp(0, 30),
+              ),
               value: _localState.isEnabled(NotificationType.agreementExpired),
               onChanged: (v) =>
                   _toggleSetting(NotificationType.agreementExpired, v),
@@ -547,9 +625,10 @@ class _NotificationSettingsScreenState
               ),
             ),
             _buildToggleWithSlider(
-              title: 'Bill not generated reminder',
-              subtitle:
-                  'Alert when cycle is overdue or within ${_localState.getDaysBefore(NotificationType.billNotGenerated).clamp(0, 14)} day(s) of ending',
+              title: l10n.billNotGeneratedAlert,
+              subtitle: l10n.billNotGeneratedAlertSubtitle(
+                _localState.getDaysBefore(NotificationType.billNotGenerated).clamp(0, 14),
+              ),
               value: _localState.isEnabled(NotificationType.billNotGenerated),
               onChanged: (v) =>
                   _toggleSetting(NotificationType.billNotGenerated, v),
@@ -565,8 +644,8 @@ class _NotificationSettingsScreenState
               ),
             ),
             _buildSimpleToggle(
-              title: 'Pause overdue follow-ups after partial payment',
-              subtitle: 'Pauses escalations once paid amount reaches 50%',
+              title: l10n.partialPaymentPauseAlert,
+              subtitle: l10n.partialPaymentPauseAlertSubtitle,
               value: _localState.isEnabled(
                 NotificationType.partialPaymentPause,
               ),
@@ -574,9 +653,10 @@ class _NotificationSettingsScreenState
                   _toggleSetting(NotificationType.partialPaymentPause, v),
             ),
             _buildToggleWithSlider(
-              title: 'Deposit settlement due after move-out',
-              subtitle:
-                  'Remind after ${_localState.getDaysBefore(NotificationType.depositSettlementDue).clamp(1, 30)} day(s) if settlement is pending',
+              title: l10n.depositSettlementAlert,
+              subtitle: l10n.depositSettlementAlertSubtitle(
+                _localState.getDaysBefore(NotificationType.depositSettlementDue).clamp(1, 30),
+              ),
               value: _localState.isEnabled(
                 NotificationType.depositSettlementDue,
               ),
@@ -594,8 +674,8 @@ class _NotificationSettingsScreenState
               ),
             ),
             _buildSimpleToggle(
-              title: 'High utility usage anomaly',
-              subtitle: 'Alerts when latest electricity usage spikes sharply',
+              title: l10n.utilityAnomalyAlert,
+              subtitle: l10n.utilityAnomalyAlertSubtitle,
               value: _localState.isEnabled(
                 NotificationType.utilityUsageAnomaly,
               ),

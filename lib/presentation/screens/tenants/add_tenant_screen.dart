@@ -295,7 +295,7 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
       }
 
       if (mounted) {
-        context.pop();
+        context.pop(true);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(isEditing ? 'Tenant updated' : 'Tenant added'),

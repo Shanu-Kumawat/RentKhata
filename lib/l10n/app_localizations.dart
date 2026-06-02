@@ -3438,6 +3438,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Payment Receipt'**
   String get paymentReceipt;
+
+  /// No description provided for @notificationPermissionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Never Miss a Payment'**
+  String get notificationPermissionTitle;
+
+  /// No description provided for @notificationPermissionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Never miss a payment! Want us to remind you when rent is due?'**
+  String get notificationPermissionBody;
+
+  /// No description provided for @biometricPermissionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep Ledger Secure'**
+  String get biometricPermissionTitle;
+
+  /// No description provided for @biometricPermissionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep your ledger secure. Would you like to lock RentKhata with your Fingerprint?'**
+  String get biometricPermissionBody;
+
+  /// No description provided for @yesBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get yesBtn;
+
+  /// No description provided for @noBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get noBtn;
+
+  /// No description provided for @notNowBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Not Now'**
+  String get notNowBtn;
+
+  /// No description provided for @systemNotificationsDisabledTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'System Notifications Disabled'**
+  String get systemNotificationsDisabledTitle;
+
+  /// No description provided for @systemNotificationsDisabledBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable notifications to receive rent alerts and payment reminders.'**
+  String get systemNotificationsDisabledBody;
+
+  /// No description provided for @enableBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable'**
+  String get enableBtn;
+
+  /// No description provided for @appLockEnabledSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'App Lock enabled successfully!'**
+  String get appLockEnabledSuccess;
+
+  /// No description provided for @appLockSetupFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'App Lock verification failed.'**
+  String get appLockSetupFailed;
+
+  /// No description provided for @smartAlerts.
+  ///
+  /// In en, this message translates to:
+  /// **'Smart Alerts'**
+  String get smartAlerts;
+
+  /// No description provided for @agreementExpiredAlert.
+  ///
+  /// In en, this message translates to:
+  /// **'Agreement already expired'**
+  String get agreementExpiredAlert;
+
+  /// No description provided for @agreementExpiredAlertSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remind after {days} day(s) past agreement end date'**
+  String agreementExpiredAlertSubtitle(int days);
+
+  /// No description provided for @billNotGeneratedAlert.
+  ///
+  /// In en, this message translates to:
+  /// **'Bill not generated reminder'**
+  String get billNotGeneratedAlert;
+
+  /// No description provided for @billNotGeneratedAlertSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Alert when cycle is overdue or within {days} day(s) of ending'**
+  String billNotGeneratedAlertSubtitle(int days);
+
+  /// No description provided for @partialPaymentPauseAlert.
+  ///
+  /// In en, this message translates to:
+  /// **'Pause overdue follow-ups after partial payment'**
+  String get partialPaymentPauseAlert;
+
+  /// No description provided for @partialPaymentPauseAlertSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pauses escalations once paid amount reaches 50%'**
+  String get partialPaymentPauseAlertSubtitle;
+
+  /// No description provided for @depositSettlementAlert.
+  ///
+  /// In en, this message translates to:
+  /// **'Deposit settlement due after move-out'**
+  String get depositSettlementAlert;
+
+  /// No description provided for @depositSettlementAlertSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remind after {days} day(s) if settlement is pending'**
+  String depositSettlementAlertSubtitle(int days);
+
+  /// No description provided for @utilityAnomalyAlert.
+  ///
+  /// In en, this message translates to:
+  /// **'High utility usage anomaly'**
+  String get utilityAnomalyAlert;
+
+  /// No description provided for @utilityAnomalyAlertSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Alerts when latest electricity usage spikes sharply'**
+  String get utilityAnomalyAlertSubtitle;
 }
 
 class _AppLocalizationsDelegate

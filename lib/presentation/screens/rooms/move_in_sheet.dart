@@ -343,7 +343,7 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
         ref.invalidate(roomsForPropertyStreamProvider(widget.room.propertyId));
         ref.invalidate(dashboardSummaryProvider);
 
-        Navigator.pop(context);
+        Navigator.pop(context, true);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
