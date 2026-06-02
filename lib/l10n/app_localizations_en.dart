@@ -1770,6 +1770,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get savedToDownloads => 'Saved to Downloads';
 
   @override
+  String savedToFolder(String folderName) {
+    return 'Saved to $folderName';
+  }
+
+  @override
   String get couldNotSavePdf => 'Could not save the PDF. Please try again.';
 
   @override

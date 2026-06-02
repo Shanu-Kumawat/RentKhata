@@ -24,6 +24,7 @@ import 'record_payment_sheet.dart';
 import 'edit_payment_sheet.dart';
 import '../../../core/theme/app_colors.dart';
 import 'package:rent_khata/l10n/app_localizations.dart';
+import '../../../core/utils/ui_utils.dart';
 
 /// Screen to view detailed bill information including payments.
 class BillDetailScreen extends ConsumerWidget {
@@ -377,11 +378,14 @@ class _BillDetailContent extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     try {
       final pdfService = InvoicePdfService();
-      final file = await pdfService.generateInvoice(
-        bill: bill,
-        landlordName: landlordName ?? l10n.landlord,
-        landlordPhone: landlordPhone ?? '',
-        landlordUpiId: landlordUpi,
+      final file = await withLoadingOverlay(
+        context: context,
+        action: () => pdfService.generateInvoice(
+          bill: bill,
+          landlordName: landlordName ?? l10n.landlord,
+          landlordPhone: landlordPhone ?? '',
+          landlordUpiId: landlordUpi,
+        ),
       );
 
       if (!context.mounted) return;

@@ -5,10 +5,10 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
 import 'package:printing/printing.dart';
 import 'package:rent_khata/l10n/app_localizations.dart';
 
+import 'package:file_picker/file_picker.dart';
 import '../../widgets/share_bottom_sheet.dart';
 import '../../../services/share_service.dart';
 
@@ -73,6 +73,24 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
     }
   }
 
+  Future<void> _withLoading(Future<void> Function() action) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+
+    try {
+      await action();
+    } finally {
+      if (mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+      }
+    }
+  }
+
   Future<void> _shareAsMessage() async {
     final onShareAsMessage = widget.onShareAsMessage;
     if (onShareAsMessage == null) return;
@@ -98,19 +116,21 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
   Future<void> _handleShareTap() async {
     if (_isSharing) return;
 
-    final shareType = widget.shareContentType;
-    final messageShare = widget.onShareAsMessage;
-    if (shareType != null && messageShare != null) {
-      await ShareBottomSheet.show(
-        context: context,
-        contentType: shareType,
-        onShareAsMessage: _shareAsMessage,
-        onShareAsPdf: _sharePdfFile,
-      );
-      return;
-    }
+    await _withLoading(() async {
+      final shareType = widget.shareContentType;
+      final messageShare = widget.onShareAsMessage;
+      if (shareType != null && messageShare != null) {
+        await ShareBottomSheet.show(
+          context: context,
+          contentType: shareType,
+          onShareAsMessage: _shareAsMessage,
+          onShareAsPdf: _sharePdfFile,
+        );
+        return;
+      }
 
-    await _sharePdfFile();
+      await _sharePdfFile();
+    });
   }
 
   String _normalizedPdfFileName(String rawName, String defaultPdfName) {
@@ -119,100 +139,78 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
     return trimmed.toLowerCase().endsWith('.pdf') ? trimmed : '$trimmed.pdf';
   }
 
-  Future<Directory> _resolveDownloadDirectory() async {
-    if (Platform.isAndroid) {
-      final commonDownloadDir = Directory('/storage/emulated/0/Download');
-      if (await commonDownloadDir.exists()) {
-        return commonDownloadDir;
-      }
-
-      final appDownloadDirs = await getExternalStorageDirectories(
-        type: StorageDirectory.downloads,
-      );
-      if (appDownloadDirs != null && appDownloadDirs.isNotEmpty) {
-        return appDownloadDirs.first;
-      }
+  String _folderLabelFromName(String name, String fallbackDownloadsName) {
+    final lowerName = name.toLowerCase();
+    if (lowerName == 'download' || lowerName == 'downloads') {
+      return fallbackDownloadsName;
     }
-
-    final downloads = await getDownloadsDirectory();
-    if (downloads != null) return downloads;
-
-    return getApplicationDocumentsDirectory();
-  }
-
-  String _folderLabel(Directory directory, String fallbackDownloadsName) {
-    final name = p.basename(directory.path);
-    if (name.toLowerCase() == 'download') return fallbackDownloadsName;
     if (name.trim().isEmpty) return fallbackDownloadsName;
     return name;
-  }
-
-  Future<File> _createUniqueTargetFile(
-    Directory directory,
-    String fileName,
-    String defaultPdfName,
-  ) async {
-    final safeName = _normalizedPdfFileName(fileName, defaultPdfName);
-    final base = p.basenameWithoutExtension(safeName);
-    const ext = '.pdf';
-
-    var index = 0;
-    while (true) {
-      final candidateName = index == 0 ? '$base$ext' : '${base}_$index$ext';
-      final candidate = File(p.join(directory.path, candidateName));
-      if (!await candidate.exists()) {
-        return candidate;
-      }
-      index++;
-    }
-  }
-
-  Future<File> _saveToDownloads(
-    String defaultName,
-    String defaultPdfName,
-  ) async {
-    final targetDir = await _resolveDownloadDirectory();
-    await targetDir.create(recursive: true);
-    final targetFile = await _createUniqueTargetFile(
-      targetDir,
-      defaultName,
-      defaultPdfName,
-    );
-    final bytes = await widget.pdfFile.readAsBytes();
-    await targetFile.writeAsBytes(bytes, flush: true);
-    return targetFile;
   }
 
   Future<void> _savePdf() async {
     if (_isSaving) return;
     setState(() => _isSaving = true);
 
-    try {
-      final l10n = AppLocalizations.of(context)!;
-      final defaultName = _normalizedPdfFileName(
-        widget.suggestedFileName ?? p.basename(widget.pdfFile.path),
-        l10n.documentPdf,
-      );
+    final l10n = AppLocalizations.of(context)!;
+    final defaultName = _normalizedPdfFileName(
+      widget.suggestedFileName ?? p.basename(widget.pdfFile.path),
+      l10n.documentPdf,
+    );
 
-      final savedFile = await _saveToDownloads(defaultName, l10n.documentPdf);
-      if (!mounted) return;
+    await _withLoading(() async {
+      try {
+        final bytes = await widget.pdfFile.readAsBytes();
+        
+        // Let user choose directory & filename via native picker (SAF on Android, Files app on iOS)
+        final outputPath = await FilePicker.platform.saveFile(
+          dialogTitle: l10n.save,
+          fileName: defaultName,
+          type: FileType.custom,
+          allowedExtensions: ['pdf'],
+          bytes: bytes,
+        );
 
-      final fileName = p.basename(savedFile.path);
-      final folderName = _folderLabel(savedFile.parent, l10n.downloadsFolder);
-      _showSuccessToast(context, fileName, folderName);
-    } catch (_) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Theme.of(context).colorScheme.error,
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 3),
-          content: Text(AppLocalizations.of(context)!.couldNotSavePdf),
-        ),
-      );
-    } finally {
-      if (mounted) setState(() => _isSaving = false);
-    }
+        if (outputPath != null) {
+          // FilePicker writes the bytes to outputPath natively because we provided the `bytes` param.
+          // outputPath might be a SAF URI string like `/document/primary:APKPure/Invoice.pdf`
+          
+          String folderName = l10n.downloadsFolder;
+          String displayPath = outputPath;
+
+          if (Platform.isAndroid && outputPath.contains('primary:')) {
+            final split = outputPath.split('primary:');
+            displayPath = split.last;
+            
+            final dirPath = p.dirname(displayPath);
+            if (dirPath != '.') {
+              folderName = _folderLabelFromName(p.basename(dirPath), l10n.downloadsFolder);
+            } else {
+              folderName = 'Storage';
+            }
+          } else {
+            final targetFile = File(outputPath);
+            folderName = _folderLabelFromName(p.basename(targetFile.parent.path), l10n.downloadsFolder);
+            displayPath = _getDisplayPath(targetFile.path);
+          }
+
+          if (!mounted) return;
+          _showSuccessToast(context, displayPath, folderName);
+        }
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Theme.of(context).colorScheme.error,
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 4),
+            content: Text('${l10n.couldNotSavePdf} - $e'),
+          ),
+        );
+      }
+    });
+
+    if (mounted) setState(() => _isSaving = false);
   }
 
   @override
@@ -288,11 +286,24 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
       ),
     );
   }
+  String _getDisplayPath(String path) {
+    var display = path;
+    const prefix = '/storage/emulated/0/';
+    if (display.startsWith(prefix)) {
+      display = display.substring(prefix.length);
+    }
+    
+    // Strip Android/data/com.example/files/ prefix
+    final appDataRegex = RegExp(r'^Android/data/[^/]+/files/');
+    display = display.replaceFirst(appDataRegex, '');
+    
+    return display;
+  }
 }
 
 void _showSuccessToast(
   BuildContext context,
-  String fileName,
+  String displayPath,
   String folderName,
 ) {
   final overlay = Overlay.of(context);
@@ -300,7 +311,7 @@ void _showSuccessToast(
 
   overlayEntry = OverlayEntry(
     builder: (context) => _AnimatedToast(
-      fileName: fileName,
+      displayPath: displayPath,
       folderName: folderName,
       onDismiss: () => overlayEntry.remove(),
     ),
@@ -310,12 +321,12 @@ void _showSuccessToast(
 }
 
 class _AnimatedToast extends StatefulWidget {
-  final String fileName;
+  final String displayPath;
   final String folderName;
   final VoidCallback onDismiss;
 
   const _AnimatedToast({
-    required this.fileName,
+    required this.displayPath,
     required this.folderName,
     required this.onDismiss,
   });
@@ -412,7 +423,7 @@ class _AnimatedToastState extends State<_AnimatedToast>
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          AppLocalizations.of(context)!.savedToDownloads,
+                          AppLocalizations.of(context)!.savedToFolder(widget.folderName),
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -421,12 +432,12 @@ class _AnimatedToastState extends State<_AnimatedToast>
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          widget.fileName,
+                          widget.displayPath,
                           style: TextStyle(
                             color: Colors.white.withAlpha(200),
                             fontSize: 12,
                           ),
-                          maxLines: 1,
+                          maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],

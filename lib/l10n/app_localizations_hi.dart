@@ -1774,6 +1774,11 @@ class AppLocalizationsHi extends AppLocalizations {
   String get savedToDownloads => 'डाउनलोड में सहेजा गया';
 
   @override
+  String savedToFolder(String folderName) {
+    return '$folderName में सहेजा गया';
+  }
+
+  @override
   String get couldNotSavePdf =>
       '[HI] PDF सहेजने में विफल। कृपया पुन: प्रयास करें।';
 

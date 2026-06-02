@@ -616,6 +616,14 @@
   },
   "downloadsFolder": "Downloads",
   "savedToDownloads": "डाउनलोड में सहेजा गया",
+  "savedToFolder": "{folderName} में सहेजा गया",
+  "@savedToFolder": {
+    "placeholders": {
+      "folderName": {
+        "type": "String"
+      }
+    }
+  },
   "couldNotSavePdf": "[HI] PDF सहेजने में विफल। कृपया पुन: प्रयास करें।",
   "unableToLoadPdfPreview": "[HI] PDF प्रीव्यू लोड करने में असमर्थ",
   "shareReceipt": "[HI] रसीद साझा करें",

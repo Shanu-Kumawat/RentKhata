@@ -938,6 +938,14 @@
   },
   "downloadsFolder": "Downloads",
   "savedToDownloads": "Saved to Downloads",
+  "savedToFolder": "Saved to {folderName}",
+  "@savedToFolder": {
+    "placeholders": {
+      "folderName": {
+        "type": "String"
+      }
+    }
+  },
   "couldNotSavePdf": "Could not save the PDF. Please try again.",
   "unableToLoadPdfPreview": "Unable to load PDF preview",
   "shareReceipt": "Share Receipt",

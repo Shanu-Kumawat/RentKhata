@@ -11,6 +11,7 @@ import '../../../services/share_service.dart';
 import '../pdf/pdf_preview_screen.dart';
 import '../../widgets/share_bottom_sheet.dart';
 import 'package:rent_khata/l10n/app_localizations.dart';
+import '../../../core/utils/ui_utils.dart';
 
 /// Dialog to show payment receipt after successful payment.
 class ReceiptDialog extends StatelessWidget {
@@ -226,11 +227,14 @@ class ReceiptDialog extends StatelessWidget {
 
     try {
       final pdfService = InvoicePdfService();
-      final file = await pdfService.generateReceipt(
-        bill: bill,
-        payment: payment,
-        landlordName: landlordName ?? l10n.landlord,
-        landlordPhone: landlordPhone ?? '',
+      final file = await withLoadingOverlay(
+        context: context,
+        action: () => pdfService.generateReceipt(
+          bill: bill,
+          payment: payment,
+          landlordName: landlordName ?? l10n.landlord,
+          landlordPhone: landlordPhone ?? '',
+        ),
       );
 
       if (!context.mounted) return;

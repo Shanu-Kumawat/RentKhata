@@ -3379,6 +3379,12 @@ abstract class AppLocalizations {
   /// **'Saved to Downloads'**
   String get savedToDownloads;
 
+  /// No description provided for @savedToFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to {folderName}'**
+  String savedToFolder(String folderName);
+
   /// No description provided for @couldNotSavePdf.
   ///
   /// In en, this message translates to:

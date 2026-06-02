@@ -1127,7 +1127,7 @@ class InvoicePdfService {
 
   Future<File> _savePdf(pw.Document pdf, String filename) async {
     final bytes = await pdf.save();
-    final dir = await getApplicationDocumentsDirectory();
+    final dir = await getTemporaryDirectory();
     final file = File('${dir.path}/$filename.pdf');
     await file.writeAsBytes(bytes);
     return file;

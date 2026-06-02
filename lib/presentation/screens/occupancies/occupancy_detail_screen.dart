@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import '../../../application/providers/occupancy_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
+import '../../../core/utils/ui_utils.dart';
 import '../../../domain/entities/bill.dart';
 import 'package:rent_khata/l10n/app_localizations.dart';
 import '../../../domain/entities/occupancy.dart';
@@ -773,41 +774,41 @@ class _DepositSettlementCard extends StatelessWidget {
     BuildContext context,
     WidgetRef ref,
   ) async {
-    // Show loading
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => const Center(child: CircularProgressIndicator()),
-    );
-
     final l10n = AppLocalizations.of(context)!;
-
+    
+    // We fetch landlord and build statement before loading, as it's quick
+    // Alternatively, just put it all in loading and return the statement too.
+    
     try {
-      final landlordRepo = ref.read(landlordRepositoryProvider);
-      final landlord = await landlordRepo.getLandlord();
+      final (pdfFile, tenantName) = await withLoadingOverlay(
+        context: context,
+        action: () async {
+          final landlordRepo = ref.read(landlordRepositoryProvider);
+          final landlord = await landlordRepo.getLandlord();
 
-      final totalDeductionCalc =
-          occupancy.securityDeposit - (occupancy.depositReturnedAmount ?? 0);
+          final totalDeductionCalc =
+              occupancy.securityDeposit - (occupancy.depositReturnedAmount ?? 0);
 
-      final statement = SettlementStatement(
-        occupancyId: occupancy.id,
-        tenantName: occupancy.tenantName ?? 'Tenant',
-        landlordName: landlord?.name ?? 'Landlord',
-        propertyName: occupancy.propertyName ?? 'Property',
-        roomNumber: occupancy.roomNumber ?? '',
-        moveInDate: occupancy.moveInDate,
-        moveOutDate: occupancy.moveOutDate ?? DateTime.now(),
-        securityDeposit: occupancy.securityDeposit,
-        billDeductions: [],
-        manualDeduction: totalDeductionCalc > 0 ? totalDeductionCalc : 0,
-        manualDeductionReason: occupancy.deductionReason ?? 'Prior Deductions',
-        totalDeductions: totalDeductionCalc > 0 ? totalDeductionCalc : 0,
-        refundAmount: occupancy.depositReturnedAmount ?? 0,
+          final statement = SettlementStatement(
+            occupancyId: occupancy.id,
+            tenantName: occupancy.tenantName ?? 'Tenant',
+            landlordName: landlord?.name ?? 'Landlord',
+            propertyName: occupancy.propertyName ?? 'Property',
+            roomNumber: occupancy.roomNumber ?? '',
+            moveInDate: occupancy.moveInDate,
+            moveOutDate: occupancy.moveOutDate ?? DateTime.now(),
+            securityDeposit: occupancy.securityDeposit,
+            billDeductions: [],
+            manualDeduction: totalDeductionCalc > 0 ? totalDeductionCalc : 0,
+            manualDeductionReason: occupancy.deductionReason ?? 'Prior Deductions',
+            totalDeductions: totalDeductionCalc > 0 ? totalDeductionCalc : 0,
+            refundAmount: occupancy.depositReturnedAmount ?? 0,
+          );
+
+          final file = await PdfService.generateSettlementPdf(statement, l10n);
+          return (file, statement.tenantName);
+        },
       );
-
-      final pdfFile = await PdfService.generateSettlementPdf(statement, l10n);
-
-      if (context.mounted) Navigator.pop(context); // Hide loading
 
       if (!context.mounted) return;
       await Navigator.push(
@@ -818,14 +819,13 @@ class _DepositSettlementCard extends StatelessWidget {
             title: l10n.moveOutSettlement,
             shareSubject: l10n.moveOutSettlement,
             shareText:
-                'Dear ${statement.tenantName},\n\nPlease find your Settlement Receipt attached.',
+                'Dear $tenantName,\n\nPlease find your Settlement Receipt attached.',
             suggestedFileName: pdfFile.path.split('/').last,
           ),
         ),
       );
     } catch (e) {
       if (context.mounted) {
-        Navigator.pop(context); // Hide loading
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('Error generating receipt: $e')));
