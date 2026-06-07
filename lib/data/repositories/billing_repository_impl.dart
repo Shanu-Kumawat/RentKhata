@@ -712,7 +712,6 @@ class BillingRepositoryImpl implements BillingRepository {
     return switch (type) {
       db.TemplateType.invoice => TemplateType.invoice,
       db.TemplateType.receipt => TemplateType.receipt,
-      db.TemplateType.reminder => TemplateType.reminder,
     };
   }
 
@@ -720,7 +719,6 @@ class BillingRepositoryImpl implements BillingRepository {
     return switch (type) {
       TemplateType.invoice => db.TemplateType.invoice,
       TemplateType.receipt => db.TemplateType.receipt,
-      TemplateType.reminder => db.TemplateType.reminder,
     };
   }
 

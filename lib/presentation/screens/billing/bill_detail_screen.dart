@@ -11,14 +11,14 @@ import '../../../application/providers/billing_providers.dart';
 import '../../../application/providers/dashboard_providers.dart';
 import '../../../application/providers/repository_providers.dart';
 
+import 'package:printing/printing.dart';
+import '../../widgets/share_bottom_sheet.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../domain/entities/audit_log.dart';
 import '../../../domain/entities/bill.dart';
 import '../../../domain/entities/payment.dart';
 import '../../../services/share_service.dart';
 import '../../../services/invoice_pdf_service.dart';
-import '../pdf/pdf_preview_screen.dart';
-import '../../widgets/share_bottom_sheet.dart';
 import 'edit_bill_sheet.dart';
 import 'record_payment_sheet.dart';
 import 'edit_payment_sheet.dart';
@@ -157,7 +157,7 @@ class _BillDetailContent extends ConsumerWidget {
             // Quick Actions
             _QuickActionsCard(
               bill: bill,
-              onSendReminder: () => _sendReminder(context, landlordName),
+              onSendReminder: () => _sendReminder(context, ref, landlordName),
             ),
             const SizedBox(height: 16),
 
@@ -275,17 +275,15 @@ class _BillDetailContent extends ConsumerWidget {
                       // Draft/Unpaid: Preview invoice PDF (secondary)
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: () => _openInvoicePdfPreview(
+                          onPressed: () => _shareBill(
                             context,
                             ref,
                             landlordName,
                             landlordPhone,
                             landlordUpi,
                           ),
-                          icon: const Icon(Icons.picture_as_pdf_outlined),
-                          label: Text(
-                            AppLocalizations.of(context)!.invoicePreview,
-                          ),
+                          icon: const Icon(Icons.share_outlined),
+                          label: Text(AppLocalizations.of(context)!.share),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -306,17 +304,15 @@ class _BillDetailContent extends ConsumerWidget {
                       // Paid: Single invoice PDF preview action
                       Expanded(
                         child: ElevatedButton.icon(
-                          onPressed: () => _openInvoicePdfPreview(
+                          onPressed: () => _shareBill(
                             context,
                             ref,
                             landlordName,
                             landlordPhone,
                             landlordUpi,
                           ),
-                          icon: const Icon(Icons.picture_as_pdf_outlined),
-                          label: Text(
-                            AppLocalizations.of(context)!.invoicePreview,
-                          ),
+                          icon: const Icon(Icons.share_outlined),
+                          label: Text(AppLocalizations.of(context)!.share),
                         ),
                       ),
                     ],
@@ -355,7 +351,7 @@ class _BillDetailContent extends ConsumerWidget {
         _confirmDeleteBill(context, ref);
         break;
       case 'reminder':
-        _sendReminder(context, landlordName);
+        _sendReminder(context, ref, landlordName);
         break;
     }
   }
@@ -368,7 +364,7 @@ class _BillDetailContent extends ConsumerWidget {
     );
   }
 
-  Future<void> _openInvoicePdfPreview(
+  Future<void> _shareBill(
     BuildContext context,
     WidgetRef ref,
     String? landlordName,
@@ -376,56 +372,86 @@ class _BillDetailContent extends ConsumerWidget {
     String? landlordUpi,
   ) async {
     final l10n = AppLocalizations.of(context)!;
-    try {
-      final pdfService = InvoicePdfService();
-      final file = await withLoadingOverlay(
-        context: context,
-        action: () => pdfService.generateInvoice(
-          bill: bill,
-          landlordName: landlordName ?? l10n.landlord,
-          landlordPhone: landlordPhone ?? '',
-          landlordUpiId: landlordUpi,
-        ),
-      );
+    final repo = ref.read(billingRepositoryProvider);
+    final isPaid = bill.isFullyPaid;
+    final payments = await repo.getPaymentsForBill(bill.id);
+    final latestPayment = payments.isNotEmpty ? payments.last : null;
 
-      if (!context.mounted) return;
-      await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => PdfPreviewScreen(
-            pdfFile: file,
-            title: l10n.invoicePreview,
-            shareSubject: l10n.invoiceNumber(bill.billNumber ?? ''),
-            suggestedFileName: file.path.split('/').last,
-            shareContentType: ShareContentType.invoice,
-            onShareAsMessage: () async {
-              final shareService = ShareService(
-                ref.read(billingRepositoryProvider),
-              );
-              await shareService.shareInvoice(
-                bill: bill,
-                landlordName: landlordName ?? l10n.landlord,
-                landlordUpi: landlordUpi,
-              );
-              await ref.read(billingRepositoryProvider).markBillAsSent(bill.id);
+    if (!context.mounted) return;
+
+    ShareBottomSheet.show(
+      context: context,
+      contentType: isPaid ? ShareContentType.receipt : ShareContentType.invoice,
+      onShareAsMessage: () async {
+        final shareService = ShareService(repo);
+        if (isPaid && latestPayment != null) {
+          await shareService.shareReceipt(
+            bill: bill,
+            payment: latestPayment,
+            landlordName: landlordName ?? l10n.landlord,
+          );
+        } else {
+          await shareService.shareInvoice(
+            bill: bill,
+            landlordName: landlordName ?? l10n.landlord,
+            landlordUpi: landlordUpi,
+          );
+          await repo.markBillAsSent(bill.id);
+        }
+      },
+      onShareAsPdf: () async {
+        try {
+          final pdfService = InvoicePdfService();
+          final file = await withLoadingOverlay(
+            context: context,
+            action: () {
+              if (isPaid && latestPayment != null) {
+                return pdfService.generateReceipt(
+                  bill: bill,
+                  payment: latestPayment,
+                  landlordName: landlordName ?? l10n.landlord,
+                  landlordPhone: landlordPhone ?? '',
+                );
+              } else {
+                return pdfService.generateInvoice(
+                  bill: bill,
+                  landlordName: landlordName ?? l10n.landlord,
+                  landlordPhone: landlordPhone ?? '',
+                  landlordUpiId: landlordUpi,
+                );
+              }
             },
-          ),
-        ),
-      );
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.errorSavingPdf(e.toString()))),
-        );
-      }
-    }
+          );
+
+          if (!context.mounted) return;
+          final bytes = await file.readAsBytes();
+          await Printing.sharePdf(
+            bytes: bytes,
+            filename: file.path.split('/').last,
+          );
+          await repo.markBillAsSent(bill.id);
+        } catch (e) {
+          if (!context.mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.errorSavingPdf(e.toString()))),
+          );
+        }
+      },
+    );
   }
 
-  void _sendReminder(BuildContext context, String? landlordName) async {
-    final shareService = ShareService();
-    await shareService.shareBillReminder(
-      bill: bill,
-      landlordName: landlordName ?? AppLocalizations.of(context)!.landlord,
+  void _sendReminder(BuildContext context, WidgetRef ref, String? landlordName) async {
+    // The "Send Reminder" quick action button now acts as a share button
+    // for the unpaid bill. It fetches additional info directly to pass to _shareBill.
+    final landlordAsync = ref.read(landlordProvider);
+    final landlord = landlordAsync.value;
+    
+    _shareBill(
+      context, 
+      ref,
+      landlordName ?? landlord?.name, 
+      landlord?.phone, 
+      landlord?.upiId,
     );
   }
 

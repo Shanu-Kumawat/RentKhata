@@ -28,8 +28,6 @@ class MessageTemplatesScreen extends ConsumerWidget {
           _TemplateEditor(type: TemplateType.invoice),
           const SizedBox(height: 16),
           _TemplateEditor(type: TemplateType.receipt),
-          const SizedBox(height: 16),
-          _TemplateEditor(type: TemplateType.reminder),
         ],
       ),
     );
@@ -107,7 +105,6 @@ class _TemplateEditorState extends ConsumerState<_TemplateEditor> {
     return switch (widget.type) {
       TemplateType.invoice => l10n.invoiceLabel,
       TemplateType.receipt => l10n.receiptLabel,
-      TemplateType.reminder => l10n.reminderLabel,
     };
   }
 
@@ -115,7 +112,6 @@ class _TemplateEditorState extends ConsumerState<_TemplateEditor> {
     return switch (widget.type) {
       TemplateType.invoice => Icons.description_outlined,
       TemplateType.receipt => Icons.receipt_outlined,
-      TemplateType.reminder => Icons.notifications_outlined,
     };
   }
 
@@ -126,7 +122,6 @@ class _TemplateEditorState extends ConsumerState<_TemplateEditor> {
         context,
       ).colorScheme.primary, // Or AppColors.info
       TemplateType.receipt => AppColors.moneyReceived, // Green via AppColors
-      TemplateType.reminder => AppColors.warning, // Orange via AppColors
     };
   }
 

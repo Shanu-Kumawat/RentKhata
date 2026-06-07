@@ -31,5 +31,4 @@ Map<String, dynamic> _$$MessageTemplateImplToJson(
 const _$TemplateTypeEnumMap = {
   TemplateType.invoice: 'invoice',
   TemplateType.receipt: 'receipt',
-  TemplateType.reminder: 'reminder',
 };

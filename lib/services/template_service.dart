@@ -13,59 +13,42 @@ class TemplateService {
   /// Default templates for each type.
   static const Map<TemplateType, Map<String, String>> _defaults = {
     TemplateType.invoice: {
-      'name': 'Default Invoice',
+      'name': 'Payment Request / Invoice',
       'body': '''Dear {tenant_name},
 
-📋 *INVOICE*
-Invoice #: {bill_number}
+This is a gentle reminder regarding your {bill_type} payment.
 
-*Bill Details:*
-Type: {bill_type}
+📋 *BILL DETAILS*
+Invoice #: {bill_number}
 Period: {period}
 Room: {room_number}
-Property: {property_name}
 
 *Amount Due: ₹{amount}*
 Due Date: {due_date}
 
-Please make the payment at your earliest convenience.
+Kindly make the payment at your earliest convenience. Let us know once the payment is done.
 
 Thank you,
 {landlord_name}''',
     },
     TemplateType.receipt: {
-      'name': 'Default Receipt',
+      'name': 'Payment Receipt',
       'body': '''Dear {tenant_name},
 
 ✅ *PAYMENT RECEIVED*
 
+Thank you for your payment! Here are the details of your transaction:
+
 *Payment Details:*
-Amount: ₹{amount}
+Amount Received: ₹{amount}
 Date: {payment_date}
-Mode: {payment_mode}
+Payment Mode: {payment_mode}
 
 *Bill Details:*
 Type: {bill_type}
 Period: {period}
-Invoice #: {bill_number}
 
-Thank you for your payment!
-{landlord_name}''',
-    },
-    TemplateType.reminder: {
-      'name': 'Default Reminder',
-      'body': '''Dear {tenant_name},
-
-⏰ *PAYMENT REMINDER*
-
-This is a friendly reminder for your pending {bill_type} bill.
-
-*Bill Details:*
-Period: {period}
-Amount Due: ₹{amount}
-Due Date: {due_date}
-
-Please make the payment at your earliest convenience to avoid any inconvenience.
+We have successfully updated your ledger.
 
 Thank you,
 {landlord_name}''',

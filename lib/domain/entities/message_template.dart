@@ -7,7 +7,7 @@ part 'message_template.freezed.dart';
 part 'message_template.g.dart';
 
 /// Types of message templates.
-enum TemplateType { invoice, receipt, reminder }
+enum TemplateType { invoice, receipt }
 
 /// Represents a customizable message template.
 @freezed

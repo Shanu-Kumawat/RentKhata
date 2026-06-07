@@ -16,10 +16,10 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../domain/entities/bill.dart';
 import '../../../domain/entities/payment.dart';
+import 'package:printing/printing.dart';
 import '../../../services/share_service.dart';
 import '../../../services/invoice_pdf_service.dart';
 import '../../../core/utils/l10n_helpers.dart';
-import '../pdf/pdf_preview_screen.dart';
 import '../billing/record_payment_sheet.dart';
 import '../../widgets/bouncing_scale_wrapper.dart';
 import '../../widgets/staggered_fade_in.dart';
@@ -1397,6 +1397,7 @@ class _PremiumBillCard extends ConsumerWidget {
           : 'Rent Due: $amount for $period. Room ${bill.roomNumber ?? ""}. Please pay at your earliest convenience.';
 
       await shareService.shareText(text: message);
+      await ref.read(billingRepositoryProvider).markBillAsSent(bill.id);
       // We don't get success check from native share, assuming triggered
       if (context.mounted) {
         Clipboard.setData(ClipboardData(text: message));
@@ -1421,17 +1422,12 @@ class _PremiumBillCard extends ConsumerWidget {
           landlordUpiId: landlord?.upiId,
         );
         if (context.mounted) {
-          await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => PdfPreviewScreen(
-                pdfFile: pdfFile,
-                title: 'Invoice Preview',
-                shareSubject: 'Invoice - $period',
-                suggestedFileName: pdfFile.path.split('/').last,
-              ),
-            ),
+          final bytes = await pdfFile.readAsBytes();
+          await Printing.sharePdf(
+            bytes: bytes,
+            filename: pdfFile.path.split('/').last,
           );
+          await ref.read(billingRepositoryProvider).markBillAsSent(bill.id);
         }
       } catch (e) {
         if (context.mounted) {

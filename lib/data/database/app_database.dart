@@ -81,7 +81,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 16;
+  int get schemaVersion => 17;
 
   @override
   MigrationStrategy get migration {
@@ -131,26 +131,6 @@ Payment Mode: {paymentMode}
 
 Thank you for your payment.
 
-{landlordName}''',
-            isDefault: const Value(true),
-          ),
-        );
-        await into(messageTemplates).insert(
-          MessageTemplatesCompanion.insert(
-            templateType: TemplateType.reminder,
-            name: 'Default Reminder',
-            body: '''Dear {tenantName},
-
-This is a reminder for your pending {billType} bill.
-
-Bill #: {billNumber}
-Period: {period}
-Amount Due: ₹{amount}
-Due Date: {dueDate}
-
-Please make the payment at your earliest convenience.
-
-Thank you,
 {landlordName}''',
             isDefault: const Value(true),
           ),
@@ -398,6 +378,10 @@ Thank you for your payment.
           // (previous v15 may have had a different column layout)
           await customStatement('DROP TABLE IF EXISTS expenses');
           await m.createTable(expenses);
+        }
+        if (from < 17) {
+          // Clear old message templates to migrate to the new 2-template system
+          await customStatement('DELETE FROM message_templates');
         }
       },
     );

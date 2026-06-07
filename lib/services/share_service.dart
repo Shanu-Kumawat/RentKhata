@@ -16,41 +16,6 @@ class ShareService {
 
   ShareService([this._repository]);
 
-  /// Share bill reminder, optionally with meter photo.
-  Future<void> shareBillReminder({
-    required Bill bill,
-    required String landlordName,
-    String? tenantPhone,
-  }) async {
-    final message = billReminderMessage(
-      tenantName: bill.tenantName ?? 'Tenant',
-      billType: bill.billType.name,
-      period: bill.billingPeriod,
-      amount: bill.pendingAmount,
-      dueDate: bill.dueDate ?? DateTime.now(),
-      landlordName: landlordName,
-    );
-
-    // If meter photo exists, share it with text using native share
-    if (bill.meterPhotoPath != null && bill.meterPhotoPath!.isNotEmpty) {
-      final file = File(bill.meterPhotoPath!);
-      if (await file.exists()) {
-        await shareFiles(
-          files: [file],
-          text: message,
-          subject: 'Bill Reminder - ${bill.billingPeriod}',
-        );
-        return;
-      }
-    }
-
-    // Share via system share sheet
-    await shareText(
-      text: message,
-      subject: 'Bill Reminder - ${bill.billingPeriod}',
-    );
-  }
-
   /// Share files with optional text.
   Future<void> shareFiles({
     required List<File> files,
@@ -152,11 +117,34 @@ class ShareService {
     required Payment payment,
     required String landlordName,
   }) async {
-    final message = generateReceiptMessage(
-      bill: bill,
-      payment: payment,
-      landlordName: landlordName,
-    );
+    String message;
+
+    if (_repository != null) {
+      final template = await _repository.getDefaultTemplate(
+        TemplateType.receipt,
+      );
+      if (template != null) {
+        message = _substituteReceiptPlaceholders(
+          template.body,
+          bill: bill,
+          payment: payment,
+          landlordName: landlordName,
+        );
+      } else {
+        message = _substituteReceiptPlaceholders(
+          TemplateService.getDefaultBody(TemplateType.receipt),
+          bill: bill,
+          payment: payment,
+          landlordName: landlordName,
+        );
+      }
+    } else {
+      message = generateReceiptMessage(
+        bill: bill,
+        payment: payment,
+        landlordName: landlordName,
+      );
+    }
 
     await Share.share(
       message,
@@ -288,31 +276,7 @@ class ShareService {
     return buffer.toString().trim();
   }
 
-  /// Generate bill reminder message.
-  static String billReminderMessage({
-    required String tenantName,
-    required String billType,
-    required String period,
-    required double amount,
-    required DateTime dueDate,
-    required String landlordName,
-  }) {
-    final dueDateStr = '${dueDate.day}/${dueDate.month}/${dueDate.year}';
-    return '''
-Dear $tenantName,
 
-This is a reminder for your $billType bill for $period.
-
-Amount Due: ₹${amount.toStringAsFixed(0)}
-Due Date: $dueDateStr
-
-Please make the payment at your earliest convenience.
-
-Thank you,
-$landlordName
-'''
-        .trim();
-  }
 
   /// Generate payment receipt message (legacy method).
   static String paymentReceiptMessage({
@@ -407,5 +371,30 @@ $landlordName
     }
 
     return result;
+  }
+
+  /// Substitute placeholders in receipt template.
+  String _substituteReceiptPlaceholders(
+    String template, {
+    required Bill bill,
+    required Payment payment,
+    required String landlordName,
+  }) {
+    final paymentDateStr =
+        '${payment.paymentDate.day}/${payment.paymentDate.month}/${payment.paymentDate.year}';
+        
+    return template
+        .replaceAll('{tenant_name}', bill.tenantName ?? 'Tenant')
+        .replaceAll('{tenantName}', bill.tenantName ?? 'Tenant')
+        .replaceAll('{landlord_name}', landlordName)
+        .replaceAll('{landlordName}', landlordName)
+        .replaceAll('{bill_type}', _getBillTypeLabel(bill.billType))
+        .replaceAll('{billType}', _getBillTypeLabel(bill.billType))
+        .replaceAll('{period}', bill.billingPeriod)
+        .replaceAll('{amount}', payment.amount.toStringAsFixed(0))
+        .replaceAll('{bill_number}', bill.billNumber ?? '')
+        .replaceAll('{billNumber}', bill.billNumber ?? '')
+        .replaceAll('{payment_date}', paymentDateStr)
+        .replaceAll('{payment_mode}', _getPaymentModeLabel(payment.paymentMode));
   }
 }

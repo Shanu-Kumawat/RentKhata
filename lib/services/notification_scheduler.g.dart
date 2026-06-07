@@ -7,7 +7,7 @@ part of 'notification_scheduler.dart';
 // **************************************************************************
 
 String _$scheduleAllNotificationsHash() =>
-    r'95470ae1b8dd5a16163991f75fa7e1450938b826';
+    r'25d92032a3c46d4ff34ee408f7027dacd3295cb0';
 
 /// Provider that schedules all notifications on app startup.
 ///

@@ -4,7 +4,7 @@ library;
 import 'package:drift/drift.dart';
 
 /// Types of message templates.
-enum TemplateType { invoice, receipt, reminder }
+enum TemplateType { invoice, receipt }
 
 /// Table for storing customizable message templates.
 @DataClassName('MessageTemplateEntity')

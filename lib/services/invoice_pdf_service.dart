@@ -696,26 +696,7 @@ class InvoicePdfService {
           );
 
           // Watermark Logic
-          if (bill.status == BillStatus.draft) {
-            return pw.Stack(
-              children: [
-                pw.Center(
-                  child: pw.Transform.rotate(
-                    angle: -0.5,
-                    child: pw.Text(
-                      'DRAFT',
-                      style: pw.TextStyle(
-                        fontSize: 100,
-                        fontWeight: pw.FontWeight.bold,
-                        color: PdfColors.grey300,
-                      ),
-                    ),
-                  ),
-                ),
-                content,
-              ],
-            );
-          } else if (bill.status == BillStatus.voided) {
+          if (bill.status == BillStatus.voided) {
             return pw.Stack(
               children: [
                 pw.Center(

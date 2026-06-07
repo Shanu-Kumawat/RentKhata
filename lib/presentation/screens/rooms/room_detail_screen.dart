@@ -12,16 +12,20 @@ import '../../../application/providers/billing_providers.dart';
 import '../../../application/providers/dashboard_providers.dart';
 import '../../../application/providers/repository_providers.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../widgets/share_bottom_sheet.dart';
+import '../../../core/utils/ui_utils.dart';
+import '../../../services/invoice_pdf_service.dart';
+import '../pdf/pdf_preview_screen.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../domain/entities/room.dart';
 import '../../../domain/entities/occupancy.dart';
 import '../../../domain/entities/bill.dart';
 import 'package:rent_khata/l10n/app_localizations.dart';
+import 'package:printing/printing.dart';
 import '../../../services/share_service.dart';
 import '../../../services/billing_cycle_service.dart';
 import '../../../services/ledger_service.dart';
 import '../../../services/pdf_service.dart';
-import '../pdf/pdf_preview_screen.dart';
 import '../billing/create_bill_sheet.dart';
 import '../billing/bill_detail_screen.dart';
 import '../onboarding/widgets/premium_permission_sheet.dart';
@@ -1192,7 +1196,7 @@ class _BillTile extends ConsumerWidget {
                         child: Material(
                           color: Colors.transparent,
                           child: InkWell(
-                            onTap: () => _shareInvoice(context, ref),
+                            onTap: () => _shareReceipt(context, ref),
                             child: Padding(
                               padding: const EdgeInsets.symmetric(vertical: 12),
                               child: Row(
@@ -1263,100 +1267,124 @@ class _BillTile extends ConsumerWidget {
 
   void _sendReminder(BuildContext context, WidgetRef ref) async {
     final l10n = AppLocalizations.of(context)!;
-    if (bill.status == BillStatus.draft) {
-      if (!context.mounted) return;
-      showDialog(
-        context: context,
-        builder: (context) => Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.send_rounded,
-                  size: 48,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Send Invoice First?',
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    height: 1.2,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Share the invoice with the tenant to start tracking.',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                        child: Text(AppLocalizations.of(context)!.cancel),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: FilledButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                          _shareInvoice(context, ref);
-                        },
-                        style: FilledButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          elevation: 0,
-                        ),
-                        child: Text(
-                          AppLocalizations.of(context)!.sendInvoiceBtn,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-      return;
-    }
 
     final landlord = await ref.read(landlordProvider.future);
     final landlordName = landlord?.name ?? l10n.landlord;
-
     final repo = ref.read(billingRepositoryProvider);
-    final shareService = ShareService(repo);
-    await shareService.shareBillReminder(
-      bill: bill,
-      landlordName: landlordName,
+
+    if (!context.mounted) return;
+
+    ShareBottomSheet.show(
+      context: context,
+      contentType: ShareContentType.invoice,
+      onShareAsMessage: () async {
+        final shareService = ShareService(repo);
+        await shareService.shareInvoice(
+          bill: bill,
+          landlordName: landlordName,
+          landlordUpi: landlord?.upiId,
+        );
+        await repo.markBillAsSent(bill.id);
+      },
+      onShareAsPdf: () async {
+        try {
+          final pdfService = InvoicePdfService();
+          final file = await withLoadingOverlay(
+            context: context,
+            action: () => pdfService.generateInvoice(
+              bill: bill,
+              landlordName: landlordName,
+              landlordPhone: landlord?.phone ?? '',
+              landlordUpiId: landlord?.upiId,
+            ),
+          );
+
+          if (!context.mounted) return;
+          final bytes = await file.readAsBytes();
+          await Printing.sharePdf(
+            bytes: bytes,
+            filename: file.path.split('/').last,
+          );
+          await repo.markBillAsSent(bill.id);
+        } catch (e) {
+          if (!context.mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(AppLocalizations.of(context)!.errorGeneratingPdf(e.toString()))),
+          );
+        }
+      },
     );
   }
 
-  void _shareInvoice(BuildContext context, WidgetRef ref) async {
+  void _shareReceipt(BuildContext context, WidgetRef ref) async {
     final l10n = AppLocalizations.of(context)!;
     final landlord = await ref.read(landlordProvider.future);
-
+    final landlordName = landlord?.name ?? l10n.landlord;
+    
     final repo = ref.read(billingRepositoryProvider);
-    final shareService = ShareService(repo);
-    await shareService.shareInvoice(
-      bill: bill,
-      landlordName: landlord?.name ?? l10n.landlord,
-      landlordUpi: landlord?.upiId,
+    final payments = await repo.getPaymentsForBill(bill.id);
+    final latestPayment = payments.isNotEmpty ? payments.last : null;
+
+    if (!context.mounted) return;
+
+    final isPaid = bill.isFullyPaid;
+    
+    ShareBottomSheet.show(
+      context: context,
+      contentType: isPaid ? ShareContentType.receipt : ShareContentType.invoice,
+      onShareAsMessage: () async {
+        final shareService = ShareService(repo);
+        if (isPaid && latestPayment != null) {
+          await shareService.shareReceipt(
+            bill: bill,
+            payment: latestPayment,
+            landlordName: landlordName,
+          );
+        } else {
+          await shareService.shareInvoice(
+            bill: bill,
+            landlordName: landlordName,
+            landlordUpi: landlord?.upiId,
+          );
+        }
+      },
+      onShareAsPdf: () async {
+        try {
+          final pdfService = InvoicePdfService();
+          final file = await withLoadingOverlay(
+            context: context,
+            action: () {
+              if (isPaid && latestPayment != null) {
+                return pdfService.generateReceipt(
+                  bill: bill,
+                  payment: latestPayment,
+                  landlordName: landlordName,
+                  landlordPhone: landlord?.phone ?? '',
+                );
+              } else {
+                return pdfService.generateInvoice(
+                  bill: bill,
+                  landlordName: landlordName,
+                  landlordPhone: landlord?.phone ?? '',
+                  landlordUpiId: landlord?.upiId,
+                );
+              }
+            },
+          );
+
+          if (!context.mounted) return;
+          final bytes = await file.readAsBytes();
+          await Printing.sharePdf(
+            bytes: bytes,
+            filename: file.path.split('/').last,
+          );
+        } catch (e) {
+          if (!context.mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(AppLocalizations.of(context)!.errorGeneratingPdf(e.toString()))),
+          );
+        }
+      },
     );
   }
 }
