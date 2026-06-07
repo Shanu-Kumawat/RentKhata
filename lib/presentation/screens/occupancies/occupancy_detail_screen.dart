@@ -12,6 +12,7 @@ import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/ui_utils.dart';
 import '../../../domain/entities/bill.dart';
 import 'package:rent_khata/l10n/app_localizations.dart';
+import '../../../core/utils/l10n_helpers.dart';
 import '../../../domain/entities/occupancy.dart';
 import '../../../domain/entities/settlement_statement.dart';
 import '../../../services/pdf_service.dart';
@@ -138,13 +139,13 @@ class _OccupancyDetailContent extends StatelessWidget {
           const SizedBox(height: 24),
 
           // Deposit Settlement
-          if (occupancy.securityDeposit > 0) ...[
+          if (occupancy.securityDeposit > 0 || !occupancy.isActive) ...[
             _SectionHeader(
-              title: 'Deposit Settlement',
+              title: 'Settlement Details',
               icon: Icons.account_balance_wallet_outlined,
             ),
             const SizedBox(height: 12),
-            _DepositSettlementCard(occupancy: occupancy),
+            _DepositSettlementCard(occupancy: occupancy, bills: detail.bills),
             const SizedBox(height: 32),
           ],
         ],
@@ -665,12 +666,32 @@ class _FamilyMemberTile extends StatelessWidget {
 
 class _DepositSettlementCard extends StatelessWidget {
   final Occupancy occupancy;
+  final List<Bill> bills;
 
-  const _DepositSettlementCard({required this.occupancy});
+  const _DepositSettlementCard({required this.occupancy, required this.bills});
 
   @override
   Widget build(BuildContext context) {
     final statusColor = _getStatusColor(occupancy.depositStatus);
+    
+    double exactRefundAmount = occupancy.depositReturnedAmount ?? 0;
+    double exactTotalDeductions = occupancy.securityDeposit - exactRefundAmount;
+
+    if (occupancy.settlementNotes != null && occupancy.settlementNotes!.contains('Refund:')) {
+      try {
+        final refundStr = occupancy.settlementNotes!.split('Refund:').last;
+        final numStr = refundStr.replaceAll(RegExp(r'[^\d.-]'), '');
+        if (numStr.isNotEmpty) {
+          exactRefundAmount = double.parse(numStr);
+          exactTotalDeductions = occupancy.securityDeposit - exactRefundAmount;
+        }
+      } catch (_) {}
+    }
+
+    final double manualDeductions = occupancy.deductionAmount > 0 ? occupancy.deductionAmount : 0;
+    final double billDeductions = exactTotalDeductions > manualDeductions 
+        ? exactTotalDeductions - manualDeductions 
+        : 0;
 
     return Card(
       child: Padding(
@@ -694,11 +715,9 @@ class _DepositSettlementCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    occupancy.depositStatus
-                        .toString()
-                        .split('.')
-                        .last
-                        .toUpperCase(),
+                    occupancy.depositStatus == DepositStatus.returned && exactRefundAmount < 0
+                        ? 'SETTLED'
+                        : occupancy.depositStatus.toString().split('.').last.toUpperCase(),
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
                       color: statusColor,
                       fontWeight: FontWeight.bold,
@@ -708,48 +727,70 @@ class _DepositSettlementCard extends StatelessWidget {
               ],
             ),
             const Divider(height: 24),
-            _RowItem('Amount', formatCurrency(occupancy.securityDeposit)),
+            _RowItem('Security Deposit', formatCurrency(occupancy.securityDeposit)),
             const SizedBox(height: 8),
-            if (occupancy.deductionAmount > 0) ...[
+            if (billDeductions > 0) ...[
               _RowItem(
-                'Deductions',
-                '- ${formatCurrency(occupancy.deductionAmount)}',
+                'Bill Deductions',
+                '- ${formatCurrency(billDeductions)}',
                 valueColor: AppColors.error,
               ),
               const SizedBox(height: 8),
             ],
-            _RowItem(
-              'Return Amount',
-              occupancy.depositReturnedAmount != null
-                  ? formatCurrency(occupancy.depositReturnedAmount!)
-                  : '-',
-              valueColor: occupancy.depositReturnedAmount != null
-                  ? AppColors.success
-                  : null,
+            if (manualDeductions > 0) ...[
+              _RowItem(
+                'Manual Deductions',
+                '- ${formatCurrency(manualDeductions)}',
+                valueColor: AppColors.error,
+              ),
+              const SizedBox(height: 16),
+            ],
+            if (exactTotalDeductions == 0) const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: exactRefundAmount >= 0 
+                    ? AppColors.success.withValues(alpha: 0.1) 
+                    : AppColors.error.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: exactRefundAmount >= 0 
+                      ? AppColors.success.withValues(alpha: 0.3) 
+                      : AppColors.error.withValues(alpha: 0.3),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    exactRefundAmount >= 0 ? 'Final Refund' : 'Amount Owed',
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: exactRefundAmount >= 0 ? AppColors.success : AppColors.error,
+                    ),
+                  ),
+                  Text(
+                    formatCurrency(exactRefundAmount.abs()),
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: exactRefundAmount >= 0 ? AppColors.success : AppColors.error,
+                    ),
+                  ),
+                ],
+              ),
             ),
             if (occupancy.deductionReason != null &&
                 occupancy.deductionReason!.isNotEmpty) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               const Divider(),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               _DetailRow(
-                'Reason',
+                'Manual Deduction Reason',
                 occupancy.deductionReason!,
                 icon: Icons.info_outline,
               ),
             ],
-            if (occupancy.settlementNotes != null &&
-                occupancy.settlementNotes!.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              if (occupancy.deductionReason == null) const Divider(),
-              const SizedBox(height: 8),
-              _DetailRow(
-                'Notes',
-                occupancy.settlementNotes!,
-                icon: Icons.notes,
-              ),
-            ],
-            if (occupancy.isSettled) ...[
+            if (!occupancy.isActive || occupancy.isSettled) ...[
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
@@ -769,7 +810,6 @@ class _DepositSettlementCard extends StatelessWidget {
       ),
     );
   }
-
   Future<void> _shareSettlementReceipt(
     BuildContext context,
     WidgetRef ref,
@@ -786,8 +826,39 @@ class _DepositSettlementCard extends StatelessWidget {
           final landlordRepo = ref.read(landlordRepositoryProvider);
           final landlord = await landlordRepo.getLandlord();
 
-          final totalDeductionCalc =
-              occupancy.securityDeposit - (occupancy.depositReturnedAmount ?? 0);
+          double exactRefundAmount = occupancy.depositReturnedAmount ?? 0;
+          double exactTotalDeductions = occupancy.securityDeposit - exactRefundAmount;
+          
+          if (occupancy.settlementNotes != null && occupancy.settlementNotes!.contains('Refund:')) {
+            try {
+              final refundStr = occupancy.settlementNotes!.split('Refund:').last;
+              final numStr = refundStr.replaceAll(RegExp(r'[^\d.-]'), '');
+              if (numStr.isNotEmpty) {
+                exactRefundAmount = double.parse(numStr);
+                exactTotalDeductions = occupancy.securityDeposit - exactRefundAmount;
+              }
+            } catch (_) {}
+          }
+
+          final billingRepo = ref.read(billingRepositoryProvider);
+          final List<SettlementBillDeduction> settlementDeductions = [];
+
+          for (final bill in bills) {
+            if (bill.paidAmount > 0 || bill.status == BillStatus.paid) {
+              final payments = await billingRepo.getPaymentsForBill(bill.id);
+              for (final payment in payments) {
+                if (payment.notes == l10n.settledViaDeposit) {
+                  settlementDeductions.add(
+                    SettlementBillDeduction(
+                      billTypeLabel: getBillTypeLabel(l10n, bill.billType).toUpperCase(),
+                      period: bill.billingPeriod,
+                      amount: payment.amount,
+                    )
+                  );
+                }
+              }
+            }
+          }
 
           final statement = SettlementStatement(
             occupancyId: occupancy.id,
@@ -798,11 +869,11 @@ class _DepositSettlementCard extends StatelessWidget {
             moveInDate: occupancy.moveInDate,
             moveOutDate: occupancy.moveOutDate ?? DateTime.now(),
             securityDeposit: occupancy.securityDeposit,
-            billDeductions: [],
-            manualDeduction: totalDeductionCalc > 0 ? totalDeductionCalc : 0,
+            billDeductions: settlementDeductions,
+            manualDeduction: occupancy.deductionAmount > 0 ? occupancy.deductionAmount : 0,
             manualDeductionReason: occupancy.deductionReason ?? 'Prior Deductions',
-            totalDeductions: totalDeductionCalc > 0 ? totalDeductionCalc : 0,
-            refundAmount: occupancy.depositReturnedAmount ?? 0,
+            totalDeductions: exactTotalDeductions > 0 ? exactTotalDeductions : 0,
+            refundAmount: exactRefundAmount,
           );
 
           final file = await PdfService.generateSettlementPdf(statement, l10n);
