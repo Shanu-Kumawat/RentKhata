@@ -1,13 +1,12 @@
 import 'dart:io';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:printing/printing.dart';
 import 'package:path_provider/path_provider.dart';
 import '../domain/entities/ledger.dart';
 import '../domain/entities/settlement_statement.dart';
 import '../core/utils/currency_formatter.dart';
-
 import 'package:rent_khata/l10n/app_localizations.dart';
+import 'pdf/pdf_template.dart';
 
 class PdfService {
   /// Generates a PDF Ledger statement and returns the saved File.
@@ -17,29 +16,31 @@ class PdfService {
   ) async {
     final pdf = pw.Document();
 
-    final fontRegular = await PdfGoogleFonts.robotoRegular();
-    final fontBold = await PdfGoogleFonts.robotoBold();
-
-    final theme = pw.ThemeData.withFont(
-      base: fontRegular,
-      bold: fontBold,
-      fontFallback: [fontRegular],
-    );
+    final theme = await PdfTemplate.loadTheme();
+    final logoBytes = await PdfTemplate.loadTransparentLogo();
 
     pdf.addPage(
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
         theme: theme,
-        margin: const pw.EdgeInsets.all(32),
         build: (pw.Context context) {
           return [
-            _buildHeader(statement, l10n),
+            PdfTemplate.buildModernHeader(
+              title: l10n.khataStatement,
+              subtitle: l10n.generatedOn(
+                '${statement.statementDate.day}/${statement.statementDate.month}/${statement.statementDate.year}',
+              ),
+              landlordName: statement.landlordName,
+              landlordPhone: statement.landlordPhone,
+              logoBytes: logoBytes,
+              titleFontSize: 20,
+            ),
             pw.SizedBox(height: 20),
             _buildSummary(statement, l10n),
             pw.SizedBox(height: 20),
             _buildLedgerTable(statement.entries, l10n),
             pw.SizedBox(height: 30),
-            _buildFooter(statement, l10n),
+            PdfTemplate.buildMarketingFooter(),
           ];
         },
       ),
@@ -56,93 +57,19 @@ class PdfService {
     return file;
   }
 
-  static pw.Widget _buildHeader(
-    LedgerStatement statement,
-    AppLocalizations l10n,
-  ) {
-    return pw.Column(
-      crossAxisAlignment: pw.CrossAxisAlignment.start,
-      children: [
-        pw.Text(
-          l10n.khataStatement,
-          style: pw.TextStyle(
-            fontSize: 24,
-            fontWeight: pw.FontWeight.bold,
-            color: PdfColors.blue900,
-          ),
-        ),
-        pw.SizedBox(height: 4),
-        pw.Text(
-          l10n.generatedOn(
-            '${statement.statementDate.day}/${statement.statementDate.month}/${statement.statementDate.year}',
-          ),
-          style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey700),
-        ),
-        pw.SizedBox(height: 16),
-        pw.Row(
-          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
-            // Landlord info
-            pw.Expanded(
-              child: pw.Column(
-                crossAxisAlignment: pw.CrossAxisAlignment.start,
-                children: [
-                  pw.Text(
-                    l10n.fromLabel,
-                    style: pw.TextStyle(
-                      fontWeight: pw.FontWeight.bold,
-                      color: PdfColors.grey600,
-                    ),
-                  ),
-                  pw.Text(
-                    statement.landlordName,
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                  ),
-                  if (statement.landlordPhone.isNotEmpty)
-                    pw.Text(statement.landlordPhone),
-                  pw.Text(statement.propertyName),
-                ],
-              ),
-            ),
-            // Tenant info
-            pw.Expanded(
-              child: pw.Column(
-                crossAxisAlignment: pw.CrossAxisAlignment.end,
-                children: [
-                  pw.Text(
-                    l10n.toLabel,
-                    style: pw.TextStyle(
-                      fontWeight: pw.FontWeight.bold,
-                      color: PdfColors.grey600,
-                    ),
-                  ),
-                  pw.Text(
-                    statement.tenantName,
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                  ),
-                  if (statement.tenantPhone.isNotEmpty)
-                    pw.Text(statement.tenantPhone),
-                  pw.Text(l10n.roomNoLabel(statement.roomNumber)),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
+  // Removed _buildHeader
 
   static pw.Widget _buildSummary(
     LedgerStatement statement,
     AppLocalizations l10n,
   ) {
     return pw.Container(
-      padding: const pw.EdgeInsets.all(12),
+      padding: const pw.EdgeInsets.symmetric(vertical: 16),
       decoration: pw.BoxDecoration(
-        color: PdfColors.grey100,
-        borderRadius: const pw.BorderRadius.all(pw.Radius.circular(8)),
-        border: pw.Border.all(color: PdfColors.grey300),
+        border: pw.Border(
+          top: pw.BorderSide(color: PdfTemplate.dividerColor, width: 0.5),
+          bottom: pw.BorderSide(color: PdfTemplate.dividerColor, width: 0.5),
+        ),
       ),
       child: pw.Row(
         mainAxisAlignment: pw.MainAxisAlignment.spaceAround,
@@ -150,7 +77,7 @@ class PdfService {
           _buildSummaryItem(
             l10n.totalBilledLabel,
             formatCurrency(statement.totalBilled),
-            PdfColors.black,
+            PdfColors.grey800,
           ),
           _buildSummaryItem(
             l10n.totalPaidLabel,
@@ -160,7 +87,7 @@ class PdfService {
           _buildSummaryItem(
             l10n.balanceDueLabel,
             formatCurrency(statement.currentBalance),
-            PdfColors.red700,
+            PdfTemplate.accentColor,
           ),
         ],
       ),
@@ -175,14 +102,19 @@ class PdfService {
     return pw.Column(
       children: [
         pw.Text(
-          label,
-          style: pw.TextStyle(fontSize: 10, color: PdfColors.grey700),
+          label.toUpperCase(),
+          style: pw.TextStyle(
+            fontSize: 8,
+            fontWeight: pw.FontWeight.bold,
+            color: PdfColors.grey500,
+            letterSpacing: 1.0,
+          ),
         ),
-        pw.SizedBox(height: 4),
+        pw.SizedBox(height: 8),
         pw.Text(
           value,
           style: pw.TextStyle(
-            fontSize: 14,
+            fontSize: 20,
             fontWeight: pw.FontWeight.bold,
             color: color,
           ),
@@ -227,10 +159,11 @@ class PdfService {
       data: data,
       border: null,
       headerStyle: pw.TextStyle(
+        fontSize: 10,
         fontWeight: pw.FontWeight.bold,
-        color: PdfColors.white,
+        color: PdfColors.black,
       ),
-      headerDecoration: const pw.BoxDecoration(color: PdfColors.blueGrey800),
+      headerDecoration: const pw.BoxDecoration(color: PdfColors.grey100),
       rowDecoration: const pw.BoxDecoration(
         border: pw.Border(
           bottom: pw.BorderSide(color: PdfColors.grey300, width: 0.5),
@@ -252,38 +185,18 @@ class PdfService {
         4: pw.Alignment.centerRight,
       },
       columnWidths: {
-        0: const pw.FlexColumnWidth(1.5), // Date
-        1: const pw.FlexColumnWidth(2.5), // Description
-        2: const pw.FlexColumnWidth(2), // Billed
-        3: const pw.FlexColumnWidth(2), // Paid
-        4: const pw.FlexColumnWidth(2), // Balance
+        0: const pw.FlexColumnWidth(1.4), // Date
+        1: const pw.FlexColumnWidth(3.8), // Description
+        2: const pw.FlexColumnWidth(1.6), // Billed
+        3: const pw.FlexColumnWidth(1.6), // Paid
+        4: const pw.FlexColumnWidth(1.6), // Balance
       },
       cellPadding: const pw.EdgeInsets.symmetric(vertical: 8, horizontal: 4),
       headerPadding: const pw.EdgeInsets.symmetric(vertical: 8, horizontal: 4),
     );
   }
 
-  static pw.Widget _buildFooter(
-    LedgerStatement statement,
-    AppLocalizations l10n,
-  ) {
-    return pw.Column(
-      crossAxisAlignment: pw.CrossAxisAlignment.center,
-      children: [
-        pw.Divider(color: PdfColors.grey400),
-        pw.SizedBox(height: 8),
-        pw.Text(
-          l10n.systemGeneratedMsg,
-          style: pw.TextStyle(
-            fontSize: 9,
-            color: PdfColors.grey600,
-            fontStyle: pw.FontStyle.italic,
-          ),
-          textAlign: pw.TextAlign.center,
-        ),
-      ],
-    );
-  }
+  // Removed _buildFooter
 
   /// Generates a PDF Settlement statement and returns the saved File.
   static Future<File> generateSettlementPdf(
@@ -292,23 +205,24 @@ class PdfService {
   ) async {
     final pdf = pw.Document();
 
-    final fontRegular = await PdfGoogleFonts.robotoRegular();
-    final fontBold = await PdfGoogleFonts.robotoBold();
-
-    final theme = pw.ThemeData.withFont(
-      base: fontRegular,
-      bold: fontBold,
-      fontFallback: [fontRegular],
-    );
+    final theme = await PdfTemplate.loadTheme();
+    final logoBytes = await PdfTemplate.loadTransparentLogo();
 
     pdf.addPage(
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
         theme: theme,
-        margin: const pw.EdgeInsets.all(32),
         build: (pw.Context context) {
           return [
-            _buildSettlementHeader(statement, l10n),
+            PdfTemplate.buildModernHeader(
+              title: l10n.moveOutSettlementTitle,
+              subtitle: l10n.moveOutDateLabel(
+                '${statement.moveOutDate.day}/${statement.moveOutDate.month}/${statement.moveOutDate.year}',
+              ),
+              landlordName: statement.landlordName,
+              logoBytes: logoBytes,
+              titleFontSize: 20,
+            ),
             pw.SizedBox(height: 20),
             _buildSettlementDepositSummary(statement, l10n),
             pw.SizedBox(height: 20),
@@ -332,104 +246,38 @@ class PdfService {
     return file;
   }
 
-  static pw.Widget _buildSettlementHeader(
-    SettlementStatement statement,
-    AppLocalizations l10n,
-  ) {
-    return pw.Column(
-      crossAxisAlignment: pw.CrossAxisAlignment.start,
-      children: [
-        pw.Text(
-          l10n.moveOutSettlementTitle,
-          style: pw.TextStyle(
-            fontSize: 24,
-            fontWeight: pw.FontWeight.bold,
-            color: PdfColors.blueGrey900,
-          ),
-        ),
-        pw.SizedBox(height: 4),
-        pw.Text(
-          l10n.moveOutDateLabel(
-            '${statement.moveOutDate.day}/${statement.moveOutDate.month}/${statement.moveOutDate.year}',
-          ),
-          style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey700),
-        ),
-        pw.SizedBox(height: 16),
-        pw.Row(
-          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
-            pw.Expanded(
-              child: pw.Column(
-                crossAxisAlignment: pw.CrossAxisAlignment.start,
-                children: [
-                  pw.Text(
-                    '${l10n.landlord}:',
-                    style: pw.TextStyle(color: PdfColors.grey600),
-                  ),
-                  pw.Text(
-                    statement.landlordName,
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                  ),
-                  pw.Text(statement.propertyName),
-                ],
-              ),
-            ),
-            pw.Expanded(
-              child: pw.Column(
-                crossAxisAlignment: pw.CrossAxisAlignment.end,
-                children: [
-                  pw.Text(
-                    '${l10n.tenant}:',
-                    style: pw.TextStyle(color: PdfColors.grey600),
-                  ),
-                  pw.Text(
-                    statement.tenantName,
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                  ),
-                  pw.Text(l10n.roomNoLabel(statement.roomNumber)),
-                  pw.Text(
-                    l10n.moveInDateLabel(
-                      '${statement.moveInDate.day}/${statement.moveInDate.month}/${statement.moveInDate.year}',
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
+  // Removed _buildSettlementHeader
 
   static pw.Widget _buildSettlementDepositSummary(
     SettlementStatement statement,
     AppLocalizations l10n,
   ) {
     return pw.Container(
-      padding: const pw.EdgeInsets.all(16),
+      padding: const pw.EdgeInsets.symmetric(vertical: 16),
       decoration: pw.BoxDecoration(
-        color: PdfColors.green50,
-        borderRadius: const pw.BorderRadius.all(pw.Radius.circular(8)),
-        border: pw.Border.all(color: PdfColors.green200),
+        border: pw.Border(
+          top: pw.BorderSide(color: PdfTemplate.dividerColor, width: 0.5),
+          bottom: pw.BorderSide(color: PdfTemplate.dividerColor, width: 0.5),
+        ),
       ),
       child: pw.Row(
         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
         children: [
           pw.Text(
-            l10n.initialSecurityDeposit,
+            l10n.initialSecurityDeposit.toUpperCase(),
             style: pw.TextStyle(
-              fontSize: 16,
+              fontSize: 10,
               fontWeight: pw.FontWeight.bold,
-              color: PdfColors.green900,
+              color: PdfColors.grey500,
+              letterSpacing: 1.0,
             ),
           ),
           pw.Text(
             formatCurrency(statement.securityDeposit),
             style: pw.TextStyle(
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: pw.FontWeight.bold,
-              color: PdfColors.green900,
+              color: PdfColors.black,
             ),
           ),
         ],
@@ -474,10 +322,11 @@ class PdfService {
           data: data,
           border: null,
           headerStyle: pw.TextStyle(
+            fontSize: 10,
             fontWeight: pw.FontWeight.bold,
-            color: PdfColors.white,
+            color: PdfColors.black,
           ),
-          headerDecoration: const pw.BoxDecoration(color: PdfColors.red800),
+          headerDecoration: const pw.BoxDecoration(color: PdfColors.grey100),
           rowDecoration: const pw.BoxDecoration(
             border: pw.Border(
               bottom: pw.BorderSide(color: PdfColors.grey300, width: 0.5),
@@ -514,30 +363,31 @@ class PdfService {
     return pw.Column(
       children: [
         pw.Container(
-          padding: const pw.EdgeInsets.all(16),
+          padding: const pw.EdgeInsets.symmetric(vertical: 20),
           decoration: pw.BoxDecoration(
-            color: isRefund ? PdfColors.blue50 : PdfColors.red50,
-            borderRadius: const pw.BorderRadius.all(pw.Radius.circular(8)),
-            border: pw.Border.all(
-              color: isRefund ? PdfColors.blue300 : PdfColors.red300,
+            border: pw.Border(
+              top: pw.BorderSide(color: PdfTemplate.dividerColor, width: 0.5),
+              bottom: pw.BorderSide(color: PdfTemplate.dividerColor, width: 0.5),
             ),
           ),
           child: pw.Row(
             mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
             children: [
               pw.Text(
-                isRefund ? l10n.finalRefundAmount : l10n.amountTenantOwes,
+                isRefund ? l10n.finalRefundAmount.toUpperCase() : l10n.amountTenantOwes.toUpperCase(),
                 style: pw.TextStyle(
-                  fontSize: 18,
+                  fontSize: 10,
                   fontWeight: pw.FontWeight.bold,
+                  color: PdfColors.grey700,
+                  letterSpacing: 1.0,
                 ),
               ),
               pw.Text(
                 formatCurrency(statement.refundAmount.abs()),
                 style: pw.TextStyle(
-                  fontSize: 22,
+                  fontSize: 24,
                   fontWeight: pw.FontWeight.bold,
-                  color: isRefund ? PdfColors.blue900 : PdfColors.red900,
+                  color: isRefund ? PdfColors.green700 : PdfColors.red700,
                 ),
               ),
             ],
@@ -558,32 +408,36 @@ class PdfService {
           children: [
             pw.Column(
               children: [
-                pw.Container(width: 150, height: 1, color: PdfColors.grey500),
-                pw.SizedBox(height: 4),
                 pw.Text(
                   l10n.tenantSignature,
-                  style: pw.TextStyle(color: PdfColors.grey700),
+                  style: pw.TextStyle(
+                    color: PdfColors.grey500,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
                 ),
               ],
             ),
             pw.Column(
               children: [
-                pw.Container(width: 150, height: 1, color: PdfColors.grey500),
-                pw.SizedBox(height: 4),
                 pw.Text(
                   l10n.landlordSignature,
-                  style: pw.TextStyle(color: PdfColors.grey700),
+                  style: pw.TextStyle(
+                    color: PdfColors.grey500,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
                 ),
               ],
             ),
           ],
         ),
         pw.SizedBox(height: 32),
+        PdfTemplate.buildMarketingFooter(),
+        pw.SizedBox(height: 8),
         pw.Center(
           child: pw.Text(
             l10n.computerGeneratedMsg,
             style: pw.TextStyle(
-              fontSize: 10,
+              fontSize: 8,
               color: PdfColors.grey600,
               fontStyle: pw.FontStyle.italic,
             ),
