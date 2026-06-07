@@ -591,112 +591,153 @@ class _OccupancyCard extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  PopupMenuButton<String>(
-                    onSelected: (value) {
-                      if (value == 'move_out') onEndOccupancy();
-                    },
-                    itemBuilder: (context) => [
-                      PopupMenuItem(
-                        value: 'move_out',
-                        child: Row(
-                          children: [
-                            Icon(Icons.exit_to_app, color: AppColors.warning),
-                            SizedBox(width: 8),
-                            Text(AppLocalizations.of(context)!.moveOutBtn),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
                 ],
               ),
               const SizedBox(height: 16),
-              Row(
-                children: [
-                  _InfoTile(
-                    label: AppLocalizations.of(context)!.agreedRent,
-                    value: formatCurrency(occupancy.agreedRent),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.outlineVariant.withValues(alpha: 0.5),
                   ),
-                  const SizedBox(width: 24),
-                  if (occupancy.securityDeposit > 0)
-                    _InfoTile(
-                      label: AppLocalizations.of(context)!.securityDepositLabel,
-                      value: formatCurrency(occupancy.securityDeposit),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              // Billing Start Date row
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                ),
+                child: Column(
+                  children: [
+                    Row(
                       children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.calendar_today_outlined,
-                              size: 16,
-                              color: Theme.of(
+                        Expanded(
+                          child: _InfoTile(
+                            label: AppLocalizations.of(context)!.agreedRent,
+                            value: formatCurrency(occupancy.agreedRent),
+                          ),
+                        ),
+                        if (occupancy.securityDeposit > 0)
+                          Expanded(
+                            child: _InfoTile(
+                              label: AppLocalizations.of(
                                 context,
-                              ).colorScheme.onSurfaceVariant,
+                              )!.securityDepositLabel,
+                              value: formatCurrency(occupancy.securityDeposit),
                             ),
-                            const SizedBox(width: 4),
-                            Text(
-                              AppLocalizations.of(context)!.billingStartLabel,
-                              style: Theme.of(context).textTheme.labelSmall
-                                  ?.copyWith(
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    const Divider(height: 1),
+                    const SizedBox(height: 12),
+                    // Billing Start Date row
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.calendar_today_outlined,
+                                    size: 14,
                                     color: Theme.of(
                                       context,
                                     ).colorScheme.onSurfaceVariant,
                                   ),
-                            ),
-                            if (!hasSeparateBillingDate) ...[
-                              const SizedBox(width: 4),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 6,
-                                  vertical: 2,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.primary.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Text(
-                                  'Same as move-in',
-                                  style: Theme.of(context).textTheme.labelSmall
-                                      ?.copyWith(
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.primary,
-                                        fontSize: 10,
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    AppLocalizations.of(
+                                      context,
+                                    )!.billingStartLabel,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelSmall
+                                        ?.copyWith(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurfaceVariant,
+                                        ),
+                                  ),
+                                  if (!hasSeparateBillingDate) ...[
+                                    const SizedBox(width: 6),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 6,
+                                        vertical: 2,
                                       ),
-                                ),
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary
+                                            .withValues(alpha: 0.1),
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Text(
+                                        AppLocalizations.of(
+                                          context,
+                                        )!.sameAsMoveIn,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .labelSmall
+                                            ?.copyWith(
+                                              color: Theme.of(
+                                                context,
+                                              ).colorScheme.primary,
+                                              fontSize: 9,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                '${billingStartDate.day}/${billingStartDate.month}/${billingStartDate.year}',
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(fontWeight: FontWeight.w600),
                               ),
                             ],
-                          ],
+                          ),
                         ),
-                        const SizedBox(height: 2),
-                        Text(
-                          '${billingStartDate.day}/${billingStartDate.month}/${billingStartDate.year}',
-                          style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(fontWeight: FontWeight.w500),
+                        IconButton(
+                          onPressed: () => _editBillingStartDate(context, ref),
+                          icon: const Icon(Icons.edit_outlined, size: 18),
+                          visualDensity: VisualDensity.compact,
+                          tooltip: AppLocalizations.of(context)!.editBtn,
+                          style: IconButton.styleFrom(
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.surface,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
                         ),
                       ],
                     ),
-                  ),
-                  TextButton.icon(
-                    onPressed: () => _editBillingStartDate(context, ref),
-                    icon: const Icon(Icons.edit_outlined, size: 16),
-                    label: Text(AppLocalizations.of(context)!.editBtn),
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Divider(height: 1),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: onEndOccupancy,
+                  icon: const Icon(Icons.exit_to_app, size: 18),
+                  label: Text(AppLocalizations.of(context)!.moveOutBtn),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.error,
+                    side: BorderSide(
+                      color: AppColors.error.withValues(alpha: 0.5),
                     ),
                   ),
-                ],
+                ),
               ),
             ],
           ),
@@ -1309,7 +1350,11 @@ class _BillTile extends ConsumerWidget {
         } catch (e) {
           if (!context.mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(AppLocalizations.of(context)!.errorGeneratingPdf(e.toString()))),
+            SnackBar(
+              content: Text(
+                AppLocalizations.of(context)!.errorGeneratingPdf(e.toString()),
+              ),
+            ),
           );
         }
       },
@@ -1320,7 +1365,7 @@ class _BillTile extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final landlord = await ref.read(landlordProvider.future);
     final landlordName = landlord?.name ?? l10n.landlord;
-    
+
     final repo = ref.read(billingRepositoryProvider);
     final payments = await repo.getPaymentsForBill(bill.id);
     final latestPayment = payments.isNotEmpty ? payments.last : null;
@@ -1328,7 +1373,7 @@ class _BillTile extends ConsumerWidget {
     if (!context.mounted) return;
 
     final isPaid = bill.isFullyPaid;
-    
+
     ShareBottomSheet.show(
       context: context,
       contentType: isPaid ? ShareContentType.receipt : ShareContentType.invoice,
@@ -1381,7 +1426,11 @@ class _BillTile extends ConsumerWidget {
         } catch (e) {
           if (!context.mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(AppLocalizations.of(context)!.errorGeneratingPdf(e.toString()))),
+            SnackBar(
+              content: Text(
+                AppLocalizations.of(context)!.errorGeneratingPdf(e.toString()),
+              ),
+            ),
           );
         }
       },

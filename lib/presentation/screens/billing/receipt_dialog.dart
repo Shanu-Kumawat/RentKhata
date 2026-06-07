@@ -119,10 +119,11 @@ class ReceiptDialog extends StatelessWidget {
             ),
 
             // Receipt details
-            Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                children: [
+            Flexible(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  children: [
                   // Bill info
                   if (bill.billNumber != null)
                     _ReceiptRow(
@@ -210,6 +211,7 @@ class ReceiptDialog extends StatelessWidget {
                 ],
               ),
             ),
+            ), // Closing Flexible
           ],
         ),
       ),

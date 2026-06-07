@@ -4,7 +4,6 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../application/providers/occupancy_providers.dart';
 import '../../../core/theme/app_colors.dart';
@@ -273,19 +272,6 @@ class _OccupancyInfoCard extends StatelessWidget {
                     ),
                   ),
                 ],
-              ),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: () =>
-                    GoRouter.of(context).push('/tenants/${occupancy.tenantId}'),
-                icon: const Icon(Icons.person_outline, size: 18),
-                label: Text('View ${occupancy.tenantName ?? 'Tenant'} Profile'),
-                style: OutlinedButton.styleFrom(
-                  visualDensity: VisualDensity.compact,
-                ),
               ),
             ),
           ],

@@ -23,6 +23,7 @@ import '../screens/settings/backup_screen.dart';
 import '../screens/reports/reports_screen.dart';
 import '../screens/occupancies/occupancy_detail_screen.dart';
 import '../screens/auth/lock_screen.dart';
+import '../screens/billing/bill_detail_screen.dart';
 import '../widgets/main_shell.dart';
 
 /// Route paths
@@ -158,6 +159,23 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final id = int.parse(state.pathParameters['id']!);
           return OccupancyDetailScreen(occupancyId: id);
+        },
+      ),
+
+      // ========== Bill Detail (outside shell for full-screen) ==========
+      GoRoute(
+        path: AppRoutes.billPreview,
+        builder: (context, state) {
+          final bill = state.extra as Bill?;
+          if (bill != null) {
+            return BillDetailScreen(bill: bill);
+          }
+          // Fallback if accessed without extra (though our app always pushes extra)
+          // Since BillDetailScreen requires a Bill, we throw or show an error
+          return Scaffold(
+            appBar: AppBar(title: const Text('Error')),
+            body: const Center(child: Text('Bill not found in navigation state')),
+          );
         },
       ),
 

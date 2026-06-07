@@ -1012,5 +1012,19 @@
   "amountOwed": "Amount Owed",
   "manualDeductionReason": "Manual Deduction Reason",
   "utilityAnomalyAlert": "High utility usage anomaly",
-  "utilityAnomalyAlertSubtitle": "Alerts when latest electricity usage spikes sharply"
+  "utilityAnomalyAlertSubtitle": "Alerts when latest electricity usage spikes sharply",
+  "sameAsMoveIn": "Same as move-in",
+  "selectBillToCollect": "Select a bill below to review it and collect its pending payment.",
+  "overdueSinceDate": "Overdue since {date}",
+  "@overdueSinceDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "awaitingPayment": "Awaiting payment",
+  "unknownTenant": "Unknown Tenant",
+  "unknownRoom": "Unknown Room",
+  "collectLabel": "Collect"
 }

@@ -37,22 +37,19 @@ class BillDetailScreen extends ConsumerWidget {
     // Watch for real-time updates to this bill
     final billAsync = ref.watch(billByIdProvider(bill.id));
 
-    return billAsync.when(
-      loading: () => Scaffold(
-        appBar: AppBar(title: Text(AppLocalizations.of(context)!.billDetails)),
-        body: const Center(child: CircularProgressIndicator()),
-      ),
-      error: (e, _) => Scaffold(
+    if (billAsync.hasError) {
+      return Scaffold(
         appBar: AppBar(title: Text(AppLocalizations.of(context)!.billDetails)),
         body: Center(
-          child: Text(AppLocalizations.of(context)!.error(e.toString())),
+          child: Text(
+            AppLocalizations.of(context)!.error(billAsync.error.toString()),
+          ),
         ),
-      ),
-      data: (currentBill) {
-        final activeBill = currentBill ?? bill;
-        return _BillDetailContent(bill: activeBill);
-      },
-    );
+      );
+    }
+
+    final activeBill = billAsync.value ?? bill;
+    return _BillDetailContent(bill: activeBill);
   }
 }
 
@@ -413,11 +410,13 @@ class _BillDetailContent extends ConsumerWidget {
           builder: (_) => PdfPreviewScreen(
             pdfFile: file,
             title: AppLocalizations.of(context)!.invoicePreview,
-            shareSubject: isPaid 
+            shareSubject: isPaid
                 ? 'Receipt #${latestPayment?.id}'
                 : l10n.invoiceNumber(bill.billNumber ?? ''),
             suggestedFileName: file.path.split('/').last,
-            shareContentType: isPaid ? ShareContentType.receipt : ShareContentType.invoice,
+            shareContentType: isPaid
+                ? ShareContentType.receipt
+                : ShareContentType.invoice,
             onShareAsMessage: () async {
               final shareService = ShareService(repo);
               if (isPaid && latestPayment != null) {
@@ -446,17 +445,21 @@ class _BillDetailContent extends ConsumerWidget {
     }
   }
 
-  void _sendReminder(BuildContext context, WidgetRef ref, String? landlordName) async {
+  void _sendReminder(
+    BuildContext context,
+    WidgetRef ref,
+    String? landlordName,
+  ) async {
     // The "Send Reminder" quick action button now acts as a share button
     // for the unpaid bill. It fetches additional info directly to pass to _openPdfPreview.
     final landlordAsync = ref.read(landlordProvider);
     final landlord = landlordAsync.value;
-    
+
     _openPdfPreview(
-      context, 
+      context,
       ref,
-      landlordName ?? landlord?.name, 
-      landlord?.phone, 
+      landlordName ?? landlord?.name,
+      landlord?.phone,
       landlord?.upiId,
     );
   }

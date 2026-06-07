@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../domain/entities/bill.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
 
 class UnpaidBillsBottomSheet extends StatelessWidget {
   final List<Bill> unpaidBills;
@@ -47,7 +48,7 @@ class UnpaidBillsBottomSheet extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  'Collect Payments',
+                  AppLocalizations.of(context)!.collectPayments,
                   style: Theme.of(
                     context,
                   ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
@@ -59,7 +60,7 @@ class UnpaidBillsBottomSheet extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Text(
-              'Select a bill below to review it and collect its pending payment.',
+              AppLocalizations.of(context)!.selectBillToCollect,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: AppColors.onSurfaceVariant,
               ),
@@ -95,60 +96,123 @@ class _UnpaidBillTile extends StatelessWidget {
     final isOverdue = bill.isOverdue;
     final statusColor = isOverdue ? theme.colorScheme.error : AppColors.warning;
 
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+    final l10n = AppLocalizations.of(context)!;
+    final tenantName = bill.tenantName ?? l10n.unknownTenant;
+    final roomName = bill.roomNumber ?? l10n.unknownRoom;
+    final propertyName = bill.propertyName ?? '';
+
+    return InkWell(
       onTap: () {
         Navigator.pop(context);
-        context.push('/bills/${bill.id}');
+        context.push('/bills/${bill.id}', extra: bill);
       },
-      title: Row(
-        children: [
-          Container(
-            width: 6,
-            height: 6,
-            margin: const EdgeInsets.only(right: 6),
-            decoration: BoxDecoration(
-              color: statusColor,
-              shape: BoxShape.circle,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            CircleAvatar(
+              radius: 22,
+              backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
+              child: Text(
+                tenantName.isNotEmpty ? tenantName[0].toUpperCase() : '?',
+                style: TextStyle(
+                  color: theme.colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
             ),
-          ),
-          Expanded(
-            child: Text(
-              '${bill.billNumber} • ${formatCurrency(bill.pendingAmount)}',
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    tenantName,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    propertyName.isNotEmpty
+                        ? '$roomName • $propertyName'
+                        : roomName,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Container(
+                        width: 6,
+                        height: 6,
+                        margin: const EdgeInsets.only(right: 6),
+                        decoration: BoxDecoration(
+                          color: statusColor,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          isOverdue
+                              ? l10n.overdueSinceDate(
+                                  '${bill.dueDate?.day ?? ''}/${bill.dueDate?.month ?? ''}',
+                                )
+                              : l10n.awaitingPayment,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: statusColor,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
-      subtitle: Text(
-        isOverdue
-            ? 'Overdue since ${bill.dueDate?.day ?? ''}/${bill.dueDate?.month ?? ''}'
-            : 'Awaiting payment',
-        style: TextStyle(
-          fontSize: 12,
-          color: statusColor,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-      trailing: OutlinedButton(
-        onPressed: () {
-          Navigator.pop(context);
-          context.push('/bills/${bill.id}');
-        },
-        style: OutlinedButton.styleFrom(
-          visualDensity: VisualDensity.compact,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          foregroundColor: theme.colorScheme.error,
-          side: BorderSide(
-            color: theme.colorScheme.error.withValues(alpha: 0.5),
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-        ),
-        child: const Text(
-          'Collect',
-          style: TextStyle(fontWeight: FontWeight.bold),
+            const SizedBox(width: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  formatCurrency(bill.pendingAmount),
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                OutlinedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    context.push('/bills/${bill.id}', extra: bill);
+                  },
+                  style: OutlinedButton.styleFrom(
+                    visualDensity: VisualDensity.compact,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    foregroundColor: statusColor,
+                    side: BorderSide(color: statusColor.withValues(alpha: 0.5)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child: Text(
+                    l10n.collectLabel,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

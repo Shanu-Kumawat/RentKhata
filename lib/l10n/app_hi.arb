@@ -690,5 +690,12 @@
   "amountOwed": "बकाया राशि",
   "manualDeductionReason": "कटौती का कारण",
   "utilityAnomalyAlert": "असामान्य उच्च उपयोगिता खपत",
-  "utilityAnomalyAlertSubtitle": "नवीनतम बिजली उपयोग में तीव्र वृद्धि होने पर सचेत करें"
+  "utilityAnomalyAlertSubtitle": "नवीनतम बिजली उपयोग में तीव्र वृद्धि होने पर सचेत करें",
+  "sameAsMoveIn": "प्रवेश के समान",
+  "selectBillToCollect": "समीक्षा और भुगतान लेने के लिए नीचे से एक बिल चुनें।",
+  "overdueSinceDate": "{date} से अतिदेय",
+  "awaitingPayment": "भुगतान की प्रतीक्षा",
+  "unknownTenant": "अज्ञात किरायेदार",
+  "unknownRoom": "अज्ञात कमरा",
+  "collectLabel": "वसूल करें"
 }
