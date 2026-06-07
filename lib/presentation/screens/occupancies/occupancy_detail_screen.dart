@@ -672,6 +672,7 @@ class _DepositSettlementCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final statusColor = _getStatusColor(occupancy.depositStatus);
     
     double exactRefundAmount = occupancy.depositReturnedAmount ?? 0;
@@ -702,7 +703,7 @@ class _DepositSettlementCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Deposit Status',
+                  l10n.depositStatus,
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
                 Container(
@@ -716,7 +717,7 @@ class _DepositSettlementCard extends StatelessWidget {
                   ),
                   child: Text(
                     occupancy.depositStatus == DepositStatus.returned && exactRefundAmount < 0
-                        ? 'SETTLED'
+                        ? l10n.settledStatusCap
                         : occupancy.depositStatus.toString().split('.').last.toUpperCase(),
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
                       color: statusColor,
@@ -727,11 +728,11 @@ class _DepositSettlementCard extends StatelessWidget {
               ],
             ),
             const Divider(height: 24),
-            _RowItem('Security Deposit', formatCurrency(occupancy.securityDeposit)),
+            _RowItem(l10n.securityDepositLabel, formatCurrency(occupancy.securityDeposit)),
             const SizedBox(height: 8),
             if (billDeductions > 0) ...[
               _RowItem(
-                'Bill Deductions',
+                l10n.billDeductions,
                 '- ${formatCurrency(billDeductions)}',
                 valueColor: AppColors.error,
               ),
@@ -739,7 +740,7 @@ class _DepositSettlementCard extends StatelessWidget {
             ],
             if (manualDeductions > 0) ...[
               _RowItem(
-                'Manual Deductions',
+                l10n.manualDeductions,
                 '- ${formatCurrency(manualDeductions)}',
                 valueColor: AppColors.error,
               ),
@@ -763,7 +764,7 @@ class _DepositSettlementCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    exactRefundAmount >= 0 ? 'Final Refund' : 'Amount Owed',
+                    exactRefundAmount >= 0 ? l10n.finalRefund : l10n.amountOwed,
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: exactRefundAmount >= 0 ? AppColors.success : AppColors.error,
@@ -785,7 +786,7 @@ class _DepositSettlementCard extends StatelessWidget {
               const Divider(),
               const SizedBox(height: 12),
               _DetailRow(
-                'Manual Deduction Reason',
+                l10n.manualDeductionReason,
                 occupancy.deductionReason!,
                 icon: Icons.info_outline,
               ),

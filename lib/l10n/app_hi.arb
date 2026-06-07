@@ -683,6 +683,12 @@
       }
     }
   },
+  "depositStatus": "जमा स्थिति",
+  "settledStatusCap": "निपटाया गया",
+  "manualDeductions": "अन्य कटौतियां",
+  "finalRefund": "अंतिम वापसी",
+  "amountOwed": "बकाया राशि",
+  "manualDeductionReason": "कटौती का कारण",
   "utilityAnomalyAlert": "असामान्य उच्च उपयोगिता खपत",
   "utilityAnomalyAlertSubtitle": "नवीनतम बिजली उपयोग में तीव्र वृद्धि होने पर सचेत करें"
 }

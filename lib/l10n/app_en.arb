@@ -1005,6 +1005,12 @@
       }
     }
   },
+  "depositStatus": "Deposit Status",
+  "settledStatusCap": "SETTLED",
+  "manualDeductions": "Manual Deductions",
+  "finalRefund": "Final Refund",
+  "amountOwed": "Amount Owed",
+  "manualDeductionReason": "Manual Deduction Reason",
   "utilityAnomalyAlert": "High utility usage anomaly",
   "utilityAnomalyAlertSubtitle": "Alerts when latest electricity usage spikes sharply"
 }
