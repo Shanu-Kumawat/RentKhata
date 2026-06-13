@@ -302,6 +302,12 @@ class NotificationStartupScheduler extends _$NotificationStartupScheduler {
   Future<bool> build() async {
     if (_hasScheduled) return true;
 
+    // Wait for settings to load before attempting to schedule
+    final settings = ref.watch(notificationSettingsNotifierProvider);
+    if (settings.isLoading) {
+      return false; // Still loading, will re-trigger when loaded
+    }
+
     try {
       await ref.read(scheduleAllNotificationsProvider.future);
       _hasScheduled = true;

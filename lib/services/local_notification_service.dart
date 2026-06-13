@@ -146,6 +146,11 @@ class LocalNotificationService {
     return true;
   }
 
+  /// Get all currently scheduled notifications (useful for debugging)
+  Future<List<PendingNotificationRequest>> getPendingNotifications() async {
+    return await _plugin.pendingNotificationRequests();
+  }
+
   /// Show immediate notification
   Future<void> showNotification({
     required int id,
@@ -192,6 +197,10 @@ class LocalNotificationService {
 
     const details = NotificationDetails(android: androidDetails);
 
+    final enrichedPayload = payload != null
+        ? '$payload|debug_time:${scheduledTime.toIso8601String()}'
+        : 'debug_time:${scheduledTime.toIso8601String()}';
+
     await _plugin.zonedSchedule(
       id,
       title,
@@ -201,7 +210,7 @@ class LocalNotificationService {
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
-      payload: payload,
+      payload: enrichedPayload,
     );
   }
 

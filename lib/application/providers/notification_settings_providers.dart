@@ -38,8 +38,32 @@ class NotificationSettingsState {
     );
   }
 
-  bool isEnabled(NotificationType type) => enabledSettings[type] ?? true;
-  int getDaysBefore(NotificationType type) => daysBeforeSettings[type] ?? 3;
+  static const Map<NotificationType, bool> _defaultEnabled = {
+    NotificationType.cycleEndingSoon: true,
+    NotificationType.billDueSoon: true,
+    NotificationType.overdue1Day: true,
+    NotificationType.overdue3Days: false,
+    NotificationType.overdue7Days: true,
+    NotificationType.overdue14Days: false,
+    NotificationType.agreementExpiringSoon: true,
+    NotificationType.agreementExpired: false,
+    NotificationType.billNotGenerated: true,
+    NotificationType.partialPaymentPause: true,
+    NotificationType.depositSettlementDue: true,
+    NotificationType.utilityUsageAnomaly: false,
+  };
+
+  static const Map<NotificationType, int> _defaultDaysBefore = {
+    NotificationType.cycleEndingSoon: 3,
+    NotificationType.billDueSoon: 3,
+    NotificationType.agreementExpiringSoon: 30,
+    NotificationType.agreementExpired: 0,
+    NotificationType.billNotGenerated: 3,
+    NotificationType.depositSettlementDue: 3,
+  };
+
+  bool isEnabled(NotificationType type) => enabledSettings[type] ?? _defaultEnabled[type] ?? true;
+  int getDaysBefore(NotificationType type) => daysBeforeSettings[type] ?? _defaultDaysBefore[type] ?? 3;
 }
 
 /// Provider for managing notification settings
@@ -208,11 +232,11 @@ class NotificationSettingsNotifier extends _$NotificationSettingsNotifier {
     );
 
     // Persist all settings
-    for (final type in enabledSettings.keys) {
+    for (final type in NotificationType.values) {
       await _upsertSetting(
         type,
-        enabled: enabledSettings[type] ?? true,
-        daysBefore: _normalizeDaysForType(type, daysBeforeSettings[type] ?? 3),
+        enabled: enabledSettings[type] ?? NotificationSettingsState._defaultEnabled[type] ?? true,
+        daysBefore: _normalizeDaysForType(type, daysBeforeSettings[type] ?? NotificationSettingsState._defaultDaysBefore[type] ?? 3),
       );
     }
   }

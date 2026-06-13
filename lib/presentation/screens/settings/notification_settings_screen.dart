@@ -2,17 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:drift/drift.dart' hide Column;
-import '../../../application/providers/billing_providers.dart';
-import '../../../application/providers/billing_cycle_providers.dart';
-import '../../../application/providers/database_provider.dart';
-import '../../../application/providers/repository_providers.dart';
-import '../../../application/providers/tenant_providers.dart';
 import '../../../application/providers/notification_settings_providers.dart';
 import '../../../data/database/tables/notification_setting_table.dart';
-import '../../../domain/entities/bill.dart';
-import '../../../domain/entities/billing_status.dart';
 import '../../../services/local_notification_service.dart';
+import '../../../services/notification_scheduler.dart';
 import 'dart:async';
 import 'package:rent_khata/l10n/app_localizations.dart';
 import '../../../core/utils/app_settings_helper.dart';
@@ -104,7 +97,7 @@ class _NotificationSettingsScreenState
       final hasPermission = await notificationService.requestPermission();
       await _checkSystemPermission();
       if (hasPermission) {
-        await _rescheduleNotifications(notificationService);
+        await ref.read(notificationStartupSchedulerProvider.notifier).reschedule();
       }
 
       if (mounted) {
@@ -128,256 +121,7 @@ class _NotificationSettingsScreenState
     }
   }
 
-  Future<void> _rescheduleNotifications(
-    LocalNotificationService service,
-  ) async {
-    // Cancel all existing notifications first
-    await service.cancelAll();
 
-    // Get all unpaid bills and schedule based on settings
-    final bills = await ref.read(unpaidBillsProvider.future);
-
-    bool billDueSoon = _localState.isEnabled(NotificationType.billDueSoon);
-    int dueSoonDays = _localState.getDaysBefore(NotificationType.billDueSoon);
-
-    final enabledOverdueDays = <int>{
-      if (_localState.isEnabled(NotificationType.overdue1Day)) 1,
-      if (_localState.isEnabled(NotificationType.overdue3Days)) 3,
-      if (_localState.isEnabled(NotificationType.overdue7Days)) 7,
-      if (_localState.isEnabled(NotificationType.overdue14Days)) 14,
-    };
-
-    for (final bill in bills) {
-      if (bill.dueDate == null) continue;
-
-      // Schedule due soon reminder
-      if (billDueSoon) {
-        await service.scheduleDueBillReminder(
-          bill: bill,
-          daysBefore: dueSoonDays,
-          notificationHour: _localState.notificationHour,
-        );
-      }
-
-      // Schedule overdue escalation
-      if (enabledOverdueDays.isNotEmpty) {
-        await service.scheduleOverdueEscalation(
-          bill: bill,
-          escalationDays: enabledOverdueDays,
-          notificationHour: _localState.notificationHour,
-          pauseOnPartialPayment: _localState.isEnabled(
-            NotificationType.partialPaymentPause,
-          ),
-          partialPaymentThresholdRatio: 0.5,
-        );
-      }
-    }
-
-    // Schedule cycle ending reminders if enabled
-    if (_localState.isEnabled(NotificationType.cycleEndingSoon)) {
-      final occupancies = await ref.read(activeOccupanciesProvider.future);
-      final cycleData =
-          <
-            ({
-              int occupancyId,
-              String tenantName,
-              String roomNumber,
-              DateTime cycleEndDate,
-            })
-          >[];
-
-      for (final occupancy in occupancies) {
-        final cycle = ref.read(currentBillingCycleProvider(occupancy));
-        cycleData.add((
-          occupancyId: occupancy.id,
-          tenantName: occupancy.tenantName ?? 'Tenant',
-          roomNumber: occupancy.roomNumber ?? 'Room',
-          cycleEndDate: cycle.end,
-        ));
-      }
-
-      await service.scheduleAllCycleReminders(
-        occupancies: cycleData,
-        daysBefore: _localState.getDaysBefore(NotificationType.cycleEndingSoon),
-        notificationHour: _localState.notificationHour,
-      );
-    }
-
-    if (_localState.isEnabled(NotificationType.agreementExpiringSoon)) {
-      final occupancies = await ref.read(activeOccupanciesProvider.future);
-      final agreementData =
-          <
-            ({
-              int occupancyId,
-              String tenantName,
-              String roomNumber,
-              DateTime agreementEndDate,
-            })
-          >[];
-
-      for (final occupancy in occupancies) {
-        final endDate = occupancy.agreementEndDate;
-        if (endDate == null) continue;
-
-        agreementData.add((
-          occupancyId: occupancy.id,
-          tenantName: occupancy.tenantName ?? 'Tenant',
-          roomNumber: occupancy.roomNumber ?? 'Room',
-          agreementEndDate: endDate,
-        ));
-      }
-
-      await service.scheduleAllAgreementExpiryReminders(
-        occupancies: agreementData,
-        daysBefore: _localState.getDaysBefore(
-          NotificationType.agreementExpiringSoon,
-        ),
-        notificationHour: _localState.notificationHour,
-      );
-    }
-
-    if (_localState.isEnabled(NotificationType.agreementExpired)) {
-      final graceDays = _localState
-          .getDaysBefore(NotificationType.agreementExpired)
-          .clamp(0, 30);
-      final occupancies = await ref.read(activeOccupanciesProvider.future);
-
-      for (final occupancy in occupancies) {
-        final endDate = occupancy.agreementEndDate;
-        if (endDate == null) continue;
-
-        await service.scheduleAgreementExpiredReminder(
-          occupancyId: occupancy.id,
-          tenantName: occupancy.tenantName ?? 'Tenant',
-          roomNumber: occupancy.roomNumber ?? 'Room',
-          agreementEndDate: endDate,
-          graceDays: graceDays,
-          notificationHour: _localState.notificationHour,
-        );
-      }
-    }
-
-    // Bill generation reminders for due-soon/overdue cycles.
-    if (_localState.isEnabled(NotificationType.billNotGenerated)) {
-      final leadDays = _localState
-          .getDaysBefore(NotificationType.billNotGenerated)
-          .clamp(0, 14);
-      final attentionItems = await ref.read(
-        billingAttentionListProvider.future,
-      );
-      final scheduledKeys = <String>{};
-
-      for (final item in attentionItems) {
-        final shouldAlert =
-            item.status == BillingCycleStatus.overdue ||
-            item.daysUntilCycleEnd <= leadDays;
-        if (!shouldAlert) continue;
-
-        final key = '${item.occupancyId}-${item.billType.index}';
-        if (!scheduledKeys.add(key)) continue;
-
-        await service.scheduleBillGenerationReminder(
-          occupancyId: item.occupancyId,
-          billType: item.billType,
-          tenantName: item.tenantName,
-          roomNumber: item.roomNumber,
-          cycleEndDate: item.cycleEnd,
-          daysUntilCycleEnd: item.daysUntilCycleEnd,
-          notificationHour: _localState.notificationHour,
-        );
-      }
-    }
-
-    // Deposit settlement reminders after move-out.
-    if (_localState.isEnabled(NotificationType.depositSettlementDue)) {
-      final daysAfterMoveOut = _localState
-          .getDaysBefore(NotificationType.depositSettlementDue)
-          .clamp(1, 30);
-      final db = ref.read(appDatabaseProvider);
-      final unsettled =
-          await (db.select(db.occupancies)..where(
-                (o) =>
-                    o.isActive.equals(false) &
-                    o.moveOutDate.isNotNull() &
-                    o.isSettled.equals(false),
-              ))
-              .get();
-
-      for (final occupancy in unsettled) {
-        if (occupancy.securityDeposit <= 0 || occupancy.moveOutDate == null) {
-          continue;
-        }
-
-        final tenant = await db.tenantDao.getTenantById(occupancy.tenantId);
-        final room = await db.propertyDao.getRoomById(occupancy.roomId);
-
-        await service.scheduleDepositSettlementDueReminder(
-          occupancyId: occupancy.id,
-          tenantName: tenant?.name ?? 'Tenant',
-          roomNumber: room?.roomNumber ?? 'Room',
-          moveOutDate: occupancy.moveOutDate!,
-          daysAfterMoveOut: daysAfterMoveOut,
-          notificationHour: _localState.notificationHour,
-        );
-      }
-    }
-
-    // High utility usage anomaly reminders.
-    if (_localState.isEnabled(NotificationType.utilityUsageAnomaly)) {
-      final occupancies = await ref.read(activeOccupanciesProvider.future);
-      final billingRepo = ref.read(billingRepositoryProvider);
-
-      for (final occupancy in occupancies) {
-        final bills = await billingRepo.getBillsForOccupancy(occupancy.id);
-        final electricityBills = bills
-            .where(
-              (b) =>
-                  b.billType == BillType.electricity &&
-                  b.electricityPrevReading != null &&
-                  b.electricityCurrReading != null &&
-                  b.electricityCurrReading! >= b.electricityPrevReading!,
-            )
-            .toList();
-
-        if (electricityBills.length < 2) continue;
-
-        electricityBills.sort((a, b) {
-          final aDate = a.periodEndDate ?? a.createdAt;
-          final bDate = b.periodEndDate ?? b.createdAt;
-          return aDate.compareTo(bDate);
-        });
-
-        final latest = electricityBills[electricityBills.length - 1];
-        final previous = electricityBills[electricityBills.length - 2];
-
-        final latestUnits =
-            (latest.electricityCurrReading! - latest.electricityPrevReading!)
-                .round();
-        final previousUnits =
-            (previous.electricityCurrReading! -
-                    previous.electricityPrevReading!)
-                .round();
-
-        if (latestUnits <= 0 || previousUnits <= 0) continue;
-
-        final increasePercent =
-            ((latestUnits - previousUnits) / previousUnits) * 100;
-        final hasSpike =
-            increasePercent >= 35 && (latestUnits - previousUnits) >= 25;
-        if (!hasSpike) continue;
-
-        await service.scheduleUtilityUsageAnomalyReminder(
-          occupancyId: occupancy.id,
-          tenantName: occupancy.tenantName ?? 'Tenant',
-          roomNumber: occupancy.roomNumber ?? 'Room',
-          currentUnits: latestUnits,
-          previousUnits: previousUnits,
-          increasePercent: increasePercent,
-          notificationHour: _localState.notificationHour,
-        );
-      }
-    }
-  }
 
   // Helper to toggle a boolean setting
   void _toggleSetting(NotificationType type, bool value) {
@@ -484,7 +228,15 @@ class _NotificationSettingsScreenState
                         backgroundColor: Theme.of(context).colorScheme.error,
                         foregroundColor: Theme.of(context).colorScheme.onError,
                       ),
-                      onPressed: () => AppSettingsHelper.openSettings(),
+                      onPressed: () async {
+                        final service = LocalNotificationService();
+                        final granted = await service.requestPermission();
+                        if (granted) {
+                          await _checkSystemPermission();
+                        } else {
+                          AppSettingsHelper.openSettings();
+                        }
+                      },
                       child: Text(l10n.enableBtn),
                     ),
                   ],
@@ -705,15 +457,17 @@ class _NotificationSettingsScreenState
                       ),
                     )
                     .toList(),
-                onChanged: (v) {
-                  if (v != null) _updateHour(v);
-                },
+                onChanged: _systemNotificationsEnabled
+                    ? (v) {
+                        if (v != null) _updateHour(v);
+                      }
+                    : null,
               ),
             ),
             const SizedBox(height: 24),
 
             // Test button (debug only)
-            if (kDebugMode)
+            if (kDebugMode) ...[
               Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: SizedBox(
@@ -725,6 +479,18 @@ class _NotificationSettingsScreenState
                   ),
                 ),
               ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    icon: const Icon(Icons.developer_board),
+                    label: const Text('View Scheduled Notifications (Debug)'),
+                    onPressed: () => _showScheduledNotifications(),
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),
@@ -790,7 +556,7 @@ class _NotificationSettingsScreenState
       title: Text(title),
       subtitle: Text(subtitle),
       value: value,
-      onChanged: onChanged,
+      onChanged: _systemNotificationsEnabled ? onChanged : null,
     );
   }
 
@@ -813,7 +579,7 @@ class _NotificationSettingsScreenState
           title: Text(title),
           subtitle: Text(subtitle),
           value: value,
-          onChanged: onChanged,
+          onChanged: _systemNotificationsEnabled ? onChanged : null,
         ),
         if (value)
           Padding(
@@ -824,7 +590,7 @@ class _NotificationSettingsScreenState
               max: sliderMax,
               divisions: (sliderMax - sliderMin).round(),
               label: '${safeValue.round()} days',
-              onChanged: onSliderChanged,
+              onChanged: _systemNotificationsEnabled ? onSliderChanged : null,
             ),
           ),
       ],
@@ -866,5 +632,141 @@ class _NotificationSettingsScreenState
         ).showSnackBar(SnackBar(content: Text('${l10n.errorPrefix}$e')));
       }
     }
+  }
+
+  Future<void> _showScheduledNotifications() async {
+    final service = LocalNotificationService();
+    final pending = await service.getPendingNotifications();
+    
+    if (!mounted) return;
+    
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.8,
+          maxChildSize: 0.95,
+          minChildSize: 0.5,
+          expand: false,
+          builder: (context, scrollController) {
+            return Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Scheduled Notifications (${pending.length})',
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
+                ),
+                const Divider(),
+                Expanded(
+                  child: pending.isEmpty
+                      ? const Center(child: Text('No notifications scheduled.'))
+                      : ListView.separated(
+                          controller: scrollController,
+                          itemCount: pending.length,
+                          separatorBuilder: (_, __) => const Divider(),
+                            itemBuilder: (context, index) {
+                              final req = pending[index];
+                              
+                              String? rawPayload = req.payload;
+                              String? debugTimeStr;
+                              String? displayPayload = rawPayload;
+                              
+                              if (rawPayload != null && rawPayload.contains('debug_time:')) {
+                                final parts = rawPayload.split('|debug_time:');
+                                if (parts.length == 2) {
+                                  displayPayload = parts[0].isEmpty ? null : parts[0];
+                                  debugTimeStr = parts[1];
+                                } else if (rawPayload.startsWith('debug_time:')) {
+                                  displayPayload = null;
+                                  debugTimeStr = rawPayload.replaceFirst('debug_time:', '');
+                                }
+                              }
+                              
+                              String formattedTime = 'Unknown Time';
+                              if (debugTimeStr != null) {
+                                try {
+                                  final dt = DateTime.parse(debugTimeStr);
+                                  // Simple manual format to avoid intl dependency issues
+                                  formattedTime = '${dt.day}/${dt.month}/${dt.year} at '
+                                      '${dt.hour > 12 ? dt.hour - 12 : (dt.hour == 0 ? 12 : dt.hour)}:'
+                                      '${dt.minute.toString().padLeft(2, '0')} '
+                                      '${dt.hour >= 12 ? 'PM' : 'AM'}';
+                                } catch (_) {}
+                              }
+                              
+                              return ListTile(
+                                leading: CircleAvatar(
+                                  backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                                  child: Icon(Icons.alarm, color: Theme.of(context).colorScheme.primary, size: 20),
+                                ),
+                                title: Text(req.title ?? 'No Title', style: const TextStyle(fontWeight: FontWeight.bold)),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const SizedBox(height: 4),
+                                    Text(req.body ?? 'No Body'),
+                                    const SizedBox(height: 8),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: Colors.green.withAlpha(26), // 0.1 opacity
+                                        borderRadius: BorderRadius.circular(4),
+                                        border: Border.all(color: Colors.green.withAlpha(77)), // 0.3 opacity
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Icon(Icons.schedule, size: 14, color: Colors.green),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            'Fires on: $formattedTime',
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.green,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'ID: ${req.id}',
+                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                            color: Colors.grey,
+                                          ),
+                                    ),
+                                    if (displayPayload != null)
+                                      Text(
+                                        'Payload: $displayPayload',
+                                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                              color: Colors.blueGrey,
+                                            ),
+                                      ),
+                                  ],
+                                ),
+                                isThreeLine: true,
+                              );
+                            },
+                        ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 }
