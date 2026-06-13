@@ -1,4 +1,4 @@
-/// Billing cycle providers for anniversary-based billing logic.
+/// Billing cycle providers for date-to-date based billing logic.
 library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,7 +27,7 @@ Future<BillingAttentionConfig> billingAttentionConfig(Ref ref) async {
 /// Get the current billing cycle for an occupancy.
 ///
 /// Returns the cycle containing today's date, calculated from the
-/// occupancy's move-in date using anniversary-based logic.
+/// occupancy's move-in date using date-to-date based logic.
 @riverpod
 BillingCycle currentBillingCycle(Ref ref, Occupancy occupancy) {
   return BillingCycleService.getCurrentCycle(
@@ -273,7 +273,7 @@ Future<List<BillingCycle>> allUnbilledCyclesForBillType(
 /// Get billing attention items for a single occupancy.
 ///
 /// Returns a list of attention items - one for EACH unbilled cycle that:
-/// - Has anniversary billing enabled in settings
+/// - Has date-to-date billing enabled in settings
 /// - Has a cycle needing attention (due soon or overdue)
 @riverpod
 Future<List<BillingAttentionItem>> billingStatusFor(
@@ -301,17 +301,17 @@ Future<List<BillingAttentionItem>> billingStatusFor(
   final tenant = await tenantRepo.getTenantById(occupancy.tenantId);
   if (tenant == null) return [];
 
-  // Check which bill types have anniversary enabled
+  // Check which bill types have date-to-date enabled
   final enabledBillTypes = <BillType>[];
-  if (settings.rentUsesAnniversary) enabledBillTypes.add(BillType.rent);
-  if (settings.electricityUsesAnniversary) {
+  if (settings.rentUsesDateToDate) enabledBillTypes.add(BillType.rent);
+  if (settings.electricityUsesDateToDate) {
     enabledBillTypes.add(BillType.electricity);
   }
-  if (settings.waterUsesAnniversary) enabledBillTypes.add(BillType.water);
-  if (settings.maintenanceUsesAnniversary) {
+  if (settings.waterUsesDateToDate) enabledBillTypes.add(BillType.water);
+  if (settings.maintenanceUsesDateToDate) {
     enabledBillTypes.add(BillType.maintenance);
   }
-  if (settings.otherUsesAnniversary) enabledBillTypes.add(BillType.other);
+  if (settings.otherUsesDateToDate) enabledBillTypes.add(BillType.other);
 
   final List<BillingAttentionItem> attentionItems = [];
   final now = DateTime.now();

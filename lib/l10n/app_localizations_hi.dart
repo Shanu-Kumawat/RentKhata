@@ -63,7 +63,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get billingAndCycles => 'बिलिंग और चक्र';
 
   @override
-  String get anniversaryBilling => 'सालगिरह बिलिंग';
+  String get dateToDateBilling => 'तारीख-से-तारीख बिलिंग';
 
   @override
   String get configureBillingCycles =>
@@ -662,7 +662,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get notesOptional => 'नोट्स (वैकल्पिक)';
 
   @override
-  String get anniversary => 'वर्षगांठ';
+  String get dateToDate => 'तारीख-से-तारीख';
 
   @override
   String get advance => 'अग्रिम';
@@ -1409,11 +1409,12 @@ class AppLocalizationsHi extends AppLocalizations {
   }
 
   @override
-  String get anniversaryBillingByBillType =>
-      '[HI] Anniversary Billing By Bill Type';
+  String get dateToDateBillingByBillType =>
+      'तारीख-से-तारीख बिलिंग बिल प्रकार के अनुसार';
 
   @override
-  String get anniversaryBillingSubtitle => '[HI] Anniversary Billing Subtitle';
+  String get dateToDateBillingSubtitle =>
+      'प्रवेश की तारीख के आधार पर बिलिंग अवधि की गणना करें।';
 
   @override
   String get backupAndRestoreSubtitle => '[HI] Backup And Restore Subtitle';
@@ -1886,9 +1887,51 @@ class AppLocalizationsHi extends AppLocalizations {
   }
 
   @override
+  String get depositStatus => 'जमा स्थिति';
+
+  @override
+  String get settledStatusCap => 'निपटाया गया';
+
+  @override
+  String get manualDeductions => 'अन्य कटौतियां';
+
+  @override
+  String get finalRefund => 'अंतिम वापसी';
+
+  @override
+  String get amountOwed => 'बकाया राशि';
+
+  @override
+  String get manualDeductionReason => 'कटौती का कारण';
+
+  @override
   String get utilityAnomalyAlert => 'असामान्य उच्च उपयोगिता खपत';
 
   @override
   String get utilityAnomalyAlertSubtitle =>
       'नवीनतम बिजली उपयोग में तीव्र वृद्धि होने पर सचेत करें';
+
+  @override
+  String get sameAsMoveIn => 'प्रवेश के समान';
+
+  @override
+  String get selectBillToCollect =>
+      'समीक्षा और भुगतान लेने के लिए नीचे से एक बिल चुनें।';
+
+  @override
+  String overdueSinceDate(String date) {
+    return '$date से अतिदेय';
+  }
+
+  @override
+  String get awaitingPayment => 'भुगतान की प्रतीक्षा';
+
+  @override
+  String get unknownTenant => 'अज्ञात किरायेदार';
+
+  @override
+  String get unknownRoom => 'अज्ञात कमरा';
+
+  @override
+  String get collectLabel => 'वसूल करें';
 }

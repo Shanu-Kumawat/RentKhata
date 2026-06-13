@@ -31,11 +31,11 @@ Future<BillSettingsEntity> billSettings(Ref ref) async {
     dueDateOffsetDays: 5,
     dueSoonThresholdDays: 5,
     autoReminders: true,
-    rentUsesAnniversary: true,
-    electricityUsesAnniversary: true,
-    waterUsesAnniversary: false,
-    maintenanceUsesAnniversary: false,
-    otherUsesAnniversary: false,
+    rentUsesDateToDate: true,
+    electricityUsesDateToDate: true,
+    waterUsesDateToDate: false,
+    maintenanceUsesDateToDate: false,
+    otherUsesDateToDate: false,
     updatedAt: DateTime.now(),
   );
 }
@@ -47,16 +47,16 @@ Stream<BillSettingsEntity?> billSettingsStream(Ref ref) {
   return db.select(db.billSettings).watchSingleOrNull();
 }
 
-/// Check if a bill type should use anniversary-based cycles.
+/// Check if a bill type should use date-to-date cycles.
 @riverpod
-Future<bool> shouldUseAnniversary(Ref ref, BillType billType) async {
+Future<bool> shouldUseDateToDate(Ref ref, BillType billType) async {
   final settings = await ref.watch(billSettingsProvider.future);
   return switch (billType) {
-    BillType.rent => settings.rentUsesAnniversary,
-    BillType.electricity => settings.electricityUsesAnniversary,
-    BillType.water => settings.waterUsesAnniversary,
-    BillType.maintenance => settings.maintenanceUsesAnniversary,
-    BillType.other => settings.otherUsesAnniversary,
+    BillType.rent => settings.rentUsesDateToDate,
+    BillType.electricity => settings.electricityUsesDateToDate,
+    BillType.water => settings.waterUsesDateToDate,
+    BillType.maintenance => settings.maintenanceUsesDateToDate,
+    BillType.other => settings.otherUsesDateToDate,
   };
 }
 

@@ -56,7 +56,7 @@ class _SystemHash {
 /// Get the current billing cycle for an occupancy.
 ///
 /// Returns the cycle containing today's date, calculated from the
-/// occupancy's move-in date using anniversary-based logic.
+/// occupancy's move-in date using date-to-date based logic.
 ///
 /// Copied from [currentBillingCycle].
 @ProviderFor(currentBillingCycle)
@@ -65,14 +65,14 @@ const currentBillingCycleProvider = CurrentBillingCycleFamily();
 /// Get the current billing cycle for an occupancy.
 ///
 /// Returns the cycle containing today's date, calculated from the
-/// occupancy's move-in date using anniversary-based logic.
+/// occupancy's move-in date using date-to-date based logic.
 ///
 /// Copied from [currentBillingCycle].
 class CurrentBillingCycleFamily extends Family<BillingCycle> {
   /// Get the current billing cycle for an occupancy.
   ///
   /// Returns the cycle containing today's date, calculated from the
-  /// occupancy's move-in date using anniversary-based logic.
+  /// occupancy's move-in date using date-to-date based logic.
   ///
   /// Copied from [currentBillingCycle].
   const CurrentBillingCycleFamily();
@@ -80,7 +80,7 @@ class CurrentBillingCycleFamily extends Family<BillingCycle> {
   /// Get the current billing cycle for an occupancy.
   ///
   /// Returns the cycle containing today's date, calculated from the
-  /// occupancy's move-in date using anniversary-based logic.
+  /// occupancy's move-in date using date-to-date based logic.
   ///
   /// Copied from [currentBillingCycle].
   CurrentBillingCycleProvider call(Occupancy occupancy) {
@@ -112,14 +112,14 @@ class CurrentBillingCycleFamily extends Family<BillingCycle> {
 /// Get the current billing cycle for an occupancy.
 ///
 /// Returns the cycle containing today's date, calculated from the
-/// occupancy's move-in date using anniversary-based logic.
+/// occupancy's move-in date using date-to-date based logic.
 ///
 /// Copied from [currentBillingCycle].
 class CurrentBillingCycleProvider extends AutoDisposeProvider<BillingCycle> {
   /// Get the current billing cycle for an occupancy.
   ///
   /// Returns the cycle containing today's date, calculated from the
-  /// occupancy's move-in date using anniversary-based logic.
+  /// occupancy's move-in date using date-to-date based logic.
   ///
   /// Copied from [currentBillingCycle].
   CurrentBillingCycleProvider(Occupancy occupancy)
@@ -737,12 +737,12 @@ class _AllUnbilledCyclesForBillTypeProviderElement
       (origin as AllUnbilledCyclesForBillTypeProvider).billType;
 }
 
-String _$billingStatusForHash() => r'49946e1721b2a360499c87e7bbc6589c00fcfb12';
+String _$billingStatusForHash() => r'1058361587447596727bc81f09f05c0aa33a9b55';
 
 /// Get billing attention items for a single occupancy.
 ///
 /// Returns a list of attention items - one for EACH unbilled cycle that:
-/// - Has anniversary billing enabled in settings
+/// - Has date-to-date billing enabled in settings
 /// - Has a cycle needing attention (due soon or overdue)
 ///
 /// Copied from [billingStatusFor].
@@ -752,7 +752,7 @@ const billingStatusForProvider = BillingStatusForFamily();
 /// Get billing attention items for a single occupancy.
 ///
 /// Returns a list of attention items - one for EACH unbilled cycle that:
-/// - Has anniversary billing enabled in settings
+/// - Has date-to-date billing enabled in settings
 /// - Has a cycle needing attention (due soon or overdue)
 ///
 /// Copied from [billingStatusFor].
@@ -761,7 +761,7 @@ class BillingStatusForFamily
   /// Get billing attention items for a single occupancy.
   ///
   /// Returns a list of attention items - one for EACH unbilled cycle that:
-  /// - Has anniversary billing enabled in settings
+  /// - Has date-to-date billing enabled in settings
   /// - Has a cycle needing attention (due soon or overdue)
   ///
   /// Copied from [billingStatusFor].
@@ -770,7 +770,7 @@ class BillingStatusForFamily
   /// Get billing attention items for a single occupancy.
   ///
   /// Returns a list of attention items - one for EACH unbilled cycle that:
-  /// - Has anniversary billing enabled in settings
+  /// - Has date-to-date billing enabled in settings
   /// - Has a cycle needing attention (due soon or overdue)
   ///
   /// Copied from [billingStatusFor].
@@ -803,7 +803,7 @@ class BillingStatusForFamily
 /// Get billing attention items for a single occupancy.
 ///
 /// Returns a list of attention items - one for EACH unbilled cycle that:
-/// - Has anniversary billing enabled in settings
+/// - Has date-to-date billing enabled in settings
 /// - Has a cycle needing attention (due soon or overdue)
 ///
 /// Copied from [billingStatusFor].
@@ -812,7 +812,7 @@ class BillingStatusForProvider
   /// Get billing attention items for a single occupancy.
   ///
   /// Returns a list of attention items - one for EACH unbilled cycle that:
-  /// - Has anniversary billing enabled in settings
+  /// - Has date-to-date billing enabled in settings
   /// - Has a cycle needing attention (due soon or overdue)
   ///
   /// Copied from [billingStatusFor].

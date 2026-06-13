@@ -141,7 +141,7 @@ class SettingsScreen extends ConsumerWidget {
             children: [
               _SettingsTile(
                 icon: Icons.calendar_month_outlined,
-                title: l10n.anniversaryBilling,
+                title: l10n.dateToDateBilling,
                 subtitle: l10n.configureBillingCycles,
                 onTap: () => Navigator.push(
                   context,

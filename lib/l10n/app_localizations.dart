@@ -200,11 +200,11 @@ abstract class AppLocalizations {
   /// **'Billing & Cycles'**
   String get billingAndCycles;
 
-  /// No description provided for @anniversaryBilling.
+  /// No description provided for @dateToDateBilling.
   ///
   /// In en, this message translates to:
-  /// **'Anniversary Billing'**
-  String get anniversaryBilling;
+  /// **'Date-to-Date Billing'**
+  String get dateToDateBilling;
 
   /// No description provided for @configureBillingCycles.
   ///
@@ -1303,11 +1303,11 @@ abstract class AppLocalizations {
   /// **'Notes (optional)'**
   String get notesOptional;
 
-  /// No description provided for @anniversary.
+  /// No description provided for @dateToDate.
   ///
   /// In en, this message translates to:
-  /// **'Anniversary'**
-  String get anniversary;
+  /// **'Date-to-Date'**
+  String get dateToDate;
 
   /// No description provided for @advance.
   ///
@@ -2689,17 +2689,17 @@ abstract class AppLocalizations {
   /// **'Alert {count} days before'**
   String alertDaysBeforeCycle(int count);
 
-  /// No description provided for @anniversaryBillingByBillType.
+  /// No description provided for @dateToDateBillingByBillType.
   ///
   /// In en, this message translates to:
-  /// **'Anniversary Billing By Bill Type'**
-  String get anniversaryBillingByBillType;
+  /// **'Date-to-Date Billing By Bill Type'**
+  String get dateToDateBillingByBillType;
 
-  /// No description provided for @anniversaryBillingSubtitle.
+  /// No description provided for @dateToDateBillingSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Anniversary Billing Subtitle'**
-  String get anniversaryBillingSubtitle;
+  /// **'Auto-calculate billing period based on move-in date.'**
+  String get dateToDateBillingSubtitle;
 
   /// No description provided for @backupAndRestoreSubtitle.
   ///
@@ -3571,6 +3571,42 @@ abstract class AppLocalizations {
   /// **'Remind after {days} day(s) if settlement is pending'**
   String depositSettlementAlertSubtitle(int days);
 
+  /// No description provided for @depositStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Deposit Status'**
+  String get depositStatus;
+
+  /// No description provided for @settledStatusCap.
+  ///
+  /// In en, this message translates to:
+  /// **'SETTLED'**
+  String get settledStatusCap;
+
+  /// No description provided for @manualDeductions.
+  ///
+  /// In en, this message translates to:
+  /// **'Manual Deductions'**
+  String get manualDeductions;
+
+  /// No description provided for @finalRefund.
+  ///
+  /// In en, this message translates to:
+  /// **'Final Refund'**
+  String get finalRefund;
+
+  /// No description provided for @amountOwed.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount Owed'**
+  String get amountOwed;
+
+  /// No description provided for @manualDeductionReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Manual Deduction Reason'**
+  String get manualDeductionReason;
+
   /// No description provided for @utilityAnomalyAlert.
   ///
   /// In en, this message translates to:
@@ -3582,6 +3618,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Alerts when latest electricity usage spikes sharply'**
   String get utilityAnomalyAlertSubtitle;
+
+  /// No description provided for @sameAsMoveIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Same as move-in'**
+  String get sameAsMoveIn;
+
+  /// No description provided for @selectBillToCollect.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a bill below to review it and collect its pending payment.'**
+  String get selectBillToCollect;
+
+  /// No description provided for @overdueSinceDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue since {date}'**
+  String overdueSinceDate(String date);
+
+  /// No description provided for @awaitingPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Awaiting payment'**
+  String get awaitingPayment;
+
+  /// No description provided for @unknownTenant.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown Tenant'**
+  String get unknownTenant;
+
+  /// No description provided for @unknownRoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown Room'**
+  String get unknownRoom;
+
+  /// No description provided for @collectLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Collect'**
+  String get collectLabel;
 }
 
 class _AppLocalizationsDelegate

@@ -424,6 +424,11 @@ class BillingRepositoryImpl implements BillingRepository {
     return updated;
   }
 
+  @override
+  Future<bool> updateBillSettings(dynamic settings) async {
+    return _billingDao.updateBillSettings(settings);
+  }
+
   // ========== Payment Operations ==========
 
   @override

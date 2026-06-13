@@ -107,7 +107,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
       _billingYear = widget.suggestedPeriodStart!.year;
     }
 
-    // Initialize mutable cycle state
+    // If date-to-date, use the cycle start date
     _currentPeriodStart = widget.suggestedPeriodStart;
     _currentPeriodEnd = widget.suggestedPeriodEnd;
 
@@ -195,15 +195,15 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
       error: (_, __) => _buildMonthYearPicker(context, months),
       data: (settings) {
         // Check if the selected bill type uses anniversary billing
-        final usesAnniversary = switch (_selectedBillType) {
-          BillType.rent => settings.rentUsesAnniversary,
-          BillType.electricity => settings.electricityUsesAnniversary,
-          BillType.water => settings.waterUsesAnniversary,
-          BillType.maintenance => settings.maintenanceUsesAnniversary,
-          BillType.other => settings.otherUsesAnniversary,
+        final defaultToDateToDate = switch (_selectedBillType) {
+          BillType.rent => settings.rentUsesDateToDate,
+          BillType.electricity => settings.electricityUsesDateToDate,
+          BillType.water => settings.waterUsesDateToDate,
+          BillType.maintenance => settings.maintenanceUsesDateToDate,
+          BillType.other => settings.otherUsesDateToDate,
         };
 
-        if (!usesAnniversary || widget.billingStartDate == null) {
+        if (!defaultToDateToDate || widget.billingStartDate == null) {
           // Bill type doesn't use anniversary billing
           return _buildMonthYearPicker(context, months);
         }
@@ -241,7 +241,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
               });
             }
 
-            return _buildAnniversaryPeriodDisplayWithCycle(
+            return _buildDateToDatePeriodDisplayWithCycle(
               context,
               effectiveStart,
               effectiveEnd,
@@ -252,9 +252,9 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
     );
   }
 
-  /// Displays the anniversary-based billing period with navigation
+  /// Displays the date-to-date based billing period with navigation
   /// Uses provided cycle dates
-  Widget _buildAnniversaryPeriodDisplayWithCycle(
+  Widget _buildDateToDatePeriodDisplayWithCycle(
     BuildContext context,
     DateTime start,
     DateTime end,
@@ -275,14 +275,10 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isFutureCycle
-            ? Theme.of(context).colorScheme.error.withValues(alpha: 0.1)
-            : theme.colorScheme.primaryContainer.withValues(alpha: 0.2),
+        color: theme.colorScheme.primaryContainer.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isFutureCycle
-              ? Theme.of(context).colorScheme.error.withValues(alpha: 0.3)
-              : theme.colorScheme.primary.withValues(alpha: 0.3),
+          color: theme.colorScheme.primary.withValues(alpha: 0.3),
         ),
       ),
       child: Column(
@@ -301,13 +297,13 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
-                      Icons.cake_outlined,
+                      Icons.event_outlined,
                       size: 14,
                       color: theme.colorScheme.primary,
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      AppLocalizations.of(context)!.anniversary,
+                      AppLocalizations.of(context)!.dateToDate,
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.colorScheme.primary,
                         fontWeight: FontWeight.w600,
@@ -345,15 +341,16 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.error.withValues(alpha: 0.1),
+                    color: Colors.transparent,
+                    border: Border.all(
+                      color: theme.colorScheme.outline.withValues(alpha: 0.5),
+                    ),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     AppLocalizations.of(context)!.advance,
                     style: theme.textTheme.labelSmall?.copyWith(
-                      color: Theme.of(context).colorScheme.error,
+                      color: theme.colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -386,21 +383,36 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (canNavigate && _currentCycleNumber > 0)
+              if (canNavigate)
                 IconButton(
-                  onPressed: _goToPreviousCycle,
+                  onPressed: _currentCycleNumber > 0 ? _goToPreviousCycle : null,
                   icon: const Icon(Icons.chevron_left),
                   tooltip: AppLocalizations.of(context)!.previousCycle,
                 )
               else
                 const SizedBox(width: 48),
               Expanded(
-                child: Text(
-                  '${_formatShortDate(context, start)} - ${_formatShortDate(context, end)}',
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '${_formatShortDate(context, start)} - ${_formatShortDate(context, end)}',
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      start.year == end.year
+                          ? '${start.year}'
+                          : '${start.year} - ${end.year}',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               if (canNavigate)
@@ -412,16 +424,6 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
               else
                 const SizedBox(width: 48),
             ],
-          ),
-
-          // Year indicator
-          Text(
-            start.year == end.year
-                ? '${start.year}'
-                : '${start.year} - ${end.year}',
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
           ),
 
           if (exceedsAgreement) ...[
@@ -673,9 +675,9 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
 
       // Get configurable due date offset from settings
       final settings = await ref.read(billSettingsProvider.future);
-      final hasAnniversaryDates =
+      final hasDateToDateDates =
           _currentPeriodEnd != null || widget.suggestedPeriodEnd != null;
-      final calculatedDueDate = hasAnniversaryDates
+      final calculatedDueDate = hasDateToDateDates
           ? periodEnd.add(Duration(days: settings.dueDateOffsetDays))
           : periodStart.add(const Duration(days: 10));
 

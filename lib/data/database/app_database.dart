@@ -81,7 +81,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 17;
+  int get schemaVersion => 18;
 
   @override
   MigrationStrategy get migration {
@@ -320,19 +320,19 @@ Thank you for your payment.
           ''');
         }
         if (from < 7) {
-          // Add new BillSettings columns for anniversary billing
+          // Add new BillSettings columns for date_to_date billing
           await m.addColumn(billSettings, billSettings.dueSoonThresholdDays);
-          await m.addColumn(billSettings, billSettings.rentUsesAnniversary);
+          await m.addColumn(billSettings, billSettings.rentUsesDateToDate);
           await m.addColumn(
             billSettings,
-            billSettings.electricityUsesAnniversary,
+            billSettings.electricityUsesDateToDate,
           );
-          await m.addColumn(billSettings, billSettings.waterUsesAnniversary);
+          await m.addColumn(billSettings, billSettings.waterUsesDateToDate);
           await m.addColumn(
             billSettings,
-            billSettings.maintenanceUsesAnniversary,
+            billSettings.maintenanceUsesDateToDate,
           );
-          await m.addColumn(billSettings, billSettings.otherUsesAnniversary);
+          await m.addColumn(billSettings, billSettings.otherUsesDateToDate);
         }
         if (from < 8) {
           // Add billingStartDate to occupancies for existing tenant support
@@ -382,6 +382,14 @@ Thank you for your payment.
         if (from < 17) {
           // Clear old message templates to migrate to the new 2-template system
           await customStatement('DELETE FROM message_templates');
+        }
+        if (from < 18) {
+          // Rename anniversary billing columns to date-to-date
+          await m.renameColumn(billSettings, 'rent_uses_anniversary', billSettings.rentUsesDateToDate);
+          await m.renameColumn(billSettings, 'electricity_uses_anniversary', billSettings.electricityUsesDateToDate);
+          await m.renameColumn(billSettings, 'water_uses_anniversary', billSettings.waterUsesDateToDate);
+          await m.renameColumn(billSettings, 'maintenance_uses_anniversary', billSettings.maintenanceUsesDateToDate);
+          await m.renameColumn(billSettings, 'other_uses_anniversary', billSettings.otherUsesDateToDate);
         }
       },
     );

@@ -17,7 +17,7 @@
   "appLock": "ऐप लॉक",
   "biometricAuthentication": "बायोमेट्रिक प्रमाणीकरण",
   "billingAndCycles": "बिलिंग और चक्र",
-  "anniversaryBilling": "सालगिरह बिलिंग",
+  "dateToDateBilling": "तारीख-से-तारीख बिलिंग",
   "configureBillingCycles": "बिलिंग चक्र और नियत तिथियां कॉन्फ़िगर करें",
   "billing": "बिलिंग",
   "electricityRates": "बिजली दरें",
@@ -200,7 +200,7 @@
   "tapToChangePhoto": "तस्वीर बदलने के लिए टैप करें",
   "billAmountLabel": "बिल राशि (₹) *",
   "notesOptional": "नोट्स (वैकल्पिक)",
-  "anniversary": "वर्षगांठ",
+  "dateToDate": "तारीख-से-तारीख",
   "advance": "अग्रिम",
   "currentLabel": "वर्तमान",
   "cycleExceedsAgreementWarning": "यह बिलिंग चक्र एग्रीमेंट खत्म होने की तारीख ({date}) से आगे जा रहा है",
@@ -438,8 +438,8 @@
       }
     }
   },
-  "anniversaryBillingByBillType": "[HI] Anniversary Billing By Bill Type",
-  "anniversaryBillingSubtitle": "[HI] Anniversary Billing Subtitle",
+  "dateToDateBillingByBillType": "तारीख-से-तारीख बिलिंग बिल प्रकार के अनुसार",
+  "dateToDateBillingSubtitle": "प्रवेश की तारीख के आधार पर बिलिंग अवधि की गणना करें।",
   "backupAndRestoreSubtitle": "[HI] Backup And Restore Subtitle",
   "backupCreatedShare": "[HI] Backup Created Share",
   "backupInfoText": "[HI] Backup Info Text",

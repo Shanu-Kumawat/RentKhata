@@ -29,6 +29,8 @@ import '../../../services/pdf_service.dart';
 import '../billing/create_bill_sheet.dart';
 import '../billing/bill_detail_screen.dart';
 import '../onboarding/widgets/premium_permission_sheet.dart';
+import '../onboarding/widgets/date_to_date_onboarding_sheet.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'move_in_sheet.dart';
 import 'add_room_screen.dart';
 import 'move_out_screen.dart';
@@ -256,6 +258,22 @@ class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
     DateTime? cycleEnd,
     BillType? billType,
   }) async {
+    // Check Date-to-Date onboarding
+    final prefs = await SharedPreferences.getInstance();
+    final hasSeenOnboarding = prefs.getBool('has_seen_date_to_date_onboarding') ?? false;
+    
+    if (!hasSeenOnboarding) {
+      if (!mounted) return;
+      await showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (_) => const DateToDateOnboardingSheet(),
+      );
+      await prefs.setBool('has_seen_date_to_date_onboarding', true);
+      if (!mounted) return;
+    }
+
     // Calculate anniversary-based cycle dates if not provided
     DateTime effectiveCycleStart;
     DateTime effectiveCycleEnd;
@@ -609,23 +627,21 @@ class _OccupancyCard extends ConsumerWidget {
                 ),
                 child: Column(
                   children: [
-                    Row(
+                    Column(
                       children: [
-                        Expanded(
-                          child: _InfoTile(
-                            label: AppLocalizations.of(context)!.agreedRent,
-                            value: formatCurrency(occupancy.agreedRent),
-                          ),
+                        _InfoTile(
+                          label: AppLocalizations.of(context)!.agreedRent,
+                          value: formatCurrency(occupancy.agreedRent),
                         ),
-                        if (occupancy.securityDeposit > 0)
-                          Expanded(
-                            child: _InfoTile(
-                              label: AppLocalizations.of(
-                                context,
-                              )!.securityDepositLabel,
-                              value: formatCurrency(occupancy.securityDeposit),
-                            ),
+                        if (occupancy.securityDeposit > 0) ...[
+                          const SizedBox(height: 8),
+                          _InfoTile(
+                            label: AppLocalizations.of(
+                              context,
+                            )!.securityDepositLabel,
+                            value: formatCurrency(occupancy.securityDeposit),
                           ),
+                        ],
                       ],
                     ),
                     const SizedBox(height: 12),
@@ -708,23 +724,14 @@ class _OccupancyCard extends ConsumerWidget {
                           icon: const Icon(Icons.edit_outlined, size: 18),
                           visualDensity: VisualDensity.compact,
                           tooltip: AppLocalizations.of(context)!.editBtn,
-                          style: IconButton.styleFrom(
-                            backgroundColor: Theme.of(
-                              context,
-                            ).colorScheme.surface,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ],
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
-              const Divider(height: 1),
-              const SizedBox(height: 12),
+              const SizedBox(height: 20),
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
@@ -799,12 +806,12 @@ class _InfoTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           label,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
         ),
@@ -812,7 +819,7 @@ class _InfoTile extends StatelessWidget {
           value,
           style: Theme.of(
             context,
-          ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
         ),
       ],
     );

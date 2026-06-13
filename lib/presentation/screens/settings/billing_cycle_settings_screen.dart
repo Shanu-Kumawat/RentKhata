@@ -11,7 +11,7 @@ import 'package:rent_khata/l10n/app_localizations.dart';
 
 enum _SaveStatus { idle, saving, saved, error }
 
-/// Billing cycle settings screen for configuring anniversary billing
+/// Billing cycle settings screen for configuring date-to-date billing
 /// Auto-saves changes immediately without a save button
 class BillingCycleSettingsScreen extends ConsumerStatefulWidget {
   const BillingCycleSettingsScreen({super.key});
@@ -26,11 +26,11 @@ class _BillingCycleSettingsScreenState
   // Local state for optimistic UI
   int? _dueDateOffsetDays;
   int? _dueSoonThresholdDays;
-  bool? _rentUsesAnniversary;
-  bool? _electricityUsesAnniversary;
-  bool? _waterUsesAnniversary;
-  bool? _maintenanceUsesAnniversary;
-  bool? _otherUsesAnniversary;
+  bool? _rentUsesDateToDate;
+  bool? _electricityUsesDateToDate;
+  bool? _waterUsesDateToDate;
+  bool? _maintenanceUsesDateToDate;
+  bool? _otherUsesDateToDate;
 
   bool _initialized = false;
   Timer? _debounceTimer;
@@ -46,11 +46,11 @@ class _BillingCycleSettingsScreenState
     if (_initialized) return;
     _dueDateOffsetDays = settings.dueDateOffsetDays;
     _dueSoonThresholdDays = settings.dueSoonThresholdDays;
-    _rentUsesAnniversary = settings.rentUsesAnniversary;
-    _electricityUsesAnniversary = settings.electricityUsesAnniversary;
-    _waterUsesAnniversary = settings.waterUsesAnniversary;
-    _maintenanceUsesAnniversary = settings.maintenanceUsesAnniversary;
-    _otherUsesAnniversary = settings.otherUsesAnniversary;
+    _rentUsesDateToDate = settings.rentUsesDateToDate;
+    _electricityUsesDateToDate = settings.electricityUsesDateToDate;
+    _waterUsesDateToDate = settings.waterUsesDateToDate;
+    _maintenanceUsesDateToDate = settings.maintenanceUsesDateToDate;
+    _otherUsesDateToDate = settings.otherUsesDateToDate;
     _initialized = true;
   }
 
@@ -72,11 +72,11 @@ class _BillingCycleSettingsScreenState
       final companion = BillSettingsCompanion(
         dueDateOffsetDays: Value(_dueDateOffsetDays!),
         dueSoonThresholdDays: Value(_dueSoonThresholdDays!),
-        rentUsesAnniversary: Value(_rentUsesAnniversary!),
-        electricityUsesAnniversary: Value(_electricityUsesAnniversary!),
-        waterUsesAnniversary: Value(_waterUsesAnniversary!),
-        maintenanceUsesAnniversary: Value(_maintenanceUsesAnniversary!),
-        otherUsesAnniversary: Value(_otherUsesAnniversary!),
+        rentUsesDateToDate: Value(_rentUsesDateToDate!),
+        electricityUsesDateToDate: Value(_electricityUsesDateToDate!),
+        waterUsesDateToDate: Value(_waterUsesDateToDate!),
+        maintenanceUsesDateToDate: Value(_maintenanceUsesDateToDate!),
+        otherUsesDateToDate: Value(_otherUsesDateToDate!),
         updatedAt: Value(DateTime.now()),
       );
 
@@ -127,19 +127,19 @@ class _BillingCycleSettingsScreenState
     setState(() {
       switch (type) {
         case 'rent':
-          _rentUsesAnniversary = value;
+          _rentUsesDateToDate = value;
           break;
         case 'electricity':
-          _electricityUsesAnniversary = value;
+          _electricityUsesDateToDate = value;
           break;
         case 'water':
-          _waterUsesAnniversary = value;
+          _waterUsesDateToDate = value;
           break;
         case 'maintenance':
-          _maintenanceUsesAnniversary = value;
+          _maintenanceUsesDateToDate = value;
           break;
         case 'other':
-          _otherUsesAnniversary = value;
+          _otherUsesDateToDate = value;
           break;
       }
     });
@@ -276,16 +276,16 @@ class _BillingCycleSettingsScreenState
           ),
           const SizedBox(height: 24),
 
-          // Anniversary Billing Toggles
+          // Date-to-Date Billing Toggles
           Text(
-            l10n.anniversaryBillingByBillType,
+            l10n.dateToDateBillingByBillType,
             style: theme.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 4),
           Text(
-            l10n.anniversaryBillingSubtitle,
+            l10n.dateToDateBillingSubtitle,
             style: theme.textTheme.bodySmall?.copyWith(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
@@ -295,7 +295,7 @@ class _BillingCycleSettingsScreenState
           _buildBillTypeToggle(
             label: l10n.rent,
             subtitle: l10n.monthlyRentBills,
-            value: _rentUsesAnniversary ?? true,
+            value: _rentUsesDateToDate ?? true,
             onChanged: (v) => _updateBillType('rent', v),
             icon: Icons.home_outlined,
             color: Theme.of(context).colorScheme.primary,
@@ -303,7 +303,7 @@ class _BillingCycleSettingsScreenState
           _buildBillTypeToggle(
             label: l10n.electricity,
             subtitle: l10n.electricityMeterBills,
-            value: _electricityUsesAnniversary ?? true,
+            value: _electricityUsesDateToDate ?? true,
             onChanged: (v) => _updateBillType('electricity', v),
             icon: Icons.bolt_outlined,
             color: Theme.of(context).colorScheme.error,
@@ -311,7 +311,7 @@ class _BillingCycleSettingsScreenState
           _buildBillTypeToggle(
             label: l10n.water,
             subtitle: l10n.waterBill,
-            value: _waterUsesAnniversary ?? false,
+            value: _waterUsesDateToDate ?? false,
             onChanged: (v) => _updateBillType('water', v),
             icon: Icons.water_drop_outlined,
             color: Colors.blue,
@@ -319,7 +319,7 @@ class _BillingCycleSettingsScreenState
           _buildBillTypeToggle(
             label: l10n.maintenance,
             subtitle: l10n.maintenanceCharges,
-            value: _maintenanceUsesAnniversary ?? false,
+            value: _maintenanceUsesDateToDate ?? false,
             onChanged: (v) => _updateBillType('maintenance', v),
             icon: Icons.build_outlined,
             color: Colors.green,
@@ -327,7 +327,7 @@ class _BillingCycleSettingsScreenState
           _buildBillTypeToggle(
             label: l10n.other,
             subtitle: l10n.otherCharges,
-            value: _otherUsesAnniversary ?? false,
+            value: _otherUsesDateToDate ?? false,
             onChanged: (v) => _updateBillType('other', v),
             icon: Icons.receipt_outlined,
             color: Colors.grey,

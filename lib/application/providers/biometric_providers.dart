@@ -60,45 +60,30 @@ class BiometricSettingsNotifier extends _$BiometricSettingsNotifier {
     return db.select(db.biometricSettings).getSingleOrNull();
   }
 
-  /// Enable or disable biometric lock.
-  Future<void> setEnabled(bool enabled) async {
+  Future<void> _updateSettings(BiometricSettingsCompanion settings) async {
     final db = ref.read(appDatabaseProvider);
-    await db
-        .update(db.biometricSettings)
-        .write(
-          BiometricSettingsCompanion(
-            isEnabled: Value(enabled),
-            updatedAt: Value(DateTime.now()),
-          ),
+    final existing = await db.select(db.biometricSettings).getSingleOrNull();
+    if (existing == null) {
+      await db.into(db.biometricSettings).insert(BiometricSettingsCompanion.insert());
+    }
+    await db.update(db.biometricSettings).write(
+          settings.copyWith(updatedAt: Value(DateTime.now())),
         );
     ref.invalidateSelf();
+  }
+
+  /// Enable or disable biometric lock.
+  Future<void> setEnabled(bool enabled) async {
+    await _updateSettings(BiometricSettingsCompanion(isEnabled: Value(enabled)));
   }
 
   /// Set lock on exit preference.
   Future<void> setLockOnExit(bool lockOnExit) async {
-    final db = ref.read(appDatabaseProvider);
-    await db
-        .update(db.biometricSettings)
-        .write(
-          BiometricSettingsCompanion(
-            lockOnExit: Value(lockOnExit),
-            updatedAt: Value(DateTime.now()),
-          ),
-        );
-    ref.invalidateSelf();
+    await _updateSettings(BiometricSettingsCompanion(lockOnExit: Value(lockOnExit)));
   }
 
   /// Set lock after inactivity timeout.
   Future<void> setLockAfterMinutes(int minutes) async {
-    final db = ref.read(appDatabaseProvider);
-    await db
-        .update(db.biometricSettings)
-        .write(
-          BiometricSettingsCompanion(
-            lockAfterMinutes: Value(minutes),
-            updatedAt: Value(DateTime.now()),
-          ),
-        );
-    ref.invalidateSelf();
+    await _updateSettings(BiometricSettingsCompanion(lockAfterMinutes: Value(minutes)));
   }
 }

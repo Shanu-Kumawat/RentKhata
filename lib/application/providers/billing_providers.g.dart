@@ -6,7 +6,7 @@ part of 'billing_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$billSettingsHash() => r'f00830007dc951d3d9fe879a44042eba5589a713';
+String _$billSettingsHash() => r'c2ff8f7a30d84ea01f6cdb7b0ad059be75807446';
 
 /// Get bill settings from database.
 /// Returns cached settings, auto-refreshes from stream.
@@ -49,8 +49,8 @@ final billSettingsStreamProvider =
 // ignore: unused_element
 typedef BillSettingsStreamRef =
     AutoDisposeStreamProviderRef<BillSettingsEntity?>;
-String _$shouldUseAnniversaryHash() =>
-    r'ebb6c0649f7e17904605d8607875ff1ecb3c6f14';
+String _$shouldUseDateToDateHash() =>
+    r'8424c3350c3591a723ee13417b272c50511d57d8';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -73,31 +73,31 @@ class _SystemHash {
   }
 }
 
-/// Check if a bill type should use anniversary-based cycles.
+/// Check if a bill type should use date-to-date cycles.
 ///
-/// Copied from [shouldUseAnniversary].
-@ProviderFor(shouldUseAnniversary)
-const shouldUseAnniversaryProvider = ShouldUseAnniversaryFamily();
+/// Copied from [shouldUseDateToDate].
+@ProviderFor(shouldUseDateToDate)
+const shouldUseDateToDateProvider = ShouldUseDateToDateFamily();
 
-/// Check if a bill type should use anniversary-based cycles.
+/// Check if a bill type should use date-to-date cycles.
 ///
-/// Copied from [shouldUseAnniversary].
-class ShouldUseAnniversaryFamily extends Family<AsyncValue<bool>> {
-  /// Check if a bill type should use anniversary-based cycles.
+/// Copied from [shouldUseDateToDate].
+class ShouldUseDateToDateFamily extends Family<AsyncValue<bool>> {
+  /// Check if a bill type should use date-to-date cycles.
   ///
-  /// Copied from [shouldUseAnniversary].
-  const ShouldUseAnniversaryFamily();
+  /// Copied from [shouldUseDateToDate].
+  const ShouldUseDateToDateFamily();
 
-  /// Check if a bill type should use anniversary-based cycles.
+  /// Check if a bill type should use date-to-date cycles.
   ///
-  /// Copied from [shouldUseAnniversary].
-  ShouldUseAnniversaryProvider call(BillType billType) {
-    return ShouldUseAnniversaryProvider(billType);
+  /// Copied from [shouldUseDateToDate].
+  ShouldUseDateToDateProvider call(BillType billType) {
+    return ShouldUseDateToDateProvider(billType);
   }
 
   @override
-  ShouldUseAnniversaryProvider getProviderOverride(
-    covariant ShouldUseAnniversaryProvider provider,
+  ShouldUseDateToDateProvider getProviderOverride(
+    covariant ShouldUseDateToDateProvider provider,
   ) {
     return call(provider.billType);
   }
@@ -114,31 +114,31 @@ class ShouldUseAnniversaryFamily extends Family<AsyncValue<bool>> {
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'shouldUseAnniversaryProvider';
+  String? get name => r'shouldUseDateToDateProvider';
 }
 
-/// Check if a bill type should use anniversary-based cycles.
+/// Check if a bill type should use date-to-date cycles.
 ///
-/// Copied from [shouldUseAnniversary].
-class ShouldUseAnniversaryProvider extends AutoDisposeFutureProvider<bool> {
-  /// Check if a bill type should use anniversary-based cycles.
+/// Copied from [shouldUseDateToDate].
+class ShouldUseDateToDateProvider extends AutoDisposeFutureProvider<bool> {
+  /// Check if a bill type should use date-to-date cycles.
   ///
-  /// Copied from [shouldUseAnniversary].
-  ShouldUseAnniversaryProvider(BillType billType)
+  /// Copied from [shouldUseDateToDate].
+  ShouldUseDateToDateProvider(BillType billType)
     : this._internal(
-        (ref) => shouldUseAnniversary(ref as ShouldUseAnniversaryRef, billType),
-        from: shouldUseAnniversaryProvider,
-        name: r'shouldUseAnniversaryProvider',
+        (ref) => shouldUseDateToDate(ref as ShouldUseDateToDateRef, billType),
+        from: shouldUseDateToDateProvider,
+        name: r'shouldUseDateToDateProvider',
         debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
             ? null
-            : _$shouldUseAnniversaryHash,
-        dependencies: ShouldUseAnniversaryFamily._dependencies,
+            : _$shouldUseDateToDateHash,
+        dependencies: ShouldUseDateToDateFamily._dependencies,
         allTransitiveDependencies:
-            ShouldUseAnniversaryFamily._allTransitiveDependencies,
+            ShouldUseDateToDateFamily._allTransitiveDependencies,
         billType: billType,
       );
 
-  ShouldUseAnniversaryProvider._internal(
+  ShouldUseDateToDateProvider._internal(
     super._createNotifier, {
     required super.name,
     required super.dependencies,
@@ -152,12 +152,12 @@ class ShouldUseAnniversaryProvider extends AutoDisposeFutureProvider<bool> {
 
   @override
   Override overrideWith(
-    FutureOr<bool> Function(ShouldUseAnniversaryRef provider) create,
+    FutureOr<bool> Function(ShouldUseDateToDateRef provider) create,
   ) {
     return ProviderOverride(
       origin: this,
-      override: ShouldUseAnniversaryProvider._internal(
-        (ref) => create(ref as ShouldUseAnniversaryRef),
+      override: ShouldUseDateToDateProvider._internal(
+        (ref) => create(ref as ShouldUseDateToDateRef),
         from: from,
         name: null,
         dependencies: null,
@@ -170,12 +170,12 @@ class ShouldUseAnniversaryProvider extends AutoDisposeFutureProvider<bool> {
 
   @override
   AutoDisposeFutureProviderElement<bool> createElement() {
-    return _ShouldUseAnniversaryProviderElement(this);
+    return _ShouldUseDateToDateProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is ShouldUseAnniversaryProvider && other.billType == billType;
+    return other is ShouldUseDateToDateProvider && other.billType == billType;
   }
 
   @override
@@ -189,18 +189,18 @@ class ShouldUseAnniversaryProvider extends AutoDisposeFutureProvider<bool> {
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin ShouldUseAnniversaryRef on AutoDisposeFutureProviderRef<bool> {
+mixin ShouldUseDateToDateRef on AutoDisposeFutureProviderRef<bool> {
   /// The parameter `billType` of this provider.
   BillType get billType;
 }
 
-class _ShouldUseAnniversaryProviderElement
+class _ShouldUseDateToDateProviderElement
     extends AutoDisposeFutureProviderElement<bool>
-    with ShouldUseAnniversaryRef {
-  _ShouldUseAnniversaryProviderElement(super.provider);
+    with ShouldUseDateToDateRef {
+  _ShouldUseDateToDateProviderElement(super.provider);
 
   @override
-  BillType get billType => (origin as ShouldUseAnniversaryProvider).billType;
+  BillType get billType => (origin as ShouldUseDateToDateProvider).billType;
 }
 
 String _$billsStreamHash() => r'ff0b76a409f8781ea546384d9cda27bac2e1528a';

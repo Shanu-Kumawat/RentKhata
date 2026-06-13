@@ -63,7 +63,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get billingAndCycles => 'Billing & Cycles';
 
   @override
-  String get anniversaryBilling => 'Anniversary Billing';
+  String get dateToDateBilling => 'Date-to-Date Billing';
 
   @override
   String get configureBillingCycles => 'Configure billing cycles and due dates';
@@ -659,7 +659,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notesOptional => 'Notes (optional)';
 
   @override
-  String get anniversary => 'Anniversary';
+  String get dateToDate => 'Date-to-Date';
 
   @override
   String get advance => 'Advance';
@@ -1406,10 +1406,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get anniversaryBillingByBillType => 'Anniversary Billing By Bill Type';
+  String get dateToDateBillingByBillType => 'Date-to-Date Billing By Bill Type';
 
   @override
-  String get anniversaryBillingSubtitle => 'Anniversary Billing Subtitle';
+  String get dateToDateBillingSubtitle =>
+      'Auto-calculate billing period based on move-in date.';
 
   @override
   String get backupAndRestoreSubtitle => 'Backup And Restore Subtitle';
@@ -1882,9 +1883,51 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get depositStatus => 'Deposit Status';
+
+  @override
+  String get settledStatusCap => 'SETTLED';
+
+  @override
+  String get manualDeductions => 'Manual Deductions';
+
+  @override
+  String get finalRefund => 'Final Refund';
+
+  @override
+  String get amountOwed => 'Amount Owed';
+
+  @override
+  String get manualDeductionReason => 'Manual Deduction Reason';
+
+  @override
   String get utilityAnomalyAlert => 'High utility usage anomaly';
 
   @override
   String get utilityAnomalyAlertSubtitle =>
       'Alerts when latest electricity usage spikes sharply';
+
+  @override
+  String get sameAsMoveIn => 'Same as move-in';
+
+  @override
+  String get selectBillToCollect =>
+      'Select a bill below to review it and collect its pending payment.';
+
+  @override
+  String overdueSinceDate(String date) {
+    return 'Overdue since $date';
+  }
+
+  @override
+  String get awaitingPayment => 'Awaiting payment';
+
+  @override
+  String get unknownTenant => 'Unknown Tenant';
+
+  @override
+  String get unknownRoom => 'Unknown Room';
+
+  @override
+  String get collectLabel => 'Collect';
 }

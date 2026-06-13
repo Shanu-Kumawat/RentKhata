@@ -9808,75 +9808,75 @@ class $BillSettingsTable extends BillSettings
     ),
     defaultValue: const Constant(true),
   );
-  static const VerificationMeta _rentUsesAnniversaryMeta =
-      const VerificationMeta('rentUsesAnniversary');
+  static const VerificationMeta _rentUsesDateToDateMeta =
+      const VerificationMeta('rentUsesDateToDate');
   @override
-  late final GeneratedColumn<bool> rentUsesAnniversary = GeneratedColumn<bool>(
-    'rent_uses_anniversary',
+  late final GeneratedColumn<bool> rentUsesDateToDate = GeneratedColumn<bool>(
+    'rent_uses_date_to_date',
     aliasedName,
     false,
     type: DriftSqlType.bool,
     requiredDuringInsert: false,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("rent_uses_anniversary" IN (0, 1))',
+      'CHECK ("rent_uses_date_to_date" IN (0, 1))',
     ),
     defaultValue: const Constant(true),
   );
-  static const VerificationMeta _electricityUsesAnniversaryMeta =
-      const VerificationMeta('electricityUsesAnniversary');
+  static const VerificationMeta _electricityUsesDateToDateMeta =
+      const VerificationMeta('electricityUsesDateToDate');
   @override
-  late final GeneratedColumn<bool> electricityUsesAnniversary =
+  late final GeneratedColumn<bool> electricityUsesDateToDate =
       GeneratedColumn<bool>(
-        'electricity_uses_anniversary',
+        'electricity_uses_date_to_date',
         aliasedName,
         false,
         type: DriftSqlType.bool,
         requiredDuringInsert: false,
         defaultConstraints: GeneratedColumn.constraintIsAlways(
-          'CHECK ("electricity_uses_anniversary" IN (0, 1))',
+          'CHECK ("electricity_uses_date_to_date" IN (0, 1))',
         ),
         defaultValue: const Constant(true),
       );
-  static const VerificationMeta _waterUsesAnniversaryMeta =
-      const VerificationMeta('waterUsesAnniversary');
+  static const VerificationMeta _waterUsesDateToDateMeta =
+      const VerificationMeta('waterUsesDateToDate');
   @override
-  late final GeneratedColumn<bool> waterUsesAnniversary = GeneratedColumn<bool>(
-    'water_uses_anniversary',
+  late final GeneratedColumn<bool> waterUsesDateToDate = GeneratedColumn<bool>(
+    'water_uses_date_to_date',
     aliasedName,
     false,
     type: DriftSqlType.bool,
     requiredDuringInsert: false,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("water_uses_anniversary" IN (0, 1))',
+      'CHECK ("water_uses_date_to_date" IN (0, 1))',
     ),
     defaultValue: const Constant(false),
   );
-  static const VerificationMeta _maintenanceUsesAnniversaryMeta =
-      const VerificationMeta('maintenanceUsesAnniversary');
+  static const VerificationMeta _maintenanceUsesDateToDateMeta =
+      const VerificationMeta('maintenanceUsesDateToDate');
   @override
-  late final GeneratedColumn<bool> maintenanceUsesAnniversary =
+  late final GeneratedColumn<bool> maintenanceUsesDateToDate =
       GeneratedColumn<bool>(
-        'maintenance_uses_anniversary',
+        'maintenance_uses_date_to_date',
         aliasedName,
         false,
         type: DriftSqlType.bool,
         requiredDuringInsert: false,
         defaultConstraints: GeneratedColumn.constraintIsAlways(
-          'CHECK ("maintenance_uses_anniversary" IN (0, 1))',
+          'CHECK ("maintenance_uses_date_to_date" IN (0, 1))',
         ),
         defaultValue: const Constant(false),
       );
-  static const VerificationMeta _otherUsesAnniversaryMeta =
-      const VerificationMeta('otherUsesAnniversary');
+  static const VerificationMeta _otherUsesDateToDateMeta =
+      const VerificationMeta('otherUsesDateToDate');
   @override
-  late final GeneratedColumn<bool> otherUsesAnniversary = GeneratedColumn<bool>(
-    'other_uses_anniversary',
+  late final GeneratedColumn<bool> otherUsesDateToDate = GeneratedColumn<bool>(
+    'other_uses_date_to_date',
     aliasedName,
     false,
     type: DriftSqlType.bool,
     requiredDuringInsert: false,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("other_uses_anniversary" IN (0, 1))',
+      'CHECK ("other_uses_date_to_date" IN (0, 1))',
     ),
     defaultValue: const Constant(false),
   );
@@ -9899,11 +9899,11 @@ class $BillSettingsTable extends BillSettings
     dueDateOffsetDays,
     dueSoonThresholdDays,
     autoReminders,
-    rentUsesAnniversary,
-    electricityUsesAnniversary,
-    waterUsesAnniversary,
-    maintenanceUsesAnniversary,
-    otherUsesAnniversary,
+    rentUsesDateToDate,
+    electricityUsesDateToDate,
+    waterUsesDateToDate,
+    maintenanceUsesDateToDate,
+    otherUsesDateToDate,
     updatedAt,
   ];
   @override
@@ -9957,48 +9957,48 @@ class $BillSettingsTable extends BillSettings
         ),
       );
     }
-    if (data.containsKey('rent_uses_anniversary')) {
+    if (data.containsKey('rent_uses_date_to_date')) {
       context.handle(
-        _rentUsesAnniversaryMeta,
-        rentUsesAnniversary.isAcceptableOrUnknown(
-          data['rent_uses_anniversary']!,
-          _rentUsesAnniversaryMeta,
+        _rentUsesDateToDateMeta,
+        rentUsesDateToDate.isAcceptableOrUnknown(
+          data['rent_uses_date_to_date']!,
+          _rentUsesDateToDateMeta,
         ),
       );
     }
-    if (data.containsKey('electricity_uses_anniversary')) {
+    if (data.containsKey('electricity_uses_date_to_date')) {
       context.handle(
-        _electricityUsesAnniversaryMeta,
-        electricityUsesAnniversary.isAcceptableOrUnknown(
-          data['electricity_uses_anniversary']!,
-          _electricityUsesAnniversaryMeta,
+        _electricityUsesDateToDateMeta,
+        electricityUsesDateToDate.isAcceptableOrUnknown(
+          data['electricity_uses_date_to_date']!,
+          _electricityUsesDateToDateMeta,
         ),
       );
     }
-    if (data.containsKey('water_uses_anniversary')) {
+    if (data.containsKey('water_uses_date_to_date')) {
       context.handle(
-        _waterUsesAnniversaryMeta,
-        waterUsesAnniversary.isAcceptableOrUnknown(
-          data['water_uses_anniversary']!,
-          _waterUsesAnniversaryMeta,
+        _waterUsesDateToDateMeta,
+        waterUsesDateToDate.isAcceptableOrUnknown(
+          data['water_uses_date_to_date']!,
+          _waterUsesDateToDateMeta,
         ),
       );
     }
-    if (data.containsKey('maintenance_uses_anniversary')) {
+    if (data.containsKey('maintenance_uses_date_to_date')) {
       context.handle(
-        _maintenanceUsesAnniversaryMeta,
-        maintenanceUsesAnniversary.isAcceptableOrUnknown(
-          data['maintenance_uses_anniversary']!,
-          _maintenanceUsesAnniversaryMeta,
+        _maintenanceUsesDateToDateMeta,
+        maintenanceUsesDateToDate.isAcceptableOrUnknown(
+          data['maintenance_uses_date_to_date']!,
+          _maintenanceUsesDateToDateMeta,
         ),
       );
     }
-    if (data.containsKey('other_uses_anniversary')) {
+    if (data.containsKey('other_uses_date_to_date')) {
       context.handle(
-        _otherUsesAnniversaryMeta,
-        otherUsesAnniversary.isAcceptableOrUnknown(
-          data['other_uses_anniversary']!,
-          _otherUsesAnniversaryMeta,
+        _otherUsesDateToDateMeta,
+        otherUsesDateToDate.isAcceptableOrUnknown(
+          data['other_uses_date_to_date']!,
+          _otherUsesDateToDateMeta,
         ),
       );
     }
@@ -10037,25 +10037,25 @@ class $BillSettingsTable extends BillSettings
         DriftSqlType.bool,
         data['${effectivePrefix}auto_reminders'],
       )!,
-      rentUsesAnniversary: attachedDatabase.typeMapping.read(
+      rentUsesDateToDate: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
-        data['${effectivePrefix}rent_uses_anniversary'],
+        data['${effectivePrefix}rent_uses_date_to_date'],
       )!,
-      electricityUsesAnniversary: attachedDatabase.typeMapping.read(
+      electricityUsesDateToDate: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
-        data['${effectivePrefix}electricity_uses_anniversary'],
+        data['${effectivePrefix}electricity_uses_date_to_date'],
       )!,
-      waterUsesAnniversary: attachedDatabase.typeMapping.read(
+      waterUsesDateToDate: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
-        data['${effectivePrefix}water_uses_anniversary'],
+        data['${effectivePrefix}water_uses_date_to_date'],
       )!,
-      maintenanceUsesAnniversary: attachedDatabase.typeMapping.read(
+      maintenanceUsesDateToDate: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
-        data['${effectivePrefix}maintenance_uses_anniversary'],
+        data['${effectivePrefix}maintenance_uses_date_to_date'],
       )!,
-      otherUsesAnniversary: attachedDatabase.typeMapping.read(
+      otherUsesDateToDate: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
-        data['${effectivePrefix}other_uses_anniversary'],
+        data['${effectivePrefix}other_uses_date_to_date'],
       )!,
       updatedAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
@@ -10087,20 +10087,20 @@ class BillSettingsEntity extends DataClass
   /// Auto-generate reminders for overdue bills
   final bool autoReminders;
 
-  /// Whether rent bills use anniversary-based cycles (default: true)
-  final bool rentUsesAnniversary;
+  /// Whether rent bills use date-to-date cycles (default: true)
+  final bool rentUsesDateToDate;
 
-  /// Whether electricity bills use anniversary-based cycles (default: true)
-  final bool electricityUsesAnniversary;
+  /// Whether electricity bills use date-to-date cycles (default: true)
+  final bool electricityUsesDateToDate;
 
-  /// Whether water bills use anniversary-based cycles (default: false)
-  final bool waterUsesAnniversary;
+  /// Whether water bills use date-to-date cycles (default: false)
+  final bool waterUsesDateToDate;
 
-  /// Whether maintenance bills use anniversary-based cycles (default: false)
-  final bool maintenanceUsesAnniversary;
+  /// Whether maintenance bills use date-to-date cycles (default: false)
+  final bool maintenanceUsesDateToDate;
 
-  /// Whether other bills use anniversary-based cycles (default: false)
-  final bool otherUsesAnniversary;
+  /// Whether other bills use date-to-date cycles (default: false)
+  final bool otherUsesDateToDate;
 
   /// Last updated timestamp
   final DateTime updatedAt;
@@ -10110,11 +10110,11 @@ class BillSettingsEntity extends DataClass
     required this.dueDateOffsetDays,
     required this.dueSoonThresholdDays,
     required this.autoReminders,
-    required this.rentUsesAnniversary,
-    required this.electricityUsesAnniversary,
-    required this.waterUsesAnniversary,
-    required this.maintenanceUsesAnniversary,
-    required this.otherUsesAnniversary,
+    required this.rentUsesDateToDate,
+    required this.electricityUsesDateToDate,
+    required this.waterUsesDateToDate,
+    required this.maintenanceUsesDateToDate,
+    required this.otherUsesDateToDate,
     required this.updatedAt,
   });
   @override
@@ -10125,15 +10125,15 @@ class BillSettingsEntity extends DataClass
     map['due_date_offset_days'] = Variable<int>(dueDateOffsetDays);
     map['due_soon_threshold_days'] = Variable<int>(dueSoonThresholdDays);
     map['auto_reminders'] = Variable<bool>(autoReminders);
-    map['rent_uses_anniversary'] = Variable<bool>(rentUsesAnniversary);
-    map['electricity_uses_anniversary'] = Variable<bool>(
-      electricityUsesAnniversary,
+    map['rent_uses_date_to_date'] = Variable<bool>(rentUsesDateToDate);
+    map['electricity_uses_date_to_date'] = Variable<bool>(
+      electricityUsesDateToDate,
     );
-    map['water_uses_anniversary'] = Variable<bool>(waterUsesAnniversary);
-    map['maintenance_uses_anniversary'] = Variable<bool>(
-      maintenanceUsesAnniversary,
+    map['water_uses_date_to_date'] = Variable<bool>(waterUsesDateToDate);
+    map['maintenance_uses_date_to_date'] = Variable<bool>(
+      maintenanceUsesDateToDate,
     );
-    map['other_uses_anniversary'] = Variable<bool>(otherUsesAnniversary);
+    map['other_uses_date_to_date'] = Variable<bool>(otherUsesDateToDate);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
   }
@@ -10145,11 +10145,11 @@ class BillSettingsEntity extends DataClass
       dueDateOffsetDays: Value(dueDateOffsetDays),
       dueSoonThresholdDays: Value(dueSoonThresholdDays),
       autoReminders: Value(autoReminders),
-      rentUsesAnniversary: Value(rentUsesAnniversary),
-      electricityUsesAnniversary: Value(electricityUsesAnniversary),
-      waterUsesAnniversary: Value(waterUsesAnniversary),
-      maintenanceUsesAnniversary: Value(maintenanceUsesAnniversary),
-      otherUsesAnniversary: Value(otherUsesAnniversary),
+      rentUsesDateToDate: Value(rentUsesDateToDate),
+      electricityUsesDateToDate: Value(electricityUsesDateToDate),
+      waterUsesDateToDate: Value(waterUsesDateToDate),
+      maintenanceUsesDateToDate: Value(maintenanceUsesDateToDate),
+      otherUsesDateToDate: Value(otherUsesDateToDate),
       updatedAt: Value(updatedAt),
     );
   }
@@ -10167,20 +10167,18 @@ class BillSettingsEntity extends DataClass
         json['dueSoonThresholdDays'],
       ),
       autoReminders: serializer.fromJson<bool>(json['autoReminders']),
-      rentUsesAnniversary: serializer.fromJson<bool>(
-        json['rentUsesAnniversary'],
+      rentUsesDateToDate: serializer.fromJson<bool>(json['rentUsesDateToDate']),
+      electricityUsesDateToDate: serializer.fromJson<bool>(
+        json['electricityUsesDateToDate'],
       ),
-      electricityUsesAnniversary: serializer.fromJson<bool>(
-        json['electricityUsesAnniversary'],
+      waterUsesDateToDate: serializer.fromJson<bool>(
+        json['waterUsesDateToDate'],
       ),
-      waterUsesAnniversary: serializer.fromJson<bool>(
-        json['waterUsesAnniversary'],
+      maintenanceUsesDateToDate: serializer.fromJson<bool>(
+        json['maintenanceUsesDateToDate'],
       ),
-      maintenanceUsesAnniversary: serializer.fromJson<bool>(
-        json['maintenanceUsesAnniversary'],
-      ),
-      otherUsesAnniversary: serializer.fromJson<bool>(
-        json['otherUsesAnniversary'],
+      otherUsesDateToDate: serializer.fromJson<bool>(
+        json['otherUsesDateToDate'],
       ),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
@@ -10194,15 +10192,15 @@ class BillSettingsEntity extends DataClass
       'dueDateOffsetDays': serializer.toJson<int>(dueDateOffsetDays),
       'dueSoonThresholdDays': serializer.toJson<int>(dueSoonThresholdDays),
       'autoReminders': serializer.toJson<bool>(autoReminders),
-      'rentUsesAnniversary': serializer.toJson<bool>(rentUsesAnniversary),
-      'electricityUsesAnniversary': serializer.toJson<bool>(
-        electricityUsesAnniversary,
+      'rentUsesDateToDate': serializer.toJson<bool>(rentUsesDateToDate),
+      'electricityUsesDateToDate': serializer.toJson<bool>(
+        electricityUsesDateToDate,
       ),
-      'waterUsesAnniversary': serializer.toJson<bool>(waterUsesAnniversary),
-      'maintenanceUsesAnniversary': serializer.toJson<bool>(
-        maintenanceUsesAnniversary,
+      'waterUsesDateToDate': serializer.toJson<bool>(waterUsesDateToDate),
+      'maintenanceUsesDateToDate': serializer.toJson<bool>(
+        maintenanceUsesDateToDate,
       ),
-      'otherUsesAnniversary': serializer.toJson<bool>(otherUsesAnniversary),
+      'otherUsesDateToDate': serializer.toJson<bool>(otherUsesDateToDate),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
   }
@@ -10213,11 +10211,11 @@ class BillSettingsEntity extends DataClass
     int? dueDateOffsetDays,
     int? dueSoonThresholdDays,
     bool? autoReminders,
-    bool? rentUsesAnniversary,
-    bool? electricityUsesAnniversary,
-    bool? waterUsesAnniversary,
-    bool? maintenanceUsesAnniversary,
-    bool? otherUsesAnniversary,
+    bool? rentUsesDateToDate,
+    bool? electricityUsesDateToDate,
+    bool? waterUsesDateToDate,
+    bool? maintenanceUsesDateToDate,
+    bool? otherUsesDateToDate,
     DateTime? updatedAt,
   }) => BillSettingsEntity(
     id: id ?? this.id,
@@ -10225,13 +10223,13 @@ class BillSettingsEntity extends DataClass
     dueDateOffsetDays: dueDateOffsetDays ?? this.dueDateOffsetDays,
     dueSoonThresholdDays: dueSoonThresholdDays ?? this.dueSoonThresholdDays,
     autoReminders: autoReminders ?? this.autoReminders,
-    rentUsesAnniversary: rentUsesAnniversary ?? this.rentUsesAnniversary,
-    electricityUsesAnniversary:
-        electricityUsesAnniversary ?? this.electricityUsesAnniversary,
-    waterUsesAnniversary: waterUsesAnniversary ?? this.waterUsesAnniversary,
-    maintenanceUsesAnniversary:
-        maintenanceUsesAnniversary ?? this.maintenanceUsesAnniversary,
-    otherUsesAnniversary: otherUsesAnniversary ?? this.otherUsesAnniversary,
+    rentUsesDateToDate: rentUsesDateToDate ?? this.rentUsesDateToDate,
+    electricityUsesDateToDate:
+        electricityUsesDateToDate ?? this.electricityUsesDateToDate,
+    waterUsesDateToDate: waterUsesDateToDate ?? this.waterUsesDateToDate,
+    maintenanceUsesDateToDate:
+        maintenanceUsesDateToDate ?? this.maintenanceUsesDateToDate,
+    otherUsesDateToDate: otherUsesDateToDate ?? this.otherUsesDateToDate,
     updatedAt: updatedAt ?? this.updatedAt,
   );
   BillSettingsEntity copyWithCompanion(BillSettingsCompanion data) {
@@ -10249,21 +10247,21 @@ class BillSettingsEntity extends DataClass
       autoReminders: data.autoReminders.present
           ? data.autoReminders.value
           : this.autoReminders,
-      rentUsesAnniversary: data.rentUsesAnniversary.present
-          ? data.rentUsesAnniversary.value
-          : this.rentUsesAnniversary,
-      electricityUsesAnniversary: data.electricityUsesAnniversary.present
-          ? data.electricityUsesAnniversary.value
-          : this.electricityUsesAnniversary,
-      waterUsesAnniversary: data.waterUsesAnniversary.present
-          ? data.waterUsesAnniversary.value
-          : this.waterUsesAnniversary,
-      maintenanceUsesAnniversary: data.maintenanceUsesAnniversary.present
-          ? data.maintenanceUsesAnniversary.value
-          : this.maintenanceUsesAnniversary,
-      otherUsesAnniversary: data.otherUsesAnniversary.present
-          ? data.otherUsesAnniversary.value
-          : this.otherUsesAnniversary,
+      rentUsesDateToDate: data.rentUsesDateToDate.present
+          ? data.rentUsesDateToDate.value
+          : this.rentUsesDateToDate,
+      electricityUsesDateToDate: data.electricityUsesDateToDate.present
+          ? data.electricityUsesDateToDate.value
+          : this.electricityUsesDateToDate,
+      waterUsesDateToDate: data.waterUsesDateToDate.present
+          ? data.waterUsesDateToDate.value
+          : this.waterUsesDateToDate,
+      maintenanceUsesDateToDate: data.maintenanceUsesDateToDate.present
+          ? data.maintenanceUsesDateToDate.value
+          : this.maintenanceUsesDateToDate,
+      otherUsesDateToDate: data.otherUsesDateToDate.present
+          ? data.otherUsesDateToDate.value
+          : this.otherUsesDateToDate,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
@@ -10276,11 +10274,11 @@ class BillSettingsEntity extends DataClass
           ..write('dueDateOffsetDays: $dueDateOffsetDays, ')
           ..write('dueSoonThresholdDays: $dueSoonThresholdDays, ')
           ..write('autoReminders: $autoReminders, ')
-          ..write('rentUsesAnniversary: $rentUsesAnniversary, ')
-          ..write('electricityUsesAnniversary: $electricityUsesAnniversary, ')
-          ..write('waterUsesAnniversary: $waterUsesAnniversary, ')
-          ..write('maintenanceUsesAnniversary: $maintenanceUsesAnniversary, ')
-          ..write('otherUsesAnniversary: $otherUsesAnniversary, ')
+          ..write('rentUsesDateToDate: $rentUsesDateToDate, ')
+          ..write('electricityUsesDateToDate: $electricityUsesDateToDate, ')
+          ..write('waterUsesDateToDate: $waterUsesDateToDate, ')
+          ..write('maintenanceUsesDateToDate: $maintenanceUsesDateToDate, ')
+          ..write('otherUsesDateToDate: $otherUsesDateToDate, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
@@ -10293,11 +10291,11 @@ class BillSettingsEntity extends DataClass
     dueDateOffsetDays,
     dueSoonThresholdDays,
     autoReminders,
-    rentUsesAnniversary,
-    electricityUsesAnniversary,
-    waterUsesAnniversary,
-    maintenanceUsesAnniversary,
-    otherUsesAnniversary,
+    rentUsesDateToDate,
+    electricityUsesDateToDate,
+    waterUsesDateToDate,
+    maintenanceUsesDateToDate,
+    otherUsesDateToDate,
     updatedAt,
   );
   @override
@@ -10309,11 +10307,11 @@ class BillSettingsEntity extends DataClass
           other.dueDateOffsetDays == this.dueDateOffsetDays &&
           other.dueSoonThresholdDays == this.dueSoonThresholdDays &&
           other.autoReminders == this.autoReminders &&
-          other.rentUsesAnniversary == this.rentUsesAnniversary &&
-          other.electricityUsesAnniversary == this.electricityUsesAnniversary &&
-          other.waterUsesAnniversary == this.waterUsesAnniversary &&
-          other.maintenanceUsesAnniversary == this.maintenanceUsesAnniversary &&
-          other.otherUsesAnniversary == this.otherUsesAnniversary &&
+          other.rentUsesDateToDate == this.rentUsesDateToDate &&
+          other.electricityUsesDateToDate == this.electricityUsesDateToDate &&
+          other.waterUsesDateToDate == this.waterUsesDateToDate &&
+          other.maintenanceUsesDateToDate == this.maintenanceUsesDateToDate &&
+          other.otherUsesDateToDate == this.otherUsesDateToDate &&
           other.updatedAt == this.updatedAt);
 }
 
@@ -10323,11 +10321,11 @@ class BillSettingsCompanion extends UpdateCompanion<BillSettingsEntity> {
   final Value<int> dueDateOffsetDays;
   final Value<int> dueSoonThresholdDays;
   final Value<bool> autoReminders;
-  final Value<bool> rentUsesAnniversary;
-  final Value<bool> electricityUsesAnniversary;
-  final Value<bool> waterUsesAnniversary;
-  final Value<bool> maintenanceUsesAnniversary;
-  final Value<bool> otherUsesAnniversary;
+  final Value<bool> rentUsesDateToDate;
+  final Value<bool> electricityUsesDateToDate;
+  final Value<bool> waterUsesDateToDate;
+  final Value<bool> maintenanceUsesDateToDate;
+  final Value<bool> otherUsesDateToDate;
   final Value<DateTime> updatedAt;
   const BillSettingsCompanion({
     this.id = const Value.absent(),
@@ -10335,11 +10333,11 @@ class BillSettingsCompanion extends UpdateCompanion<BillSettingsEntity> {
     this.dueDateOffsetDays = const Value.absent(),
     this.dueSoonThresholdDays = const Value.absent(),
     this.autoReminders = const Value.absent(),
-    this.rentUsesAnniversary = const Value.absent(),
-    this.electricityUsesAnniversary = const Value.absent(),
-    this.waterUsesAnniversary = const Value.absent(),
-    this.maintenanceUsesAnniversary = const Value.absent(),
-    this.otherUsesAnniversary = const Value.absent(),
+    this.rentUsesDateToDate = const Value.absent(),
+    this.electricityUsesDateToDate = const Value.absent(),
+    this.waterUsesDateToDate = const Value.absent(),
+    this.maintenanceUsesDateToDate = const Value.absent(),
+    this.otherUsesDateToDate = const Value.absent(),
     this.updatedAt = const Value.absent(),
   });
   BillSettingsCompanion.insert({
@@ -10348,11 +10346,11 @@ class BillSettingsCompanion extends UpdateCompanion<BillSettingsEntity> {
     this.dueDateOffsetDays = const Value.absent(),
     this.dueSoonThresholdDays = const Value.absent(),
     this.autoReminders = const Value.absent(),
-    this.rentUsesAnniversary = const Value.absent(),
-    this.electricityUsesAnniversary = const Value.absent(),
-    this.waterUsesAnniversary = const Value.absent(),
-    this.maintenanceUsesAnniversary = const Value.absent(),
-    this.otherUsesAnniversary = const Value.absent(),
+    this.rentUsesDateToDate = const Value.absent(),
+    this.electricityUsesDateToDate = const Value.absent(),
+    this.waterUsesDateToDate = const Value.absent(),
+    this.maintenanceUsesDateToDate = const Value.absent(),
+    this.otherUsesDateToDate = const Value.absent(),
     this.updatedAt = const Value.absent(),
   });
   static Insertable<BillSettingsEntity> custom({
@@ -10361,11 +10359,11 @@ class BillSettingsCompanion extends UpdateCompanion<BillSettingsEntity> {
     Expression<int>? dueDateOffsetDays,
     Expression<int>? dueSoonThresholdDays,
     Expression<bool>? autoReminders,
-    Expression<bool>? rentUsesAnniversary,
-    Expression<bool>? electricityUsesAnniversary,
-    Expression<bool>? waterUsesAnniversary,
-    Expression<bool>? maintenanceUsesAnniversary,
-    Expression<bool>? otherUsesAnniversary,
+    Expression<bool>? rentUsesDateToDate,
+    Expression<bool>? electricityUsesDateToDate,
+    Expression<bool>? waterUsesDateToDate,
+    Expression<bool>? maintenanceUsesDateToDate,
+    Expression<bool>? otherUsesDateToDate,
     Expression<DateTime>? updatedAt,
   }) {
     return RawValuesInsertable({
@@ -10375,16 +10373,16 @@ class BillSettingsCompanion extends UpdateCompanion<BillSettingsEntity> {
       if (dueSoonThresholdDays != null)
         'due_soon_threshold_days': dueSoonThresholdDays,
       if (autoReminders != null) 'auto_reminders': autoReminders,
-      if (rentUsesAnniversary != null)
-        'rent_uses_anniversary': rentUsesAnniversary,
-      if (electricityUsesAnniversary != null)
-        'electricity_uses_anniversary': electricityUsesAnniversary,
-      if (waterUsesAnniversary != null)
-        'water_uses_anniversary': waterUsesAnniversary,
-      if (maintenanceUsesAnniversary != null)
-        'maintenance_uses_anniversary': maintenanceUsesAnniversary,
-      if (otherUsesAnniversary != null)
-        'other_uses_anniversary': otherUsesAnniversary,
+      if (rentUsesDateToDate != null)
+        'rent_uses_date_to_date': rentUsesDateToDate,
+      if (electricityUsesDateToDate != null)
+        'electricity_uses_date_to_date': electricityUsesDateToDate,
+      if (waterUsesDateToDate != null)
+        'water_uses_date_to_date': waterUsesDateToDate,
+      if (maintenanceUsesDateToDate != null)
+        'maintenance_uses_date_to_date': maintenanceUsesDateToDate,
+      if (otherUsesDateToDate != null)
+        'other_uses_date_to_date': otherUsesDateToDate,
       if (updatedAt != null) 'updated_at': updatedAt,
     });
   }
@@ -10395,11 +10393,11 @@ class BillSettingsCompanion extends UpdateCompanion<BillSettingsEntity> {
     Value<int>? dueDateOffsetDays,
     Value<int>? dueSoonThresholdDays,
     Value<bool>? autoReminders,
-    Value<bool>? rentUsesAnniversary,
-    Value<bool>? electricityUsesAnniversary,
-    Value<bool>? waterUsesAnniversary,
-    Value<bool>? maintenanceUsesAnniversary,
-    Value<bool>? otherUsesAnniversary,
+    Value<bool>? rentUsesDateToDate,
+    Value<bool>? electricityUsesDateToDate,
+    Value<bool>? waterUsesDateToDate,
+    Value<bool>? maintenanceUsesDateToDate,
+    Value<bool>? otherUsesDateToDate,
     Value<DateTime>? updatedAt,
   }) {
     return BillSettingsCompanion(
@@ -10408,13 +10406,13 @@ class BillSettingsCompanion extends UpdateCompanion<BillSettingsEntity> {
       dueDateOffsetDays: dueDateOffsetDays ?? this.dueDateOffsetDays,
       dueSoonThresholdDays: dueSoonThresholdDays ?? this.dueSoonThresholdDays,
       autoReminders: autoReminders ?? this.autoReminders,
-      rentUsesAnniversary: rentUsesAnniversary ?? this.rentUsesAnniversary,
-      electricityUsesAnniversary:
-          electricityUsesAnniversary ?? this.electricityUsesAnniversary,
-      waterUsesAnniversary: waterUsesAnniversary ?? this.waterUsesAnniversary,
-      maintenanceUsesAnniversary:
-          maintenanceUsesAnniversary ?? this.maintenanceUsesAnniversary,
-      otherUsesAnniversary: otherUsesAnniversary ?? this.otherUsesAnniversary,
+      rentUsesDateToDate: rentUsesDateToDate ?? this.rentUsesDateToDate,
+      electricityUsesDateToDate:
+          electricityUsesDateToDate ?? this.electricityUsesDateToDate,
+      waterUsesDateToDate: waterUsesDateToDate ?? this.waterUsesDateToDate,
+      maintenanceUsesDateToDate:
+          maintenanceUsesDateToDate ?? this.maintenanceUsesDateToDate,
+      otherUsesDateToDate: otherUsesDateToDate ?? this.otherUsesDateToDate,
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }
@@ -10439,27 +10437,27 @@ class BillSettingsCompanion extends UpdateCompanion<BillSettingsEntity> {
     if (autoReminders.present) {
       map['auto_reminders'] = Variable<bool>(autoReminders.value);
     }
-    if (rentUsesAnniversary.present) {
-      map['rent_uses_anniversary'] = Variable<bool>(rentUsesAnniversary.value);
+    if (rentUsesDateToDate.present) {
+      map['rent_uses_date_to_date'] = Variable<bool>(rentUsesDateToDate.value);
     }
-    if (electricityUsesAnniversary.present) {
-      map['electricity_uses_anniversary'] = Variable<bool>(
-        electricityUsesAnniversary.value,
+    if (electricityUsesDateToDate.present) {
+      map['electricity_uses_date_to_date'] = Variable<bool>(
+        electricityUsesDateToDate.value,
       );
     }
-    if (waterUsesAnniversary.present) {
-      map['water_uses_anniversary'] = Variable<bool>(
-        waterUsesAnniversary.value,
+    if (waterUsesDateToDate.present) {
+      map['water_uses_date_to_date'] = Variable<bool>(
+        waterUsesDateToDate.value,
       );
     }
-    if (maintenanceUsesAnniversary.present) {
-      map['maintenance_uses_anniversary'] = Variable<bool>(
-        maintenanceUsesAnniversary.value,
+    if (maintenanceUsesDateToDate.present) {
+      map['maintenance_uses_date_to_date'] = Variable<bool>(
+        maintenanceUsesDateToDate.value,
       );
     }
-    if (otherUsesAnniversary.present) {
-      map['other_uses_anniversary'] = Variable<bool>(
-        otherUsesAnniversary.value,
+    if (otherUsesDateToDate.present) {
+      map['other_uses_date_to_date'] = Variable<bool>(
+        otherUsesDateToDate.value,
       );
     }
     if (updatedAt.present) {
@@ -10476,11 +10474,11 @@ class BillSettingsCompanion extends UpdateCompanion<BillSettingsEntity> {
           ..write('dueDateOffsetDays: $dueDateOffsetDays, ')
           ..write('dueSoonThresholdDays: $dueSoonThresholdDays, ')
           ..write('autoReminders: $autoReminders, ')
-          ..write('rentUsesAnniversary: $rentUsesAnniversary, ')
-          ..write('electricityUsesAnniversary: $electricityUsesAnniversary, ')
-          ..write('waterUsesAnniversary: $waterUsesAnniversary, ')
-          ..write('maintenanceUsesAnniversary: $maintenanceUsesAnniversary, ')
-          ..write('otherUsesAnniversary: $otherUsesAnniversary, ')
+          ..write('rentUsesDateToDate: $rentUsesDateToDate, ')
+          ..write('electricityUsesDateToDate: $electricityUsesDateToDate, ')
+          ..write('waterUsesDateToDate: $waterUsesDateToDate, ')
+          ..write('maintenanceUsesDateToDate: $maintenanceUsesDateToDate, ')
+          ..write('otherUsesDateToDate: $otherUsesDateToDate, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
@@ -18817,11 +18815,11 @@ typedef $$BillSettingsTableCreateCompanionBuilder =
       Value<int> dueDateOffsetDays,
       Value<int> dueSoonThresholdDays,
       Value<bool> autoReminders,
-      Value<bool> rentUsesAnniversary,
-      Value<bool> electricityUsesAnniversary,
-      Value<bool> waterUsesAnniversary,
-      Value<bool> maintenanceUsesAnniversary,
-      Value<bool> otherUsesAnniversary,
+      Value<bool> rentUsesDateToDate,
+      Value<bool> electricityUsesDateToDate,
+      Value<bool> waterUsesDateToDate,
+      Value<bool> maintenanceUsesDateToDate,
+      Value<bool> otherUsesDateToDate,
       Value<DateTime> updatedAt,
     });
 typedef $$BillSettingsTableUpdateCompanionBuilder =
@@ -18831,11 +18829,11 @@ typedef $$BillSettingsTableUpdateCompanionBuilder =
       Value<int> dueDateOffsetDays,
       Value<int> dueSoonThresholdDays,
       Value<bool> autoReminders,
-      Value<bool> rentUsesAnniversary,
-      Value<bool> electricityUsesAnniversary,
-      Value<bool> waterUsesAnniversary,
-      Value<bool> maintenanceUsesAnniversary,
-      Value<bool> otherUsesAnniversary,
+      Value<bool> rentUsesDateToDate,
+      Value<bool> electricityUsesDateToDate,
+      Value<bool> waterUsesDateToDate,
+      Value<bool> maintenanceUsesDateToDate,
+      Value<bool> otherUsesDateToDate,
       Value<DateTime> updatedAt,
     });
 
@@ -18873,28 +18871,28 @@ class $$BillSettingsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<bool> get rentUsesAnniversary => $composableBuilder(
-    column: $table.rentUsesAnniversary,
+  ColumnFilters<bool> get rentUsesDateToDate => $composableBuilder(
+    column: $table.rentUsesDateToDate,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<bool> get electricityUsesAnniversary => $composableBuilder(
-    column: $table.electricityUsesAnniversary,
+  ColumnFilters<bool> get electricityUsesDateToDate => $composableBuilder(
+    column: $table.electricityUsesDateToDate,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<bool> get waterUsesAnniversary => $composableBuilder(
-    column: $table.waterUsesAnniversary,
+  ColumnFilters<bool> get waterUsesDateToDate => $composableBuilder(
+    column: $table.waterUsesDateToDate,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<bool> get maintenanceUsesAnniversary => $composableBuilder(
-    column: $table.maintenanceUsesAnniversary,
+  ColumnFilters<bool> get maintenanceUsesDateToDate => $composableBuilder(
+    column: $table.maintenanceUsesDateToDate,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<bool> get otherUsesAnniversary => $composableBuilder(
-    column: $table.otherUsesAnniversary,
+  ColumnFilters<bool> get otherUsesDateToDate => $composableBuilder(
+    column: $table.otherUsesDateToDate,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -18938,28 +18936,28 @@ class $$BillSettingsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<bool> get rentUsesAnniversary => $composableBuilder(
-    column: $table.rentUsesAnniversary,
+  ColumnOrderings<bool> get rentUsesDateToDate => $composableBuilder(
+    column: $table.rentUsesDateToDate,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<bool> get electricityUsesAnniversary => $composableBuilder(
-    column: $table.electricityUsesAnniversary,
+  ColumnOrderings<bool> get electricityUsesDateToDate => $composableBuilder(
+    column: $table.electricityUsesDateToDate,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<bool> get waterUsesAnniversary => $composableBuilder(
-    column: $table.waterUsesAnniversary,
+  ColumnOrderings<bool> get waterUsesDateToDate => $composableBuilder(
+    column: $table.waterUsesDateToDate,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<bool> get maintenanceUsesAnniversary => $composableBuilder(
-    column: $table.maintenanceUsesAnniversary,
+  ColumnOrderings<bool> get maintenanceUsesDateToDate => $composableBuilder(
+    column: $table.maintenanceUsesDateToDate,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<bool> get otherUsesAnniversary => $composableBuilder(
-    column: $table.otherUsesAnniversary,
+  ColumnOrderings<bool> get otherUsesDateToDate => $composableBuilder(
+    column: $table.otherUsesDateToDate,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -19001,28 +18999,28 @@ class $$BillSettingsTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<bool> get rentUsesAnniversary => $composableBuilder(
-    column: $table.rentUsesAnniversary,
+  GeneratedColumn<bool> get rentUsesDateToDate => $composableBuilder(
+    column: $table.rentUsesDateToDate,
     builder: (column) => column,
   );
 
-  GeneratedColumn<bool> get electricityUsesAnniversary => $composableBuilder(
-    column: $table.electricityUsesAnniversary,
+  GeneratedColumn<bool> get electricityUsesDateToDate => $composableBuilder(
+    column: $table.electricityUsesDateToDate,
     builder: (column) => column,
   );
 
-  GeneratedColumn<bool> get waterUsesAnniversary => $composableBuilder(
-    column: $table.waterUsesAnniversary,
+  GeneratedColumn<bool> get waterUsesDateToDate => $composableBuilder(
+    column: $table.waterUsesDateToDate,
     builder: (column) => column,
   );
 
-  GeneratedColumn<bool> get maintenanceUsesAnniversary => $composableBuilder(
-    column: $table.maintenanceUsesAnniversary,
+  GeneratedColumn<bool> get maintenanceUsesDateToDate => $composableBuilder(
+    column: $table.maintenanceUsesDateToDate,
     builder: (column) => column,
   );
 
-  GeneratedColumn<bool> get otherUsesAnniversary => $composableBuilder(
-    column: $table.otherUsesAnniversary,
+  GeneratedColumn<bool> get otherUsesDateToDate => $composableBuilder(
+    column: $table.otherUsesDateToDate,
     builder: (column) => column,
   );
 
@@ -19070,11 +19068,11 @@ class $$BillSettingsTableTableManager
                 Value<int> dueDateOffsetDays = const Value.absent(),
                 Value<int> dueSoonThresholdDays = const Value.absent(),
                 Value<bool> autoReminders = const Value.absent(),
-                Value<bool> rentUsesAnniversary = const Value.absent(),
-                Value<bool> electricityUsesAnniversary = const Value.absent(),
-                Value<bool> waterUsesAnniversary = const Value.absent(),
-                Value<bool> maintenanceUsesAnniversary = const Value.absent(),
-                Value<bool> otherUsesAnniversary = const Value.absent(),
+                Value<bool> rentUsesDateToDate = const Value.absent(),
+                Value<bool> electricityUsesDateToDate = const Value.absent(),
+                Value<bool> waterUsesDateToDate = const Value.absent(),
+                Value<bool> maintenanceUsesDateToDate = const Value.absent(),
+                Value<bool> otherUsesDateToDate = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
               }) => BillSettingsCompanion(
                 id: id,
@@ -19082,11 +19080,11 @@ class $$BillSettingsTableTableManager
                 dueDateOffsetDays: dueDateOffsetDays,
                 dueSoonThresholdDays: dueSoonThresholdDays,
                 autoReminders: autoReminders,
-                rentUsesAnniversary: rentUsesAnniversary,
-                electricityUsesAnniversary: electricityUsesAnniversary,
-                waterUsesAnniversary: waterUsesAnniversary,
-                maintenanceUsesAnniversary: maintenanceUsesAnniversary,
-                otherUsesAnniversary: otherUsesAnniversary,
+                rentUsesDateToDate: rentUsesDateToDate,
+                electricityUsesDateToDate: electricityUsesDateToDate,
+                waterUsesDateToDate: waterUsesDateToDate,
+                maintenanceUsesDateToDate: maintenanceUsesDateToDate,
+                otherUsesDateToDate: otherUsesDateToDate,
                 updatedAt: updatedAt,
               ),
           createCompanionCallback:
@@ -19096,11 +19094,11 @@ class $$BillSettingsTableTableManager
                 Value<int> dueDateOffsetDays = const Value.absent(),
                 Value<int> dueSoonThresholdDays = const Value.absent(),
                 Value<bool> autoReminders = const Value.absent(),
-                Value<bool> rentUsesAnniversary = const Value.absent(),
-                Value<bool> electricityUsesAnniversary = const Value.absent(),
-                Value<bool> waterUsesAnniversary = const Value.absent(),
-                Value<bool> maintenanceUsesAnniversary = const Value.absent(),
-                Value<bool> otherUsesAnniversary = const Value.absent(),
+                Value<bool> rentUsesDateToDate = const Value.absent(),
+                Value<bool> electricityUsesDateToDate = const Value.absent(),
+                Value<bool> waterUsesDateToDate = const Value.absent(),
+                Value<bool> maintenanceUsesDateToDate = const Value.absent(),
+                Value<bool> otherUsesDateToDate = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
               }) => BillSettingsCompanion.insert(
                 id: id,
@@ -19108,11 +19106,11 @@ class $$BillSettingsTableTableManager
                 dueDateOffsetDays: dueDateOffsetDays,
                 dueSoonThresholdDays: dueSoonThresholdDays,
                 autoReminders: autoReminders,
-                rentUsesAnniversary: rentUsesAnniversary,
-                electricityUsesAnniversary: electricityUsesAnniversary,
-                waterUsesAnniversary: waterUsesAnniversary,
-                maintenanceUsesAnniversary: maintenanceUsesAnniversary,
-                otherUsesAnniversary: otherUsesAnniversary,
+                rentUsesDateToDate: rentUsesDateToDate,
+                electricityUsesDateToDate: electricityUsesDateToDate,
+                waterUsesDateToDate: waterUsesDateToDate,
+                maintenanceUsesDateToDate: maintenanceUsesDateToDate,
+                otherUsesDateToDate: otherUsesDateToDate,
                 updatedAt: updatedAt,
               ),
           withReferenceMapper: (p0) => p0

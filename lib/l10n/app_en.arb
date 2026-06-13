@@ -24,7 +24,7 @@
   "appLock": "App Lock",
   "biometricAuthentication": "Biometric authentication",
   "billingAndCycles": "Billing & Cycles",
-  "anniversaryBilling": "Anniversary Billing",
+  "dateToDateBilling": "Date-to-Date Billing",
   "configureBillingCycles": "Configure billing cycles and due dates",
   "billing": "Billing",
   "electricityRates": "Electricity Rates",
@@ -358,7 +358,7 @@
   "tapToChangePhoto": "Tap to change photo",
   "billAmountLabel": "Bill Amount (₹) *",
   "notesOptional": "Notes (optional)",
-  "anniversary": "Anniversary",
+  "dateToDate": "Date-to-Date",
   "advance": "Advance",
   "currentLabel": "Current",
   "cycleExceedsAgreementWarning": "This cycle exceeds the agreement end date ({date})",
@@ -760,8 +760,8 @@
       }
     }
   },
-  "anniversaryBillingByBillType": "Anniversary Billing By Bill Type",
-  "anniversaryBillingSubtitle": "Anniversary Billing Subtitle",
+  "dateToDateBillingByBillType": "Date-to-Date Billing By Bill Type",
+  "dateToDateBillingSubtitle": "Auto-calculate billing period based on move-in date.",
   "backupAndRestoreSubtitle": "Backup And Restore Subtitle",
   "backupCreatedShare": "Backup Created Share",
   "backupInfoText": "Backup Info Text",

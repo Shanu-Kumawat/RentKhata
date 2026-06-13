@@ -58,6 +58,9 @@ abstract class BillingRepository {
   /// Void a bill
   Future<bool> voidBill(int id, String reason);
 
+  /// Update bill settings
+  Future<bool> updateBillSettings(dynamic settings);
+
   // ========== Payment Operations ==========
 
   /// Get payments for a bill

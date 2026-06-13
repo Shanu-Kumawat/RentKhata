@@ -24,26 +24,26 @@ class BillSettings extends Table {
   /// Auto-generate reminders for overdue bills
   BoolColumn get autoReminders => boolean().withDefault(const Constant(true))();
 
-  // ========== Anniversary Billing Per Bill Type ==========
+  // ========== Date-to-Date Billing Per Bill Type ==========
 
-  /// Whether rent bills use anniversary-based cycles (default: true)
-  BoolColumn get rentUsesAnniversary =>
+  /// Whether rent bills use date-to-date cycles (default: true)
+  BoolColumn get rentUsesDateToDate =>
       boolean().withDefault(const Constant(true))();
 
-  /// Whether electricity bills use anniversary-based cycles (default: true)
-  BoolColumn get electricityUsesAnniversary =>
+  /// Whether electricity bills use date-to-date cycles (default: true)
+  BoolColumn get electricityUsesDateToDate =>
       boolean().withDefault(const Constant(true))();
 
-  /// Whether water bills use anniversary-based cycles (default: false)
-  BoolColumn get waterUsesAnniversary =>
+  /// Whether water bills use date-to-date cycles (default: false)
+  BoolColumn get waterUsesDateToDate =>
       boolean().withDefault(const Constant(false))();
 
-  /// Whether maintenance bills use anniversary-based cycles (default: false)
-  BoolColumn get maintenanceUsesAnniversary =>
+  /// Whether maintenance bills use date-to-date cycles (default: false)
+  BoolColumn get maintenanceUsesDateToDate =>
       boolean().withDefault(const Constant(false))();
 
-  /// Whether other bills use anniversary-based cycles (default: false)
-  BoolColumn get otherUsesAnniversary =>
+  /// Whether other bills use date-to-date cycles (default: false)
+  BoolColumn get otherUsesDateToDate =>
       boolean().withDefault(const Constant(false))();
 
   /// Last updated timestamp

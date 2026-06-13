@@ -122,10 +122,7 @@ class _LockScreenState extends ConsumerState<LockScreen>
                   children: [
                     // App icon
                     Container(
-                      width: 100,
-                      height: 100,
                       decoration: BoxDecoration(
-                        color: Colors.white,
                         borderRadius: BorderRadius.circular(24),
                         boxShadow: [
                           BoxShadow(
@@ -135,10 +132,13 @@ class _LockScreenState extends ConsumerState<LockScreen>
                           ),
                         ],
                       ),
-                      child: Icon(
-                        Icons.home_work_rounded,
-                        size: 56,
-                        color: colorScheme.primary,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(24),
+                        child: Image.asset(
+                          'assets/logo/logo_primary_with_bg.png',
+                          width: 100,
+                          height: 100,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 24),
