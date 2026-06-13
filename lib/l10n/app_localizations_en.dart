@@ -820,6 +820,32 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get invoiceAttachmentMeterProof => 'ATTACHMENT: METER READING PROOF';
+
+  @override
+  String invoiceReference(String number) {
+    return 'Invoice Reference: #$number';
+  }
+
+  @override
+  String invoiceReadings(String prev, String curr) {
+    return 'Readings: $prev - $curr';
+  }
+
+  @override
+  String invoiceConsumption(String units, String rate) {
+    return 'Consumption: $units units @ ₹$rate';
+  }
+
+  @override
+  String get invoiceUpiTerms =>
+      '3. Make payments via UPI to the details mentioned above.';
+
+  @override
+  String get debugViewScheduledNotifications =>
+      'View Scheduled Notifications (Debug)';
+
+  @override
   String get billTo => 'Bill To';
 
   @override

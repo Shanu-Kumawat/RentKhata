@@ -485,7 +485,7 @@ class _NotificationSettingsScreenState
                   width: double.infinity,
                   child: OutlinedButton.icon(
                     icon: const Icon(Icons.developer_board),
-                    label: const Text('View Scheduled Notifications (Debug)'),
+                    label: Text(l10n.debugViewScheduledNotifications),
                     onPressed: () => _showScheduledNotifications(),
                   ),
                 ),

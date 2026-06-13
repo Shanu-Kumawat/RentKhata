@@ -481,6 +481,39 @@
       }
     }
   },
+  "invoiceAttachmentMeterProof": "ATTACHMENT: METER READING PROOF",
+  "invoiceReference": "Invoice Reference: #{number}",
+  "@invoiceReference": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "invoiceReadings": "Readings: {prev} - {curr}",
+  "@invoiceReadings": {
+    "placeholders": {
+      "prev": {
+        "type": "String"
+      },
+      "curr": {
+        "type": "String"
+      }
+    }
+  },
+  "invoiceConsumption": "Consumption: {units} units @ ₹{rate}",
+  "@invoiceConsumption": {
+    "placeholders": {
+      "units": {
+        "type": "String"
+      },
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "invoiceUpiTerms": "3. Make payments via UPI to the details mentioned above.",
+  "debugViewScheduledNotifications": "View Scheduled Notifications (Debug)",
   "billTo": "Bill To",
   "unitsAmount": "{amount} units",
   "@unitsAmount": {

@@ -1579,6 +1579,42 @@ abstract class AppLocalizations {
   /// **'Invoice {number}'**
   String invoiceNumber(String number);
 
+  /// No description provided for @invoiceAttachmentMeterProof.
+  ///
+  /// In en, this message translates to:
+  /// **'ATTACHMENT: METER READING PROOF'**
+  String get invoiceAttachmentMeterProof;
+
+  /// No description provided for @invoiceReference.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice Reference: #{number}'**
+  String invoiceReference(String number);
+
+  /// No description provided for @invoiceReadings.
+  ///
+  /// In en, this message translates to:
+  /// **'Readings: {prev} - {curr}'**
+  String invoiceReadings(String prev, String curr);
+
+  /// No description provided for @invoiceConsumption.
+  ///
+  /// In en, this message translates to:
+  /// **'Consumption: {units} units @ ₹{rate}'**
+  String invoiceConsumption(String units, String rate);
+
+  /// No description provided for @invoiceUpiTerms.
+  ///
+  /// In en, this message translates to:
+  /// **'3. Make payments via UPI to the details mentioned above.'**
+  String get invoiceUpiTerms;
+
+  /// No description provided for @debugViewScheduledNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'View Scheduled Notifications (Debug)'**
+  String get debugViewScheduledNotifications;
+
   /// No description provided for @billTo.
   ///
   /// In en, this message translates to:

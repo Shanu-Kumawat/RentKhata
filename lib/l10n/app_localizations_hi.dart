@@ -823,6 +823,32 @@ class AppLocalizationsHi extends AppLocalizations {
   }
 
   @override
+  String get invoiceAttachmentMeterProof => 'संलग्नक: मीटर रीडिंग प्रमाण';
+
+  @override
+  String invoiceReference(String number) {
+    return 'इनवॉइस संदर्भ: #$number';
+  }
+
+  @override
+  String invoiceReadings(String prev, String curr) {
+    return 'रीडिंग: $prev - $curr';
+  }
+
+  @override
+  String invoiceConsumption(String units, String rate) {
+    return 'खपत: $units यूनिट @ ₹$rate';
+  }
+
+  @override
+  String get invoiceUpiTerms =>
+      '3. ऊपर दिए गए विवरण पर UPI के माध्यम से भुगतान करें।';
+
+  @override
+  String get debugViewScheduledNotifications =>
+      'शेड्यूल की गई सूचनाएं देखें (डीबग)';
+
+  @override
   String get billTo => 'बिल प्राप्तकर्ता';
 
   @override

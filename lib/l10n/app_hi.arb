@@ -479,6 +479,40 @@
       }
     }
   },
+
+  "invoiceAttachmentMeterProof": "संलग्नक: मीटर रीडिंग प्रमाण",
+  "invoiceReference": "इनवॉइस संदर्भ: #{number}",
+  "@invoiceReference": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "invoiceReadings": "रीडिंग: {prev} - {curr}",
+  "@invoiceReadings": {
+    "placeholders": {
+      "prev": {
+        "type": "String"
+      },
+      "curr": {
+        "type": "String"
+      }
+    }
+  },
+  "invoiceConsumption": "खपत: {units} यूनिट @ ₹{rate}",
+  "@invoiceConsumption": {
+    "placeholders": {
+      "units": {
+        "type": "String"
+      },
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "invoiceUpiTerms": "3. ऊपर दिए गए विवरण पर UPI के माध्यम से भुगतान करें।",
+  "debugViewScheduledNotifications": "शेड्यूल की गई सूचनाएं देखें (डीबग)",
   "dueSoonAlert": "[HI] Due Soon Alert",
   "dueSoonAlertSubtitle": "[HI] Due Soon Alert Subtitle",
   "editProfile": "[HI] Edit Profile",
