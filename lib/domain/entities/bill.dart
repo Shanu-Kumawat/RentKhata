@@ -121,6 +121,9 @@ class Bill with _$Bill {
     }
 
     // Fallback to month-based format
-    return '${months[billingMonth - 1]} $billingYear';
+    int safeMonth = billingMonth;
+    if (safeMonth < 1) safeMonth = 1;
+    if (safeMonth > 12) safeMonth = 12;
+    return '${months[safeMonth - 1]} $billingYear';
   }
 }

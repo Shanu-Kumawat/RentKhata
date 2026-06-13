@@ -11,6 +11,7 @@ import 'package:open_file/open_file.dart';
 import '../domain/entities/bill.dart';
 import '../domain/entities/payment.dart';
 import 'upi_qr_service.dart';
+import 'image_service.dart';
 import 'pdf/pdf_template.dart';
 
 /// Helper to sanitize filenames
@@ -55,7 +56,8 @@ class InvoicePdfService {
     // Load meter photo if available
     pw.MemoryImage? meterImage;
     if (bill.meterPhotoPath != null) {
-      final file = File(bill.meterPhotoPath!);
+      final absolutePath = ImageService.resolveImagePathSync(bill.meterPhotoPath!);
+      final file = File(absolutePath);
       if (await file.exists()) {
         final imageBytes = await file.readAsBytes();
         meterImage = pw.MemoryImage(imageBytes);
@@ -305,21 +307,22 @@ class InvoicePdfService {
                                 ),
                               ),
                               if (bill.billType == BillType.electricity &&
-                                  bill.electricityPrevReading != null)
+                                  bill.electricityPrevReading != null &&
+                                  bill.electricityCurrReading != null)
                                 pw.Padding(
                                   padding: const pw.EdgeInsets.only(top: 4),
                                   child: pw.Column(
                                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                                     children: [
                                       pw.Text(
-                                        'Readings: ${bill.electricityPrevReading!.toStringAsFixed(0)} → ${bill.electricityCurrReading!.toStringAsFixed(0)}',
+                                        'Readings: ${bill.electricityPrevReading!.toStringAsFixed(0)} - ${bill.electricityCurrReading!.toStringAsFixed(0)}',
                                         style: const pw.TextStyle(
                                           fontSize: 10,
                                           color: PdfColors.grey700,
                                         ),
                                       ),
                                       pw.Text(
-                                        'Consumption: ${(bill.electricityCurrReading! - bill.electricityPrevReading!).toStringAsFixed(0)} units @ ₹${bill.electricityRateAtBilling}',
+                                        'Consumption: ${(bill.electricityCurrReading! - bill.electricityPrevReading!).toStringAsFixed(0)} units @ ₹${bill.electricityRateAtBilling ?? 0}',
                                         style: const pw.TextStyle(
                                           fontSize: 10,
                                           color: PdfColors.grey700,
@@ -384,38 +387,7 @@ class InvoicePdfService {
                 ],
               ),
 
-              // 6. METER PROOF (Attachment Style)
-              if (meterImage != null) ...[
-                pw.SizedBox(height: 30),
-                pw.Container(
-                  width: double.infinity,
-                  padding: const pw.EdgeInsets.all(12),
-                  decoration: pw.BoxDecoration(
-                    border: pw.Border.all(color: dividerColor),
-                    borderRadius: pw.BorderRadius.circular(8),
-                  ),
-                  child: pw.Column(
-                    crossAxisAlignment: pw.CrossAxisAlignment.start,
-                    children: [
-                      pw.Text(
-                        'PROOF OF READING',
-                        style: pw.TextStyle(
-                          fontSize: 10,
-                          fontWeight: pw.FontWeight.bold,
-                          color: accentColor,
-                          letterSpacing: 1.0,
-                        ),
-                      ),
-                      pw.SizedBox(height: 8),
-                      pw.Container(
-                        height: 120,
-                        alignment: pw.Alignment.centerLeft,
-                        child: pw.Image(meterImage, fit: pw.BoxFit.contain),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+
 
               // 7. PAYMENT HISTORY
               if (paymentHistory.isNotEmpty) ...[
@@ -646,7 +618,12 @@ class InvoicePdfService {
                           ),
                           pw.SizedBox(height: 6),
                           pw.Text(
-                            '1. Please pay the bill before the due date to avoid late fees.\n2. This is a computer-generated invoice and no signature is required unless specified.\n3. Make payments via UPI to the details mentioned above.',
+                            [
+                              '1. Please pay the bill before the due date to avoid late fees.',
+                              '2. This is a computer-generated invoice and no signature is required unless specified.',
+                              if (landlordUpiId != null && landlordUpiId.isNotEmpty)
+                                '3. Make payments via UPI to the details mentioned above.',
+                            ].join('\n'),
                             style: pw.TextStyle(
                               fontSize: 8,
                               color: PdfColors.grey600,
@@ -726,6 +703,49 @@ class InvoicePdfService {
         },
       ),
     );
+
+    // Add Attachment Page for Meter Photo
+    if (meterImage != null) {
+      pdf.addPage(
+        pw.Page(
+          pageFormat: PdfPageFormat.a4,
+          theme: theme,
+          build: (pw.Context context) {
+            return pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Header(
+                  level: 1,
+                  child: pw.Text(
+                    'ATTACHMENT: METER READING PROOF',
+                    style: pw.TextStyle(
+                      color: accentColor,
+                      fontSize: 14,
+                      fontWeight: pw.FontWeight.bold,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                ),
+                pw.SizedBox(height: 10),
+                pw.Text(
+                  'Invoice Reference: # INV-${bill.id.toString().padLeft(6, '0')}',
+                  style: const pw.TextStyle(
+                    fontSize: 10,
+                    color: PdfColors.grey700,
+                  ),
+                ),
+                pw.SizedBox(height: 20),
+                pw.Expanded(
+                  child: pw.Center(
+                    child: pw.Image(meterImage!, fit: pw.BoxFit.contain),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      );
+    }
 
     // Generate smart filename: Invoice_Rent_Sep2023_JohnDoe.pdf
     final safePeriod = _sanitizeFilename(bill.billingPeriod);
