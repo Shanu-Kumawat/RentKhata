@@ -731,5 +731,184 @@
   "awaitingPayment": "भुगतान की प्रतीक्षा",
   "unknownTenant": "अज्ञात किरायेदार",
   "unknownRoom": "अज्ञात कमरा",
-  "collectLabel": "वसूल करें"
+  "collectLabel": "संग्रह करें",
+  "pdfReceivedFrom": "प्राप्तकर्ता",
+  "pdfInvoiceTitle": "इनवॉइस",
+  "pdfReceiptTitle": "रसीद",
+  "pdfBalanceDue": "बकाया राशि",
+  "pdfBillTo": "बिल किसे",
+  "pdfRoom": "कमरा",
+  "pdfIssued": "जारी किया गया",
+  "pdfDueDate": "देय तिथि",
+  "pdfDescription": "विवरण",
+  "pdfPeriod": "अवधि",
+  "pdfAmount": "राशि",
+  "pdfTotalAmount": "कुल राशि",
+  "pdfAmountPaid": "भुगतान की गई राशि",
+  "pdfPaymentHistory": "भुगतान इतिहास",
+  "pdfDate": "दिनांक",
+  "pdfMode": "माध्यम",
+  "pdfPaymentDetails": "भुगतान विवरण",
+  "pdfTotalBill": "कुल बिल",
+  "pdfTotalPaid": "कुल भुगतान",
+  "pdfRemaining": "शेष",
+  "pdfStatusFullyPaid": "स्थिति: पूर्ण भुगतान ✅",
+  "pdfUpiId": "UPI आईडी",
+  "pdfScanToPay": "भुगतान के लिए स्कैन करें",
+  "pdfTermsAndConditions": "नियम और शर्तें",
+  "pdfTerm1": "1. विलंब शुल्क से बचने के लिए कृपया देय तिथि से पहले बिल का भुगतान करें।",
+  "pdfTerm2": "2. यह एक कंप्यूटर-जनरेटेड इनवॉइस है और जब तक निर्दिष्ट न हो, किसी हस्ताक्षर की आवश्यकता नहीं है।",
+  "pdfVoid": "रद्द",
+  "pdfPaid": "भुगतान किया गया",
+  "shareStatementSubject": "खाता विवरण",
+  "shareStatementBody": "प्रिय {name},\n\nकृपया अपना जनरेट किया गया खाता विवरण संलग्न पाएं।",
+  "@shareStatementBody": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "shareSettlementSubject": "मूव-आउट निपटान रसीद",
+  "shareSettlementBody": "प्रिय {name},\n\nआपका मूव-आउट निपटान पूरा हो गया है। कृपया विस्तृत निपटान रसीद संलग्न पाएं।",
+  "@shareSettlementBody": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "shareInvoiceSubject": "इनवॉइस - {period}",
+  "@shareInvoiceSubject": {
+    "placeholders": {
+      "period": { "type": "String" }
+    }
+  },
+  "shareReceiptSubject": "भुगतान रसीद - {period}",
+  "@shareReceiptSubject": {
+    "placeholders": {
+      "period": { "type": "String" }
+    }
+  },
+  "shareDear": "प्रिय {name},",
+  "@shareDear": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "shareInvoiceHeader": "📋 *इनवॉइस*",
+  "shareInvoiceNumber": "इनवॉइस #: {number}",
+  "@shareInvoiceNumber": {
+    "placeholders": {
+      "number": { "type": "String" }
+    }
+  },
+  "shareBillDetails": "*बिल विवरण:*",
+  "shareType": "प्रकार: {type}",
+  "@shareType": {
+    "placeholders": {
+      "type": { "type": "String" }
+    }
+  },
+  "sharePeriod": "अवधि: {period}",
+  "@sharePeriod": {
+    "placeholders": {
+      "period": { "type": "String" }
+    }
+  },
+  "shareRoom": "कमरा: {room}",
+  "@shareRoom": {
+    "placeholders": {
+      "room": { "type": "String" }
+    }
+  },
+  "shareMeterReadings": "*मीटर रीडिंग:*",
+  "sharePrevious": "पिछला: {reading} यूनिट",
+  "@sharePrevious": {
+    "placeholders": {
+      "reading": { "type": "String" }
+    }
+  },
+  "shareCurrent": "वर्तमान: {reading} यूनिट",
+  "@shareCurrent": {
+    "placeholders": {
+      "reading": { "type": "String" }
+    }
+  },
+  "shareUnitsUsed": "खपत: {units} यूनिट",
+  "@shareUnitsUsed": {
+    "placeholders": {
+      "units": { "type": "String" }
+    }
+  },
+  "shareRate": "दर: ₹{rate}/यूनिट",
+  "@shareRate": {
+    "placeholders": {
+      "rate": { "type": "String" }
+    }
+  },
+  "shareAmountHeader": "*राशि:*",
+  "shareTotal": "कुल: ₹{amount}",
+  "@shareTotal": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "sharePaid": "भुगतान: ₹{amount}",
+  "@sharePaid": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "sharePending": "*बकाया: ₹{amount}*",
+  "@sharePending": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "shareDueDate": "देय तिथि: {date}",
+  "@shareDueDate": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
+  },
+  "sharePayViaUpi": "📱 *UPI द्वारा भुगतान करें:*",
+  "shareThankYou": "धन्यवाद,",
+  "sharePaymentReceived": "✅ *भुगतान प्राप्त*",
+  "sharePaymentDetails": "*भुगतान विवरण:*",
+  "shareAmount": "राशि: ₹{amount}",
+  "@shareAmount": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "shareMode": "माध्यम: {mode}",
+  "@shareMode": {
+    "placeholders": {
+      "mode": { "type": "String" }
+    }
+  },
+  "shareDate": "दिनांक: {date}",
+  "@shareDate": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
+  },
+  "shareBillStatus": "*बिल स्थिति:*",
+  "shareTotalBill": "कुल बिल: ₹{amount}",
+  "@shareTotalBill": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "shareTotalPaid": "कुल भुगतान: ₹{amount}",
+  "@shareTotalPaid": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "shareRemaining": "*शेष: ₹{amount}*",
+  "@shareRemaining": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "shareStatusFullyPaid": "*स्थिति: पूर्ण भुगतान ✅*",
+  "shareThankYouPayment": "आपके भुगतान के लिए धन्यवाद!"
 }

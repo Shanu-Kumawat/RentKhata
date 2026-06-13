@@ -391,6 +391,7 @@ class _BillDetailContent extends ConsumerWidget {
               payment: latestPayment,
               landlordName: landlordName ?? l10n.landlord,
               landlordPhone: landlordPhone ?? '',
+              l10n: l10n,
             );
           } else {
             return pdfService.generateInvoice(
@@ -398,6 +399,7 @@ class _BillDetailContent extends ConsumerWidget {
               landlordName: landlordName ?? l10n.landlord,
               landlordPhone: landlordPhone ?? '',
               landlordUpiId: landlordUpi,
+              l10n: l10n,
             );
           }
         },
@@ -424,12 +426,14 @@ class _BillDetailContent extends ConsumerWidget {
                   bill: bill,
                   payment: latestPayment,
                   landlordName: landlordName ?? l10n.landlord,
+                  l10n: l10n,
                 );
               } else {
                 await shareService.shareInvoice(
                   bill: bill,
                   landlordName: landlordName ?? l10n.landlord,
                   landlordUpi: landlordUpi,
+                  l10n: l10n,
                 );
                 await repo.markBillAsSent(bill.id);
               }

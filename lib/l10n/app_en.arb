@@ -1059,5 +1059,184 @@
   "awaitingPayment": "Awaiting payment",
   "unknownTenant": "Unknown Tenant",
   "unknownRoom": "Unknown Room",
-  "collectLabel": "Collect"
+  "collectLabel": "Collect",
+  "pdfReceivedFrom": "RECEIVED FROM",
+  "pdfInvoiceTitle": "INVOICE",
+  "pdfReceiptTitle": "RECEIPT",
+  "pdfBalanceDue": "Balance Due",
+  "pdfBillTo": "BILL TO",
+  "pdfRoom": "Room",
+  "pdfIssued": "ISSUED",
+  "pdfDueDate": "DUE DATE",
+  "pdfDescription": "DESCRIPTION",
+  "pdfPeriod": "PERIOD",
+  "pdfAmount": "AMOUNT",
+  "pdfTotalAmount": "Total Amount",
+  "pdfAmountPaid": "Amount Paid",
+  "pdfPaymentHistory": "PAYMENT HISTORY",
+  "pdfDate": "Date",
+  "pdfMode": "Mode",
+  "pdfPaymentDetails": "PAYMENT DETAILS",
+  "pdfTotalBill": "Total Bill",
+  "pdfTotalPaid": "Total Paid",
+  "pdfRemaining": "Remaining",
+  "pdfStatusFullyPaid": "Status: FULLY PAID ✅",
+  "pdfUpiId": "UPI ID",
+  "pdfScanToPay": "Scan to Pay",
+  "pdfTermsAndConditions": "TERMS & CONDITIONS",
+  "pdfTerm1": "1. Please pay the bill before the due date to avoid late fees.",
+  "pdfTerm2": "2. This is a computer-generated invoice and no signature is required unless specified.",
+  "pdfVoid": "VOID",
+  "pdfPaid": "PAID",
+  "shareStatementSubject": "Khata Statement",
+  "shareStatementBody": "Dear {name},\n\nPlease find your generated Khata Statement attached.",
+  "@shareStatementBody": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "shareSettlementSubject": "Move-Out Settlement Receipt",
+  "shareSettlementBody": "Dear {name},\n\nYour Move-Out Settlement is complete. Please find the detailed Settlement Receipt attached.",
+  "@shareSettlementBody": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "shareInvoiceSubject": "Invoice - {period}",
+  "@shareInvoiceSubject": {
+    "placeholders": {
+      "period": { "type": "String" }
+    }
+  },
+  "shareReceiptSubject": "Payment Receipt - {period}",
+  "@shareReceiptSubject": {
+    "placeholders": {
+      "period": { "type": "String" }
+    }
+  },
+  "shareDear": "Dear {name},",
+  "@shareDear": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "shareInvoiceHeader": "📋 *INVOICE*",
+  "shareInvoiceNumber": "Invoice #: {number}",
+  "@shareInvoiceNumber": {
+    "placeholders": {
+      "number": { "type": "String" }
+    }
+  },
+  "shareBillDetails": "*Bill Details:*",
+  "shareType": "Type: {type}",
+  "@shareType": {
+    "placeholders": {
+      "type": { "type": "String" }
+    }
+  },
+  "sharePeriod": "Period: {period}",
+  "@sharePeriod": {
+    "placeholders": {
+      "period": { "type": "String" }
+    }
+  },
+  "shareRoom": "Room: {room}",
+  "@shareRoom": {
+    "placeholders": {
+      "room": { "type": "String" }
+    }
+  },
+  "shareMeterReadings": "*Meter Readings:*",
+  "sharePrevious": "Previous: {reading} units",
+  "@sharePrevious": {
+    "placeholders": {
+      "reading": { "type": "String" }
+    }
+  },
+  "shareCurrent": "Current: {reading} units",
+  "@shareCurrent": {
+    "placeholders": {
+      "reading": { "type": "String" }
+    }
+  },
+  "shareUnitsUsed": "Units Used: {units} units",
+  "@shareUnitsUsed": {
+    "placeholders": {
+      "units": { "type": "String" }
+    }
+  },
+  "shareRate": "Rate: ₹{rate}/unit",
+  "@shareRate": {
+    "placeholders": {
+      "rate": { "type": "String" }
+    }
+  },
+  "shareAmountHeader": "*Amount:*",
+  "shareTotal": "Total: ₹{amount}",
+  "@shareTotal": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "sharePaid": "Paid: ₹{amount}",
+  "@sharePaid": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "sharePending": "*Pending: ₹{amount}*",
+  "@sharePending": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "shareDueDate": "Due Date: {date}",
+  "@shareDueDate": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
+  },
+  "sharePayViaUpi": "📱 *Pay via UPI:*",
+  "shareThankYou": "Thank you,",
+  "sharePaymentReceived": "✅ *PAYMENT RECEIVED*",
+  "sharePaymentDetails": "*Payment Details:*",
+  "shareAmount": "Amount: ₹{amount}",
+  "@shareAmount": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "shareMode": "Mode: {mode}",
+  "@shareMode": {
+    "placeholders": {
+      "mode": { "type": "String" }
+    }
+  },
+  "shareDate": "Date: {date}",
+  "@shareDate": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
+  },
+  "shareBillStatus": "*Bill Status:*",
+  "shareTotalBill": "Total Bill: ₹{amount}",
+  "@shareTotalBill": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "shareTotalPaid": "Total Paid: ₹{amount}",
+  "@shareTotalPaid": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "shareRemaining": "*Remaining: ₹{amount}*",
+  "@shareRemaining": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "shareStatusFullyPaid": "*Status: FULLY PAID ✅*",
+  "shareThankYouPayment": "Thank you for your payment!"
 }

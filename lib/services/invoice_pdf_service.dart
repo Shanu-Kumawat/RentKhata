@@ -8,6 +8,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
 import 'package:printing/printing.dart';
 import 'package:open_file/open_file.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
 import '../domain/entities/bill.dart';
 import '../domain/entities/payment.dart';
 import 'upi_qr_service.dart';
@@ -50,6 +51,7 @@ class InvoicePdfService {
     String? landlordAddress,
     String? landlordUpiId,
     List<Payment> paymentHistory = const [],
+    AppLocalizations? l10n,
   }) async {
     final pdf = pw.Document();
 
@@ -92,7 +94,7 @@ class InvoicePdfService {
             children: [
               // 1. MODERN HEADER
               PdfTemplate.buildModernHeader(
-                title: 'INVOICE',
+                title: l10n?.pdfInvoiceTitle ?? 'INVOICE',
                 subtitle: '# INV-${bill.id.toString().padLeft(6, '0')}',
                 landlordName: landlordName,
                 landlordPhone: landlordPhone,
@@ -107,7 +109,7 @@ class InvoicePdfService {
                 child: pw.Column(
                   children: [
                     pw.Text(
-                      'Balance Due',
+                      l10n?.pdfBalanceDue ?? 'Balance Due',
                       style: pw.TextStyle(
                         fontSize: 14,
                         color: PdfColors.grey600,
@@ -140,7 +142,7 @@ class InvoicePdfService {
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
                           pw.Text(
-                            'BILL TO',
+                            l10n?.pdfBillTo ?? 'BILL TO',
                             style: pw.TextStyle(
                               color: accentColor,
                               fontSize: 10,
@@ -150,17 +152,17 @@ class InvoicePdfService {
                           ),
                           pw.SizedBox(height: 8),
                           pw.Text(
-                            bill.tenantName ?? 'Tenant',
+                            bill.tenantName ?? (l10n?.unknownTenant ?? 'Unknown Tenant'),
                             style: pw.TextStyle(
                               fontSize: 14,
-                              color: PdfColors.black,
+                              fontWeight: pw.FontWeight.bold,
                             ),
                           ),
                           pw.SizedBox(height: 4),
                           if (bill.roomNumber != null)
                             pw.Text(
-                              'Room ${bill.roomNumber} • ${bill.propertyName ?? ""}',
-                              style: pw.TextStyle(
+                              '${l10n?.pdfRoom ?? "Room"}: ${bill.roomNumber} • ${bill.propertyName ?? ""}',
+                              style: const pw.TextStyle(
                                 fontSize: 12,
                                 color: PdfColors.black,
                               ),
@@ -175,7 +177,7 @@ class InvoicePdfService {
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
                           pw.Text(
-                            'ISSUED',
+                            l10n?.pdfIssued ?? 'ISSUED',
                             style: pw.TextStyle(
                               color: accentColor,
                               fontSize: 10,
@@ -186,7 +188,7 @@ class InvoicePdfService {
                           pw.SizedBox(height: 8),
                           pw.Text(
                             _formatDate(bill.createdAt),
-                            style: pw.TextStyle(
+                            style: const pw.TextStyle(
                               fontSize: 12,
                               color: PdfColors.black,
                             ),
@@ -201,7 +203,7 @@ class InvoicePdfService {
                         crossAxisAlignment: pw.CrossAxisAlignment.end,
                         children: [
                           pw.Text(
-                            'DUE DATE',
+                            l10n?.pdfDueDate ?? 'DUE DATE',
                             style: pw.TextStyle(
                               color: accentColor,
                               fontSize: 10,
@@ -246,7 +248,7 @@ class InvoicePdfService {
                         pw.Expanded(
                           flex: 3,
                           child: pw.Text(
-                            'DESCRIPTION',
+                            l10n?.pdfDescription ?? 'DESCRIPTION',
                             style: pw.TextStyle(
                               fontSize: 10,
                               fontWeight: pw.FontWeight.bold,
@@ -258,7 +260,7 @@ class InvoicePdfService {
                         pw.Expanded(
                           flex: 2,
                           child: pw.Text(
-                            'PERIOD',
+                            l10n?.pdfPeriod ?? 'PERIOD',
                             style: pw.TextStyle(
                               fontSize: 10,
                               fontWeight: pw.FontWeight.bold,
@@ -270,7 +272,7 @@ class InvoicePdfService {
                         pw.Expanded(
                           flex: 1,
                           child: pw.Text(
-                            'AMOUNT',
+                            l10n?.pdfAmount ?? 'AMOUNT',
                             textAlign: pw.TextAlign.right,
                             style: pw.TextStyle(
                               fontSize: 10,
@@ -315,14 +317,14 @@ class InvoicePdfService {
                                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                                     children: [
                                       pw.Text(
-                                        'Readings: ${bill.electricityPrevReading!.toStringAsFixed(0)} - ${bill.electricityCurrReading!.toStringAsFixed(0)}',
+                                        l10n?.invoiceReadings(bill.electricityPrevReading!.toStringAsFixed(0), bill.electricityCurrReading!.toStringAsFixed(0)) ?? 'Readings: ${bill.electricityPrevReading!.toStringAsFixed(0)} - ${bill.electricityCurrReading!.toStringAsFixed(0)}',
                                         style: const pw.TextStyle(
                                           fontSize: 10,
                                           color: PdfColors.grey700,
                                         ),
                                       ),
                                       pw.Text(
-                                        'Consumption: ${(bill.electricityCurrReading! - bill.electricityPrevReading!).toStringAsFixed(0)} units @ ₹${bill.electricityRateAtBilling ?? 0}',
+                                        l10n?.invoiceConsumption((bill.electricityCurrReading! - bill.electricityPrevReading!).toStringAsFixed(0), (bill.electricityRateAtBilling ?? 0).toString()) ?? 'Consumption: ${(bill.electricityCurrReading! - bill.electricityPrevReading!).toStringAsFixed(0)} units @ ₹${bill.electricityRateAtBilling ?? 0}',
                                         style: const pw.TextStyle(
                                           fontSize: 10,
                                           color: PdfColors.grey700,
@@ -371,13 +373,13 @@ class InvoicePdfService {
                     children: [
                       // Subtotal / Total Amount
                       _buildTotalRow(
-                        'Total Amount',
+                        l10n?.pdfTotalAmount ?? 'Total Amount',
                         '₹${bill.amount.toStringAsFixed(2)}',
                       ),
                       if (bill.paidAmount > 0) ...[
                         pw.SizedBox(height: 4),
                         _buildTotalRow(
-                          'Amount Paid',
+                          l10n?.pdfAmountPaid ?? 'Amount Paid',
                           '- ₹${bill.paidAmount.toStringAsFixed(2)}',
                           color: PdfColors.green700,
                         ),
@@ -393,7 +395,7 @@ class InvoicePdfService {
               if (paymentHistory.isNotEmpty) ...[
                 pw.SizedBox(height: 30),
                 pw.Text(
-                  'PAYMENT HISTORY',
+                  l10n?.pdfPaymentHistory ?? 'PAYMENT HISTORY',
                   style: pw.TextStyle(
                     fontSize: 10,
                     fontWeight: pw.FontWeight.bold,
@@ -420,7 +422,7 @@ class InvoicePdfService {
                         pw.Padding(
                           padding: const pw.EdgeInsets.symmetric(vertical: 4),
                           child: pw.Text(
-                            'Date',
+                            l10n?.pdfDate ?? 'Date',
                             style: const pw.TextStyle(
                               fontSize: 10,
                               color: PdfColors.grey700,
@@ -430,7 +432,7 @@ class InvoicePdfService {
                         pw.Padding(
                           padding: const pw.EdgeInsets.symmetric(vertical: 4),
                           child: pw.Text(
-                            'Mode',
+                            l10n?.pdfMode ?? 'Mode',
                             style: const pw.TextStyle(
                               fontSize: 10,
                               color: PdfColors.grey700,
@@ -440,7 +442,7 @@ class InvoicePdfService {
                         pw.Padding(
                           padding: const pw.EdgeInsets.symmetric(vertical: 4),
                           child: pw.Text(
-                            'Amount',
+                            l10n?.pdfAmount ?? 'Amount',
                             textAlign: pw.TextAlign.right,
                             style: const pw.TextStyle(
                               fontSize: 10,
@@ -515,7 +517,7 @@ class InvoicePdfService {
                                 ),
                               ),
                               child: pw.Text(
-                                'PAYMENT DETAILS',
+                                l10n?.pdfPaymentDetails ?? 'PAYMENT DETAILS',
                                 style: pw.TextStyle(
                                   fontSize: 10,
                                   fontWeight: pw.FontWeight.bold,
@@ -564,7 +566,7 @@ class InvoicePdfService {
                                       crossAxisAlignment: pw.CrossAxisAlignment.start,
                                       children: [
                                         pw.Text(
-                                          'UPI ID',
+                                          l10n?.pdfUpiId ?? 'UPI ID',
                                           style: pw.TextStyle(
                                             fontSize: 10,
                                             fontWeight: pw.FontWeight.bold,
@@ -582,7 +584,7 @@ class InvoicePdfService {
                                         ),
                                         pw.SizedBox(height: 4),
                                         pw.Text(
-                                          'Scan to Pay',
+                                          l10n?.pdfScanToPay ?? 'Scan to Pay',
                                           style: pw.TextStyle(
                                             fontSize: 10,
                                             color: PdfColors.black,
@@ -609,7 +611,7 @@ class InvoicePdfService {
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
                           pw.Text(
-                            'TERMS & CONDITIONS',
+                            l10n?.pdfTermsAndConditions ?? 'TERMS & CONDITIONS',
                             style: pw.TextStyle(
                               fontSize: 8,
                               fontWeight: pw.FontWeight.bold,
@@ -619,10 +621,10 @@ class InvoicePdfService {
                           pw.SizedBox(height: 6),
                           pw.Text(
                             [
-                              '1. Please pay the bill before the due date to avoid late fees.',
-                              '2. This is a computer-generated invoice and no signature is required unless specified.',
+                              l10n?.pdfTerm1 ?? '1. Please pay the bill before the due date to avoid late fees.',
+                              l10n?.pdfTerm2 ?? '2. This is a computer-generated invoice and no signature is required unless specified.',
                               if (landlordUpiId != null && landlordUpiId.isNotEmpty)
-                                '3. Make payments via UPI to the details mentioned above.',
+                                l10n?.invoiceUpiTerms ?? '3. Make payments via UPI to the details mentioned above.',
                             ].join('\n'),
                             style: pw.TextStyle(
                               fontSize: 8,
@@ -651,7 +653,7 @@ class InvoicePdfService {
                   child: pw.Transform.rotate(
                     angle: -0.5,
                     child: pw.Text(
-                      'VOID',
+                      l10n?.pdfVoid ?? 'VOID',
                       style: pw.TextStyle(
                         fontSize: 100,
                         fontWeight: pw.FontWeight.bold,
@@ -685,7 +687,7 @@ class InvoicePdfService {
                         borderRadius: pw.BorderRadius.circular(10),
                       ),
                       child: pw.Text(
-                        'PAID',
+                        l10n?.pdfPaid ?? 'PAID',
                         style: pw.TextStyle(
                           fontSize: 50,
                           fontWeight: pw.FontWeight.bold,
@@ -717,7 +719,7 @@ class InvoicePdfService {
                 pw.Header(
                   level: 1,
                   child: pw.Text(
-                    'ATTACHMENT: METER READING PROOF',
+                    l10n?.invoiceAttachmentMeterProof ?? 'ATTACHMENT: METER READING PROOF',
                     style: pw.TextStyle(
                       color: accentColor,
                       fontSize: 14,
@@ -728,7 +730,7 @@ class InvoicePdfService {
                 ),
                 pw.SizedBox(height: 10),
                 pw.Text(
-                  'Invoice Reference: # INV-${bill.id.toString().padLeft(6, '0')}',
+                  l10n?.invoiceReference(bill.id.toString().padLeft(6, '0')) ?? 'Invoice Reference: # INV-${bill.id.toString().padLeft(6, '0')}',
                   style: const pw.TextStyle(
                     fontSize: 10,
                     color: PdfColors.grey700,
@@ -797,6 +799,7 @@ class InvoicePdfService {
     required Payment payment,
     required String landlordName,
     required String landlordPhone,
+    AppLocalizations? l10n,
   }) async {
     final pdf = pw.Document();
 
@@ -813,7 +816,7 @@ class InvoicePdfService {
             children: [
               // 1. MODERN HEADER
               PdfTemplate.buildModernHeader(
-                title: 'RECEIPT',
+                title: l10n?.pdfReceiptTitle ?? 'RECEIPT',
                 subtitle: '# RCT-${payment.id.toString().padLeft(6, '0')}',
                 landlordName: landlordName,
                 landlordPhone: landlordPhone,
@@ -829,7 +832,7 @@ class InvoicePdfService {
                   crossAxisAlignment: pw.CrossAxisAlignment.center,
                   children: [
                     pw.Text(
-                      'Amount Received',
+                      l10n?.pdfAmountPaid ?? 'Amount Received',
                       style: pw.TextStyle(
                         fontSize: 12,
                         color: PdfColors.grey600,
@@ -856,7 +859,7 @@ class InvoicePdfService {
                         borderRadius: pw.BorderRadius.circular(6),
                       ),
                       child: pw.Text(
-                        'SUCCESS',
+                        l10n?.pdfPaid ?? 'SUCCESS',
                         style: pw.TextStyle(
                           color: PdfColors.green900,
                           fontWeight: pw.FontWeight.bold,
@@ -892,7 +895,7 @@ class InvoicePdfService {
                           child: pw.Column(
                             crossAxisAlignment: pw.CrossAxisAlignment.start,
                             children: [
-                              pw.Text('RECEIVED FROM', style: pw.TextStyle(color: PdfColors.grey500, fontSize: 8, fontWeight: pw.FontWeight.bold, letterSpacing: 1.0)),
+                              pw.Text(l10n?.pdfReceivedFrom ?? 'RECEIVED FROM', style: pw.TextStyle(color: PdfColors.grey500, fontSize: 8, fontWeight: pw.FontWeight.bold, letterSpacing: 1.0)),
                               pw.SizedBox(height: 4),
                               pw.Text(bill.tenantName ?? 'Tenant', style: pw.TextStyle(fontSize: 12)),
                               if (bill.roomNumber != null)
@@ -904,7 +907,7 @@ class InvoicePdfService {
                           child: pw.Column(
                             crossAxisAlignment: pw.CrossAxisAlignment.end,
                             children: [
-                              pw.Text('DATE', style: pw.TextStyle(color: PdfColors.grey500, fontSize: 8, fontWeight: pw.FontWeight.bold, letterSpacing: 1.0)),
+                              pw.Text(l10n?.pdfDate ?? 'DATE', style: pw.TextStyle(color: PdfColors.grey500, fontSize: 8, fontWeight: pw.FontWeight.bold, letterSpacing: 1.0)),
                               pw.SizedBox(height: 4),
                               pw.Text(_formatDate(payment.paymentDate), style: pw.TextStyle(fontSize: 12)),
                             ],
@@ -922,7 +925,7 @@ class InvoicePdfService {
                           child: pw.Column(
                             crossAxisAlignment: pw.CrossAxisAlignment.start,
                             children: [
-                              pw.Text('PAYMENT FOR', style: pw.TextStyle(color: PdfColors.grey500, fontSize: 8, fontWeight: pw.FontWeight.bold, letterSpacing: 1.0)),
+                              pw.Text(l10n?.pdfDescription ?? 'PAYMENT FOR', style: pw.TextStyle(color: PdfColors.grey500, fontSize: 8, fontWeight: pw.FontWeight.bold, letterSpacing: 1.0)),
                               pw.SizedBox(height: 4),
                               pw.Text('${bill.billType.name.toUpperCase()} - ${bill.billingPeriod}', style: pw.TextStyle(fontSize: 12)),
                             ],
@@ -932,7 +935,7 @@ class InvoicePdfService {
                           child: pw.Column(
                             crossAxisAlignment: pw.CrossAxisAlignment.end,
                             children: [
-                              pw.Text('MODE', style: pw.TextStyle(color: PdfColors.grey500, fontSize: 8, fontWeight: pw.FontWeight.bold, letterSpacing: 1.0)),
+                              pw.Text(l10n?.pdfMode ?? 'MODE', style: pw.TextStyle(color: PdfColors.grey500, fontSize: 8, fontWeight: pw.FontWeight.bold, letterSpacing: 1.0)),
                               pw.SizedBox(height: 4),
                               pw.Text(payment.paymentMode.name.toUpperCase(), style: pw.TextStyle(fontSize: 12)),
                             ],
@@ -947,7 +950,7 @@ class InvoicePdfService {
                         child: pw.Column(
                           crossAxisAlignment: pw.CrossAxisAlignment.start,
                           children: [
-                            pw.Text('NOTES', style: pw.TextStyle(color: PdfColors.grey500, fontSize: 8, fontWeight: pw.FontWeight.bold, letterSpacing: 1.0)),
+                            pw.Text((l10n?.notes ?? 'NOTES').toUpperCase(), style: pw.TextStyle(color: PdfColors.grey500, fontSize: 8, fontWeight: pw.FontWeight.bold, letterSpacing: 1.0)),
                             pw.SizedBox(height: 4),
                             pw.Text(payment.notes!, style: pw.TextStyle(fontSize: 10, color: PdfColors.grey800)),
                           ],

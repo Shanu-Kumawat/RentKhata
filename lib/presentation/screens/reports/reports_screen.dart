@@ -1413,6 +1413,7 @@ class _PremiumBillCard extends ConsumerWidget {
       }
 
       try {
+        final l10n = AppLocalizations.of(context);
         final landlord = await ref.read(landlordProvider.future);
         final pdfService = InvoicePdfService();
         final pdfFile = await pdfService.generateInvoice(
@@ -1420,6 +1421,7 @@ class _PremiumBillCard extends ConsumerWidget {
           landlordName: landlord?.name ?? 'Landlord',
           landlordPhone: landlord?.phone ?? '',
           landlordUpiId: landlord?.upiId,
+          l10n: l10n,
         );
         if (context.mounted) {
           final bytes = await pdfFile.readAsBytes();

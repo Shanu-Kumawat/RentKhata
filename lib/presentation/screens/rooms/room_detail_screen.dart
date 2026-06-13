@@ -1331,6 +1331,7 @@ class _BillTile extends ConsumerWidget {
           bill: bill,
           landlordName: landlordName,
           landlordUpi: landlord?.upiId,
+          l10n: l10n,
         );
         await repo.markBillAsSent(bill.id);
       },
@@ -1344,6 +1345,7 @@ class _BillTile extends ConsumerWidget {
               landlordName: landlordName,
               landlordPhone: landlord?.phone ?? '',
               landlordUpiId: landlord?.upiId,
+              l10n: l10n,
             ),
           );
 
@@ -1391,12 +1393,14 @@ class _BillTile extends ConsumerWidget {
             bill: bill,
             payment: latestPayment,
             landlordName: landlordName,
+            l10n: l10n,
           );
         } else {
           await shareService.shareInvoice(
             bill: bill,
             landlordName: landlordName,
             landlordUpi: landlord?.upiId,
+            l10n: l10n,
           );
         }
       },
@@ -1412,6 +1416,7 @@ class _BillTile extends ConsumerWidget {
                   payment: latestPayment,
                   landlordName: landlordName,
                   landlordPhone: landlord?.phone ?? '',
+                  l10n: l10n,
                 );
               } else {
                 return pdfService.generateInvoice(
@@ -1419,6 +1424,7 @@ class _BillTile extends ConsumerWidget {
                   landlordName: landlordName,
                   landlordPhone: landlord?.phone ?? '',
                   landlordUpiId: landlord?.upiId,
+                  l10n: l10n,
                 );
               }
             },

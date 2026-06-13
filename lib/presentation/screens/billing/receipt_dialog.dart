@@ -236,6 +236,7 @@ class ReceiptDialog extends StatelessWidget {
           payment: payment,
           landlordName: landlordName ?? l10n.landlord,
           landlordPhone: landlordPhone ?? '',
+          l10n: l10n,
         ),
       );
 
@@ -274,6 +275,7 @@ class ReceiptDialog extends StatelessWidget {
       bill: bill,
       payment: payment,
       landlordName: landlordName ?? AppLocalizations.of(context)!.landlord,
+      l10n: AppLocalizations.of(context),
     );
   }
 

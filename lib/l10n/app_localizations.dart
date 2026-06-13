@@ -3696,6 +3696,390 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Collect'**
   String get collectLabel;
+
+  /// No description provided for @pdfReceivedFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'RECEIVED FROM'**
+  String get pdfReceivedFrom;
+
+  /// No description provided for @pdfInvoiceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'INVOICE'**
+  String get pdfInvoiceTitle;
+
+  /// No description provided for @pdfReceiptTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'RECEIPT'**
+  String get pdfReceiptTitle;
+
+  /// No description provided for @pdfBalanceDue.
+  ///
+  /// In en, this message translates to:
+  /// **'Balance Due'**
+  String get pdfBalanceDue;
+
+  /// No description provided for @pdfBillTo.
+  ///
+  /// In en, this message translates to:
+  /// **'BILL TO'**
+  String get pdfBillTo;
+
+  /// No description provided for @pdfRoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Room'**
+  String get pdfRoom;
+
+  /// No description provided for @pdfIssued.
+  ///
+  /// In en, this message translates to:
+  /// **'ISSUED'**
+  String get pdfIssued;
+
+  /// No description provided for @pdfDueDate.
+  ///
+  /// In en, this message translates to:
+  /// **'DUE DATE'**
+  String get pdfDueDate;
+
+  /// No description provided for @pdfDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'DESCRIPTION'**
+  String get pdfDescription;
+
+  /// No description provided for @pdfPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'PERIOD'**
+  String get pdfPeriod;
+
+  /// No description provided for @pdfAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'AMOUNT'**
+  String get pdfAmount;
+
+  /// No description provided for @pdfTotalAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Amount'**
+  String get pdfTotalAmount;
+
+  /// No description provided for @pdfAmountPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount Paid'**
+  String get pdfAmountPaid;
+
+  /// No description provided for @pdfPaymentHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'PAYMENT HISTORY'**
+  String get pdfPaymentHistory;
+
+  /// No description provided for @pdfDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get pdfDate;
+
+  /// No description provided for @pdfMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Mode'**
+  String get pdfMode;
+
+  /// No description provided for @pdfPaymentDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'PAYMENT DETAILS'**
+  String get pdfPaymentDetails;
+
+  /// No description provided for @pdfTotalBill.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Bill'**
+  String get pdfTotalBill;
+
+  /// No description provided for @pdfTotalPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Paid'**
+  String get pdfTotalPaid;
+
+  /// No description provided for @pdfRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Remaining'**
+  String get pdfRemaining;
+
+  /// No description provided for @pdfStatusFullyPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Status: FULLY PAID ✅'**
+  String get pdfStatusFullyPaid;
+
+  /// No description provided for @pdfUpiId.
+  ///
+  /// In en, this message translates to:
+  /// **'UPI ID'**
+  String get pdfUpiId;
+
+  /// No description provided for @pdfScanToPay.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan to Pay'**
+  String get pdfScanToPay;
+
+  /// No description provided for @pdfTermsAndConditions.
+  ///
+  /// In en, this message translates to:
+  /// **'TERMS & CONDITIONS'**
+  String get pdfTermsAndConditions;
+
+  /// No description provided for @pdfTerm1.
+  ///
+  /// In en, this message translates to:
+  /// **'1. Please pay the bill before the due date to avoid late fees.'**
+  String get pdfTerm1;
+
+  /// No description provided for @pdfTerm2.
+  ///
+  /// In en, this message translates to:
+  /// **'2. This is a computer-generated invoice and no signature is required unless specified.'**
+  String get pdfTerm2;
+
+  /// No description provided for @pdfVoid.
+  ///
+  /// In en, this message translates to:
+  /// **'VOID'**
+  String get pdfVoid;
+
+  /// No description provided for @pdfPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'PAID'**
+  String get pdfPaid;
+
+  /// No description provided for @shareStatementSubject.
+  ///
+  /// In en, this message translates to:
+  /// **'Khata Statement'**
+  String get shareStatementSubject;
+
+  /// No description provided for @shareStatementBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Dear {name},\n\nPlease find your generated Khata Statement attached.'**
+  String shareStatementBody(String name);
+
+  /// No description provided for @shareSettlementSubject.
+  ///
+  /// In en, this message translates to:
+  /// **'Move-Out Settlement Receipt'**
+  String get shareSettlementSubject;
+
+  /// No description provided for @shareSettlementBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Dear {name},\n\nYour Move-Out Settlement is complete. Please find the detailed Settlement Receipt attached.'**
+  String shareSettlementBody(String name);
+
+  /// No description provided for @shareInvoiceSubject.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice - {period}'**
+  String shareInvoiceSubject(String period);
+
+  /// No description provided for @shareReceiptSubject.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Receipt - {period}'**
+  String shareReceiptSubject(String period);
+
+  /// No description provided for @shareDear.
+  ///
+  /// In en, this message translates to:
+  /// **'Dear {name},'**
+  String shareDear(String name);
+
+  /// No description provided for @shareInvoiceHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'📋 *INVOICE*'**
+  String get shareInvoiceHeader;
+
+  /// No description provided for @shareInvoiceNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice #: {number}'**
+  String shareInvoiceNumber(String number);
+
+  /// No description provided for @shareBillDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'*Bill Details:*'**
+  String get shareBillDetails;
+
+  /// No description provided for @shareType.
+  ///
+  /// In en, this message translates to:
+  /// **'Type: {type}'**
+  String shareType(String type);
+
+  /// No description provided for @sharePeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'Period: {period}'**
+  String sharePeriod(String period);
+
+  /// No description provided for @shareRoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Room: {room}'**
+  String shareRoom(String room);
+
+  /// No description provided for @shareMeterReadings.
+  ///
+  /// In en, this message translates to:
+  /// **'*Meter Readings:*'**
+  String get shareMeterReadings;
+
+  /// No description provided for @sharePrevious.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous: {reading} units'**
+  String sharePrevious(String reading);
+
+  /// No description provided for @shareCurrent.
+  ///
+  /// In en, this message translates to:
+  /// **'Current: {reading} units'**
+  String shareCurrent(String reading);
+
+  /// No description provided for @shareUnitsUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'Units Used: {units} units'**
+  String shareUnitsUsed(String units);
+
+  /// No description provided for @shareRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate: ₹{rate}/unit'**
+  String shareRate(String rate);
+
+  /// No description provided for @shareAmountHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'*Amount:*'**
+  String get shareAmountHeader;
+
+  /// No description provided for @shareTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Total: ₹{amount}'**
+  String shareTotal(String amount);
+
+  /// No description provided for @sharePaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid: ₹{amount}'**
+  String sharePaid(String amount);
+
+  /// No description provided for @sharePending.
+  ///
+  /// In en, this message translates to:
+  /// **'*Pending: ₹{amount}*'**
+  String sharePending(String amount);
+
+  /// No description provided for @shareDueDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Due Date: {date}'**
+  String shareDueDate(String date);
+
+  /// No description provided for @sharePayViaUpi.
+  ///
+  /// In en, this message translates to:
+  /// **'📱 *Pay via UPI:*'**
+  String get sharePayViaUpi;
+
+  /// No description provided for @shareThankYou.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you,'**
+  String get shareThankYou;
+
+  /// No description provided for @sharePaymentReceived.
+  ///
+  /// In en, this message translates to:
+  /// **'✅ *PAYMENT RECEIVED*'**
+  String get sharePaymentReceived;
+
+  /// No description provided for @sharePaymentDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'*Payment Details:*'**
+  String get sharePaymentDetails;
+
+  /// No description provided for @shareAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount: ₹{amount}'**
+  String shareAmount(String amount);
+
+  /// No description provided for @shareMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Mode: {mode}'**
+  String shareMode(String mode);
+
+  /// No description provided for @shareDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Date: {date}'**
+  String shareDate(String date);
+
+  /// No description provided for @shareBillStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'*Bill Status:*'**
+  String get shareBillStatus;
+
+  /// No description provided for @shareTotalBill.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Bill: ₹{amount}'**
+  String shareTotalBill(String amount);
+
+  /// No description provided for @shareTotalPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Paid: ₹{amount}'**
+  String shareTotalPaid(String amount);
+
+  /// No description provided for @shareRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'*Remaining: ₹{amount}*'**
+  String shareRemaining(String amount);
+
+  /// No description provided for @shareStatusFullyPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'*Status: FULLY PAID ✅*'**
+  String get shareStatusFullyPaid;
+
+  /// No description provided for @shareThankYouPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you for your payment!'**
+  String get shareThankYouPayment;
 }
 
 class _AppLocalizationsDelegate

@@ -7,6 +7,7 @@ import '../domain/entities/bill.dart';
 import '../domain/entities/payment.dart';
 import '../domain/entities/message_template.dart';
 import '../domain/repositories/billing_repository.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
 import 'upi_qr_service.dart';
 import 'template_service.dart';
 
@@ -27,24 +28,22 @@ class ShareService {
   }
 
   /// Share a generated PDF Statement.
-  Future<void> sharePdfStatement(File pdfFile, {String? tenantName}) async {
+  Future<void> sharePdfStatement(File pdfFile, {String? tenantName, AppLocalizations? l10n}) async {
     final name = tenantName ?? 'Tenant';
     await shareFiles(
       files: [pdfFile],
-      text:
-          'Dear $name,\n\nPlease find your generated Khata Statement attached.',
-      subject: 'Khata Statement',
+      text: l10n?.shareStatementBody(name) ?? 'Dear $name,\n\nPlease find your generated Khata Statement attached.',
+      subject: l10n?.shareStatementSubject ?? 'Khata Statement',
     );
   }
 
   /// Share a generated PDF Settlement Receipt.
-  Future<void> shareSettlementPdf(File pdfFile, {String? tenantName}) async {
+  Future<void> shareSettlementPdf(File pdfFile, {String? tenantName, AppLocalizations? l10n}) async {
     final name = tenantName ?? 'Tenant';
     await shareFiles(
       files: [pdfFile],
-      text:
-          'Dear $name,\n\nYour Move-Out Settlement is complete. Please find the detailed Settlement Receipt attached.',
-      subject: 'Move-Out Settlement Receipt',
+      text: l10n?.shareSettlementBody(name) ?? 'Dear $name,\n\nYour Move-Out Settlement is complete. Please find the detailed Settlement Receipt attached.',
+      subject: l10n?.shareSettlementSubject ?? 'Move-Out Settlement Receipt',
     );
   }
 
@@ -59,6 +58,7 @@ class ShareService {
     required Bill bill,
     required String landlordName,
     String? landlordUpi,
+    AppLocalizations? l10n,
   }) async {
     String message;
 
@@ -99,7 +99,7 @@ class ShareService {
         await shareFiles(
           files: [file],
           text: message,
-          subject: 'Invoice - ${bill.billNumber ?? bill.billingPeriod}',
+          subject: l10n?.shareInvoiceSubject(bill.billNumber ?? bill.billingPeriod) ?? 'Invoice - ${bill.billNumber ?? bill.billingPeriod}',
         );
         return;
       }
@@ -107,7 +107,7 @@ class ShareService {
 
     await Share.share(
       message,
-      subject: 'Invoice - ${bill.billNumber ?? bill.billingPeriod}',
+      subject: l10n?.shareInvoiceSubject(bill.billNumber ?? bill.billingPeriod) ?? 'Invoice - ${bill.billNumber ?? bill.billingPeriod}',
     );
   }
 
@@ -116,6 +116,7 @@ class ShareService {
     required Bill bill,
     required Payment payment,
     required String landlordName,
+    AppLocalizations? l10n,
   }) async {
     String message;
 
@@ -148,7 +149,7 @@ class ShareService {
 
     await Share.share(
       message,
-      subject: 'Payment Receipt - ${bill.billNumber ?? bill.billingPeriod}',
+      subject: l10n?.shareReceiptSubject(bill.billNumber ?? bill.billingPeriod) ?? 'Payment Receipt - ${bill.billNumber ?? bill.billingPeriod}',
     );
   }
 
@@ -157,6 +158,7 @@ class ShareService {
     required Bill bill,
     required String landlordName,
     String? landlordUpi,
+    AppLocalizations? l10n,
   }) {
     final tenantName = bill.tenantName ?? 'Tenant';
     final dueDate = bill.dueDate;
@@ -167,18 +169,18 @@ class ShareService {
     final billTypeLabel = _getBillTypeLabel(bill.billType);
 
     final buffer = StringBuffer();
-    buffer.writeln('Dear $tenantName,');
+    buffer.writeln(l10n?.shareDear(tenantName) ?? 'Dear $tenantName,');
     buffer.writeln();
-    buffer.writeln('📋 *INVOICE*');
+    buffer.writeln(l10n?.shareInvoiceHeader ?? '📋 *INVOICE*');
     if (bill.billNumber != null) {
-      buffer.writeln('Invoice #: ${bill.billNumber}');
+      buffer.writeln(l10n?.shareInvoiceNumber(bill.billNumber!) ?? 'Invoice #: ${bill.billNumber}');
     }
     buffer.writeln();
-    buffer.writeln('*Bill Details:*');
-    buffer.writeln('Type: $billTypeLabel');
-    buffer.writeln('Period: ${bill.billingPeriod}');
+    buffer.writeln(l10n?.shareBillDetails ?? '*Bill Details:*');
+    buffer.writeln(l10n?.shareType(billTypeLabel) ?? 'Type: $billTypeLabel');
+    buffer.writeln(l10n?.sharePeriod(bill.billingPeriod) ?? 'Period: ${bill.billingPeriod}');
     if (bill.roomNumber != null) {
-      buffer.writeln('Room: ${bill.roomNumber}');
+      buffer.writeln(l10n?.shareRoom(bill.roomNumber!) ?? 'Room: ${bill.roomNumber}');
     }
     buffer.writeln();
 
@@ -187,29 +189,29 @@ class ShareService {
         bill.electricityPrevReading != null &&
         bill.electricityCurrReading != null) {
       final units = bill.electricityCurrReading! - bill.electricityPrevReading!;
-      buffer.writeln('*Meter Readings:*');
+      buffer.writeln(l10n?.shareMeterReadings ?? '*Meter Readings:*');
       buffer.writeln(
-        'Previous: ${bill.electricityPrevReading!.toStringAsFixed(0)} units',
+        l10n?.sharePrevious(bill.electricityPrevReading!.toStringAsFixed(0)) ?? 'Previous: ${bill.electricityPrevReading!.toStringAsFixed(0)} units',
       );
       buffer.writeln(
-        'Current: ${bill.electricityCurrReading!.toStringAsFixed(0)} units',
+        l10n?.shareCurrent(bill.electricityCurrReading!.toStringAsFixed(0)) ?? 'Current: ${bill.electricityCurrReading!.toStringAsFixed(0)} units',
       );
-      buffer.writeln('Units Used: ${units.toStringAsFixed(0)} units');
+      buffer.writeln(l10n?.shareUnitsUsed(units.toStringAsFixed(0)) ?? 'Units Used: ${units.toStringAsFixed(0)} units');
       if (bill.electricityRateAtBilling != null) {
         buffer.writeln(
-          'Rate: ₹${bill.electricityRateAtBilling!.toStringAsFixed(2)}/unit',
+          l10n?.shareRate(bill.electricityRateAtBilling!.toStringAsFixed(2)) ?? 'Rate: ₹${bill.electricityRateAtBilling!.toStringAsFixed(2)}/unit',
         );
       }
       buffer.writeln();
     }
 
-    buffer.writeln('*Amount:*');
-    buffer.writeln('Total: ₹${bill.amount.toStringAsFixed(0)}');
+    buffer.writeln(l10n?.shareAmountHeader ?? '*Amount:*');
+    buffer.writeln(l10n?.shareTotal(bill.amount.toStringAsFixed(0)) ?? 'Total: ₹${bill.amount.toStringAsFixed(0)}');
     if (bill.paidAmount > 0) {
-      buffer.writeln('Paid: ₹${bill.paidAmount.toStringAsFixed(0)}');
-      buffer.writeln('*Pending: ₹${bill.pendingAmount.toStringAsFixed(0)}*');
+      buffer.writeln(l10n?.sharePaid(bill.paidAmount.toStringAsFixed(0)) ?? 'Paid: ₹${bill.paidAmount.toStringAsFixed(0)}');
+      buffer.writeln(l10n?.sharePending(bill.pendingAmount.toStringAsFixed(0)) ?? '*Pending: ₹${bill.pendingAmount.toStringAsFixed(0)}*');
     }
-    buffer.writeln('Due Date: $dueDateStr');
+    buffer.writeln(l10n?.shareDueDate(dueDateStr) ?? 'Due Date: $dueDateStr');
     buffer.writeln();
 
     // UPI payment link
@@ -222,12 +224,12 @@ class ShareService {
         amount: bill.pendingAmount,
         transactionNote: '${bill.billType.name} - ${bill.billingPeriod}',
       );
-      buffer.writeln('📱 *Pay via UPI:*');
+      buffer.writeln(l10n?.sharePayViaUpi ?? '📱 *Pay via UPI:*');
       buffer.writeln(upiLink);
       buffer.writeln();
     }
 
-    buffer.writeln('Thank you,');
+    buffer.writeln(l10n?.shareThankYou ?? 'Thank you,');
     buffer.writeln(landlordName);
 
     return buffer.toString().trim();
@@ -238,6 +240,7 @@ class ShareService {
     required Bill bill,
     required Payment payment,
     required String landlordName,
+    AppLocalizations? l10n,
   }) {
     final tenantName = bill.tenantName ?? 'Tenant';
     final paymentDateStr =
@@ -245,32 +248,32 @@ class ShareService {
     final billTypeLabel = _getBillTypeLabel(bill.billType);
 
     final buffer = StringBuffer();
-    buffer.writeln('Dear $tenantName,');
+    buffer.writeln(l10n?.shareDear(tenantName) ?? 'Dear $tenantName,');
     buffer.writeln();
-    buffer.writeln('✅ *PAYMENT RECEIVED*');
+    buffer.writeln(l10n?.sharePaymentReceived ?? '✅ *PAYMENT RECEIVED*');
     buffer.writeln();
-    buffer.writeln('*Payment Details:*');
-    buffer.writeln('Amount: ₹${payment.amount.toStringAsFixed(0)}');
-    buffer.writeln('Mode: ${_getPaymentModeLabel(payment.paymentMode)}');
-    buffer.writeln('Date: $paymentDateStr');
+    buffer.writeln(l10n?.sharePaymentDetails ?? '*Payment Details:*');
+    buffer.writeln(l10n?.shareAmount(payment.amount.toStringAsFixed(0)) ?? 'Amount: ₹${payment.amount.toStringAsFixed(0)}');
+    buffer.writeln(l10n?.shareMode(_getPaymentModeLabel(payment.paymentMode)) ?? 'Mode: ${_getPaymentModeLabel(payment.paymentMode)}');
+    buffer.writeln(l10n?.shareDate(paymentDateStr) ?? 'Date: $paymentDateStr');
     buffer.writeln();
-    buffer.writeln('*Bill Details:*');
-    buffer.writeln('Type: $billTypeLabel');
-    buffer.writeln('Period: ${bill.billingPeriod}');
+    buffer.writeln(l10n?.shareBillDetails ?? '*Bill Details:*');
+    buffer.writeln(l10n?.shareType(billTypeLabel) ?? 'Type: $billTypeLabel');
+    buffer.writeln(l10n?.sharePeriod(bill.billingPeriod) ?? 'Period: ${bill.billingPeriod}');
     if (bill.billNumber != null) {
-      buffer.writeln('Invoice #: ${bill.billNumber}');
+      buffer.writeln(l10n?.shareInvoiceNumber(bill.billNumber!) ?? 'Invoice #: ${bill.billNumber}');
     }
     buffer.writeln();
-    buffer.writeln('*Bill Status:*');
-    buffer.writeln('Total Bill: ₹${bill.amount.toStringAsFixed(0)}');
-    buffer.writeln('Total Paid: ₹${bill.paidAmount.toStringAsFixed(0)}');
+    buffer.writeln(l10n?.shareBillStatus ?? '*Bill Status:*');
+    buffer.writeln(l10n?.shareTotalBill(bill.amount.toStringAsFixed(0)) ?? 'Total Bill: ₹${bill.amount.toStringAsFixed(0)}');
+    buffer.writeln(l10n?.shareTotalPaid(bill.paidAmount.toStringAsFixed(0)) ?? 'Total Paid: ₹${bill.paidAmount.toStringAsFixed(0)}');
     if (bill.pendingAmount > 0) {
-      buffer.writeln('*Remaining: ₹${bill.pendingAmount.toStringAsFixed(0)}*');
+      buffer.writeln(l10n?.shareRemaining(bill.pendingAmount.toStringAsFixed(0)) ?? '*Remaining: ₹${bill.pendingAmount.toStringAsFixed(0)}*');
     } else {
-      buffer.writeln('*Status: FULLY PAID ✅*');
+      buffer.writeln(l10n?.shareStatusFullyPaid ?? '*Status: FULLY PAID ✅*');
     }
     buffer.writeln();
-    buffer.writeln('Thank you for your payment!');
+    buffer.writeln(l10n?.shareThankYouPayment ?? 'Thank you for your payment!');
     buffer.writeln(landlordName);
 
     return buffer.toString().trim();

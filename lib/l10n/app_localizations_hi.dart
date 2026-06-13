@@ -1959,5 +1959,245 @@ class AppLocalizationsHi extends AppLocalizations {
   String get unknownRoom => 'अज्ञात कमरा';
 
   @override
-  String get collectLabel => 'वसूल करें';
+  String get collectLabel => 'संग्रह करें';
+
+  @override
+  String get pdfReceivedFrom => 'प्राप्तकर्ता';
+
+  @override
+  String get pdfInvoiceTitle => 'इनवॉइस';
+
+  @override
+  String get pdfReceiptTitle => 'रसीद';
+
+  @override
+  String get pdfBalanceDue => 'बकाया राशि';
+
+  @override
+  String get pdfBillTo => 'बिल किसे';
+
+  @override
+  String get pdfRoom => 'कमरा';
+
+  @override
+  String get pdfIssued => 'जारी किया गया';
+
+  @override
+  String get pdfDueDate => 'देय तिथि';
+
+  @override
+  String get pdfDescription => 'विवरण';
+
+  @override
+  String get pdfPeriod => 'अवधि';
+
+  @override
+  String get pdfAmount => 'राशि';
+
+  @override
+  String get pdfTotalAmount => 'कुल राशि';
+
+  @override
+  String get pdfAmountPaid => 'भुगतान की गई राशि';
+
+  @override
+  String get pdfPaymentHistory => 'भुगतान इतिहास';
+
+  @override
+  String get pdfDate => 'दिनांक';
+
+  @override
+  String get pdfMode => 'माध्यम';
+
+  @override
+  String get pdfPaymentDetails => 'भुगतान विवरण';
+
+  @override
+  String get pdfTotalBill => 'कुल बिल';
+
+  @override
+  String get pdfTotalPaid => 'कुल भुगतान';
+
+  @override
+  String get pdfRemaining => 'शेष';
+
+  @override
+  String get pdfStatusFullyPaid => 'स्थिति: पूर्ण भुगतान ✅';
+
+  @override
+  String get pdfUpiId => 'UPI आईडी';
+
+  @override
+  String get pdfScanToPay => 'भुगतान के लिए स्कैन करें';
+
+  @override
+  String get pdfTermsAndConditions => 'नियम और शर्तें';
+
+  @override
+  String get pdfTerm1 =>
+      '1. विलंब शुल्क से बचने के लिए कृपया देय तिथि से पहले बिल का भुगतान करें।';
+
+  @override
+  String get pdfTerm2 =>
+      '2. यह एक कंप्यूटर-जनरेटेड इनवॉइस है और जब तक निर्दिष्ट न हो, किसी हस्ताक्षर की आवश्यकता नहीं है।';
+
+  @override
+  String get pdfVoid => 'रद्द';
+
+  @override
+  String get pdfPaid => 'भुगतान किया गया';
+
+  @override
+  String get shareStatementSubject => 'खाता विवरण';
+
+  @override
+  String shareStatementBody(String name) {
+    return 'प्रिय $name,\n\nकृपया अपना जनरेट किया गया खाता विवरण संलग्न पाएं।';
+  }
+
+  @override
+  String get shareSettlementSubject => 'मूव-आउट निपटान रसीद';
+
+  @override
+  String shareSettlementBody(String name) {
+    return 'प्रिय $name,\n\nआपका मूव-आउट निपटान पूरा हो गया है। कृपया विस्तृत निपटान रसीद संलग्न पाएं।';
+  }
+
+  @override
+  String shareInvoiceSubject(String period) {
+    return 'इनवॉइस - $period';
+  }
+
+  @override
+  String shareReceiptSubject(String period) {
+    return 'भुगतान रसीद - $period';
+  }
+
+  @override
+  String shareDear(String name) {
+    return 'प्रिय $name,';
+  }
+
+  @override
+  String get shareInvoiceHeader => '📋 *इनवॉइस*';
+
+  @override
+  String shareInvoiceNumber(String number) {
+    return 'इनवॉइस #: $number';
+  }
+
+  @override
+  String get shareBillDetails => '*बिल विवरण:*';
+
+  @override
+  String shareType(String type) {
+    return 'प्रकार: $type';
+  }
+
+  @override
+  String sharePeriod(String period) {
+    return 'अवधि: $period';
+  }
+
+  @override
+  String shareRoom(String room) {
+    return 'कमरा: $room';
+  }
+
+  @override
+  String get shareMeterReadings => '*मीटर रीडिंग:*';
+
+  @override
+  String sharePrevious(String reading) {
+    return 'पिछला: $reading यूनिट';
+  }
+
+  @override
+  String shareCurrent(String reading) {
+    return 'वर्तमान: $reading यूनिट';
+  }
+
+  @override
+  String shareUnitsUsed(String units) {
+    return 'खपत: $units यूनिट';
+  }
+
+  @override
+  String shareRate(String rate) {
+    return 'दर: ₹$rate/यूनिट';
+  }
+
+  @override
+  String get shareAmountHeader => '*राशि:*';
+
+  @override
+  String shareTotal(String amount) {
+    return 'कुल: ₹$amount';
+  }
+
+  @override
+  String sharePaid(String amount) {
+    return 'भुगतान: ₹$amount';
+  }
+
+  @override
+  String sharePending(String amount) {
+    return '*बकाया: ₹$amount*';
+  }
+
+  @override
+  String shareDueDate(String date) {
+    return 'देय तिथि: $date';
+  }
+
+  @override
+  String get sharePayViaUpi => '📱 *UPI द्वारा भुगतान करें:*';
+
+  @override
+  String get shareThankYou => 'धन्यवाद,';
+
+  @override
+  String get sharePaymentReceived => '✅ *भुगतान प्राप्त*';
+
+  @override
+  String get sharePaymentDetails => '*भुगतान विवरण:*';
+
+  @override
+  String shareAmount(String amount) {
+    return 'राशि: ₹$amount';
+  }
+
+  @override
+  String shareMode(String mode) {
+    return 'माध्यम: $mode';
+  }
+
+  @override
+  String shareDate(String date) {
+    return 'दिनांक: $date';
+  }
+
+  @override
+  String get shareBillStatus => '*बिल स्थिति:*';
+
+  @override
+  String shareTotalBill(String amount) {
+    return 'कुल बिल: ₹$amount';
+  }
+
+  @override
+  String shareTotalPaid(String amount) {
+    return 'कुल भुगतान: ₹$amount';
+  }
+
+  @override
+  String shareRemaining(String amount) {
+    return '*शेष: ₹$amount*';
+  }
+
+  @override
+  String get shareStatusFullyPaid => '*स्थिति: पूर्ण भुगतान ✅*';
+
+  @override
+  String get shareThankYouPayment => 'आपके भुगतान के लिए धन्यवाद!';
 }
