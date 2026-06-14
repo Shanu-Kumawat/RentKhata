@@ -899,7 +899,7 @@ class InvoicePdfService {
                               pw.SizedBox(height: 4),
                               pw.Text(bill.tenantName ?? 'Tenant', style: pw.TextStyle(fontSize: 12)),
                               if (bill.roomNumber != null)
-                                pw.Text('Room ${bill.roomNumber}', style: pw.TextStyle(fontSize: 10, color: PdfColors.grey700)),
+                                pw.Text(l10n?.roomNumber(bill.roomNumber!) ?? 'Room ${bill.roomNumber}', style: pw.TextStyle(fontSize: 10, color: PdfColors.grey700)),
                             ],
                           ),
                         ),

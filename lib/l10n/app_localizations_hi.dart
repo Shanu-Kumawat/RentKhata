@@ -2389,7 +2389,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get relationshipRequiredLabel => 'संबंध *';
 
   @override
-  String get phoneOptionalLabel => 'फ़ोन (वैकल्पिक)';
+  String get phoneOptionalLabel => 'फ़ोन';
 
   @override
   String get fullNameRequiredLabel => 'पूरा नाम *';

@@ -2387,7 +2387,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get relationshipRequiredLabel => 'Relationship *';
 
   @override
-  String get phoneOptionalLabel => 'Phone (Optional)';
+  String get phoneOptionalLabel => 'Phone';
 
   @override
   String get fullNameRequiredLabel => 'Full Name *';

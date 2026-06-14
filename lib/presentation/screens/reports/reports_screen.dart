@@ -1704,7 +1704,7 @@ class _BillDetailsSheet extends ConsumerWidget {
       builder: (context) => AlertDialog(
         insetPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
         title: Text(AppLocalizations.of(context)!.deletePaymentTitle),
-        content: Text('Delete ${formatCurrency(payment.amount)} payment?'),
+        content: Text(AppLocalizations.of(context)!.confirmDeletePayment(formatCurrency(payment.amount), DateFormat.yMMMd().format(payment.paymentDate))),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),

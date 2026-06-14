@@ -712,38 +712,47 @@ class _RoomStatusTile extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               children: [
-                // Leading Room Badge
+                // Leading Icon Badge
                 Container(
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.secondaryContainer,
+                    color: color.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: Center(
-                    child: Text(
-                      item.roomNumber,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onSecondaryContainer,
-                        fontSize: 14,
-                      ),
-                    ),
+                  child: Icon(
+                    Icons.meeting_room_rounded,
+                    color: color,
+                    size: 22,
                   ),
                 ),
                 const SizedBox(width: 16),
                 // Middle Info
                 Expanded(
-                  child: Text(
-                    item.tenantName,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        item.roomNumber,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${item.tenantName} • ${item.propertyName}',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
                 ),
                 // Trailing Status Pill

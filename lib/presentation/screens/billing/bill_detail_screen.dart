@@ -659,7 +659,7 @@ class _StatusCard extends StatelessWidget {
                     _AmountColumn(
                       label: AppLocalizations.of(context)!.paid,
                       amount: bill.paidAmount,
-                      color: Theme.of(context).colorScheme.tertiary,
+                      color: AppColors.success,
                     ),
                     Container(
                       height: 40,
@@ -671,7 +671,7 @@ class _StatusCard extends StatelessWidget {
                       amount: bill.pendingAmount,
                       color: bill.pendingAmount > 0
                           ? Theme.of(context).colorScheme.error
-                          : Theme.of(context).colorScheme.tertiary,
+                          : AppColors.success,
                     ),
                   ],
                 ),
@@ -682,8 +682,8 @@ class _StatusCard extends StatelessWidget {
                     child: LinearProgressIndicator(
                       value: bill.paidAmount / bill.amount,
                       backgroundColor: Colors.grey.shade200,
-                      valueColor: AlwaysStoppedAnimation(
-                        Theme.of(context).colorScheme.tertiary,
+                      valueColor: const AlwaysStoppedAnimation(
+                        AppColors.success,
                       ),
                       minHeight: 8,
                     ),
@@ -718,7 +718,7 @@ class _StatusCard extends StatelessWidget {
         Icons.timelapse,
       ),
       BillStatus.paid => (
-        Theme.of(context).colorScheme.tertiary,
+        AppColors.success,
         AppLocalizations.of(context)!.paid,
         Icons.check_circle,
       ),
@@ -1251,7 +1251,7 @@ class _InfoRow extends StatelessWidget {
             value,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w500,
-              color: valueColor,
+              color: valueColor ?? Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ],
@@ -1275,12 +1275,10 @@ class _PaymentTile extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: Theme.of(
-            context,
-          ).colorScheme.tertiary.withValues(alpha: 0.1),
+          backgroundColor: AppColors.success.withValues(alpha: 0.1),
           child: Icon(
             _getPaymentModeIcon(payment.paymentMode),
-            color: Theme.of(context).colorScheme.tertiary,
+            color: AppColors.success,
             size: 20,
           ),
         ),
@@ -1288,7 +1286,7 @@ class _PaymentTile extends ConsumerWidget {
           formatCurrency(payment.amount),
           style: theme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.tertiary,
+            color: AppColors.success,
           ),
         ),
         subtitle: Text(

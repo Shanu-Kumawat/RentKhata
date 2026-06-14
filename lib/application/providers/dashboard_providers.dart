@@ -198,6 +198,7 @@ class RoomStatusItem {
   final int roomId;
   final String roomNumber;
   final String tenantName;
+  final String propertyName;
   final RoomStatusType status;
   final String statusLabel;
 
@@ -205,6 +206,7 @@ class RoomStatusItem {
     required this.roomId,
     required this.roomNumber,
     required this.tenantName,
+    required this.propertyName,
     required this.status,
     required this.statusLabel,
   });
@@ -251,6 +253,7 @@ Future<List<RoomStatusItem>> roomStatusList(Ref ref) async {
       roomId: room.id,
       roomNumber: room.roomNumber,
       tenantName: room.currentTenantName ?? 'Unknown',
+      propertyName: room.propertyName ?? 'Unknown',
       status: status,
       statusLabel: label,
     );

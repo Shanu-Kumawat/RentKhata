@@ -4444,7 +4444,7 @@ abstract class AppLocalizations {
   /// No description provided for @phoneOptionalLabel.
   ///
   /// In en, this message translates to:
-  /// **'Phone (Optional)'**
+  /// **'Phone'**
   String get phoneOptionalLabel;
 
   /// No description provided for @fullNameRequiredLabel.

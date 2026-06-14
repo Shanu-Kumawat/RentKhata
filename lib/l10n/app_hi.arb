@@ -1016,7 +1016,7 @@
   "panCardHint": "उदा. पैन कार्ड",
   "nameRequiredLabel": "नाम *",
   "relationshipRequiredLabel": "संबंध *",
-  "phoneOptionalLabel": "फ़ोन (वैकल्पिक)",
+  "phoneOptionalLabel": "फ़ोन",
   "fullNameRequiredLabel": "पूरा नाम *",
   "guardianNameOptionalLabel": "पिता/पति का नाम (वैकल्पिक)",
   "twelveDigitNumberHint": "12 अंकों का नंबर",

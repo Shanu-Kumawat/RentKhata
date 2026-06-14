@@ -93,7 +93,7 @@ class _ContextualProfileSheetState
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Failed to save profile: $e')));
+        ).showSnackBar(SnackBar(content: Text('${AppLocalizations.of(context)!.errorPrefix}$e')));
       }
     } finally {
       if (mounted) {

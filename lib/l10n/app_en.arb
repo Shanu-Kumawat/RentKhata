@@ -1345,7 +1345,7 @@
   "panCardHint": "e.g. PAN Card",
   "nameRequiredLabel": "Name *",
   "relationshipRequiredLabel": "Relationship *",
-  "phoneOptionalLabel": "Phone (Optional)",
+  "phoneOptionalLabel": "Phone",
   "fullNameRequiredLabel": "Full Name *",
   "guardianNameOptionalLabel": "Father's/Spouse's Name (Optional)",
   "twelveDigitNumberHint": "12-digit number",

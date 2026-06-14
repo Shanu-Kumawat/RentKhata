@@ -145,7 +145,7 @@ class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Room ${widget.room.roomNumber}'),
+        title: Text(AppLocalizations.of(context)!.roomNumber(widget.room.roomNumber)),
         actions: [
           IconButton(
             icon: const Icon(Icons.edit_outlined),

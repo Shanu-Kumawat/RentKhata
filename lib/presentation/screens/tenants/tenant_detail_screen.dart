@@ -1367,6 +1367,7 @@ class _FamilyMembersSection extends ConsumerWidget {
                 children: [
                   Expanded(
                     child: DropdownButtonFormField<String>(
+                      isExpanded: true,
                       decoration: InputDecoration(
                         labelText: AppLocalizations.of(context)!.relationshipRequiredLabel,
                       ),
@@ -1407,6 +1408,7 @@ labelText: AppLocalizations.of(context)!.ageLabel),
                   const SizedBox(width: 16),
                   Expanded(
                     child: DropdownButtonFormField<String>(
+                      isExpanded: true,
                       decoration: InputDecoration(
 labelText: AppLocalizations.of(context)!.genderLabel),
                       initialValue: selectedGender,

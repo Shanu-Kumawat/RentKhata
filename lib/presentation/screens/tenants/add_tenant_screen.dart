@@ -372,6 +372,7 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
                     const SizedBox(width: 16),
                     Expanded(
                       child: DropdownButtonFormField<String>(
+                        isExpanded: true,
                         initialValue: _selectedGender,
                         decoration: InputDecoration(
                           labelText: AppLocalizations.of(context)!.genderLabel,

@@ -150,7 +150,10 @@ class PropertyRepositoryImpl implements PropertyRepository {
   @override
   Future<List<Room>> getAllRooms() async {
     final entities = await _propertyDao.getAllRooms();
-    return Future.wait(entities.map((e) => _roomToDomain(e)));
+    return Future.wait(entities.map((e) async {
+      final property = await _propertyDao.getPropertyById(e.propertyId);
+      return _roomToDomain(e, propertyName: property?.name);
+    }));
   }
 
   @override
