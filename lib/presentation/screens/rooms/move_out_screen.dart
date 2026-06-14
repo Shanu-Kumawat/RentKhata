@@ -283,9 +283,9 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
                       const SizedBox(height: 8),
                       TextFormField(
                         controller: _deductionController,
-                        decoration: const InputDecoration(
-                          labelText: 'Manual Deduction Amount (₹)',
-                          prefixIcon: Icon(Icons.money_off),
+                        decoration: InputDecoration(
+                          labelText: AppLocalizations.of(context)!.manualDeductionAmountLabel,
+                          prefixIcon: const Icon(Icons.money_off),
                           hintText: '0',
                         ),
                         keyboardType: TextInputType.number,
@@ -293,9 +293,9 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
                       const SizedBox(height: 12),
                       TextFormField(
                         controller: _reasonController,
-                        decoration: const InputDecoration(
-                          labelText: 'Reason (e.g. Damages, Painting)',
-                          prefixIcon: Icon(Icons.comment),
+                        decoration: InputDecoration(
+                          labelText: AppLocalizations.of(context)!.deductionReasonHint,
+                          prefixIcon: const Icon(Icons.comment),
                         ),
                         maxLines: 2,
                       ),

@@ -4,6 +4,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
 
 import '../../../core/utils/currency_formatter.dart';
 
@@ -165,7 +166,7 @@ Pay using UPI: $_upiUri
           TextButton.icon(
             onPressed: () => _sharePaymentLink(context),
             icon: const Icon(Icons.share_outlined),
-            label: const Text('Share Payment Link'),
+            label: Text(AppLocalizations.of(context)!.sharePaymentLinkBtn),
           ),
         ],
       ),

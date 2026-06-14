@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
 import '../../services/image_service.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
 
 class ImagePickerWidget extends StatefulWidget {
   final String? initialImagePath;
@@ -55,7 +56,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
           children: [
             ListTile(
               leading: const Icon(Icons.camera_alt),
-              title: const Text('Take Photo'),
+              title: Text(AppLocalizations.of(context)!.takePhotoBtn),
               onTap: () {
                 Navigator.pop(context);
                 _pickImage(ImageSource.camera);
@@ -63,7 +64,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
             ),
             ListTile(
               leading: const Icon(Icons.photo_library),
-              title: const Text('Choose from Gallery'),
+              title: Text(AppLocalizations.of(context)!.chooseFromGalleryBtn),
               onTap: () {
                 Navigator.pop(context);
                 _pickImage(ImageSource.gallery);

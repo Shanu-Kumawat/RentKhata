@@ -1024,7 +1024,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get agreedRent => 'Agreed Rent';
 
   @override
-  String get securityDepositLabel => 'Security Deposit';
+  String get securityDepositLabel => 'Security Deposit (₹)';
 
   @override
   String get billingStartLabel => 'Billing Start';
@@ -1077,7 +1077,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shareBtn => 'Share';
 
   @override
-  String get monthlyRentLabel => 'Monthly Rent';
+  String get monthlyRentLabel => 'Monthly Rent (₹) *';
 
   @override
   String get electricityBillLabel => 'Electricity Bill';
@@ -1389,7 +1389,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String moveInDateLabel(String date) {
-    return 'Move In: $date';
+    return 'Move In Date: $date';
   }
 
   @override
@@ -1769,7 +1769,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get upiIdHelperText => 'Upi Id Helper Text';
 
   @override
-  String get upiIdHint => 'Upi Id Hint';
+  String get upiIdHint => 'e.g. yourname@upi';
 
   @override
   String versionLabel(String version) {
@@ -2196,4 +2196,495 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shareThankYouPayment => 'Thank you for your payment!';
+
+  @override
+  String get editRoomTitle => 'Edit Room';
+
+  @override
+  String get addRoomTitle => 'Add Room';
+
+  @override
+  String get roomNumberLabel => 'Room Number/Name *';
+
+  @override
+  String get roomNumberHint => 'e.g., 101, Ground Floor Left';
+
+  @override
+  String get monthlyRentHint => 'e.g., 5000';
+
+  @override
+  String get electricityMeterToggleTitle => 'Electricity Meter';
+
+  @override
+  String get electricityMeterToggleSubtitle =>
+      'Track meter readings and auto-calculate electricity bills';
+
+  @override
+  String get saveChangesBtn => 'Save Changes';
+
+  @override
+  String get roomUpdatedSuccess => 'Room updated';
+
+  @override
+  String get roomAddedSuccess => 'Room added';
+
+  @override
+  String get addExpenseTitle => 'Add Expense';
+
+  @override
+  String get categoryLabel => 'Category';
+
+  @override
+  String get noteOptionalLabel => 'Note (Optional)';
+
+  @override
+  String get noteExpenseHint => 'e.g. Pump repair parts';
+
+  @override
+  String get saveExpenseBtn => 'Save Expense';
+
+  @override
+  String get expenseAddedSuccess => 'Expense added successfully';
+
+  @override
+  String get addDocumentTitle => 'Add Document';
+
+  @override
+  String get documentTitleLabel => 'Document Title';
+
+  @override
+  String get documentTitleHint => 'e.g., Rent Agreement, PAN Card';
+
+  @override
+  String get tapToAddDocument => 'Tap to add document';
+
+  @override
+  String get imageOrPdf => 'Image or PDF';
+
+  @override
+  String get saveDocumentBtn => 'Save Document';
+
+  @override
+  String get selectPdf => 'Select PDF';
+
+  @override
+  String get selectDocumentError => 'Please select a document';
+
+  @override
+  String get skipForNowBtn => 'Skip for now';
+
+  @override
+  String get whatAreYouManaging => 'What are you managing?';
+
+  @override
+  String get giveFirstPropertyTitle =>
+      'Give your first property or building a name.';
+
+  @override
+  String get propertyNameLabel => 'Property Name';
+
+  @override
+  String get propertyNameHint => 'e.g., Green Valley Apartments';
+
+  @override
+  String get continueBtn => 'Continue';
+
+  @override
+  String get yourProfileTitle => 'Your Profile';
+
+  @override
+  String get letsSetUpProfile =>
+      'Let\'s set up your profile so you can start managing properties.';
+
+  @override
+  String get profileBillingInfoText =>
+      'This information will be used for billing and receipts.';
+
+  @override
+  String get profileUpiInfoText =>
+      'Your UPI ID will be used to generate QR codes for tenants to pay rent easily.';
+
+  @override
+  String get yourNameLabel => 'Your Name *';
+
+  @override
+  String get enterFullNameHint => 'Enter your full name';
+
+  @override
+  String get phoneNumberLabel => 'Phone Number';
+
+  @override
+  String get phoneNumberHint => '10-digit mobile number';
+
+  @override
+  String get upiIdLabel => 'UPI ID';
+
+  @override
+  String get configureBillingCyclesTitle => 'Configure Billing Cycles';
+
+  @override
+  String get calculateBillsTenantDateText =>
+      'Calculate bills based on the tenant\'s specific move-in date';
+
+  @override
+  String get saveAndContinueBtn => 'Save & Continue';
+
+  @override
+  String get notificationsEnabledSuccess =>
+      'Notifications enabled successfully!';
+
+  @override
+  String get notificationsDeniedError => 'Notification permission denied.';
+
+  @override
+  String get appLockNotConfiguredError => 'App Lock was not configured.';
+
+  @override
+  String get upiHelperText => 'For receiving rent payments';
+
+  @override
+  String get propertyNameRequiredLabel => 'Property Name *';
+
+  @override
+  String get propertySunriseHint => 'e.g., Sunrise Apartments';
+
+  @override
+  String get propertyAddressLabel => 'Address';
+
+  @override
+  String get propertyAddressHint => 'Full address of the property';
+
+  @override
+  String get noDocumentsAddedYet => 'No documents added yet.';
+
+  @override
+  String get noAvailableTenantsCreateNew =>
+      'No available tenants. Create a new tenant.';
+
+  @override
+  String get moveInDetailsTitle => 'Move-in Details';
+
+  @override
+  String get olderMoveInDetectedInfo =>
+      'Older move-in detected. Billing starts from this month.';
+
+  @override
+  String get noFamilyMembersTap => 'No family members. Tap';
+
+  @override
+  String get existingMembersLabel => 'Existing members:';
+
+  @override
+  String get newMembersToAddLabel => 'New members to add:';
+
+  @override
+  String get panCardHint => 'e.g. PAN Card';
+
+  @override
+  String get nameRequiredLabel => 'Name *';
+
+  @override
+  String get relationshipRequiredLabel => 'Relationship *';
+
+  @override
+  String get phoneOptionalLabel => 'Phone (Optional)';
+
+  @override
+  String get fullNameRequiredLabel => 'Full Name *';
+
+  @override
+  String get guardianNameOptionalLabel => 'Father\'s/Spouse\'s Name (Optional)';
+
+  @override
+  String get twelveDigitNumberHint => '12-digit number';
+
+  @override
+  String get agreementEndDateOptionalLabel => 'Agreement End Date (Optional)';
+
+  @override
+  String get agreedRentLabel => 'Agreed Rent (₹)';
+
+  @override
+  String get manualDeductionAmountLabel => 'Manual Deduction Amount (₹)';
+
+  @override
+  String get deductionReasonHint => 'Reason (e.g. Damages, Painting)';
+
+  @override
+  String get moveInDateInputLabel => 'Move-in Date';
+
+  @override
+  String get propertyUpdatedSuccess => 'Property updated';
+
+  @override
+  String get propertyAddedSuccess => 'Property added';
+
+  @override
+  String get editPropertyTitle => 'Edit Property';
+
+  @override
+  String get addPropertyTitle => 'Add Property';
+
+  @override
+  String get aadhaarCardPhotosLabel => 'Aadhaar Card Photos';
+
+  @override
+  String get policeVerifiedLabel => 'Police Verified';
+
+  @override
+  String get policeVerifiedSubtitle =>
+      'Mark if police verification is complete';
+
+  @override
+  String get profilePhotoLabel => 'Profile Photo';
+
+  @override
+  String get enterTenantFullNameHint => 'Enter tenant\'s full name';
+
+  @override
+  String get fathersNameRequiredHint => 'Required for legal agreements';
+
+  @override
+  String get tenDigitMobileHint => '10-digit mobile number';
+
+  @override
+  String get secondaryPhoneLabel => 'Secondary Phone';
+
+  @override
+  String get emergencyFamilyContactHint => 'Emergency/Family contact';
+
+  @override
+  String get addressLineLabel => 'Address Line';
+
+  @override
+  String get streetLocalityHint => 'Street, Locality';
+
+  @override
+  String get companyNameLabel => 'Company Name';
+
+  @override
+  String get officeAddressLabel => 'Office Address';
+
+  @override
+  String get aadhaarNumberLabel => 'Aadhaar Number';
+
+  @override
+  String get twelveDigitAadhaarHint => '12-digit Aadhaar number';
+
+  @override
+  String get introducerNameLabel => 'Introducer Name';
+
+  @override
+  String get vouchedForTenantHint => 'Person who vouched for tenant';
+
+  @override
+  String get introducerAddressLabel => 'Introducer Address';
+
+  @override
+  String get introducerPhoneLabel => 'Introducer Phone';
+
+  @override
+  String get identityContactTitle => 'Identity & Contact';
+
+  @override
+  String get permanentAddressTitle => 'Permanent Address';
+
+  @override
+  String get workDetailsTitle => 'Work Details';
+
+  @override
+  String get idDocumentsTitle => 'ID Documents';
+
+  @override
+  String get introducerReferenceTitle => 'Introducer / Reference';
+
+  @override
+  String get additionalDocumentsTitle => 'Additional Documents';
+
+  @override
+  String get otherLabel => 'Other';
+
+  @override
+  String get editTenantTitle => 'Edit Tenant';
+
+  @override
+  String get addTenantTitle => 'Add Tenant';
+
+  @override
+  String get tenantUpdatedSuccess => 'Tenant updated';
+
+  @override
+  String get tenantAddedSuccess => 'Tenant added';
+
+  @override
+  String get tenantDeletedSuccess => 'Tenant deleted';
+
+  @override
+  String get cancelBtn => 'Cancel';
+
+  @override
+  String get moveInAgainBtn => 'Move In Again';
+
+  @override
+  String get selectRoomToMoveInHint => 'Select a room to move this tenant in';
+
+  @override
+  String get deleteTenantTitle => 'Delete Tenant?';
+
+  @override
+  String get deleteBtn => 'Delete';
+
+  @override
+  String get currentLocationLabel => 'Current Location';
+
+  @override
+  String get unableToLoadImage => 'Unable to load image';
+
+  @override
+  String get imageFileNotFound => 'Image file not found';
+
+  @override
+  String get occupancyHistoryTitle => 'Occupancy History';
+
+  @override
+  String get noOccupancyHistoryYet => 'No occupancy history yet';
+
+  @override
+  String get familyMembersTitle => 'Family Members';
+
+  @override
+  String get addFamilyMemberTitle => 'Add Family Member';
+
+  @override
+  String get familyMembersActiveOnlyHint =>
+      'Family members can only be added to active occupancies';
+
+  @override
+  String get deleteFamilyMemberTitle => 'Delete Family Member?';
+
+  @override
+  String get actionCannotBeUndone => 'This action cannot be undone.';
+
+  @override
+  String get familyMemberDeletedSuccess => 'Family member deleted';
+
+  @override
+  String get spouseLabel => 'Spouse';
+
+  @override
+  String get childLabel => 'Child';
+
+  @override
+  String get parentLabel => 'Parent';
+
+  @override
+  String get siblingLabel => 'Sibling';
+
+  @override
+  String get nameAndRelationshipRequired =>
+      'Name and relationship are required';
+
+  @override
+  String get familyMemberAddedSuccess => 'Family member added!';
+
+  @override
+  String get customFieldsTitle => 'Custom Fields';
+
+  @override
+  String get noCustomFields => 'No custom fields';
+
+  @override
+  String get documentsTitle => 'Documents';
+
+  @override
+  String get noDocumentsAttached => 'No documents attached.';
+
+  @override
+  String get deleteDocumentTitle => 'Delete Document?';
+
+  @override
+  String get confirmDeleteDocumentPrefix => 'Are you sure you want to delete ';
+
+  @override
+  String get documentDeletedSuccess => 'Document deleted';
+
+  @override
+  String get fieldNameLabel => 'Field Name';
+
+  @override
+  String get fieldValueLabel => 'Value';
+
+  @override
+  String get zeroAmount => '0';
+
+  @override
+  String get letsMakeItProfessionalTitle => 'Let\'s make it professional!';
+
+  @override
+  String get addNameUpiSubtitle =>
+      'Add your Name and UPI ID to generate professional invoices with embedded QR codes.';
+
+  @override
+  String get continueToBillBtn => 'Continue to Bill';
+
+  @override
+  String get yourNameBusinessNameLabel => 'Your Name or Business Name';
+
+  @override
+  String get upiIdOptionalLabel => 'UPI ID (Optional but recommended)';
+
+  @override
+  String get occupancyDetailsTitle => 'Occupancy Details';
+
+  @override
+  String get shareFunctionalityComingSoon => 'Share functionality coming soon';
+
+  @override
+  String get occupancyNotFound => 'Occupancy not found';
+
+  @override
+  String get viewSettlementReceiptBtn => 'View Settlement Receipt';
+
+  @override
+  String get enterPaymentAmountLabel => 'Payment Amount (₹)';
+
+  @override
+  String get shareTextBtn => 'Share Text';
+
+  @override
+  String get pdfInvoiceBtn => 'PDF Invoice';
+
+  @override
+  String get messageCopiedSuccess => 'Message copied to clipboard!';
+
+  @override
+  String get generatingPdfMsg => 'Generating PDF...';
+
+  @override
+  String get noPaymentsRecordedMsg => 'No payments recorded yet';
+
+  @override
+  String get paymentDeletedSuccess => 'Payment deleted';
+
+  @override
+  String get enterValidAmountMsg => 'Enter a valid amount';
+
+  @override
+  String get paymentUpdatedSuccess => 'Payment updated';
+
+  @override
+  String get noNotificationsScheduled => 'No notifications scheduled.';
+
+  @override
+  String get errorGeneric => 'Error';
+
+  @override
+  String get chooseFromGalleryBtn => 'Choose from Gallery';
+
+  @override
+  String get sharePaymentLinkBtn => 'Share Payment Link';
+
+  @override
+  String get meterTrackingExplanation =>
+      'Enter readings to automatically calculate electricity charges based on your configured rate.';
 }

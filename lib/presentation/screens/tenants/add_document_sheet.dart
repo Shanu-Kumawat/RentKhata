@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import '../../../services/image_service.dart';
 import '../../../application/providers/repository_providers.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
 
 class AddDocumentSheet extends ConsumerStatefulWidget {
   final int tenantId;
@@ -51,7 +52,7 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
     if (_selectedFile == null) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Please select a document')));
+      ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.selectDocumentError)));
       return;
     }
 
@@ -94,14 +95,15 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
         right: 24,
         top: 24,
       ),
-      child: Form(
-        key: _formKey,
-        child: Column(
+      child: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Add Document',
+              AppLocalizations.of(context)!.addDocumentTitle,
               style: Theme.of(
                 context,
               ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
@@ -109,10 +111,10 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
             const SizedBox(height: 24),
             TextFormField(
               controller: _titleController,
-              decoration: const InputDecoration(
-                labelText: 'Document Title *',
-                hintText: 'e.g., Rent Agreement, PAN Card',
-                prefixIcon: Icon(Icons.description_outlined),
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.documentTitleLabel,
+                hintText: AppLocalizations.of(context)!.documentTitleHint,
+                prefixIcon: const Icon(Icons.description_outlined),
               ),
               validator: (value) =>
                   value == null || value.isEmpty ? 'Required' : null,
@@ -145,14 +147,14 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Tap to add document',
+                            AppLocalizations.of(context)!.tapToAddDocument,
                             style: Theme.of(context).textTheme.bodyMedium
                                 ?.copyWith(
                                   color: Theme.of(context).colorScheme.primary,
                                 ),
                           ),
                           Text(
-                            'Image or PDF',
+                            AppLocalizations.of(context)!.imageOrPdf,
                             style: Theme.of(context).textTheme.bodySmall
                                 ?.copyWith(
                                   color: Theme.of(
@@ -175,11 +177,12 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
                         width: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Text('Save Document'),
+                    : Text(AppLocalizations.of(context)!.saveDocumentBtn),
               ),
             ),
             const SizedBox(height: 24),
           ],
+        ),
         ),
       ),
     );
@@ -236,7 +239,7 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
           children: [
             ListTile(
               leading: const Icon(Icons.camera_alt),
-              title: const Text('Take Photo'),
+              title: Text(AppLocalizations.of(context)!.takePhoto),
               onTap: () {
                 Navigator.pop(context);
                 _pickImage(ImageSource.camera);
@@ -244,7 +247,7 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
             ),
             ListTile(
               leading: const Icon(Icons.photo_library),
-              title: const Text('Choose from Gallery'),
+              title: Text(AppLocalizations.of(context)!.chooseFromGallery),
               onTap: () {
                 Navigator.pop(context);
                 _pickImage(ImageSource.gallery);
@@ -252,7 +255,7 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
             ),
             ListTile(
               leading: Icon(Icons.picture_as_pdf, color: Colors.red.shade400),
-              title: const Text('Select PDF'),
+              title: Text(AppLocalizations.of(context)!.selectPdf),
               onTap: () {
                 Navigator.pop(context);
                 _pickPdf();

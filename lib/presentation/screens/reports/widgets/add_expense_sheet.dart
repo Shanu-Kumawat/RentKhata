@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../../application/providers/expense_providers.dart';
 import '../../../../domain/entities/expense.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
 
 class AddExpenseSheet extends ConsumerStatefulWidget {
   const AddExpenseSheet({super.key});
@@ -67,7 +68,7 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
       if (mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Expense added successfully')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.expenseAddedSuccess)),
         );
       }
     } catch (e) {
@@ -91,9 +92,10 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: EdgeInsets.fromLTRB(24, 16, 24, 24 + bottomPadding),
-      child: Form(
-        key: _formKey,
-        child: Column(
+      child: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -109,7 +111,7 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Add Expense',
+              AppLocalizations.of(context)!.addExpenseTitle,
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -135,7 +137,7 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
                   fontWeight: FontWeight.bold,
                   color: theme.colorScheme.primary,
                 ),
-                labelText: 'Amount',
+                labelText: AppLocalizations.of(context)!.amountLabel,
                 filled: true,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
@@ -158,7 +160,7 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
                     isExpanded: true,
                     initialValue: _selectedCategory,
                     decoration: InputDecoration(
-                      labelText: 'Category',
+                      labelText: AppLocalizations.of(context)!.categoryLabel,
                       filled: true,
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 12,
@@ -195,7 +197,7 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
                     borderRadius: BorderRadius.circular(12),
                     child: InputDecorator(
                       decoration: InputDecoration(
-                        labelText: 'Date',
+                        labelText: AppLocalizations.of(context)!.dateLabel,
                         filled: true,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -217,8 +219,8 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
             TextFormField(
               controller: _noteController,
               decoration: InputDecoration(
-                labelText: 'Note (Optional)',
-                hintText: 'e.g. Pump repair parts',
+                labelText: AppLocalizations.of(context)!.noteOptionalLabel,
+                hintText: AppLocalizations.of(context)!.noteExpenseHint,
                 filled: true,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -244,9 +246,10 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
                       height: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : const Text('Save Expense', style: TextStyle(fontSize: 16)),
+                  : Text(AppLocalizations.of(context)!.saveExpenseBtn, style: const TextStyle(fontSize: 16)),
             ),
           ],
+        ),
         ),
       ),
     );

@@ -990,6 +990,13 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                                 ),
                               ],
                             ),
+                            const SizedBox(height: 8),
+                            Text(
+                              AppLocalizations.of(context)!.meterTrackingExplanation,
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              ),
+                            ),
                             const SizedBox(height: 16),
                             // Meter reading inputs
                             Row(

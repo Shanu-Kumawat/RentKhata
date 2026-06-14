@@ -341,7 +341,7 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
                           ),
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.zero,
-                          hintText: '0',
+                          hintText: AppLocalizations.of(context)!.zeroAmount,
                           hintStyle: theme.textTheme.displayMedium?.copyWith(
                             color: theme.colorScheme.onSurface.withValues(
                               alpha: 0.2,

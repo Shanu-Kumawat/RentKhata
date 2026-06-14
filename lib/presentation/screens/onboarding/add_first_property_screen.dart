@@ -9,6 +9,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../application/providers/repository_providers.dart';
 import '../../../core/utils/validators.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
 
 /// Screen to add the first property during onboarding.
 class AddFirstPropertyScreen extends ConsumerStatefulWidget {
@@ -124,7 +125,7 @@ class _AddFirstPropertyScreenState
           TextButton(
             onPressed: _skipForNow,
             child: Text(
-              'Skip for now',
+              AppLocalizations.of(context)!.skipForNowBtn,
               style: GoogleFonts.inter(
                 fontWeight: FontWeight.w500,
                 color: colorScheme.onSurfaceVariant,
@@ -144,7 +145,7 @@ class _AddFirstPropertyScreenState
               children: [
                 // Header Sequence
                 Text(
-                      'What are you managing?',
+                      AppLocalizations.of(context)!.whatAreYouManaging,
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 32,
                         fontWeight: FontWeight.w800,
@@ -164,7 +165,7 @@ class _AddFirstPropertyScreenState
                 const SizedBox(height: 12),
 
                 Text(
-                      'Give your first property or building a name.',
+                      AppLocalizations.of(context)!.giveFirstPropertyTitle,
                       style: GoogleFonts.inter(
                         fontSize: 16,
                         color: colorScheme.onSurfaceVariant,
@@ -201,8 +202,8 @@ class _AddFirstPropertyScreenState
                           fontWeight: FontWeight.w500,
                         ),
                         decoration: InputDecoration(
-                          labelText: 'Property Name',
-                          hintText: 'e.g., Green Valley Apartments',
+                          labelText: AppLocalizations.of(context)!.propertyNameLabel,
+                          hintText: AppLocalizations.of(context)!.propertyNameHint,
                           labelStyle: GoogleFonts.inter(),
                           hintStyle: GoogleFonts.inter(
                             color: colorScheme.onSurfaceVariant.withValues(
@@ -341,7 +342,7 @@ class _AddFirstPropertyScreenState
                                   ),
                                 )
                               : Text(
-                                  'Continue',
+                                  AppLocalizations.of(context)!.continueBtn,
                                   style: GoogleFonts.plusJakartaSans(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w700,

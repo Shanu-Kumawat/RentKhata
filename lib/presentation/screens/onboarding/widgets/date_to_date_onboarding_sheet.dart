@@ -137,7 +137,7 @@ class _DateToDateOnboardingSheetState extends ConsumerState<DateToDateOnboarding
               const SizedBox(height: 16),
 
               Text(
-                'Configure Billing Cycles',
+                l10n.configureBillingCyclesTitle,
                 textAlign: TextAlign.center,
                 style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.w800,
@@ -151,7 +151,7 @@ class _DateToDateOnboardingSheetState extends ConsumerState<DateToDateOnboarding
               const SizedBox(height: 8),
 
               Text(
-                'Calculate bills based on the tenant\'s exact move-in date (Date-to-Date) rather than calendar months.',
+                l10n.calculateBillsTenantDateText,
                 textAlign: TextAlign.center,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
@@ -229,9 +229,9 @@ class _DateToDateOnboardingSheetState extends ConsumerState<DateToDateOnboarding
                         width: 20,
                         child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                       )
-                    : const Text(
-                        'Save & Continue',
-                        style: TextStyle(
+                    : Text(
+                        AppLocalizations.of(context)!.saveAndContinueBtn,
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),

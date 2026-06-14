@@ -167,7 +167,7 @@
   "meterPhoto": "मीटर की फोटो",
   "tapToViewFullSize": "पूरा आकार देखने के लिए टैप करें",
   "addMeterPhoto": "मीटर की फोटो जोड़ें",
-  "takePhoto": "फोटो लें",
+  "takePhoto": "फ़ोटो लें",
   "chooseFromGallery": "गैलरी से चुनें",
   "meterPhotoAdded": "मीटर की फोटो सफलतापूर्वक जोड़ दी गई",
   "errorAddingPhoto": "फोटो जोड़ने में त्रुटि: {error}",
@@ -211,7 +211,7 @@
   "minAmount": "न्यूनतम राशि: {amount}",
   "notSet": "सेट नहीं है",
   "saveChanges": "परिवर्तन सहेजें",
-  "amountLabel": "राशि",
+  "amountLabel": "रकम",
   "amountCannotExceedPendingBalance": "राशि बकाया राशि {amount} से अधिक नहीं हो सकती",
   "recordPayment": "भुगतान रिकॉर्ड करें",
   "dueAmount": "बकाया: {amount}",
@@ -302,7 +302,7 @@
   "occupiedStatus": "कब्जे में",
   "moveOutBtn": "बाहर जाएँ",
   "agreedRent": "सहमत किराया",
-  "securityDepositLabel": "सुरक्षा जमा",
+  "securityDepositLabel": "सुरक्षा जमा (₹)",
   "billingStartLabel": "बिलिंग प्रारंभ",
   "editBtn": "संपादित करें",
   "selectBillingStartDate": "बिलिंग प्रारंभ तिथि का चयन करें",
@@ -319,7 +319,7 @@
   "payNowBtn": "अभी भुगतान करें",
   "viewBtn": "देखें",
   "shareBtn": "साझा करें",
-  "monthlyRentLabel": "मासिक किराया",
+  "monthlyRentLabel": "मासिक किराया (Rs.) *",
   "electricityBillLabel": "बिजली का बिल",
   "waterBillLabel": "पानी का बिल",
   "maintenanceLabel": "रखरखाव",
@@ -340,7 +340,7 @@
   "parent": "माता-पिता",
   "sibling": "भाई-बहन",
   "otherRelation": "अन्य",
-  "ageLabel": "आयु",
+  "ageLabel": "उम्र",
   "genderLabel": "लिंग",
   "maleLabel": "पुरुष",
   "femaleLabel": "महिला",
@@ -362,7 +362,7 @@
   "backLabel": "पीछे",
   "policeVerificationStatus": "पुलिस सत्यापन स्थिति",
   "clearBtn": "साफ़ करें",
-  "takePhotoBtn": "फोटो लें",
+  "takePhotoBtn": "तस्वीर लें",
   "uploadGalleryBtn": "गैलरी से अपलोड करें",
   "addMemberMsg": "सदस्य जोड़ें",
   "electricitySetup": "बिजली सेटअप",
@@ -479,7 +479,6 @@
       }
     }
   },
-
   "invoiceAttachmentMeterProof": "संलग्नक: मीटर रीडिंग प्रमाण",
   "invoiceReference": "इनवॉइस संदर्भ: #{number}",
   "@invoiceReference": {
@@ -628,7 +627,7 @@
   "updateRate": "[HI] Update Rate",
   "upiId": "[HI] Upi Id",
   "upiIdHelperText": "[HI] Upi Id Helper Text",
-  "upiIdHint": "[HI] Upi Id Hint",
+  "upiIdHint": "उदा. yourname@upi",
   "versionLabel": "[HI] Version {version}",
   "@versionLabel": {
     "placeholders": {
@@ -764,108 +763,142 @@
   "shareStatementBody": "प्रिय {name},\n\nकृपया अपना जनरेट किया गया खाता विवरण संलग्न पाएं।",
   "@shareStatementBody": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "shareSettlementSubject": "मूव-आउट निपटान रसीद",
   "shareSettlementBody": "प्रिय {name},\n\nआपका मूव-आउट निपटान पूरा हो गया है। कृपया विस्तृत निपटान रसीद संलग्न पाएं।",
   "@shareSettlementBody": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "shareInvoiceSubject": "इनवॉइस - {period}",
   "@shareInvoiceSubject": {
     "placeholders": {
-      "period": { "type": "String" }
+      "period": {
+        "type": "String"
+      }
     }
   },
   "shareReceiptSubject": "भुगतान रसीद - {period}",
   "@shareReceiptSubject": {
     "placeholders": {
-      "period": { "type": "String" }
+      "period": {
+        "type": "String"
+      }
     }
   },
   "shareDear": "प्रिय {name},",
   "@shareDear": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "shareInvoiceHeader": "📋 *इनवॉइस*",
   "shareInvoiceNumber": "इनवॉइस #: {number}",
   "@shareInvoiceNumber": {
     "placeholders": {
-      "number": { "type": "String" }
+      "number": {
+        "type": "String"
+      }
     }
   },
   "shareBillDetails": "*बिल विवरण:*",
   "shareType": "प्रकार: {type}",
   "@shareType": {
     "placeholders": {
-      "type": { "type": "String" }
+      "type": {
+        "type": "String"
+      }
     }
   },
   "sharePeriod": "अवधि: {period}",
   "@sharePeriod": {
     "placeholders": {
-      "period": { "type": "String" }
+      "period": {
+        "type": "String"
+      }
     }
   },
   "shareRoom": "कमरा: {room}",
   "@shareRoom": {
     "placeholders": {
-      "room": { "type": "String" }
+      "room": {
+        "type": "String"
+      }
     }
   },
   "shareMeterReadings": "*मीटर रीडिंग:*",
   "sharePrevious": "पिछला: {reading} यूनिट",
   "@sharePrevious": {
     "placeholders": {
-      "reading": { "type": "String" }
+      "reading": {
+        "type": "String"
+      }
     }
   },
   "shareCurrent": "वर्तमान: {reading} यूनिट",
   "@shareCurrent": {
     "placeholders": {
-      "reading": { "type": "String" }
+      "reading": {
+        "type": "String"
+      }
     }
   },
   "shareUnitsUsed": "खपत: {units} यूनिट",
   "@shareUnitsUsed": {
     "placeholders": {
-      "units": { "type": "String" }
+      "units": {
+        "type": "String"
+      }
     }
   },
   "shareRate": "दर: ₹{rate}/यूनिट",
   "@shareRate": {
     "placeholders": {
-      "rate": { "type": "String" }
+      "rate": {
+        "type": "String"
+      }
     }
   },
   "shareAmountHeader": "*राशि:*",
   "shareTotal": "कुल: ₹{amount}",
   "@shareTotal": {
     "placeholders": {
-      "amount": { "type": "String" }
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "sharePaid": "भुगतान: ₹{amount}",
   "@sharePaid": {
     "placeholders": {
-      "amount": { "type": "String" }
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "sharePending": "*बकाया: ₹{amount}*",
   "@sharePending": {
     "placeholders": {
-      "amount": { "type": "String" }
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "shareDueDate": "देय तिथि: {date}",
   "@shareDueDate": {
     "placeholders": {
-      "date": { "type": "String" }
+      "date": {
+        "type": "String"
+      }
     }
   },
   "sharePayViaUpi": "📱 *UPI द्वारा भुगतान करें:*",
@@ -875,40 +908,211 @@
   "shareAmount": "राशि: ₹{amount}",
   "@shareAmount": {
     "placeholders": {
-      "amount": { "type": "String" }
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "shareMode": "माध्यम: {mode}",
   "@shareMode": {
     "placeholders": {
-      "mode": { "type": "String" }
+      "mode": {
+        "type": "String"
+      }
     }
   },
   "shareDate": "दिनांक: {date}",
   "@shareDate": {
     "placeholders": {
-      "date": { "type": "String" }
+      "date": {
+        "type": "String"
+      }
     }
   },
   "shareBillStatus": "*बिल स्थिति:*",
   "shareTotalBill": "कुल बिल: ₹{amount}",
   "@shareTotalBill": {
     "placeholders": {
-      "amount": { "type": "String" }
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "shareTotalPaid": "कुल भुगतान: ₹{amount}",
   "@shareTotalPaid": {
     "placeholders": {
-      "amount": { "type": "String" }
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "shareRemaining": "*शेष: ₹{amount}*",
   "@shareRemaining": {
     "placeholders": {
-      "amount": { "type": "String" }
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "shareStatusFullyPaid": "*स्थिति: पूर्ण भुगतान ✅*",
-  "shareThankYouPayment": "आपके भुगतान के लिए धन्यवाद!"
+  "shareThankYouPayment": "आपके भुगतान के लिए धन्यवाद!",
+  "editRoomTitle": "कमरा संपादित करें",
+  "addRoomTitle": "कमरा जोड़ें",
+  "roomNumberLabel": "कमरा नंबर/नाम *",
+  "roomNumberHint": "उदा., 101, ग्राउंड फ्लोर बायां",
+  "monthlyRentHint": "उदा., 5000",
+  "electricityMeterToggleTitle": "बिजली मीटर",
+  "electricityMeterToggleSubtitle": "मीटर रीडिंग ट्रैक करें और बिजली बिल अपने आप कैलकुलेट करें",
+  "saveChangesBtn": "परिवर्तन सहेजें",
+  "roomUpdatedSuccess": "कमरा अपडेट किया गया",
+  "roomAddedSuccess": "कमरा जोड़ा गया",
+  "addExpenseTitle": "खर्च जोड़ें",
+  "categoryLabel": "श्रेणी",
+  "noteOptionalLabel": "नोट (वैकल्पिक)",
+  "noteExpenseHint": "उदा. पंप मरम्मत के पुर्जे",
+  "saveExpenseBtn": "खर्च सेव करें",
+  "expenseAddedSuccess": "खर्च सफलतापूर्वक जोड़ा गया",
+  "addDocumentTitle": "दस्तावेज़ जोड़ें",
+  "documentTitleLabel": "दस्तावेज़ का शीर्षक",
+  "documentTitleHint": "उदा., किराया समझौता, पैन कार्ड",
+  "tapToAddDocument": "दस्तावेज़ जोड़ने के लिए टैप करें",
+  "imageOrPdf": "छवि या PDF",
+  "saveDocumentBtn": "दस्तावेज़ सेव करें",
+  "selectPdf": "PDF चुनें",
+  "selectDocumentError": "कृपया एक दस्तावेज़ चुनें",
+  "skipForNowBtn": "अभी छोड़ें",
+  "whatAreYouManaging": "आप क्या प्रबंधित कर रहे हैं?",
+  "giveFirstPropertyTitle": "अपनी पहली संपत्ति या इमारत को नाम दें।",
+  "propertyNameLabel": "संपत्ति का नाम",
+  "propertyNameHint": "उदा., ग्रीन वैली अपार्टमेंट्स",
+  "continueBtn": "जारी रखें",
+  "yourProfileTitle": "आपकी प्रोफ़ाइल",
+  "letsSetUpProfile": "आइए आपकी प्रोफ़ाइल सेट अप करें ताकि आप संपत्तियों का प्रबंधन शुरू कर सकें।",
+  "profileBillingInfoText": "इस जानकारी का उपयोग बिलिंग और रसीदों के लिए किया जाएगा।",
+  "profileUpiInfoText": "आपकी UPI ID का उपयोग किरायेदारों द्वारा आसानी से किराया चुकाने के लिए QR कोड उत्पन्न करने में किया जाएगा।",
+  "yourNameLabel": "आपका नाम *",
+  "enterFullNameHint": "अपना पूरा नाम दर्ज करें",
+  "phoneNumberLabel": "फ़ोन नंबर",
+  "phoneNumberHint": "10 अंकों का मोबाइल नंबर",
+  "upiIdLabel": "UPI ID",
+  "configureBillingCyclesTitle": "बिलिंग साइकिल कॉन्फ़िगर करें",
+  "calculateBillsTenantDateText": "किरायेदार के विशिष्ट प्रवेश-तिथि के आधार पर बिल की गणना करें",
+  "saveAndContinueBtn": "सहेजें और जारी रखें",
+  "notificationsEnabledSuccess": "सूचनाएँ सफलतापूर्वक सक्षम की गईं!",
+  "notificationsDeniedError": "सूचना की अनुमति अस्वीकार कर दी गई।",
+  "appLockNotConfiguredError": "ऐप लॉक कॉन्फ़िगर नहीं किया गया था।",
+  "upiHelperText": "किराया भुगतान प्राप्त करने के लिए",
+  "propertyNameRequiredLabel": "संपत्ति का नाम *",
+  "propertySunriseHint": "उदा., सनराइज अपार्टमेंट्स",
+  "propertyAddressLabel": "पता",
+  "propertyAddressHint": "संपत्ति का पूरा पता",
+  "noDocumentsAddedYet": "अभी तक कोई दस्तावेज़ नहीं जोड़ा गया है।",
+  "noAvailableTenantsCreateNew": "कोई किरायेदार उपलब्ध नहीं है। नया किरायेदार बनाएं।",
+  "moveInDetailsTitle": "प्रवेश विवरण",
+  "olderMoveInDetectedInfo": "पुराना प्रवेश पाया गया। बिलिंग इस महीने से शुरू होगी।",
+  "noFamilyMembersTap": "कोई परिवार का सदस्य नहीं है। टैप करें",
+  "existingMembersLabel": "मौजूदा सदस्य:",
+  "newMembersToAddLabel": "जोड़ने के लिए नए सदस्य:",
+  "panCardHint": "उदा. पैन कार्ड",
+  "nameRequiredLabel": "नाम *",
+  "relationshipRequiredLabel": "संबंध *",
+  "phoneOptionalLabel": "फ़ोन (वैकल्पिक)",
+  "fullNameRequiredLabel": "पूरा नाम *",
+  "guardianNameOptionalLabel": "पिता/पति का नाम (वैकल्पिक)",
+  "twelveDigitNumberHint": "12 अंकों का नंबर",
+  "agreementEndDateOptionalLabel": "अनुबंध समाप्ति तिथि (वैकल्पिक)",
+  "agreedRentLabel": "सहमत किराया (₹)",
+  "manualDeductionAmountLabel": "मैन्युअल कटौती राशि (₹)",
+  "deductionReasonHint": "कारण (उदा. नुकसान, पेंटिंग)",
+  "moveInDateInputLabel": "प्रवेश तिथि",
+  "propertyUpdatedSuccess": "संपत्ति अद्यतन की गई",
+  "propertyAddedSuccess": "संपत्ति जोड़ी गई",
+  "editPropertyTitle": "संपत्ति संपादित करें",
+  "addPropertyTitle": "संपत्ति जोड़ें",
+  "aadhaarCardPhotosLabel": "आधार कार्ड की तस्वीरें",
+  "policeVerifiedLabel": "पुलिस सत्यापित",
+  "policeVerifiedSubtitle": "यदि पुलिस सत्यापन पूरा हो गया है तो चिह्नित करें",
+  "profilePhotoLabel": "प्रोफ़ाइल फ़ोटो",
+  "enterTenantFullNameHint": "किरायेदार का पूरा नाम दर्ज करें",
+  "fathersNameRequiredHint": "कानूनी अनुबंधों के लिए आवश्यक",
+  "tenDigitMobileHint": "10 अंकों का मोबाइल नंबर",
+  "secondaryPhoneLabel": "वैकल्पिक फ़ोन",
+  "emergencyFamilyContactHint": "आपातकालीन/पारिवारिक संपर्क",
+  "addressLineLabel": "पता",
+  "streetLocalityHint": "सड़क, मोहल्ला",
+  "companyNameLabel": "कंपनी का नाम",
+  "officeAddressLabel": "कार्यालय का पता",
+  "aadhaarNumberLabel": "आधार संख्या",
+  "twelveDigitAadhaarHint": "12 अंकों का आधार नंबर",
+  "introducerNameLabel": "परिचयकर्ता का नाम",
+  "vouchedForTenantHint": "किरायेदार की गारंटी देने वाला व्यक्ति",
+  "introducerAddressLabel": "परिचयकर्ता का पता",
+  "introducerPhoneLabel": "परिचयकर्ता का फ़ोन",
+  "identityContactTitle": "पहचान और संपर्क",
+  "permanentAddressTitle": "स्थायी पता",
+  "workDetailsTitle": "काम का विवरण",
+  "idDocumentsTitle": "पहचान दस्तावेज़",
+  "introducerReferenceTitle": "परिचयकर्ता / संदर्भ",
+  "additionalDocumentsTitle": "अतिरिक्त दस्तावेज़",
+  "otherLabel": "अन्य",
+  "editTenantTitle": "किरायेदार संपादित करें",
+  "addTenantTitle": "किरायेदार जोड़ें",
+  "tenantUpdatedSuccess": "किरायेदार अद्यतन किया गया",
+  "tenantAddedSuccess": "किरायेदार जोड़ा गया",
+  "tenantDeletedSuccess": "किरायेदार हटा दिया गया",
+  "cancelBtn": "रद्द करें",
+  "moveInAgainBtn": "फिर से प्रवेश करें",
+  "selectRoomToMoveInHint": "इस किरायेदार को प्रवेश देने के लिए एक कमरा चुनें",
+  "deleteTenantTitle": "किरायेदार हटाएं?",
+  "deleteBtn": "हटाएं",
+  "currentLocationLabel": "वर्तमान स्थान",
+  "unableToLoadImage": "छवि लोड करने में असमर्थ",
+  "imageFileNotFound": "छवि फ़ाइल नहीं मिली",
+  "occupancyHistoryTitle": "अधिभोग इतिहास",
+  "noOccupancyHistoryYet": "अभी तक कोई अधिभोग इतिहास नहीं है",
+  "familyMembersTitle": "परिवार के सदस्य",
+  "addFamilyMemberTitle": "परिवार का सदस्य जोड़ें",
+  "familyMembersActiveOnlyHint": "परिवार के सदस्य केवल सक्रिय अधिभोग में जोड़े जा सकते हैं",
+  "deleteFamilyMemberTitle": "परिवार के सदस्य को हटाएं?",
+  "actionCannotBeUndone": "इस क्रिया को पूर्ववत नहीं किया जा सकता है।",
+  "familyMemberDeletedSuccess": "परिवार का सदस्य हटा दिया गया",
+  "spouseLabel": "पति/पत्नी",
+  "childLabel": "बच्चा",
+  "parentLabel": "माता-पिता",
+  "siblingLabel": "भाई/बहन",
+  "nameAndRelationshipRequired": "नाम और संबंध आवश्यक हैं",
+  "familyMemberAddedSuccess": "परिवार का सदस्य जोड़ा गया!",
+  "customFieldsTitle": "कस्टम फ़ील्ड",
+  "noCustomFields": "कोई कस्टम फ़ील्ड नहीं",
+  "documentsTitle": "दस्तावेज़",
+  "noDocumentsAttached": "कोई दस्तावेज़ संलग्न नहीं है।",
+  "deleteDocumentTitle": "दस्तावेज़ हटाएं?",
+  "confirmDeleteDocumentPrefix": "क्या आप वाकई हटाना चाहते हैं ",
+  "documentDeletedSuccess": "दस्तावेज़ हटा दिया गया",
+  "fieldNameLabel": "फ़ील्ड का नाम",
+  "fieldValueLabel": "मूल्य",
+  "zeroAmount": "0",
+  "letsMakeItProfessionalTitle": "आइए इसे पेशेवर बनाएं!",
+  "addNameUpiSubtitle": "एंबेडेड QR कोड के साथ पेशेवर चालान बनाने के लिए अपना नाम और UPI ID जोड़ें।",
+  "continueToBillBtn": "बिल पर जारी रखें",
+  "yourNameBusinessNameLabel": "आपका नाम या व्यवसाय का नाम",
+  "upiIdOptionalLabel": "UPI ID (वैकल्पिक लेकिन अनुशंसित)",
+  "occupancyDetailsTitle": "अधिभोग विवरण",
+  "shareFunctionalityComingSoon": "साझा करने की कार्यक्षमता जल्द आ रही है",
+  "occupancyNotFound": "अधिभोग नहीं मिला",
+  "viewSettlementReceiptBtn": "निपटान रसीद देखें",
+  "enterPaymentAmountLabel": "भुगतान राशि (₹)",
+  "shareTextBtn": "टेक्स्ट साझा करें",
+  "pdfInvoiceBtn": "PDF चालान",
+  "messageCopiedSuccess": "संदेश क्लिपबोर्ड पर कॉपी किया गया!",
+  "generatingPdfMsg": "PDF जेनरेट किया जा रहा है...",
+  "noPaymentsRecordedMsg": "अभी तक कोई भुगतान दर्ज नहीं है",
+  "paymentDeletedSuccess": "भुगतान हटा दिया गया",
+  "enterValidAmountMsg": "एक वैध राशि दर्ज करें",
+  "paymentUpdatedSuccess": "भुगतान अद्यतन किया गया",
+  "noNotificationsScheduled": "कोई सूचना निर्धारित नहीं है।",
+  "errorGeneric": "त्रुटि",
+  "chooseFromGalleryBtn": "गैलरी से चुनें",
+  "sharePaymentLinkBtn": "भुगतान लिंक साझा करें",
+  "meterTrackingExplanation": "अपनी निर्धारित दर के आधार पर बिजली शुल्क की स्वचालित गणना करने के लिए रीडिंग दर्ज करें।"
 }

@@ -11,6 +11,7 @@ import '../../../application/providers/tenant_providers.dart';
 
 import '../../../core/utils/validators.dart';
 import '../../../domain/entities/tenant.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
 import '../../widgets/image_picker_widget.dart';
 
 /// Screen to add or edit a tenant with comprehensive profile.
@@ -85,7 +86,7 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
         context: context,
         builder: (context) => AlertDialog(
           insetPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
-          title: const Text('Document Title'),
+          title: Text(AppLocalizations.of(context)!.documentTitleLabel),
           content: TextField(
             controller: titleController,
             decoration: const InputDecoration(hintText: 'e.g. PAN Card'),
@@ -94,11 +95,11 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
+              child: Text(AppLocalizations.of(context)!.cancelBtn),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(context, titleController.text),
-              child: const Text('Add'),
+              child: Text(AppLocalizations.of(context)!.addBtn),
             ),
           ],
         ),
@@ -299,7 +300,7 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
         context.pop(true);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(isEditing ? 'Tenant updated' : 'Tenant added'),
+            content: Text(isEditing ? AppLocalizations.of(context)!.tenantUpdatedSuccess : AppLocalizations.of(context)!.tenantAddedSuccess),
           ),
         );
       }
@@ -317,7 +318,7 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(isEditing ? 'Edit Tenant' : 'Add Tenant')),
+      appBar: AppBar(title: Text(isEditing ? AppLocalizations.of(context)!.editTenantTitle : AppLocalizations.of(context)!.addTenantTitle)),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -329,14 +330,14 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
 
             // Identity & Contact Section
             _buildSectionCard(
-              title: 'Identity & Contact',
+              title: AppLocalizations.of(context)!.identityContactTitle,
               icon: Icons.person_outline,
               children: [
                 TextFormField(
                   controller: _nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Full Name *',
-                    hintText: 'Enter tenant\'s full name',
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.fullNameRequiredLabel,
+                    hintText: AppLocalizations.of(context)!.enterTenantFullNameHint,
                     prefixIcon: Icon(Icons.person_outline),
                   ),
                   textCapitalization: TextCapitalization.words,
@@ -345,9 +346,9 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _fatherNameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Father\'s Name',
-                    hintText: 'Required for legal agreements',
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.guardianNameOptionalLabel,
+                    hintText: AppLocalizations.of(context)!.fathersNameRequiredHint,
                     prefixIcon: Icon(Icons.person_outline),
                   ),
                   textCapitalization: TextCapitalization.words,
@@ -358,8 +359,8 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
                     Expanded(
                       child: TextFormField(
                         controller: _ageController,
-                        decoration: const InputDecoration(
-                          labelText: 'Age',
+                        decoration: InputDecoration(
+                          labelText: AppLocalizations.of(context)!.ageLabel,
                           prefixIcon: Icon(Icons.cake_outlined),
                         ),
                         keyboardType: TextInputType.number,
@@ -372,19 +373,19 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
                     Expanded(
                       child: DropdownButtonFormField<String>(
                         initialValue: _selectedGender,
-                        decoration: const InputDecoration(
-                          labelText: 'Gender',
+                        decoration: InputDecoration(
+                          labelText: AppLocalizations.of(context)!.genderLabel,
                           prefixIcon: Icon(Icons.wc_outlined),
                         ),
-                        items: const [
-                          DropdownMenuItem(value: 'male', child: Text('Male')),
+                        items: [
+                          DropdownMenuItem(value: 'male', child: Text(AppLocalizations.of(context)!.maleLabel)),
                           DropdownMenuItem(
                             value: 'female',
-                            child: Text('Female'),
+                            child: Text(AppLocalizations.of(context)!.femaleLabel),
                           ),
                           DropdownMenuItem(
                             value: 'other',
-                            child: Text('Other'),
+                            child: Text(AppLocalizations.of(context)!.otherLabel),
                           ),
                         ],
                         onChanged: (v) => setState(() => _selectedGender = v),
@@ -395,9 +396,9 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _phoneController,
-                  decoration: const InputDecoration(
-                    labelText: 'Phone Number *',
-                    hintText: '10-digit mobile number',
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.phoneOptionalLabel,
+                    hintText: AppLocalizations.of(context)!.tenDigitMobileHint,
                     prefixIcon: Icon(Icons.phone_outlined),
                   ),
                   keyboardType: TextInputType.phone,
@@ -407,9 +408,9 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _secondaryPhoneController,
-                  decoration: const InputDecoration(
-                    labelText: 'Secondary Phone',
-                    hintText: 'Emergency/Family contact',
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.secondaryPhoneLabel,
+                    hintText: AppLocalizations.of(context)!.emergencyFamilyContactHint,
                     prefixIcon: Icon(Icons.phone_outlined),
                   ),
                   keyboardType: TextInputType.phone,
@@ -420,14 +421,14 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
 
             // Permanent Address Section
             _buildSectionCard(
-              title: 'Permanent Address',
+              title: AppLocalizations.of(context)!.permanentAddressTitle,
               icon: Icons.home_outlined,
               children: [
                 TextFormField(
                   controller: _addressLineController,
-                  decoration: const InputDecoration(
-                    labelText: 'Address Line',
-                    hintText: 'Street, Locality',
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.addressLineLabel,
+                    hintText: AppLocalizations.of(context)!.streetLocalityHint,
                     prefixIcon: Icon(Icons.location_on_outlined),
                   ),
                   maxLines: 2,
@@ -438,7 +439,8 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
                     Expanded(
                       child: TextFormField(
                         controller: _cityController,
-                        decoration: const InputDecoration(labelText: 'City'),
+                        decoration: InputDecoration(
+labelText: AppLocalizations.of(context)!.cityLabel),
                         textCapitalization: TextCapitalization.words,
                       ),
                     ),
@@ -446,7 +448,8 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
                     Expanded(
                       child: TextFormField(
                         controller: _stateController,
-                        decoration: const InputDecoration(labelText: 'State'),
+                        decoration: InputDecoration(
+labelText: AppLocalizations.of(context)!.stateLabel),
                         textCapitalization: TextCapitalization.words,
                       ),
                     ),
@@ -455,8 +458,8 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _pincodeController,
-                  decoration: const InputDecoration(
-                    labelText: 'Pincode',
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.pincodeLabel,
                     prefixIcon: Icon(Icons.pin_drop_outlined),
                   ),
                   keyboardType: TextInputType.number,
@@ -468,13 +471,13 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
 
             // Work Details Section
             _buildSectionCard(
-              title: 'Work Details',
+              title: AppLocalizations.of(context)!.workDetailsTitle,
               icon: Icons.work_outline,
               children: [
                 TextFormField(
                   controller: _companyNameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Company Name',
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.companyNameLabel,
                     prefixIcon: Icon(Icons.business_outlined),
                   ),
                   textCapitalization: TextCapitalization.words,
@@ -482,8 +485,8 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _officeAddressController,
-                  decoration: const InputDecoration(
-                    labelText: 'Office Address',
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.officeAddressLabel,
                     prefixIcon: Icon(Icons.location_city_outlined),
                   ),
                   maxLines: 2,
@@ -494,14 +497,14 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
 
             // ID Documents Section
             _buildSectionCard(
-              title: 'ID Documents',
+              title: AppLocalizations.of(context)!.idDocumentsTitle,
               icon: Icons.badge_outlined,
               children: [
                 TextFormField(
                   controller: _aadharController,
-                  decoration: const InputDecoration(
-                    labelText: 'Aadhaar Number',
-                    hintText: '12-digit Aadhaar number',
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.aadhaarNumberLabel,
+                    hintText: AppLocalizations.of(context)!.twelveDigitAadhaarHint,
                     prefixIcon: Icon(Icons.credit_card_outlined),
                   ),
                   keyboardType: TextInputType.number,
@@ -510,7 +513,7 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  'Aadhaar Card Photos',
+                  AppLocalizations.of(context)!.aadhaarCardPhotosLabel,
                   style: Theme.of(context).textTheme.titleSmall,
                 ),
                 const SizedBox(height: 12),
@@ -528,7 +531,7 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Front',
+                          AppLocalizations.of(context)!.frontLabel,
                           style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(
                                 color: Theme.of(
@@ -549,7 +552,7 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Back',
+                          AppLocalizations.of(context)!.backLabel,
                           style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(
                                 color: Theme.of(
@@ -567,14 +570,14 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
 
             // Introducer/Reference Section
             _buildSectionCard(
-              title: 'Introducer / Reference',
+              title: AppLocalizations.of(context)!.introducerReferenceTitle,
               icon: Icons.handshake_outlined,
               children: [
                 TextFormField(
                   controller: _introducerNameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Introducer Name',
-                    hintText: 'Person who vouched for tenant',
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.introducerNameLabel,
+                    hintText: AppLocalizations.of(context)!.vouchedForTenantHint,
                     prefixIcon: Icon(Icons.person_outline),
                   ),
                   textCapitalization: TextCapitalization.words,
@@ -582,8 +585,8 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _introducerAddressController,
-                  decoration: const InputDecoration(
-                    labelText: 'Introducer Address',
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.introducerAddressLabel,
                     prefixIcon: Icon(Icons.location_on_outlined),
                   ),
                   maxLines: 2,
@@ -591,8 +594,8 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _introducerPhoneController,
-                  decoration: const InputDecoration(
-                    labelText: 'Introducer Phone',
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.introducerPhoneLabel,
                     prefixIcon: Icon(Icons.phone_outlined),
                   ),
                   keyboardType: TextInputType.phone,
@@ -604,8 +607,8 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
             // Police Verification Section
             Card(
               child: SwitchListTile(
-                title: const Text('Police Verified'),
-                subtitle: const Text('Mark if police verification is complete'),
+                title: Text(AppLocalizations.of(context)!.policeVerifiedLabel),
+                subtitle: Text(AppLocalizations.of(context)!.policeVerifiedSubtitle),
                 secondary: Icon(
                   _isPoliceVerified
                       ? Icons.verified_user
@@ -622,14 +625,14 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
 
             // Additional Documents Section
             _buildSectionCard(
-              title: 'Additional Documents',
+              title: AppLocalizations.of(context)!.additionalDocumentsTitle,
               icon: Icons.folder_outlined,
               children: [
                 if (_documents.isEmpty)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 12),
                     child: Text(
-                      'No documents added yet.',
+                      AppLocalizations.of(context)!.noDocumentsAddedYet,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
@@ -658,7 +661,7 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
                 OutlinedButton.icon(
                   onPressed: _pickDocument,
                   icon: const Icon(Icons.add),
-                  label: const Text('Add Document'),
+                  label: Text(AppLocalizations.of(context)!.addDocumentBtn),
                 ),
               ],
             ),
@@ -678,7 +681,7 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
                           color: Colors.white,
                         ),
                       )
-                    : Text(isEditing ? 'Save Changes' : 'Add Tenant'),
+                    : Text(isEditing ? AppLocalizations.of(context)!.saveChangesBtn : AppLocalizations.of(context)!.addTenantTitle),
               ),
             ),
             const SizedBox(height: 24),
@@ -700,7 +703,7 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Profile Photo',
+            AppLocalizations.of(context)!.profilePhotoLabel,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),

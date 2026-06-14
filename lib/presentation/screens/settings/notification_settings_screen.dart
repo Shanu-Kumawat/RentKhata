@@ -671,7 +671,7 @@ class _NotificationSettingsScreenState
                 const Divider(),
                 Expanded(
                   child: pending.isEmpty
-                      ? const Center(child: Text('No notifications scheduled.'))
+                      ? Center(child: Text(AppLocalizations.of(context)!.noNotificationsScheduled))
                       : ListView.separated(
                           controller: scrollController,
                           itemCount: pending.length,

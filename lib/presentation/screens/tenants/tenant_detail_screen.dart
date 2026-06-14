@@ -377,7 +377,7 @@ class _TenantDetailContent extends ConsumerWidget {
           ? FloatingActionButton.extended(
               onPressed: () => _showMoveInAgainSheet(context),
               icon: const Icon(Icons.home_outlined),
-              label: const Text('Move In Again'),
+              label: Text(AppLocalizations.of(context)!.moveInAgainBtn),
             )
           : null,
     );
@@ -460,7 +460,7 @@ class _TenantDetailContent extends ConsumerWidget {
   void _showMoveInAgainSheet(BuildContext context) {
     // Navigate to room selection for move-in
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Select a room to move this tenant in')),
+      SnackBar(content: Text(AppLocalizations.of(context)!.selectRoomToMoveInHint)),
     );
     context.push('/rooms');
   }
@@ -470,14 +470,14 @@ class _TenantDetailContent extends ConsumerWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         insetPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
-        title: const Text('Delete Tenant?'),
+        title: Text(AppLocalizations.of(context)!.deleteTenantTitle),
         content: Text(
           'Are you sure you want to delete ${tenant.name}? This action cannot be undone.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context)!.cancelBtn),
           ),
           FilledButton(
             onPressed: () async {
@@ -487,13 +487,13 @@ class _TenantDetailContent extends ConsumerWidget {
                 context.pop();
                 ScaffoldMessenger.of(
                   context,
-                ).showSnackBar(const SnackBar(content: Text('Tenant deleted')));
+                ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.tenantDeletedSuccess)));
               }
             },
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.error,
             ),
-            child: const Text('Delete'),
+            child: Text(AppLocalizations.of(context)!.deleteBtn),
           ),
         ],
       ),
@@ -638,7 +638,7 @@ class _CurrentOccupancyCard extends StatelessWidget {
           '${tenant.currentPropertyName ?? 'Property'} - Room ${tenant.currentRoomNumber}',
           style: const TextStyle(fontWeight: FontWeight.w600),
         ),
-        subtitle: const Text('Current Location'),
+        subtitle: Text(AppLocalizations.of(context)!.currentLocationLabel),
         trailing: const Icon(Icons.chevron_right),
         onTap: () {
           if (tenant.currentRoomId != null) {
@@ -863,7 +863,7 @@ class _FullscreenImageViewer extends StatelessWidget {
         if (context.mounted) {
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(const SnackBar(content: Text('Image file not found')));
+          ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.imageFileNotFound)));
         }
       }
     } catch (e) {
@@ -1179,15 +1179,15 @@ class _FamilyMembersSection extends ConsumerWidget {
           Icons.family_restroom_outlined,
           color: Theme.of(context).colorScheme.primary,
         ),
-        title: const Text('Family Members'),
+        title: Text(AppLocalizations.of(context)!.familyMembersTitle),
         subtitle: familyMembersAsync.when(
           data: (members) => Text(
             currentOccupancyId != null
                 ? '${members.length} current member(s)'
                 : 'View occupancy history for past members',
           ),
-          loading: () => const Text('Loading...'),
-          error: (_, __) => const Text('Error'),
+          loading: () => Text(AppLocalizations.of(context)!.loading),
+          error: (_, __) => Text(AppLocalizations.of(context)!.errorGeneric),
         ),
         children: [
           Padding(
@@ -1266,7 +1266,7 @@ class _FamilyMembersSection extends ConsumerWidget {
                     OutlinedButton.icon(
                       onPressed: () => _showAddFamilyMember(context, ref),
                       icon: const Icon(Icons.add),
-                      label: const Text('Add Family Member'),
+                      label: Text(AppLocalizations.of(context)!.addFamilyMemberTitle),
                     )
                   else
                     Text(
@@ -1296,16 +1296,16 @@ class _FamilyMembersSection extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         insetPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
-        title: const Text('Delete Family Member?'),
-        content: const Text('This action cannot be undone.'),
+        title: Text(AppLocalizations.of(context)!.deleteFamilyMemberTitle),
+        content: Text(AppLocalizations.of(context)!.actionCannotBeUndone),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context)!.cancelBtn),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete'),
+            child: Text(AppLocalizations.of(context)!.deleteBtn),
           ),
         ],
       ),
@@ -1317,7 +1317,7 @@ class _FamilyMembersSection extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('Family member deleted')));
+        ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.familyMemberDeletedSuccess)));
       }
     }
   }
@@ -1356,8 +1356,8 @@ class _FamilyMembersSection extends ConsumerWidget {
               const SizedBox(height: 24),
               TextFormField(
                 controller: nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Name *',
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.nameRequiredLabel,
                   prefixIcon: Icon(Icons.person_outline),
                 ),
                 autofocus: true,
@@ -1367,25 +1367,25 @@ class _FamilyMembersSection extends ConsumerWidget {
                 children: [
                   Expanded(
                     child: DropdownButtonFormField<String>(
-                      decoration: const InputDecoration(
-                        labelText: 'Relationship *',
+                      decoration: InputDecoration(
+                        labelText: AppLocalizations.of(context)!.relationshipRequiredLabel,
                       ),
                       initialValue: selectedRelationship,
-                      items: const [
+                      items: [
                         DropdownMenuItem(
                           value: 'spouse',
-                          child: Text('Spouse'),
+                          child: Text(AppLocalizations.of(context)!.spouseLabel),
                         ),
-                        DropdownMenuItem(value: 'child', child: Text('Child')),
+                        DropdownMenuItem(value: 'child', child: Text(AppLocalizations.of(context)!.childLabel)),
                         DropdownMenuItem(
                           value: 'parent',
-                          child: Text('Parent'),
+                          child: Text(AppLocalizations.of(context)!.parentLabel),
                         ),
                         DropdownMenuItem(
                           value: 'sibling',
-                          child: Text('Sibling'),
+                          child: Text(AppLocalizations.of(context)!.siblingLabel),
                         ),
-                        DropdownMenuItem(value: 'other', child: Text('Other')),
+                        DropdownMenuItem(value: 'other', child: Text(AppLocalizations.of(context)!.otherLabel)),
                       ],
                       onChanged: (value) =>
                           setState(() => selectedRelationship = value),
@@ -1399,22 +1399,24 @@ class _FamilyMembersSection extends ConsumerWidget {
                   Expanded(
                     child: TextFormField(
                       controller: ageController,
-                      decoration: const InputDecoration(labelText: 'Age'),
+                      decoration: InputDecoration(
+labelText: AppLocalizations.of(context)!.ageLabel),
                       keyboardType: TextInputType.number,
                     ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
                     child: DropdownButtonFormField<String>(
-                      decoration: const InputDecoration(labelText: 'Gender'),
+                      decoration: InputDecoration(
+labelText: AppLocalizations.of(context)!.genderLabel),
                       initialValue: selectedGender,
-                      items: const [
-                        DropdownMenuItem(value: 'male', child: Text('Male')),
+                      items: [
+                        DropdownMenuItem(value: 'male', child: Text(AppLocalizations.of(context)!.maleLabel)),
                         DropdownMenuItem(
                           value: 'female',
-                          child: Text('Female'),
+                          child: Text(AppLocalizations.of(context)!.femaleLabel),
                         ),
-                        DropdownMenuItem(value: 'other', child: Text('Other')),
+                        DropdownMenuItem(value: 'other', child: Text(AppLocalizations.of(context)!.otherLabel)),
                       ],
                       onChanged: (value) =>
                           setState(() => selectedGender = value),
@@ -1425,8 +1427,8 @@ class _FamilyMembersSection extends ConsumerWidget {
               const SizedBox(height: 16),
               TextFormField(
                 controller: phoneController,
-                decoration: const InputDecoration(
-                  labelText: 'Phone (Optional)',
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.phoneOptionalLabel,
                   prefixIcon: Icon(Icons.phone_outlined),
                 ),
                 keyboardType: TextInputType.phone,
@@ -1437,7 +1439,7 @@ class _FamilyMembersSection extends ConsumerWidget {
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () => Navigator.pop(context),
-                      child: const Text('Cancel'),
+                      child: Text(AppLocalizations.of(context)!.cancelBtn),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -1447,9 +1449,9 @@ class _FamilyMembersSection extends ConsumerWidget {
                         if (nameController.text.isEmpty ||
                             selectedRelationship == null) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
+                            SnackBar(
                               content: Text(
-                                'Name and relationship are required',
+                                AppLocalizations.of(context)!.nameAndRelationshipRequired,
                               ),
                             ),
                           );
@@ -1477,13 +1479,13 @@ class _FamilyMembersSection extends ConsumerWidget {
                         if (context.mounted) {
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Family member added!'),
+                            SnackBar(
+                              content: Text(AppLocalizations.of(context)!.familyMemberAddedSuccess),
                             ),
                           );
                         }
                       },
-                      child: const Text('Add'),
+                      child: Text(AppLocalizations.of(context)!.addBtn),
                     ),
                   ),
                 ],
@@ -1592,8 +1594,8 @@ class _CustomFieldsSectionState extends ConsumerState<_CustomFieldsSection> {
                   Expanded(
                     child: TextField(
                       controller: _fieldNameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Field Name',
+                      decoration: InputDecoration(
+                        labelText: AppLocalizations.of(context)!.fieldNameLabel,
                         isDense: true,
                       ),
                     ),
@@ -1602,8 +1604,8 @@ class _CustomFieldsSectionState extends ConsumerState<_CustomFieldsSection> {
                   Expanded(
                     child: TextField(
                       controller: _fieldValueController,
-                      decoration: const InputDecoration(
-                        labelText: 'Value',
+                      decoration: InputDecoration(
+                        labelText: AppLocalizations.of(context)!.fieldValueLabel,
                         isDense: true,
                       ),
                     ),
@@ -1708,7 +1710,7 @@ class _DocumentsSection extends ConsumerWidget {
                 TextButton.icon(
                   onPressed: () => _showAddDocumentSheet(context, ref),
                   icon: const Icon(Icons.add, size: 18),
-                  label: const Text('Add'),
+                  label: Text(AppLocalizations.of(context)!.addBtn),
                 ),
               ],
             ),
@@ -1830,16 +1832,16 @@ class _DocumentsSection extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         insetPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
-        title: const Text('Delete Document?'),
-        content: Text('Are you sure you want to delete "${doc.title}"?'),
+        title: Text(AppLocalizations.of(context)!.deleteDocumentTitle),
+        content: Text('${AppLocalizations.of(context)!.confirmDeleteDocumentPrefix}"${doc.title}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context)!.cancelBtn),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete'),
+            child: Text(AppLocalizations.of(context)!.deleteBtn),
           ),
         ],
       ),
@@ -1851,7 +1853,7 @@ class _DocumentsSection extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('Document deleted')));
+        ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.documentDeletedSuccess)));
       }
     }
   }

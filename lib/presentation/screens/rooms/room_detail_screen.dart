@@ -506,7 +506,7 @@ class _RoomInfoCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '/month',
+                      AppLocalizations.of(context)!.perMonth,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: AppColors.onSurfaceVariant,
                       ),

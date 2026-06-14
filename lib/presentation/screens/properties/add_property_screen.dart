@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../application/providers/repository_providers.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
 import '../../../core/utils/validators.dart';
 import '../../../domain/entities/property.dart';
 import '../../widgets/image_picker_widget.dart';
@@ -77,7 +78,7 @@ class _AddPropertyScreenState extends ConsumerState<AddPropertyScreen> {
         context.pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(isEditing ? 'Property updated' : 'Property added'),
+            content: Text(isEditing ? AppLocalizations.of(context)!.propertyUpdatedSuccess : AppLocalizations.of(context)!.propertyAddedSuccess),
           ),
         );
       }
@@ -95,7 +96,7 @@ class _AddPropertyScreenState extends ConsumerState<AddPropertyScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(isEditing ? 'Edit Property' : 'Add Property')),
+      appBar: AppBar(title: Text(isEditing ? AppLocalizations.of(context)!.editPropertyTitle : AppLocalizations.of(context)!.addPropertyTitle)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Form(
@@ -116,10 +117,10 @@ class _AddPropertyScreenState extends ConsumerState<AddPropertyScreen> {
               // Property name
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Property Name *',
-                  hintText: 'e.g., Sunrise Apartments',
-                  prefixIcon: Icon(Icons.home_work_outlined),
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.propertyNameRequiredLabel,
+                  hintText: AppLocalizations.of(context)!.propertySunriseHint,
+                  prefixIcon: const Icon(Icons.business_outlined),
                 ),
                 textCapitalization: TextCapitalization.words,
                 validator: (v) => validateRequired(v, 'Property name'),
@@ -129,10 +130,10 @@ class _AddPropertyScreenState extends ConsumerState<AddPropertyScreen> {
               // Address
               TextFormField(
                 controller: _addressController,
-                decoration: const InputDecoration(
-                  labelText: 'Address',
-                  hintText: 'Full address of the property',
-                  prefixIcon: Icon(Icons.location_on_outlined),
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.propertyAddressLabel,
+                  hintText: AppLocalizations.of(context)!.propertyAddressHint,
+                  prefixIcon: const Icon(Icons.location_on_outlined),
                 ),
                 textCapitalization: TextCapitalization.sentences,
                 maxLines: 2,
@@ -153,7 +154,7 @@ class _AddPropertyScreenState extends ConsumerState<AddPropertyScreen> {
                             color: Colors.white,
                           ),
                         )
-                      : Text(isEditing ? 'Save Changes' : 'Add Property'),
+                      : Text(isEditing ? AppLocalizations.of(context)!.saveChangesBtn : AppLocalizations.of(context)!.addPropertyTitle),
                 ),
               ),
             ],

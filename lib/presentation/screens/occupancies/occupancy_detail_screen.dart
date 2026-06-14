@@ -31,7 +31,7 @@ class OccupancyDetailScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Occupancy Details'),
+        title: Text(AppLocalizations.of(context)!.occupancyDetailsTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.share_outlined),
@@ -39,8 +39,7 @@ class OccupancyDetailScreen extends ConsumerWidget {
             onPressed: () {
               HapticFeedback.lightImpact();
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Share functionality coming soon'),
+                SnackBar(content: Text(AppLocalizations.of(context)!.shareFunctionalityComingSoon),
                 ),
               );
             },
@@ -50,7 +49,7 @@ class OccupancyDetailScreen extends ConsumerWidget {
       body: detailAsync.when(
         data: (detail) {
           if (detail == null) {
-            return const Center(child: Text('Occupancy not found'));
+            return Center(child: Text(AppLocalizations.of(context)!.occupancyNotFound));
           }
           return _OccupancyDetailContent(detail: detail);
         },
@@ -786,7 +785,7 @@ class _DepositSettlementCard extends StatelessWidget {
                     return OutlinedButton.icon(
                       onPressed: () => _shareSettlementReceipt(context, ref),
                       icon: const Icon(Icons.receipt_long),
-                      label: const Text('View Settlement Receipt'),
+                      label: Text(AppLocalizations.of(context)!.viewSettlementReceiptBtn),
                     );
                   },
                 ),

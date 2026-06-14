@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../../../application/providers/repository_providers.dart';
 import '../../../../application/providers/dashboard_providers.dart';
 import '../../../../core/utils/validators.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
 
 /// Contextual bottom sheet to collect Landlord Name & UPI before generating first bill.
 class ContextualProfileSheet extends ConsumerStatefulWidget {
@@ -191,7 +192,7 @@ class _ContextualProfileSheetState
                   controller: _nameController,
                   textCapitalization: TextCapitalization.words,
                   decoration: InputDecoration(
-                    labelText: 'Your Name or Business Name',
+                    labelText: AppLocalizations.of(context)!.yourNameBusinessNameLabel,
                     prefixIcon: const Icon(Icons.business_center_rounded),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
@@ -211,8 +212,8 @@ class _ContextualProfileSheetState
                 TextFormField(
                   controller: _upiController,
                   decoration: InputDecoration(
-                    labelText: 'UPI ID (Optional but recommended)',
-                    hintText: 'e.g. yourname@upi',
+                    labelText: AppLocalizations.of(context)!.upiIdOptionalLabel,
+                    hintText: AppLocalizations.of(context)!.upiIdHint,
                     prefixIcon: const Icon(Icons.qr_code_2_rounded),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),

@@ -1274,7 +1274,7 @@ class _PremiumBillCard extends ConsumerWidget {
                         _handleShare(context, ref, bill, value);
                       },
                       itemBuilder: (context) => [
-                        const PopupMenuItem(
+                        PopupMenuItem(
                           value: 'text',
                           child: Row(
                             children: [
@@ -1284,11 +1284,11 @@ class _PremiumBillCard extends ConsumerWidget {
                                 size: 20,
                               ),
                               SizedBox(width: 12),
-                              Text('Share Text'),
+                              Text(AppLocalizations.of(context)!.shareTextBtn),
                             ],
                           ),
                         ),
-                        const PopupMenuItem(
+                        PopupMenuItem(
                           value: 'pdf',
                           child: Row(
                             children: [
@@ -1298,7 +1298,7 @@ class _PremiumBillCard extends ConsumerWidget {
                                 size: 20,
                               ),
                               SizedBox(width: 12),
-                              Text('PDF Invoice'),
+                              Text(AppLocalizations.of(context)!.pdfInvoiceBtn),
                             ],
                           ),
                         ),
@@ -1402,14 +1402,14 @@ class _PremiumBillCard extends ConsumerWidget {
       if (context.mounted) {
         Clipboard.setData(ClipboardData(text: message));
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Message copied to clipboard!')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.messageCopiedSuccess)),
         );
       }
     } else if (action == 'pdf') {
       if (context.mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('Generating PDF...')));
+        ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.generatingPdfMsg)));
       }
 
       try {
@@ -1601,7 +1601,7 @@ class _BillDetailsSheet extends ConsumerWidget {
                                     ).colorScheme.onSurfaceVariant,
                                   ),
                                   const SizedBox(height: 8),
-                                  const Text('No payments recorded yet'),
+                                  Text(AppLocalizations.of(context)!.noPaymentsRecordedMsg),
                                 ],
                               ),
                             ),
@@ -1635,13 +1635,13 @@ class _BillDetailsSheet extends ConsumerWidget {
                                       }
                                     },
                                     itemBuilder: (context) => [
-                                      const PopupMenuItem(
+                                      PopupMenuItem(
                                         value: 'edit',
                                         child: Row(
                                           children: [
                                             Icon(Icons.edit_outlined, size: 20),
                                             SizedBox(width: 8),
-                                            Text('Edit'),
+                                            Text(AppLocalizations.of(context)!.editBtn),
                                           ],
                                         ),
                                       ),
@@ -1703,17 +1703,17 @@ class _BillDetailsSheet extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         insetPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
-        title: const Text('Delete Payment?'),
+        title: Text(AppLocalizations.of(context)!.deletePaymentTitle),
         content: Text('Delete ${formatCurrency(payment.amount)} payment?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context)!.cancelBtn),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
             style: FilledButton.styleFrom(backgroundColor: AppColors.error),
-            child: const Text('Delete'),
+            child: Text(AppLocalizations.of(context)!.deleteBtn),
           ),
         ],
       ),
@@ -1727,7 +1727,7 @@ class _BillDetailsSheet extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('Payment deleted')));
+        ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.paymentDeletedSuccess)));
       }
     }
   }
@@ -1851,7 +1851,7 @@ class _EditPaymentSheetState extends ConsumerState<_EditPaymentSheet> {
           const SizedBox(height: 16),
           ListTile(
             contentPadding: EdgeInsets.zero,
-            title: const Text('Payment Date'),
+            title: Text(AppLocalizations.of(context)!.paymentDateLabel),
             subtitle: Text(DateFormat('dd MMM yyyy').format(_selectedDate)),
             trailing: const Icon(Icons.calendar_today),
             onTap: () async {
@@ -1875,7 +1875,7 @@ class _EditPaymentSheetState extends ConsumerState<_EditPaymentSheet> {
                       width: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : const Text('Save Changes'),
+                  : Text(AppLocalizations.of(context)!.saveChangesBtn),
             ),
           ),
         ],
@@ -1888,7 +1888,7 @@ class _EditPaymentSheetState extends ConsumerState<_EditPaymentSheet> {
     if (amount == null || amount <= 0) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Enter a valid amount')));
+      ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.enterValidAmountMsg)));
       return;
     }
 
@@ -1910,7 +1910,7 @@ class _EditPaymentSheetState extends ConsumerState<_EditPaymentSheet> {
         Navigator.pop(context);
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('Payment updated')));
+        ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.paymentUpdatedSuccess)));
       }
     } catch (e) {
       if (mounted) {

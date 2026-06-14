@@ -10,6 +10,7 @@ import '../../../application/providers/repository_providers.dart';
 
 import '../../../core/utils/validators.dart';
 import '../../widgets/image_picker_widget.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
 
 /// Profile setup screen for landlord to enter their details.
 class ProfileSetupScreen extends ConsumerStatefulWidget {
@@ -71,7 +72,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Your Profile'),
+        title: Text(AppLocalizations.of(context)!.yourProfileTitle),
         automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
@@ -83,7 +84,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
             children: [
               // Header
               Text(
-                    'Let\'s set up your profile',
+                    AppLocalizations.of(context)!.letsSetUpProfile,
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 28,
                       fontWeight: FontWeight.w800,
@@ -100,7 +101,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                   ),
               const SizedBox(height: 8),
               Text(
-                    'This information will be used for billing and receipts.',
+                    AppLocalizations.of(context)!.profileBillingInfoText,
                     style: GoogleFonts.inter(
                       fontSize: 16,
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -134,10 +135,10 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
               // Name field
               TextFormField(
                     controller: _nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Your Name *',
-                      hintText: 'Enter your full name',
-                      prefixIcon: Icon(Icons.person_outline),
+                    decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context)!.yourNameLabel,
+                      hintText: AppLocalizations.of(context)!.enterFullNameHint,
+                      prefixIcon: const Icon(Icons.person_outline),
                     ),
                     textCapitalization: TextCapitalization.words,
                     validator: (v) => validateRequired(v, 'Name'),
@@ -155,10 +156,10 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
               // Phone field
               TextFormField(
                     controller: _phoneController,
-                    decoration: const InputDecoration(
-                      labelText: 'Phone Number',
-                      hintText: '10-digit mobile number',
-                      prefixIcon: Icon(Icons.phone_outlined),
+                    decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context)!.phoneNumberLabel,
+                      hintText: AppLocalizations.of(context)!.phoneNumberHint,
+                      prefixIcon: const Icon(Icons.phone_outlined),
                     ),
                     keyboardType: TextInputType.phone,
                     validator: (v) =>
@@ -177,11 +178,11 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
               // UPI field
               TextFormField(
                     controller: _upiController,
-                    decoration: const InputDecoration(
-                      labelText: 'UPI ID',
-                      hintText: 'yourname@upi',
-                      prefixIcon: Icon(Icons.account_balance_wallet_outlined),
-                      helperText: 'For receiving rent payments',
+                    decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context)!.upiIdLabel,
+                      hintText: AppLocalizations.of(context)!.upiIdHint,
+                      prefixIcon: const Icon(Icons.account_balance_wallet_outlined),
+                      helperText: AppLocalizations.of(context)!.upiHelperText,
                     ),
                     keyboardType: TextInputType.emailAddress,
                     validator: validateUpiId,
@@ -219,7 +220,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            'Your UPI ID will be used to generate QR codes for tenants to pay rent easily.',
+                            AppLocalizations.of(context)!.profileUpiInfoText,
                             style: Theme.of(context).textTheme.bodySmall
                                 ?.copyWith(
                                   color: Theme.of(context).colorScheme.primary,
@@ -255,7 +256,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                               ),
                             )
                           : Text(
-                              'Continue',
+                              AppLocalizations.of(context)!.continueBtn,
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,

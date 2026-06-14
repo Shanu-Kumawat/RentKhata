@@ -25,6 +25,7 @@ import '../screens/occupancies/occupancy_detail_screen.dart';
 import '../screens/auth/lock_screen.dart';
 import '../screens/billing/bill_detail_screen.dart';
 import '../widgets/main_shell.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
 
 /// Route paths
 class AppRoutes {
@@ -173,7 +174,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           // Fallback if accessed without extra (though our app always pushes extra)
           // Since BillDetailScreen requires a Bill, we throw or show an error
           return Scaffold(
-            appBar: AppBar(title: const Text('Error')),
+            appBar: AppBar(title: Text(AppLocalizations.of(context)!.errorGeneric)),
             body: const Center(child: Text('Bill not found in navigation state')),
           );
         },

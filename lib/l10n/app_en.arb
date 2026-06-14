@@ -608,7 +608,7 @@
   "occupiedStatus": "Occupied",
   "moveOutBtn": "Move Out",
   "agreedRent": "Agreed Rent",
-  "securityDepositLabel": "Security Deposit",
+  "securityDepositLabel": "Security Deposit (₹)",
   "billingStartLabel": "Billing Start",
   "editBtn": "Edit",
   "selectBillingStartDate": "Select Billing Start Date",
@@ -625,7 +625,7 @@
   "payNowBtn": "Pay Now",
   "viewBtn": "View",
   "shareBtn": "Share",
-  "monthlyRentLabel": "Monthly Rent",
+  "monthlyRentLabel": "Monthly Rent (₹) *",
   "electricityBillLabel": "Electricity Bill",
   "waterBillLabel": "Water Bill",
   "maintenanceLabel": "Maintenance",
@@ -766,7 +766,7 @@
       }
     }
   },
-  "moveInDateLabel": "Move In: {date}",
+  "moveInDateLabel": "Move In Date: {date}",
   "@moveInDateLabel": {
     "placeholders": {
       "date": {
@@ -949,7 +949,7 @@
   "updateRate": "Update Rate",
   "upiId": "Upi Id",
   "upiIdHelperText": "Upi Id Helper Text",
-  "upiIdHint": "Upi Id Hint",
+  "upiIdHint": "e.g. yourname@upi",
   "versionLabel": "Version {version}",
   "@versionLabel": {
     "placeholders": {
@@ -1092,108 +1092,142 @@
   "shareStatementBody": "Dear {name},\n\nPlease find your generated Khata Statement attached.",
   "@shareStatementBody": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "shareSettlementSubject": "Move-Out Settlement Receipt",
   "shareSettlementBody": "Dear {name},\n\nYour Move-Out Settlement is complete. Please find the detailed Settlement Receipt attached.",
   "@shareSettlementBody": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "shareInvoiceSubject": "Invoice - {period}",
   "@shareInvoiceSubject": {
     "placeholders": {
-      "period": { "type": "String" }
+      "period": {
+        "type": "String"
+      }
     }
   },
   "shareReceiptSubject": "Payment Receipt - {period}",
   "@shareReceiptSubject": {
     "placeholders": {
-      "period": { "type": "String" }
+      "period": {
+        "type": "String"
+      }
     }
   },
   "shareDear": "Dear {name},",
   "@shareDear": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "shareInvoiceHeader": "📋 *INVOICE*",
   "shareInvoiceNumber": "Invoice #: {number}",
   "@shareInvoiceNumber": {
     "placeholders": {
-      "number": { "type": "String" }
+      "number": {
+        "type": "String"
+      }
     }
   },
   "shareBillDetails": "*Bill Details:*",
   "shareType": "Type: {type}",
   "@shareType": {
     "placeholders": {
-      "type": { "type": "String" }
+      "type": {
+        "type": "String"
+      }
     }
   },
   "sharePeriod": "Period: {period}",
   "@sharePeriod": {
     "placeholders": {
-      "period": { "type": "String" }
+      "period": {
+        "type": "String"
+      }
     }
   },
   "shareRoom": "Room: {room}",
   "@shareRoom": {
     "placeholders": {
-      "room": { "type": "String" }
+      "room": {
+        "type": "String"
+      }
     }
   },
   "shareMeterReadings": "*Meter Readings:*",
   "sharePrevious": "Previous: {reading} units",
   "@sharePrevious": {
     "placeholders": {
-      "reading": { "type": "String" }
+      "reading": {
+        "type": "String"
+      }
     }
   },
   "shareCurrent": "Current: {reading} units",
   "@shareCurrent": {
     "placeholders": {
-      "reading": { "type": "String" }
+      "reading": {
+        "type": "String"
+      }
     }
   },
   "shareUnitsUsed": "Units Used: {units} units",
   "@shareUnitsUsed": {
     "placeholders": {
-      "units": { "type": "String" }
+      "units": {
+        "type": "String"
+      }
     }
   },
   "shareRate": "Rate: ₹{rate}/unit",
   "@shareRate": {
     "placeholders": {
-      "rate": { "type": "String" }
+      "rate": {
+        "type": "String"
+      }
     }
   },
   "shareAmountHeader": "*Amount:*",
   "shareTotal": "Total: ₹{amount}",
   "@shareTotal": {
     "placeholders": {
-      "amount": { "type": "String" }
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "sharePaid": "Paid: ₹{amount}",
   "@sharePaid": {
     "placeholders": {
-      "amount": { "type": "String" }
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "sharePending": "*Pending: ₹{amount}*",
   "@sharePending": {
     "placeholders": {
-      "amount": { "type": "String" }
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "shareDueDate": "Due Date: {date}",
   "@shareDueDate": {
     "placeholders": {
-      "date": { "type": "String" }
+      "date": {
+        "type": "String"
+      }
     }
   },
   "sharePayViaUpi": "📱 *Pay via UPI:*",
@@ -1203,40 +1237,211 @@
   "shareAmount": "Amount: ₹{amount}",
   "@shareAmount": {
     "placeholders": {
-      "amount": { "type": "String" }
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "shareMode": "Mode: {mode}",
   "@shareMode": {
     "placeholders": {
-      "mode": { "type": "String" }
+      "mode": {
+        "type": "String"
+      }
     }
   },
   "shareDate": "Date: {date}",
   "@shareDate": {
     "placeholders": {
-      "date": { "type": "String" }
+      "date": {
+        "type": "String"
+      }
     }
   },
   "shareBillStatus": "*Bill Status:*",
   "shareTotalBill": "Total Bill: ₹{amount}",
   "@shareTotalBill": {
     "placeholders": {
-      "amount": { "type": "String" }
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "shareTotalPaid": "Total Paid: ₹{amount}",
   "@shareTotalPaid": {
     "placeholders": {
-      "amount": { "type": "String" }
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "shareRemaining": "*Remaining: ₹{amount}*",
   "@shareRemaining": {
     "placeholders": {
-      "amount": { "type": "String" }
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "shareStatusFullyPaid": "*Status: FULLY PAID ✅*",
-  "shareThankYouPayment": "Thank you for your payment!"
+  "shareThankYouPayment": "Thank you for your payment!",
+  "editRoomTitle": "Edit Room",
+  "addRoomTitle": "Add Room",
+  "roomNumberLabel": "Room Number/Name *",
+  "roomNumberHint": "e.g., 101, Ground Floor Left",
+  "monthlyRentHint": "e.g., 5000",
+  "electricityMeterToggleTitle": "Electricity Meter",
+  "electricityMeterToggleSubtitle": "Track meter readings and auto-calculate electricity bills",
+  "saveChangesBtn": "Save Changes",
+  "roomUpdatedSuccess": "Room updated",
+  "roomAddedSuccess": "Room added",
+  "addExpenseTitle": "Add Expense",
+  "categoryLabel": "Category",
+  "noteOptionalLabel": "Note (Optional)",
+  "noteExpenseHint": "e.g. Pump repair parts",
+  "saveExpenseBtn": "Save Expense",
+  "expenseAddedSuccess": "Expense added successfully",
+  "addDocumentTitle": "Add Document",
+  "documentTitleLabel": "Document Title",
+  "documentTitleHint": "e.g., Rent Agreement, PAN Card",
+  "tapToAddDocument": "Tap to add document",
+  "imageOrPdf": "Image or PDF",
+  "saveDocumentBtn": "Save Document",
+  "selectPdf": "Select PDF",
+  "selectDocumentError": "Please select a document",
+  "skipForNowBtn": "Skip for now",
+  "whatAreYouManaging": "What are you managing?",
+  "giveFirstPropertyTitle": "Give your first property or building a name.",
+  "propertyNameLabel": "Property Name",
+  "propertyNameHint": "e.g., Green Valley Apartments",
+  "continueBtn": "Continue",
+  "yourProfileTitle": "Your Profile",
+  "letsSetUpProfile": "Let's set up your profile so you can start managing properties.",
+  "profileBillingInfoText": "This information will be used for billing and receipts.",
+  "profileUpiInfoText": "Your UPI ID will be used to generate QR codes for tenants to pay rent easily.",
+  "yourNameLabel": "Your Name *",
+  "enterFullNameHint": "Enter your full name",
+  "phoneNumberLabel": "Phone Number",
+  "phoneNumberHint": "10-digit mobile number",
+  "upiIdLabel": "UPI ID",
+  "configureBillingCyclesTitle": "Configure Billing Cycles",
+  "calculateBillsTenantDateText": "Calculate bills based on the tenant's specific move-in date",
+  "saveAndContinueBtn": "Save & Continue",
+  "notificationsEnabledSuccess": "Notifications enabled successfully!",
+  "notificationsDeniedError": "Notification permission denied.",
+  "appLockNotConfiguredError": "App Lock was not configured.",
+  "upiHelperText": "For receiving rent payments",
+  "propertyNameRequiredLabel": "Property Name *",
+  "propertySunriseHint": "e.g., Sunrise Apartments",
+  "propertyAddressLabel": "Address",
+  "propertyAddressHint": "Full address of the property",
+  "noDocumentsAddedYet": "No documents added yet.",
+  "noAvailableTenantsCreateNew": "No available tenants. Create a new tenant.",
+  "moveInDetailsTitle": "Move-in Details",
+  "olderMoveInDetectedInfo": "Older move-in detected. Billing starts from this month.",
+  "noFamilyMembersTap": "No family members. Tap",
+  "existingMembersLabel": "Existing members:",
+  "newMembersToAddLabel": "New members to add:",
+  "panCardHint": "e.g. PAN Card",
+  "nameRequiredLabel": "Name *",
+  "relationshipRequiredLabel": "Relationship *",
+  "phoneOptionalLabel": "Phone (Optional)",
+  "fullNameRequiredLabel": "Full Name *",
+  "guardianNameOptionalLabel": "Father's/Spouse's Name (Optional)",
+  "twelveDigitNumberHint": "12-digit number",
+  "agreementEndDateOptionalLabel": "Agreement End Date (Optional)",
+  "agreedRentLabel": "Agreed Rent (₹)",
+  "manualDeductionAmountLabel": "Manual Deduction Amount (₹)",
+  "deductionReasonHint": "Reason (e.g. Damages, Painting)",
+  "moveInDateInputLabel": "Move-in Date",
+  "propertyUpdatedSuccess": "Property updated",
+  "propertyAddedSuccess": "Property added",
+  "editPropertyTitle": "Edit Property",
+  "addPropertyTitle": "Add Property",
+  "aadhaarCardPhotosLabel": "Aadhaar Card Photos",
+  "policeVerifiedLabel": "Police Verified",
+  "policeVerifiedSubtitle": "Mark if police verification is complete",
+  "profilePhotoLabel": "Profile Photo",
+  "enterTenantFullNameHint": "Enter tenant's full name",
+  "fathersNameRequiredHint": "Required for legal agreements",
+  "tenDigitMobileHint": "10-digit mobile number",
+  "secondaryPhoneLabel": "Secondary Phone",
+  "emergencyFamilyContactHint": "Emergency/Family contact",
+  "addressLineLabel": "Address Line",
+  "streetLocalityHint": "Street, Locality",
+  "companyNameLabel": "Company Name",
+  "officeAddressLabel": "Office Address",
+  "aadhaarNumberLabel": "Aadhaar Number",
+  "twelveDigitAadhaarHint": "12-digit Aadhaar number",
+  "introducerNameLabel": "Introducer Name",
+  "vouchedForTenantHint": "Person who vouched for tenant",
+  "introducerAddressLabel": "Introducer Address",
+  "introducerPhoneLabel": "Introducer Phone",
+  "identityContactTitle": "Identity & Contact",
+  "permanentAddressTitle": "Permanent Address",
+  "workDetailsTitle": "Work Details",
+  "idDocumentsTitle": "ID Documents",
+  "introducerReferenceTitle": "Introducer / Reference",
+  "additionalDocumentsTitle": "Additional Documents",
+  "otherLabel": "Other",
+  "editTenantTitle": "Edit Tenant",
+  "addTenantTitle": "Add Tenant",
+  "tenantUpdatedSuccess": "Tenant updated",
+  "tenantAddedSuccess": "Tenant added",
+  "tenantDeletedSuccess": "Tenant deleted",
+  "cancelBtn": "Cancel",
+  "moveInAgainBtn": "Move In Again",
+  "selectRoomToMoveInHint": "Select a room to move this tenant in",
+  "deleteTenantTitle": "Delete Tenant?",
+  "deleteBtn": "Delete",
+  "currentLocationLabel": "Current Location",
+  "unableToLoadImage": "Unable to load image",
+  "imageFileNotFound": "Image file not found",
+  "occupancyHistoryTitle": "Occupancy History",
+  "noOccupancyHistoryYet": "No occupancy history yet",
+  "familyMembersTitle": "Family Members",
+  "addFamilyMemberTitle": "Add Family Member",
+  "familyMembersActiveOnlyHint": "Family members can only be added to active occupancies",
+  "deleteFamilyMemberTitle": "Delete Family Member?",
+  "actionCannotBeUndone": "This action cannot be undone.",
+  "familyMemberDeletedSuccess": "Family member deleted",
+  "spouseLabel": "Spouse",
+  "childLabel": "Child",
+  "parentLabel": "Parent",
+  "siblingLabel": "Sibling",
+  "nameAndRelationshipRequired": "Name and relationship are required",
+  "familyMemberAddedSuccess": "Family member added!",
+  "customFieldsTitle": "Custom Fields",
+  "noCustomFields": "No custom fields",
+  "documentsTitle": "Documents",
+  "noDocumentsAttached": "No documents attached.",
+  "deleteDocumentTitle": "Delete Document?",
+  "confirmDeleteDocumentPrefix": "Are you sure you want to delete ",
+  "documentDeletedSuccess": "Document deleted",
+  "fieldNameLabel": "Field Name",
+  "fieldValueLabel": "Value",
+  "zeroAmount": "0",
+  "letsMakeItProfessionalTitle": "Let's make it professional!",
+  "addNameUpiSubtitle": "Add your Name and UPI ID to generate professional invoices with embedded QR codes.",
+  "continueToBillBtn": "Continue to Bill",
+  "yourNameBusinessNameLabel": "Your Name or Business Name",
+  "upiIdOptionalLabel": "UPI ID (Optional but recommended)",
+  "occupancyDetailsTitle": "Occupancy Details",
+  "shareFunctionalityComingSoon": "Share functionality coming soon",
+  "occupancyNotFound": "Occupancy not found",
+  "viewSettlementReceiptBtn": "View Settlement Receipt",
+  "enterPaymentAmountLabel": "Payment Amount (₹)",
+  "shareTextBtn": "Share Text",
+  "pdfInvoiceBtn": "PDF Invoice",
+  "messageCopiedSuccess": "Message copied to clipboard!",
+  "generatingPdfMsg": "Generating PDF...",
+  "noPaymentsRecordedMsg": "No payments recorded yet",
+  "paymentDeletedSuccess": "Payment deleted",
+  "enterValidAmountMsg": "Enter a valid amount",
+  "paymentUpdatedSuccess": "Payment updated",
+  "noNotificationsScheduled": "No notifications scheduled.",
+  "errorGeneric": "Error",
+  "chooseFromGalleryBtn": "Choose from Gallery",
+  "sharePaymentLinkBtn": "Share Payment Link",
+  "meterTrackingExplanation": "Enter readings to automatically calculate electricity charges based on your configured rate."
 }

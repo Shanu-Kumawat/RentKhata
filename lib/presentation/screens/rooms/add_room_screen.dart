@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../application/providers/repository_providers.dart';
 import '../../../core/utils/validators.dart';
 import '../../../domain/entities/room.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
 
 /// Bottom sheet to add or edit a room.
 class AddRoomSheet extends ConsumerStatefulWidget {
@@ -74,7 +75,7 @@ class _AddRoomSheetState extends ConsumerState<AddRoomSheet> {
       if (mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(isEditing ? 'Room updated' : 'Room added')),
+          SnackBar(content: Text(isEditing ? AppLocalizations.of(context)!.roomUpdatedSuccess : AppLocalizations.of(context)!.roomAddedSuccess)),
         );
       }
     } catch (e) {
@@ -94,10 +95,11 @@ class _AddRoomSheetState extends ConsumerState<AddRoomSheet> {
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
-      child: Container(
-        padding: const EdgeInsets.all(24),
-        child: Form(
-          key: _formKey,
+      child: SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          child: Form(
+            key: _formKey,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -107,7 +109,7 @@ class _AddRoomSheetState extends ConsumerState<AddRoomSheet> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    isEditing ? 'Edit Room' : 'Add Room',
+                    isEditing ? AppLocalizations.of(context)!.editRoomTitle : AppLocalizations.of(context)!.addRoomTitle,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -123,10 +125,10 @@ class _AddRoomSheetState extends ConsumerState<AddRoomSheet> {
               // Room number
               TextFormField(
                 controller: _roomNumberController,
-                decoration: const InputDecoration(
-                  labelText: 'Room Number/Name *',
-                  hintText: 'e.g., 101, Ground Floor Left',
-                  prefixIcon: Icon(Icons.meeting_room_outlined),
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.roomNumberLabel,
+                  hintText: AppLocalizations.of(context)!.roomNumberHint,
+                  prefixIcon: const Icon(Icons.meeting_room_outlined),
                 ),
                 validator: (v) => validateRequired(v, 'Room number'),
               ),
@@ -135,22 +137,39 @@ class _AddRoomSheetState extends ConsumerState<AddRoomSheet> {
               // Base rent
               TextFormField(
                 controller: _rentController,
-                decoration: const InputDecoration(
-                  labelText: 'Monthly Rent (₹) *',
-                  hintText: 'e.g., 5000',
-                  prefixIcon: Icon(Icons.currency_rupee),
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.monthlyRentLabel,
+                  hintText: AppLocalizations.of(context)!.monthlyRentHint,
+                  prefixIcon: const Icon(Icons.currency_rupee),
                 ),
                 keyboardType: TextInputType.number,
                 validator: (v) => validatePositiveNumber(v, 'Rent'),
               ),
               const SizedBox(height: 16),
 
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: const Text('Has Electricity Meter'),
-                subtitle: const Text('Track electricity readings separately'),
-                value: _hasElectricityMeter,
-                onChanged: (v) => setState(() => _hasElectricityMeter = v),
+              InputDecorator(
+                decoration: const InputDecoration(
+                  contentPadding: EdgeInsets.zero,
+                ),
+                child: SwitchListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  secondary: const Icon(Icons.electric_meter_outlined),
+                  title: Text(
+                    AppLocalizations.of(context)!.electricityMeterToggleTitle,
+                  ),
+                  subtitle: Text(
+                    AppLocalizations.of(context)!.electricityMeterToggleSubtitle,
+                    style: TextStyle(
+                      fontSize: 12,
+                      height: 1.2,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                    ),
+                  ),
+                  value: _hasElectricityMeter,
+                  onChanged: (v) => setState(() => _hasElectricityMeter = v),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  tileColor: Colors.transparent,
+                ),
               ),
               const SizedBox(height: 24),
 
@@ -168,11 +187,12 @@ class _AddRoomSheetState extends ConsumerState<AddRoomSheet> {
                             color: Colors.white,
                           ),
                         )
-                      : Text(isEditing ? 'Save Changes' : 'Add Room'),
+                      : Text(isEditing ? AppLocalizations.of(context)!.saveChangesBtn : AppLocalizations.of(context)!.addRoomTitle),
                 ),
               ),
             ],
           ),
+        ),
         ),
       ),
     );

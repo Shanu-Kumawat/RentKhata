@@ -548,7 +548,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get addMeterPhoto => 'मीटर की फोटो जोड़ें';
 
   @override
-  String get takePhoto => 'फोटो लें';
+  String get takePhoto => 'फ़ोटो लें';
 
   @override
   String get chooseFromGallery => 'गैलरी से चुनें';
@@ -704,7 +704,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get saveChanges => 'परिवर्तन सहेजें';
 
   @override
-  String get amountLabel => 'राशि';
+  String get amountLabel => 'रकम';
 
   @override
   String amountCannotExceedPendingBalance(String amount) {
@@ -1027,7 +1027,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get agreedRent => 'सहमत किराया';
 
   @override
-  String get securityDepositLabel => 'सुरक्षा जमा';
+  String get securityDepositLabel => 'सुरक्षा जमा (₹)';
 
   @override
   String get billingStartLabel => 'बिलिंग प्रारंभ';
@@ -1080,7 +1080,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get shareBtn => 'साझा करें';
 
   @override
-  String get monthlyRentLabel => 'मासिक किराया';
+  String get monthlyRentLabel => 'मासिक किराया (Rs.) *';
 
   @override
   String get electricityBillLabel => 'बिजली का बिल';
@@ -1145,7 +1145,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get otherRelation => 'अन्य';
 
   @override
-  String get ageLabel => 'आयु';
+  String get ageLabel => 'उम्र';
 
   @override
   String get genderLabel => 'लिंग';
@@ -1211,7 +1211,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get clearBtn => 'साफ़ करें';
 
   @override
-  String get takePhotoBtn => 'फोटो लें';
+  String get takePhotoBtn => 'तस्वीर लें';
 
   @override
   String get uploadGalleryBtn => 'गैलरी से अपलोड करें';
@@ -1773,7 +1773,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get upiIdHelperText => '[HI] Upi Id Helper Text';
 
   @override
-  String get upiIdHint => '[HI] Upi Id Hint';
+  String get upiIdHint => 'उदा. yourname@upi';
 
   @override
   String versionLabel(String version) {
@@ -2200,4 +2200,495 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get shareThankYouPayment => 'आपके भुगतान के लिए धन्यवाद!';
+
+  @override
+  String get editRoomTitle => 'कमरा संपादित करें';
+
+  @override
+  String get addRoomTitle => 'कमरा जोड़ें';
+
+  @override
+  String get roomNumberLabel => 'कमरा नंबर/नाम *';
+
+  @override
+  String get roomNumberHint => 'उदा., 101, ग्राउंड फ्लोर बायां';
+
+  @override
+  String get monthlyRentHint => 'उदा., 5000';
+
+  @override
+  String get electricityMeterToggleTitle => 'बिजली मीटर';
+
+  @override
+  String get electricityMeterToggleSubtitle =>
+      'मीटर रीडिंग ट्रैक करें और बिजली बिल अपने आप कैलकुलेट करें';
+
+  @override
+  String get saveChangesBtn => 'परिवर्तन सहेजें';
+
+  @override
+  String get roomUpdatedSuccess => 'कमरा अपडेट किया गया';
+
+  @override
+  String get roomAddedSuccess => 'कमरा जोड़ा गया';
+
+  @override
+  String get addExpenseTitle => 'खर्च जोड़ें';
+
+  @override
+  String get categoryLabel => 'श्रेणी';
+
+  @override
+  String get noteOptionalLabel => 'नोट (वैकल्पिक)';
+
+  @override
+  String get noteExpenseHint => 'उदा. पंप मरम्मत के पुर्जे';
+
+  @override
+  String get saveExpenseBtn => 'खर्च सेव करें';
+
+  @override
+  String get expenseAddedSuccess => 'खर्च सफलतापूर्वक जोड़ा गया';
+
+  @override
+  String get addDocumentTitle => 'दस्तावेज़ जोड़ें';
+
+  @override
+  String get documentTitleLabel => 'दस्तावेज़ का शीर्षक';
+
+  @override
+  String get documentTitleHint => 'उदा., किराया समझौता, पैन कार्ड';
+
+  @override
+  String get tapToAddDocument => 'दस्तावेज़ जोड़ने के लिए टैप करें';
+
+  @override
+  String get imageOrPdf => 'छवि या PDF';
+
+  @override
+  String get saveDocumentBtn => 'दस्तावेज़ सेव करें';
+
+  @override
+  String get selectPdf => 'PDF चुनें';
+
+  @override
+  String get selectDocumentError => 'कृपया एक दस्तावेज़ चुनें';
+
+  @override
+  String get skipForNowBtn => 'अभी छोड़ें';
+
+  @override
+  String get whatAreYouManaging => 'आप क्या प्रबंधित कर रहे हैं?';
+
+  @override
+  String get giveFirstPropertyTitle => 'अपनी पहली संपत्ति या इमारत को नाम दें।';
+
+  @override
+  String get propertyNameLabel => 'संपत्ति का नाम';
+
+  @override
+  String get propertyNameHint => 'उदा., ग्रीन वैली अपार्टमेंट्स';
+
+  @override
+  String get continueBtn => 'जारी रखें';
+
+  @override
+  String get yourProfileTitle => 'आपकी प्रोफ़ाइल';
+
+  @override
+  String get letsSetUpProfile =>
+      'आइए आपकी प्रोफ़ाइल सेट अप करें ताकि आप संपत्तियों का प्रबंधन शुरू कर सकें।';
+
+  @override
+  String get profileBillingInfoText =>
+      'इस जानकारी का उपयोग बिलिंग और रसीदों के लिए किया जाएगा।';
+
+  @override
+  String get profileUpiInfoText =>
+      'आपकी UPI ID का उपयोग किरायेदारों द्वारा आसानी से किराया चुकाने के लिए QR कोड उत्पन्न करने में किया जाएगा।';
+
+  @override
+  String get yourNameLabel => 'आपका नाम *';
+
+  @override
+  String get enterFullNameHint => 'अपना पूरा नाम दर्ज करें';
+
+  @override
+  String get phoneNumberLabel => 'फ़ोन नंबर';
+
+  @override
+  String get phoneNumberHint => '10 अंकों का मोबाइल नंबर';
+
+  @override
+  String get upiIdLabel => 'UPI ID';
+
+  @override
+  String get configureBillingCyclesTitle => 'बिलिंग साइकिल कॉन्फ़िगर करें';
+
+  @override
+  String get calculateBillsTenantDateText =>
+      'किरायेदार के विशिष्ट प्रवेश-तिथि के आधार पर बिल की गणना करें';
+
+  @override
+  String get saveAndContinueBtn => 'सहेजें और जारी रखें';
+
+  @override
+  String get notificationsEnabledSuccess => 'सूचनाएँ सफलतापूर्वक सक्षम की गईं!';
+
+  @override
+  String get notificationsDeniedError => 'सूचना की अनुमति अस्वीकार कर दी गई।';
+
+  @override
+  String get appLockNotConfiguredError => 'ऐप लॉक कॉन्फ़िगर नहीं किया गया था।';
+
+  @override
+  String get upiHelperText => 'किराया भुगतान प्राप्त करने के लिए';
+
+  @override
+  String get propertyNameRequiredLabel => 'संपत्ति का नाम *';
+
+  @override
+  String get propertySunriseHint => 'उदा., सनराइज अपार्टमेंट्स';
+
+  @override
+  String get propertyAddressLabel => 'पता';
+
+  @override
+  String get propertyAddressHint => 'संपत्ति का पूरा पता';
+
+  @override
+  String get noDocumentsAddedYet => 'अभी तक कोई दस्तावेज़ नहीं जोड़ा गया है।';
+
+  @override
+  String get noAvailableTenantsCreateNew =>
+      'कोई किरायेदार उपलब्ध नहीं है। नया किरायेदार बनाएं।';
+
+  @override
+  String get moveInDetailsTitle => 'प्रवेश विवरण';
+
+  @override
+  String get olderMoveInDetectedInfo =>
+      'पुराना प्रवेश पाया गया। बिलिंग इस महीने से शुरू होगी।';
+
+  @override
+  String get noFamilyMembersTap => 'कोई परिवार का सदस्य नहीं है। टैप करें';
+
+  @override
+  String get existingMembersLabel => 'मौजूदा सदस्य:';
+
+  @override
+  String get newMembersToAddLabel => 'जोड़ने के लिए नए सदस्य:';
+
+  @override
+  String get panCardHint => 'उदा. पैन कार्ड';
+
+  @override
+  String get nameRequiredLabel => 'नाम *';
+
+  @override
+  String get relationshipRequiredLabel => 'संबंध *';
+
+  @override
+  String get phoneOptionalLabel => 'फ़ोन (वैकल्पिक)';
+
+  @override
+  String get fullNameRequiredLabel => 'पूरा नाम *';
+
+  @override
+  String get guardianNameOptionalLabel => 'पिता/पति का नाम (वैकल्पिक)';
+
+  @override
+  String get twelveDigitNumberHint => '12 अंकों का नंबर';
+
+  @override
+  String get agreementEndDateOptionalLabel => 'अनुबंध समाप्ति तिथि (वैकल्पिक)';
+
+  @override
+  String get agreedRentLabel => 'सहमत किराया (₹)';
+
+  @override
+  String get manualDeductionAmountLabel => 'मैन्युअल कटौती राशि (₹)';
+
+  @override
+  String get deductionReasonHint => 'कारण (उदा. नुकसान, पेंटिंग)';
+
+  @override
+  String get moveInDateInputLabel => 'प्रवेश तिथि';
+
+  @override
+  String get propertyUpdatedSuccess => 'संपत्ति अद्यतन की गई';
+
+  @override
+  String get propertyAddedSuccess => 'संपत्ति जोड़ी गई';
+
+  @override
+  String get editPropertyTitle => 'संपत्ति संपादित करें';
+
+  @override
+  String get addPropertyTitle => 'संपत्ति जोड़ें';
+
+  @override
+  String get aadhaarCardPhotosLabel => 'आधार कार्ड की तस्वीरें';
+
+  @override
+  String get policeVerifiedLabel => 'पुलिस सत्यापित';
+
+  @override
+  String get policeVerifiedSubtitle =>
+      'यदि पुलिस सत्यापन पूरा हो गया है तो चिह्नित करें';
+
+  @override
+  String get profilePhotoLabel => 'प्रोफ़ाइल फ़ोटो';
+
+  @override
+  String get enterTenantFullNameHint => 'किरायेदार का पूरा नाम दर्ज करें';
+
+  @override
+  String get fathersNameRequiredHint => 'कानूनी अनुबंधों के लिए आवश्यक';
+
+  @override
+  String get tenDigitMobileHint => '10 अंकों का मोबाइल नंबर';
+
+  @override
+  String get secondaryPhoneLabel => 'वैकल्पिक फ़ोन';
+
+  @override
+  String get emergencyFamilyContactHint => 'आपातकालीन/पारिवारिक संपर्क';
+
+  @override
+  String get addressLineLabel => 'पता';
+
+  @override
+  String get streetLocalityHint => 'सड़क, मोहल्ला';
+
+  @override
+  String get companyNameLabel => 'कंपनी का नाम';
+
+  @override
+  String get officeAddressLabel => 'कार्यालय का पता';
+
+  @override
+  String get aadhaarNumberLabel => 'आधार संख्या';
+
+  @override
+  String get twelveDigitAadhaarHint => '12 अंकों का आधार नंबर';
+
+  @override
+  String get introducerNameLabel => 'परिचयकर्ता का नाम';
+
+  @override
+  String get vouchedForTenantHint => 'किरायेदार की गारंटी देने वाला व्यक्ति';
+
+  @override
+  String get introducerAddressLabel => 'परिचयकर्ता का पता';
+
+  @override
+  String get introducerPhoneLabel => 'परिचयकर्ता का फ़ोन';
+
+  @override
+  String get identityContactTitle => 'पहचान और संपर्क';
+
+  @override
+  String get permanentAddressTitle => 'स्थायी पता';
+
+  @override
+  String get workDetailsTitle => 'काम का विवरण';
+
+  @override
+  String get idDocumentsTitle => 'पहचान दस्तावेज़';
+
+  @override
+  String get introducerReferenceTitle => 'परिचयकर्ता / संदर्भ';
+
+  @override
+  String get additionalDocumentsTitle => 'अतिरिक्त दस्तावेज़';
+
+  @override
+  String get otherLabel => 'अन्य';
+
+  @override
+  String get editTenantTitle => 'किरायेदार संपादित करें';
+
+  @override
+  String get addTenantTitle => 'किरायेदार जोड़ें';
+
+  @override
+  String get tenantUpdatedSuccess => 'किरायेदार अद्यतन किया गया';
+
+  @override
+  String get tenantAddedSuccess => 'किरायेदार जोड़ा गया';
+
+  @override
+  String get tenantDeletedSuccess => 'किरायेदार हटा दिया गया';
+
+  @override
+  String get cancelBtn => 'रद्द करें';
+
+  @override
+  String get moveInAgainBtn => 'फिर से प्रवेश करें';
+
+  @override
+  String get selectRoomToMoveInHint =>
+      'इस किरायेदार को प्रवेश देने के लिए एक कमरा चुनें';
+
+  @override
+  String get deleteTenantTitle => 'किरायेदार हटाएं?';
+
+  @override
+  String get deleteBtn => 'हटाएं';
+
+  @override
+  String get currentLocationLabel => 'वर्तमान स्थान';
+
+  @override
+  String get unableToLoadImage => 'छवि लोड करने में असमर्थ';
+
+  @override
+  String get imageFileNotFound => 'छवि फ़ाइल नहीं मिली';
+
+  @override
+  String get occupancyHistoryTitle => 'अधिभोग इतिहास';
+
+  @override
+  String get noOccupancyHistoryYet => 'अभी तक कोई अधिभोग इतिहास नहीं है';
+
+  @override
+  String get familyMembersTitle => 'परिवार के सदस्य';
+
+  @override
+  String get addFamilyMemberTitle => 'परिवार का सदस्य जोड़ें';
+
+  @override
+  String get familyMembersActiveOnlyHint =>
+      'परिवार के सदस्य केवल सक्रिय अधिभोग में जोड़े जा सकते हैं';
+
+  @override
+  String get deleteFamilyMemberTitle => 'परिवार के सदस्य को हटाएं?';
+
+  @override
+  String get actionCannotBeUndone =>
+      'इस क्रिया को पूर्ववत नहीं किया जा सकता है।';
+
+  @override
+  String get familyMemberDeletedSuccess => 'परिवार का सदस्य हटा दिया गया';
+
+  @override
+  String get spouseLabel => 'पति/पत्नी';
+
+  @override
+  String get childLabel => 'बच्चा';
+
+  @override
+  String get parentLabel => 'माता-पिता';
+
+  @override
+  String get siblingLabel => 'भाई/बहन';
+
+  @override
+  String get nameAndRelationshipRequired => 'नाम और संबंध आवश्यक हैं';
+
+  @override
+  String get familyMemberAddedSuccess => 'परिवार का सदस्य जोड़ा गया!';
+
+  @override
+  String get customFieldsTitle => 'कस्टम फ़ील्ड';
+
+  @override
+  String get noCustomFields => 'कोई कस्टम फ़ील्ड नहीं';
+
+  @override
+  String get documentsTitle => 'दस्तावेज़';
+
+  @override
+  String get noDocumentsAttached => 'कोई दस्तावेज़ संलग्न नहीं है।';
+
+  @override
+  String get deleteDocumentTitle => 'दस्तावेज़ हटाएं?';
+
+  @override
+  String get confirmDeleteDocumentPrefix => 'क्या आप वाकई हटाना चाहते हैं ';
+
+  @override
+  String get documentDeletedSuccess => 'दस्तावेज़ हटा दिया गया';
+
+  @override
+  String get fieldNameLabel => 'फ़ील्ड का नाम';
+
+  @override
+  String get fieldValueLabel => 'मूल्य';
+
+  @override
+  String get zeroAmount => '0';
+
+  @override
+  String get letsMakeItProfessionalTitle => 'आइए इसे पेशेवर बनाएं!';
+
+  @override
+  String get addNameUpiSubtitle =>
+      'एंबेडेड QR कोड के साथ पेशेवर चालान बनाने के लिए अपना नाम और UPI ID जोड़ें।';
+
+  @override
+  String get continueToBillBtn => 'बिल पर जारी रखें';
+
+  @override
+  String get yourNameBusinessNameLabel => 'आपका नाम या व्यवसाय का नाम';
+
+  @override
+  String get upiIdOptionalLabel => 'UPI ID (वैकल्पिक लेकिन अनुशंसित)';
+
+  @override
+  String get occupancyDetailsTitle => 'अधिभोग विवरण';
+
+  @override
+  String get shareFunctionalityComingSoon =>
+      'साझा करने की कार्यक्षमता जल्द आ रही है';
+
+  @override
+  String get occupancyNotFound => 'अधिभोग नहीं मिला';
+
+  @override
+  String get viewSettlementReceiptBtn => 'निपटान रसीद देखें';
+
+  @override
+  String get enterPaymentAmountLabel => 'भुगतान राशि (₹)';
+
+  @override
+  String get shareTextBtn => 'टेक्स्ट साझा करें';
+
+  @override
+  String get pdfInvoiceBtn => 'PDF चालान';
+
+  @override
+  String get messageCopiedSuccess => 'संदेश क्लिपबोर्ड पर कॉपी किया गया!';
+
+  @override
+  String get generatingPdfMsg => 'PDF जेनरेट किया जा रहा है...';
+
+  @override
+  String get noPaymentsRecordedMsg => 'अभी तक कोई भुगतान दर्ज नहीं है';
+
+  @override
+  String get paymentDeletedSuccess => 'भुगतान हटा दिया गया';
+
+  @override
+  String get enterValidAmountMsg => 'एक वैध राशि दर्ज करें';
+
+  @override
+  String get paymentUpdatedSuccess => 'भुगतान अद्यतन किया गया';
+
+  @override
+  String get noNotificationsScheduled => 'कोई सूचना निर्धारित नहीं है।';
+
+  @override
+  String get errorGeneric => 'त्रुटि';
+
+  @override
+  String get chooseFromGalleryBtn => 'गैलरी से चुनें';
+
+  @override
+  String get sharePaymentLinkBtn => 'भुगतान लिंक साझा करें';
+
+  @override
+  String get meterTrackingExplanation =>
+      'अपनी निर्धारित दर के आधार पर बिजली शुल्क की स्वचालित गणना करने के लिए रीडिंग दर्ज करें।';
 }

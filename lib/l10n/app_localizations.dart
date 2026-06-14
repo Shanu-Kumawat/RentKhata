@@ -1954,7 +1954,7 @@ abstract class AppLocalizations {
   /// No description provided for @securityDepositLabel.
   ///
   /// In en, this message translates to:
-  /// **'Security Deposit'**
+  /// **'Security Deposit (₹)'**
   String get securityDepositLabel;
 
   /// No description provided for @billingStartLabel.
@@ -2056,7 +2056,7 @@ abstract class AppLocalizations {
   /// No description provided for @monthlyRentLabel.
   ///
   /// In en, this message translates to:
-  /// **'Monthly Rent'**
+  /// **'Monthly Rent (₹) *'**
   String get monthlyRentLabel;
 
   /// No description provided for @electricityBillLabel.
@@ -2650,7 +2650,7 @@ abstract class AppLocalizations {
   /// No description provided for @moveInDateLabel.
   ///
   /// In en, this message translates to:
-  /// **'Move In: {date}'**
+  /// **'Move In Date: {date}'**
   String moveInDateLabel(String date);
 
   /// No description provided for @initialSecurityDeposit.
@@ -3370,7 +3370,7 @@ abstract class AppLocalizations {
   /// No description provided for @upiIdHint.
   ///
   /// In en, this message translates to:
-  /// **'Upi Id Hint'**
+  /// **'e.g. yourname@upi'**
   String get upiIdHint;
 
   /// No description provided for @versionLabel.
@@ -4080,6 +4080,960 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Thank you for your payment!'**
   String get shareThankYouPayment;
+
+  /// No description provided for @editRoomTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Room'**
+  String get editRoomTitle;
+
+  /// No description provided for @addRoomTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Room'**
+  String get addRoomTitle;
+
+  /// No description provided for @roomNumberLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Room Number/Name *'**
+  String get roomNumberLabel;
+
+  /// No description provided for @roomNumberHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., 101, Ground Floor Left'**
+  String get roomNumberHint;
+
+  /// No description provided for @monthlyRentHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., 5000'**
+  String get monthlyRentHint;
+
+  /// No description provided for @electricityMeterToggleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Electricity Meter'**
+  String get electricityMeterToggleTitle;
+
+  /// No description provided for @electricityMeterToggleSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Track meter readings and auto-calculate electricity bills'**
+  String get electricityMeterToggleSubtitle;
+
+  /// No description provided for @saveChangesBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Changes'**
+  String get saveChangesBtn;
+
+  /// No description provided for @roomUpdatedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Room updated'**
+  String get roomUpdatedSuccess;
+
+  /// No description provided for @roomAddedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Room added'**
+  String get roomAddedSuccess;
+
+  /// No description provided for @addExpenseTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Expense'**
+  String get addExpenseTitle;
+
+  /// No description provided for @categoryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get categoryLabel;
+
+  /// No description provided for @noteOptionalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Note (Optional)'**
+  String get noteOptionalLabel;
+
+  /// No description provided for @noteExpenseHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Pump repair parts'**
+  String get noteExpenseHint;
+
+  /// No description provided for @saveExpenseBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Expense'**
+  String get saveExpenseBtn;
+
+  /// No description provided for @expenseAddedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense added successfully'**
+  String get expenseAddedSuccess;
+
+  /// No description provided for @addDocumentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Document'**
+  String get addDocumentTitle;
+
+  /// No description provided for @documentTitleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Document Title'**
+  String get documentTitleLabel;
+
+  /// No description provided for @documentTitleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., Rent Agreement, PAN Card'**
+  String get documentTitleHint;
+
+  /// No description provided for @tapToAddDocument.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to add document'**
+  String get tapToAddDocument;
+
+  /// No description provided for @imageOrPdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Image or PDF'**
+  String get imageOrPdf;
+
+  /// No description provided for @saveDocumentBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Document'**
+  String get saveDocumentBtn;
+
+  /// No description provided for @selectPdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Select PDF'**
+  String get selectPdf;
+
+  /// No description provided for @selectDocumentError.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a document'**
+  String get selectDocumentError;
+
+  /// No description provided for @skipForNowBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip for now'**
+  String get skipForNowBtn;
+
+  /// No description provided for @whatAreYouManaging.
+  ///
+  /// In en, this message translates to:
+  /// **'What are you managing?'**
+  String get whatAreYouManaging;
+
+  /// No description provided for @giveFirstPropertyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Give your first property or building a name.'**
+  String get giveFirstPropertyTitle;
+
+  /// No description provided for @propertyNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Property Name'**
+  String get propertyNameLabel;
+
+  /// No description provided for @propertyNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., Green Valley Apartments'**
+  String get propertyNameHint;
+
+  /// No description provided for @continueBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continueBtn;
+
+  /// No description provided for @yourProfileTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Profile'**
+  String get yourProfileTitle;
+
+  /// No description provided for @letsSetUpProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s set up your profile so you can start managing properties.'**
+  String get letsSetUpProfile;
+
+  /// No description provided for @profileBillingInfoText.
+  ///
+  /// In en, this message translates to:
+  /// **'This information will be used for billing and receipts.'**
+  String get profileBillingInfoText;
+
+  /// No description provided for @profileUpiInfoText.
+  ///
+  /// In en, this message translates to:
+  /// **'Your UPI ID will be used to generate QR codes for tenants to pay rent easily.'**
+  String get profileUpiInfoText;
+
+  /// No description provided for @yourNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Name *'**
+  String get yourNameLabel;
+
+  /// No description provided for @enterFullNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your full name'**
+  String get enterFullNameHint;
+
+  /// No description provided for @phoneNumberLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone Number'**
+  String get phoneNumberLabel;
+
+  /// No description provided for @phoneNumberHint.
+  ///
+  /// In en, this message translates to:
+  /// **'10-digit mobile number'**
+  String get phoneNumberHint;
+
+  /// No description provided for @upiIdLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'UPI ID'**
+  String get upiIdLabel;
+
+  /// No description provided for @configureBillingCyclesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Configure Billing Cycles'**
+  String get configureBillingCyclesTitle;
+
+  /// No description provided for @calculateBillsTenantDateText.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculate bills based on the tenant\'s specific move-in date'**
+  String get calculateBillsTenantDateText;
+
+  /// No description provided for @saveAndContinueBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Save & Continue'**
+  String get saveAndContinueBtn;
+
+  /// No description provided for @notificationsEnabledSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications enabled successfully!'**
+  String get notificationsEnabledSuccess;
+
+  /// No description provided for @notificationsDeniedError.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification permission denied.'**
+  String get notificationsDeniedError;
+
+  /// No description provided for @appLockNotConfiguredError.
+  ///
+  /// In en, this message translates to:
+  /// **'App Lock was not configured.'**
+  String get appLockNotConfiguredError;
+
+  /// No description provided for @upiHelperText.
+  ///
+  /// In en, this message translates to:
+  /// **'For receiving rent payments'**
+  String get upiHelperText;
+
+  /// No description provided for @propertyNameRequiredLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Property Name *'**
+  String get propertyNameRequiredLabel;
+
+  /// No description provided for @propertySunriseHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., Sunrise Apartments'**
+  String get propertySunriseHint;
+
+  /// No description provided for @propertyAddressLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Address'**
+  String get propertyAddressLabel;
+
+  /// No description provided for @propertyAddressHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Full address of the property'**
+  String get propertyAddressHint;
+
+  /// No description provided for @noDocumentsAddedYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No documents added yet.'**
+  String get noDocumentsAddedYet;
+
+  /// No description provided for @noAvailableTenantsCreateNew.
+  ///
+  /// In en, this message translates to:
+  /// **'No available tenants. Create a new tenant.'**
+  String get noAvailableTenantsCreateNew;
+
+  /// No description provided for @moveInDetailsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Move-in Details'**
+  String get moveInDetailsTitle;
+
+  /// No description provided for @olderMoveInDetectedInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Older move-in detected. Billing starts from this month.'**
+  String get olderMoveInDetectedInfo;
+
+  /// No description provided for @noFamilyMembersTap.
+  ///
+  /// In en, this message translates to:
+  /// **'No family members. Tap'**
+  String get noFamilyMembersTap;
+
+  /// No description provided for @existingMembersLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Existing members:'**
+  String get existingMembersLabel;
+
+  /// No description provided for @newMembersToAddLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'New members to add:'**
+  String get newMembersToAddLabel;
+
+  /// No description provided for @panCardHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. PAN Card'**
+  String get panCardHint;
+
+  /// No description provided for @nameRequiredLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Name *'**
+  String get nameRequiredLabel;
+
+  /// No description provided for @relationshipRequiredLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Relationship *'**
+  String get relationshipRequiredLabel;
+
+  /// No description provided for @phoneOptionalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone (Optional)'**
+  String get phoneOptionalLabel;
+
+  /// No description provided for @fullNameRequiredLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Full Name *'**
+  String get fullNameRequiredLabel;
+
+  /// No description provided for @guardianNameOptionalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Father\'s/Spouse\'s Name (Optional)'**
+  String get guardianNameOptionalLabel;
+
+  /// No description provided for @twelveDigitNumberHint.
+  ///
+  /// In en, this message translates to:
+  /// **'12-digit number'**
+  String get twelveDigitNumberHint;
+
+  /// No description provided for @agreementEndDateOptionalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Agreement End Date (Optional)'**
+  String get agreementEndDateOptionalLabel;
+
+  /// No description provided for @agreedRentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Agreed Rent (₹)'**
+  String get agreedRentLabel;
+
+  /// No description provided for @manualDeductionAmountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Manual Deduction Amount (₹)'**
+  String get manualDeductionAmountLabel;
+
+  /// No description provided for @deductionReasonHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason (e.g. Damages, Painting)'**
+  String get deductionReasonHint;
+
+  /// No description provided for @moveInDateInputLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Move-in Date'**
+  String get moveInDateInputLabel;
+
+  /// No description provided for @propertyUpdatedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Property updated'**
+  String get propertyUpdatedSuccess;
+
+  /// No description provided for @propertyAddedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Property added'**
+  String get propertyAddedSuccess;
+
+  /// No description provided for @editPropertyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Property'**
+  String get editPropertyTitle;
+
+  /// No description provided for @addPropertyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Property'**
+  String get addPropertyTitle;
+
+  /// No description provided for @aadhaarCardPhotosLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Aadhaar Card Photos'**
+  String get aadhaarCardPhotosLabel;
+
+  /// No description provided for @policeVerifiedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Police Verified'**
+  String get policeVerifiedLabel;
+
+  /// No description provided for @policeVerifiedSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark if police verification is complete'**
+  String get policeVerifiedSubtitle;
+
+  /// No description provided for @profilePhotoLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile Photo'**
+  String get profilePhotoLabel;
+
+  /// No description provided for @enterTenantFullNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter tenant\'s full name'**
+  String get enterTenantFullNameHint;
+
+  /// No description provided for @fathersNameRequiredHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Required for legal agreements'**
+  String get fathersNameRequiredHint;
+
+  /// No description provided for @tenDigitMobileHint.
+  ///
+  /// In en, this message translates to:
+  /// **'10-digit mobile number'**
+  String get tenDigitMobileHint;
+
+  /// No description provided for @secondaryPhoneLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Secondary Phone'**
+  String get secondaryPhoneLabel;
+
+  /// No description provided for @emergencyFamilyContactHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Emergency/Family contact'**
+  String get emergencyFamilyContactHint;
+
+  /// No description provided for @addressLineLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Address Line'**
+  String get addressLineLabel;
+
+  /// No description provided for @streetLocalityHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Street, Locality'**
+  String get streetLocalityHint;
+
+  /// No description provided for @companyNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Company Name'**
+  String get companyNameLabel;
+
+  /// No description provided for @officeAddressLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Office Address'**
+  String get officeAddressLabel;
+
+  /// No description provided for @aadhaarNumberLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Aadhaar Number'**
+  String get aadhaarNumberLabel;
+
+  /// No description provided for @twelveDigitAadhaarHint.
+  ///
+  /// In en, this message translates to:
+  /// **'12-digit Aadhaar number'**
+  String get twelveDigitAadhaarHint;
+
+  /// No description provided for @introducerNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Introducer Name'**
+  String get introducerNameLabel;
+
+  /// No description provided for @vouchedForTenantHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Person who vouched for tenant'**
+  String get vouchedForTenantHint;
+
+  /// No description provided for @introducerAddressLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Introducer Address'**
+  String get introducerAddressLabel;
+
+  /// No description provided for @introducerPhoneLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Introducer Phone'**
+  String get introducerPhoneLabel;
+
+  /// No description provided for @identityContactTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Identity & Contact'**
+  String get identityContactTitle;
+
+  /// No description provided for @permanentAddressTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Permanent Address'**
+  String get permanentAddressTitle;
+
+  /// No description provided for @workDetailsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Work Details'**
+  String get workDetailsTitle;
+
+  /// No description provided for @idDocumentsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'ID Documents'**
+  String get idDocumentsTitle;
+
+  /// No description provided for @introducerReferenceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Introducer / Reference'**
+  String get introducerReferenceTitle;
+
+  /// No description provided for @additionalDocumentsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Additional Documents'**
+  String get additionalDocumentsTitle;
+
+  /// No description provided for @otherLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get otherLabel;
+
+  /// No description provided for @editTenantTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Tenant'**
+  String get editTenantTitle;
+
+  /// No description provided for @addTenantTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Tenant'**
+  String get addTenantTitle;
+
+  /// No description provided for @tenantUpdatedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Tenant updated'**
+  String get tenantUpdatedSuccess;
+
+  /// No description provided for @tenantAddedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Tenant added'**
+  String get tenantAddedSuccess;
+
+  /// No description provided for @tenantDeletedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Tenant deleted'**
+  String get tenantDeletedSuccess;
+
+  /// No description provided for @cancelBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancelBtn;
+
+  /// No description provided for @moveInAgainBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Move In Again'**
+  String get moveInAgainBtn;
+
+  /// No description provided for @selectRoomToMoveInHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a room to move this tenant in'**
+  String get selectRoomToMoveInHint;
+
+  /// No description provided for @deleteTenantTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Tenant?'**
+  String get deleteTenantTitle;
+
+  /// No description provided for @deleteBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get deleteBtn;
+
+  /// No description provided for @currentLocationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Location'**
+  String get currentLocationLabel;
+
+  /// No description provided for @unableToLoadImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load image'**
+  String get unableToLoadImage;
+
+  /// No description provided for @imageFileNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Image file not found'**
+  String get imageFileNotFound;
+
+  /// No description provided for @occupancyHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Occupancy History'**
+  String get occupancyHistoryTitle;
+
+  /// No description provided for @noOccupancyHistoryYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No occupancy history yet'**
+  String get noOccupancyHistoryYet;
+
+  /// No description provided for @familyMembersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Family Members'**
+  String get familyMembersTitle;
+
+  /// No description provided for @addFamilyMemberTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Family Member'**
+  String get addFamilyMemberTitle;
+
+  /// No description provided for @familyMembersActiveOnlyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Family members can only be added to active occupancies'**
+  String get familyMembersActiveOnlyHint;
+
+  /// No description provided for @deleteFamilyMemberTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Family Member?'**
+  String get deleteFamilyMemberTitle;
+
+  /// No description provided for @actionCannotBeUndone.
+  ///
+  /// In en, this message translates to:
+  /// **'This action cannot be undone.'**
+  String get actionCannotBeUndone;
+
+  /// No description provided for @familyMemberDeletedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Family member deleted'**
+  String get familyMemberDeletedSuccess;
+
+  /// No description provided for @spouseLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Spouse'**
+  String get spouseLabel;
+
+  /// No description provided for @childLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Child'**
+  String get childLabel;
+
+  /// No description provided for @parentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Parent'**
+  String get parentLabel;
+
+  /// No description provided for @siblingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Sibling'**
+  String get siblingLabel;
+
+  /// No description provided for @nameAndRelationshipRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Name and relationship are required'**
+  String get nameAndRelationshipRequired;
+
+  /// No description provided for @familyMemberAddedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Family member added!'**
+  String get familyMemberAddedSuccess;
+
+  /// No description provided for @customFieldsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Fields'**
+  String get customFieldsTitle;
+
+  /// No description provided for @noCustomFields.
+  ///
+  /// In en, this message translates to:
+  /// **'No custom fields'**
+  String get noCustomFields;
+
+  /// No description provided for @documentsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Documents'**
+  String get documentsTitle;
+
+  /// No description provided for @noDocumentsAttached.
+  ///
+  /// In en, this message translates to:
+  /// **'No documents attached.'**
+  String get noDocumentsAttached;
+
+  /// No description provided for @deleteDocumentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Document?'**
+  String get deleteDocumentTitle;
+
+  /// No description provided for @confirmDeleteDocumentPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete '**
+  String get confirmDeleteDocumentPrefix;
+
+  /// No description provided for @documentDeletedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Document deleted'**
+  String get documentDeletedSuccess;
+
+  /// No description provided for @fieldNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Field Name'**
+  String get fieldNameLabel;
+
+  /// No description provided for @fieldValueLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Value'**
+  String get fieldValueLabel;
+
+  /// No description provided for @zeroAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'0'**
+  String get zeroAmount;
+
+  /// No description provided for @letsMakeItProfessionalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s make it professional!'**
+  String get letsMakeItProfessionalTitle;
+
+  /// No description provided for @addNameUpiSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your Name and UPI ID to generate professional invoices with embedded QR codes.'**
+  String get addNameUpiSubtitle;
+
+  /// No description provided for @continueToBillBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue to Bill'**
+  String get continueToBillBtn;
+
+  /// No description provided for @yourNameBusinessNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Name or Business Name'**
+  String get yourNameBusinessNameLabel;
+
+  /// No description provided for @upiIdOptionalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'UPI ID (Optional but recommended)'**
+  String get upiIdOptionalLabel;
+
+  /// No description provided for @occupancyDetailsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Occupancy Details'**
+  String get occupancyDetailsTitle;
+
+  /// No description provided for @shareFunctionalityComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Share functionality coming soon'**
+  String get shareFunctionalityComingSoon;
+
+  /// No description provided for @occupancyNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Occupancy not found'**
+  String get occupancyNotFound;
+
+  /// No description provided for @viewSettlementReceiptBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'View Settlement Receipt'**
+  String get viewSettlementReceiptBtn;
+
+  /// No description provided for @enterPaymentAmountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Amount (₹)'**
+  String get enterPaymentAmountLabel;
+
+  /// No description provided for @shareTextBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Text'**
+  String get shareTextBtn;
+
+  /// No description provided for @pdfInvoiceBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'PDF Invoice'**
+  String get pdfInvoiceBtn;
+
+  /// No description provided for @messageCopiedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Message copied to clipboard!'**
+  String get messageCopiedSuccess;
+
+  /// No description provided for @generatingPdfMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'Generating PDF...'**
+  String get generatingPdfMsg;
+
+  /// No description provided for @noPaymentsRecordedMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'No payments recorded yet'**
+  String get noPaymentsRecordedMsg;
+
+  /// No description provided for @paymentDeletedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment deleted'**
+  String get paymentDeletedSuccess;
+
+  /// No description provided for @enterValidAmountMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid amount'**
+  String get enterValidAmountMsg;
+
+  /// No description provided for @paymentUpdatedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment updated'**
+  String get paymentUpdatedSuccess;
+
+  /// No description provided for @noNotificationsScheduled.
+  ///
+  /// In en, this message translates to:
+  /// **'No notifications scheduled.'**
+  String get noNotificationsScheduled;
+
+  /// No description provided for @errorGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get errorGeneric;
+
+  /// No description provided for @chooseFromGalleryBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from Gallery'**
+  String get chooseFromGalleryBtn;
+
+  /// No description provided for @sharePaymentLinkBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Payment Link'**
+  String get sharePaymentLinkBtn;
+
+  /// No description provided for @meterTrackingExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter readings to automatically calculate electricity charges based on your configured rate.'**
+  String get meterTrackingExplanation;
 }
 
 class _AppLocalizationsDelegate

@@ -91,6 +91,7 @@ class PremiumPermissionSheet extends ConsumerWidget {
   Future<void> _handleAccept(BuildContext context, WidgetRef ref) async {
     final theme = Theme.of(context);
     final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     if (variant == PermissionVariant.notifications) {
       final notifService = LocalNotificationService();
@@ -104,8 +105,8 @@ class PremiumPermissionSheet extends ConsumerWidget {
             await notifier.setEnabled(type, true);
           }
           scaffoldMessenger.showSnackBar(
-            const SnackBar(
-              content: Text('Notifications enabled successfully!'),
+            SnackBar(
+              content: Text(l10n.notificationsEnabledSuccess),
               behavior: SnackBarBehavior.floating,
             ),
           );
@@ -117,7 +118,7 @@ class PremiumPermissionSheet extends ConsumerWidget {
           }
           scaffoldMessenger.showSnackBar(
             SnackBar(
-              content: const Text('Notification permission denied.'),
+              content: Text(l10n.notificationsDeniedError),
               behavior: SnackBarBehavior.floating,
               backgroundColor: theme.colorScheme.error,
             ),
@@ -126,7 +127,6 @@ class PremiumPermissionSheet extends ConsumerWidget {
       }
     } else if (variant == PermissionVariant.biometrics) {
       final biometricService = ref.read(biometricServiceProvider);
-      final l10n = AppLocalizations.of(context)!;
       final result = await biometricService.authenticate(
         reason: l10n.biometricPermissionBody,
       );
@@ -136,8 +136,8 @@ class PremiumPermissionSheet extends ConsumerWidget {
           // Save in the biometric settings table
           await ref.read(biometricSettingsNotifierProvider.notifier).setEnabled(true);
           scaffoldMessenger.showSnackBar(
-            const SnackBar(
-              content: Text('App Lock enabled successfully!'),
+            SnackBar(
+              content: Text(l10n.appLockEnabledSuccess),
               behavior: SnackBarBehavior.floating,
             ),
           );
@@ -146,7 +146,7 @@ class PremiumPermissionSheet extends ConsumerWidget {
           await ref.read(biometricSettingsNotifierProvider.notifier).setEnabled(false);
           scaffoldMessenger.showSnackBar(
             SnackBar(
-              content: const Text('App Lock was not configured.'),
+              content: Text(l10n.appLockNotConfiguredError),
               behavior: SnackBarBehavior.floating,
               backgroundColor: theme.colorScheme.error,
             ),

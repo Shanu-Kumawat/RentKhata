@@ -103,7 +103,7 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
           title: Text(AppLocalizations.of(context)!.documentTitle),
           content: TextField(
             controller: titleController,
-            decoration: InputDecoration(hintText: 'e.g. PAN Card'),
+            decoration: InputDecoration(hintText: AppLocalizations.of(context)!.panCardHint),
             autofocus: true,
           ),
           actions: [
@@ -437,29 +437,32 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceVariant.withValues(alpha: 0.5),
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Column(
                   children: missingFields
                       .map(
                         (field) => Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          padding: const EdgeInsets.symmetric(vertical: 6),
                           child: Row(
                             children: [
                               Container(
-                                width: 8,
-                                height: 8,
+                                width: 6,
+                                height: 6,
                                 decoration: BoxDecoration(
-                                  color: AppColors.warning,
-                                  borderRadius: BorderRadius.circular(4),
+                                  color: Theme.of(context).colorScheme.error,
+                                  borderRadius: BorderRadius.circular(3),
                                 ),
                               ),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Text(
                                   field,
-                                  style: Theme.of(context).textTheme.bodyMedium,
+                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Theme.of(context).colorScheme.onSurface,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
                               ),
                             ],
@@ -561,7 +564,7 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
               TextFormField(
                 controller: nameController,
                 decoration: InputDecoration(
-                  labelText: 'Name *',
+                  labelText: AppLocalizations.of(context)!.nameRequiredLabel,
                   prefixIcon: Icon(Icons.person_outline),
                 ),
                 autofocus: true,
@@ -571,7 +574,7 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
                 children: [
                   Expanded(
                     child: DropdownButtonFormField<String>(
-                      decoration: InputDecoration(labelText: 'Relationship *'),
+                      decoration: InputDecoration(labelText: AppLocalizations.of(context)!.relationshipRequiredLabel),
                       initialValue: relationship,
                       items: [
                         DropdownMenuItem(
@@ -648,7 +651,7 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
               TextFormField(
                 controller: phoneController,
                 decoration: InputDecoration(
-                  labelText: 'Phone (Optional)',
+                  labelText: AppLocalizations.of(context)!.phoneOptionalLabel,
                   prefixIcon: Icon(Icons.phone_outlined),
                 ),
                 keyboardType: TextInputType.phone,
@@ -858,7 +861,7 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
             TextFormField(
               controller: _newNameController,
               decoration: InputDecoration(
-                labelText: 'Full Name *',
+                labelText: AppLocalizations.of(context)!.fullNameRequiredLabel,
                 prefixIcon: Icon(Icons.person_outline),
               ),
               textCapitalization: TextCapitalization.words,
@@ -994,7 +997,7 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
               controller: _newAadharController,
               decoration: InputDecoration(
                 labelText: AppLocalizations.of(context)!.aadhaarNumber,
-                hintText: '12-digit number',
+                hintText: AppLocalizations.of(context)!.twelveDigitNumberHint,
                 prefixIcon: Icon(Icons.credit_card_outlined),
               ),
               keyboardType: TextInputType.number,
@@ -1330,13 +1333,13 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Move-in Details', style: Theme.of(context).textTheme.titleSmall),
+        Text(AppLocalizations.of(context)!.moveInDetailsTitle, style: Theme.of(context).textTheme.titleSmall),
         const SizedBox(height: 16),
         InkWell(
           onTap: _selectMoveInDate,
           child: InputDecorator(
             decoration: InputDecoration(
-              labelText: 'Move-in Date',
+              labelText: AppLocalizations.of(context)!.moveInDateInputLabel,
               prefixIcon: const Icon(Icons.calendar_today_outlined),
               suffixIcon: _moveInDate.isAfter(DateTime.now())
                   ? Container(
@@ -1435,7 +1438,7 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
           onTap: _selectAgreementEndDate,
           child: InputDecorator(
             decoration: InputDecoration(
-              labelText: 'Agreement End Date (Optional)',
+              labelText: AppLocalizations.of(context)!.agreementEndDateOptionalLabel,
               prefixIcon: const Icon(Icons.handshake_outlined),
               suffixIcon: _agreementEndDate == null
                   ? null
@@ -1461,7 +1464,7 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
         TextFormField(
           controller: _rentController,
           decoration: InputDecoration(
-            labelText: 'Agreed Rent (₹)',
+            labelText: AppLocalizations.of(context)!.agreedRentLabel,
             prefixIcon: const Icon(Icons.currency_rupee),
             helperText: 'Base: ${formatCurrency(widget.room.baseRent)}',
           ),
@@ -1473,7 +1476,7 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
         TextFormField(
           controller: _depositController,
           decoration: InputDecoration(
-            labelText: 'Security Deposit (₹)',
+            labelText: AppLocalizations.of(context)!.securityDepositLabel,
             prefixIcon: Icon(Icons.shield_outlined),
             hintText: '0',
           ),
