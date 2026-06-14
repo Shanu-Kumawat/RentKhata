@@ -191,6 +191,7 @@ class BillingCycleService {
 
   /// Calculate how many complete cycles have passed since move-in.
   static int getCycleNumber(DateTime moveInDate, DateTime targetDate) {
+    final service = BillingCycleService.fromMoveIn(moveInDate);
     final normalizedMoveIn = DateTime(
       moveInDate.year,
       moveInDate.month,
@@ -206,17 +207,29 @@ class BillingCycleService {
       return 0;
     }
 
-    // Approximate: calculate months difference
-    int months =
-        (normalizedTarget.year - normalizedMoveIn.year) * 12 +
-        (normalizedTarget.month - normalizedMoveIn.month);
+    int cycleIndex = 0;
+    DateTime cycleStart = normalizedMoveIn;
 
-    // Adjust based on day
-    if (normalizedTarget.day < normalizedMoveIn.day) {
-      months--;
+    while (true) {
+      final nextCycleStart = addRentalMonths(
+        cycleStart,
+        1,
+        originalAnchorDay: service._originalAnchorDay,
+      );
+      final cycleEnd = nextCycleStart.subtract(const Duration(days: 1));
+      final cycle = BillingCycle(start: cycleStart, end: cycleEnd);
+
+      if (normalizedTarget.isBefore(cycleStart) || cycle.contains(normalizedTarget)) {
+        return cycleIndex;
+      }
+
+      cycleStart = nextCycleStart;
+      cycleIndex++;
+
+      if (cycleIndex > 1200) { // 100 years safety
+        return cycleIndex;
+      }
     }
-
-    return months < 0 ? 0 : months;
   }
 
   /// Get the Nth billing cycle (0-indexed).

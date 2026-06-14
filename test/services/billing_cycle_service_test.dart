@@ -199,5 +199,63 @@ void main() {
         expect(nextCycle.end, DateTime(2026, 2, 14));
       });
     });
+
+    group('getCycleNumber', () {
+      test('returns 0 for date within first cycle', () {
+        final moveIn = DateTime(2026, 1, 15);
+        expect(BillingCycleService.getCycleNumber(moveIn, DateTime(2026, 1, 15)), 0);
+        expect(BillingCycleService.getCycleNumber(moveIn, DateTime(2026, 2, 10)), 0);
+        expect(BillingCycleService.getCycleNumber(moveIn, DateTime(2026, 2, 14)), 0);
+      });
+
+      test('returns 1 for date exactly on start of second cycle', () {
+        final moveIn = DateTime(2026, 1, 15);
+        expect(BillingCycleService.getCycleNumber(moveIn, DateTime(2026, 2, 15)), 1);
+      });
+
+      test('handles short months correctly after loop rewrite', () {
+        final moveIn = DateTime(2026, 1, 31);
+        expect(BillingCycleService.getCycleNumber(moveIn, DateTime(2026, 1, 31)), 0);
+        expect(BillingCycleService.getCycleNumber(moveIn, DateTime(2026, 2, 28)), 1);
+        expect(BillingCycleService.getCycleNumber(moveIn, DateTime(2026, 3, 31)), 2);
+      });
+
+      test('returns 0 for dates before move-in', () {
+        final moveIn = DateTime(2026, 1, 15);
+        expect(BillingCycleService.getCycleNumber(moveIn, DateTime(2026, 1, 1)), 0);
+      });
+    });
+
+    group('getCycleByNumber', () {
+      test('returns correct cycle for 0', () {
+        final moveIn = DateTime(2026, 1, 15);
+        final cycle = BillingCycleService.getCycleByNumber(moveIn, 0);
+        expect(cycle.start, DateTime(2026, 1, 15));
+        expect(cycle.end, DateTime(2026, 2, 14));
+      });
+
+      test('returns correct cycle for 1', () {
+        final moveIn = DateTime(2026, 1, 15);
+        final cycle = BillingCycleService.getCycleByNumber(moveIn, 1);
+        expect(cycle.start, DateTime(2026, 2, 15));
+        expect(cycle.end, DateTime(2026, 3, 14));
+      });
+
+      test('handles 31st move-in correctly across months', () {
+        final moveIn = DateTime(2026, 1, 31);
+        
+        final cycle0 = BillingCycleService.getCycleByNumber(moveIn, 0);
+        expect(cycle0.start, DateTime(2026, 1, 31));
+        expect(cycle0.end, DateTime(2026, 2, 27));
+
+        final cycle1 = BillingCycleService.getCycleByNumber(moveIn, 1);
+        expect(cycle1.start, DateTime(2026, 2, 28));
+        expect(cycle1.end, DateTime(2026, 3, 30));
+
+        final cycle2 = BillingCycleService.getCycleByNumber(moveIn, 2);
+        expect(cycle2.start, DateTime(2026, 3, 31));
+        expect(cycle2.end, DateTime(2026, 4, 29));
+      });
+    });
   });
 }

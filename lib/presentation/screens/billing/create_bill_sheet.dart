@@ -231,6 +231,8 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                   setState(() {
                     _currentPeriodStart = cycle.start;
                     _currentPeriodEnd = cycle.end;
+                    _billingMonth = cycle.start.month;
+                    _billingYear = cycle.start.year;
                     // Calculate cycle number using static method
                     _currentCycleNumber = BillingCycleService.getCycleNumber(
                       widget.billingStartDate!,
@@ -521,13 +523,24 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
             decoration: InputDecoration(
               labelText: AppLocalizations.of(context)!.yearLabel,
             ),
-            items: List.generate(5, (i) {
-              final year = DateTime.now().year - 2 + i;
-              return DropdownMenuItem(
-                value: year,
-                child: Text(year.toString()),
-              );
-            }),
+            items: () {
+              final currentYear = DateTime.now().year;
+              // Generate a range of years, ensuring _billingYear is included
+              final minYear = _billingYear < currentYear - 2 ? _billingYear : currentYear - 2;
+              final maxYear = _billingYear > currentYear + 2 ? _billingYear : currentYear + 2;
+              
+              final years = <int>[];
+              for (int y = minYear; y <= maxYear; y++) {
+                years.add(y);
+              }
+              
+              return years.map((year) {
+                return DropdownMenuItem(
+                  value: year,
+                  child: Text(year.toString()),
+                );
+              }).toList();
+            }(),
             onChanged: (v) => setState(() => _billingYear = v!),
           ),
         ),
@@ -663,22 +676,27 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
         }
       }
 
-      // Calculate period dates - use mutable cycle state (from navigation),
-      // falling back to suggested dates, then to calendar month dates
-      final periodStart =
-          _currentPeriodStart ??
-          widget.suggestedPeriodStart ??
-          DateTime(_billingYear, _billingMonth, 1);
-      final periodEnd =
-          _currentPeriodEnd ??
-          widget.suggestedPeriodEnd ??
-          DateTime(_billingYear, _billingMonth + 1, 0);
-
-      // Get configurable due date offset from settings
+      // Get configurable due date offset and date-to-date settings
       final settings = await ref.read(billSettingsProvider.future);
-      final hasDateToDateDates =
-          _currentPeriodEnd != null || widget.suggestedPeriodEnd != null;
-      final calculatedDueDate = hasDateToDateDates
+      
+      final isDateToDate = widget.billingStartDate != null && switch (_selectedBillType) {
+        BillType.rent => settings.rentUsesDateToDate,
+        BillType.electricity => settings.electricityUsesDateToDate,
+        BillType.water => settings.waterUsesDateToDate,
+        BillType.maintenance => settings.maintenanceUsesDateToDate,
+        BillType.other => settings.otherUsesDateToDate,
+      };
+
+      // Calculate period dates
+      final periodStart = isDateToDate && _currentPeriodStart != null
+          ? _currentPeriodStart!
+          : DateTime(_billingYear, _billingMonth, 1);
+          
+      final periodEnd = isDateToDate && _currentPeriodEnd != null
+          ? _currentPeriodEnd!
+          : DateTime(_billingYear, _billingMonth + 1, 0);
+
+      final calculatedDueDate = isDateToDate
           ? periodEnd.add(Duration(days: settings.dueDateOffsetDays))
           : periodStart.add(const Duration(days: 10));
 
