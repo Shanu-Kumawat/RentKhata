@@ -375,18 +375,18 @@ class AppLocalizationsHi extends AppLocalizations {
   String get propertyDeleted => 'प्रॉपर्टी हटा दी गई';
 
   @override
-  String get deleteRoom => 'Delete Room';
+  String get deleteRoom => 'कमरा मिटाएं';
 
   @override
-  String get deleteRoomTitle => 'Delete Room?';
+  String get deleteRoomTitle => 'कमरा मिटाएं?';
 
   @override
   String confirmDeleteRoom(String roomNumber) {
-    return 'Are you sure you want to delete room \"$roomNumber\"? This action cannot be undone.';
+    return 'क्या आप वाकई कमरा \"$roomNumber\" मिटाना चाहते हैं? यह कार्रवाई पहले जैसी नहीं की जा सकती।';
   }
 
   @override
-  String get roomDeletedSuccess => 'Room deleted';
+  String get roomDeletedSuccess => 'कमरा मिटा दिया गया';
 
   @override
   String occupancyCount(int count) {

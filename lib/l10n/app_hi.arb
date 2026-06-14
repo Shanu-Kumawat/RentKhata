@@ -1124,5 +1124,9 @@
   "unarchiveTenant": "किरायेदार अन-आर्काइव करें",
   "showArchived": "आर्काइव दिखाएं",
   "hideArchived": "आर्काइव छिपाएं",
-  "archivedBadge": "आर्काइव्ड"
+  "archivedBadge": "आर्काइव्ड",
+  "deleteRoom": "कमरा मिटाएं",
+  "deleteRoomTitle": "कमरा मिटाएं?",
+  "confirmDeleteRoom": "क्या आप वाकई कमरा \"{roomNumber}\" मिटाना चाहते हैं? यह कार्रवाई पहले जैसी नहीं की जा सकती।",
+  "roomDeletedSuccess": "कमरा मिटा दिया गया"
 }
