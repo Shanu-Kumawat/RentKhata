@@ -211,9 +211,7 @@ class _OverviewTab extends ConsumerWidget {
                     final endDate = DateTime(year + 1, 3, 31, 23, 59, 59);
                     final unpaidInYear = unpaidBills.where((b) {
                       final bStart = b.periodStartDate ?? b.createdAt;
-                      final bEnd = b.periodEndDate ?? b.createdAt;
-                      return bStart.isBefore(endDate) &&
-                          bEnd.isAfter(startDate);
+                      return !bStart.isBefore(startDate) && !bStart.isAfter(endDate);
                     }).toList();
 
                     final overdueAmount = unpaidInYear
@@ -224,8 +222,7 @@ class _OverviewTab extends ConsumerWidget {
                         .length;
 
                     final expensesInYear = allExpenses.where((e) {
-                      return e.date.isBefore(endDate) &&
-                          e.date.isAfter(startDate);
+                      return !e.date.isBefore(startDate) && !e.date.isAfter(endDate);
                     }).toList();
                     final totalExpenses = expensesInYear.fold(
                       0.0,
@@ -1942,7 +1939,7 @@ class _ExpensesTab extends ConsumerWidget {
         final endDate = DateTime(year + 1, 3, 31, 23, 59, 59);
 
         final filteredExpenses = expenses.where((e) {
-          return e.date.isBefore(endDate) && e.date.isAfter(startDate);
+          return !e.date.isBefore(startDate) && !e.date.isAfter(endDate);
         }).toList();
 
         if (filteredExpenses.isEmpty) {

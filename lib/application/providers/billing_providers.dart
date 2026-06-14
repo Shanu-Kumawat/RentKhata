@@ -235,8 +235,7 @@ Future<List<Bill>> billsByFinancialYear(Ref ref) async {
   final allBills = await repo.getAllBills();
   return allBills.where((b) {
     final bStart = b.periodStartDate ?? b.createdAt;
-    final bEnd = b.periodEndDate ?? b.createdAt;
-    return bStart.isBefore(endDate) && bEnd.isAfter(startDate);
+    return !bStart.isBefore(startDate) && !bStart.isAfter(endDate);
   }).toList();
 }
 
