@@ -81,7 +81,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 18;
+  int get schemaVersion => 19;
 
   @override
   MigrationStrategy get migration {
@@ -390,6 +390,12 @@ Thank you for your payment.
           await m.renameColumn(billSettings, 'water_uses_anniversary', billSettings.waterUsesDateToDate);
           await m.renameColumn(billSettings, 'maintenance_uses_anniversary', billSettings.maintenanceUsesDateToDate);
           await m.renameColumn(billSettings, 'other_uses_anniversary', billSettings.otherUsesDateToDate);
+        }
+        if (from < 19) {
+          // Add isArchived columns
+          await m.addColumn(properties, properties.isArchived);
+          await m.addColumn(rooms, rooms.isArchived);
+          await m.addColumn(tenants, tenants.isArchived);
         }
       },
     );

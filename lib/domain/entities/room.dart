@@ -22,6 +22,7 @@ class Room with _$Room {
     String? currentTenantName,
     int? currentOccupancyId,
     @Default(false) bool isOccupied,
+    @Default(false) bool isArchived,
   }) = _Room;
 
   factory Room.fromJson(Map<String, dynamic> json) => _$RoomFromJson(json);

@@ -145,11 +145,66 @@ class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.roomNumber(widget.room.roomNumber)),
+        title: Row(
+          children: [
+            Expanded(child: Text(AppLocalizations.of(context)!.roomNumber(widget.room.roomNumber))),
+            if (widget.room.isArchived)
+              Container(
+                margin: const EdgeInsets.only(left: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.errorContainer,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  AppLocalizations.of(context)!.archivedBadge,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(context).colorScheme.onErrorContainer,
+                  ),
+                ),
+              ),
+          ],
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.edit_outlined),
             onPressed: () => _showEditRoom(context, widget.room),
+          ),
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              if (value == 'archive') {
+                _toggleArchive();
+              } else if (value == 'delete') {
+                _confirmDelete();
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 'archive',
+                child: Row(
+                  children: [
+                    Icon(widget.room.isArchived ? Icons.unarchive_outlined : Icons.archive_outlined),
+                    const SizedBox(width: 8),
+                    Text(widget.room.isArchived ? AppLocalizations.of(context)!.unarchiveRoom : AppLocalizations.of(context)!.archiveRoom),
+                  ],
+                ),
+              ),
+              const PopupMenuDivider(),
+              PopupMenuItem(
+                value: 'delete',
+                child: Row(
+                  children: [
+                    Icon(Icons.delete_outline, color: Theme.of(context).colorScheme.error),
+                    const SizedBox(width: 8),
+                    Text(
+                      AppLocalizations.of(context)!.deleteRoom,
+                      style: TextStyle(color: Theme.of(context).colorScheme.error),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -222,6 +277,7 @@ class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
                       children: [
                         const Spacer(flex: 3),
                         _VacantRoomCard(
+                          isArchived: widget.room.isArchived,
                           onMoveIn: () => _showMoveIn(widget.room),
                         ),
                         const Spacer(flex: 7),
@@ -235,6 +291,78 @@ class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, s) => Center(child: Text('${AppLocalizations.of(context)!.errorPrefix}$e')),
+      ),
+    );
+  }
+
+  Future<void> _toggleArchive() async {
+    final repo = ref.read(propertyRepositoryProvider);
+    final newState = !widget.room.isArchived;
+    try {
+      await repo.archiveRoom(widget.room.id, isArchived: newState);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(newState ? AppLocalizations.of(context)!.archiveRoom : AppLocalizations.of(context)!.unarchiveRoom),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        if (newState) {
+          context.pop();
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString().replaceAll('Bad state: ', '')),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    }
+  }
+
+  void _confirmDelete() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(AppLocalizations.of(context)!.deleteRoomTitle),
+        content: Text(AppLocalizations.of(context)!.confirmDeleteRoom(widget.room.roomNumber)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(AppLocalizations.of(context)!.cancelBtn),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+              foregroundColor: Theme.of(context).colorScheme.onError,
+            ),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              try {
+                await ref.read(propertyRepositoryProvider).deleteRoom(widget.room.id);
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(AppLocalizations.of(context)!.roomDeletedSuccess)),
+                  );
+                  context.pop();
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(e.toString().replaceAll('Bad state: ', '')),
+                      backgroundColor: Theme.of(context).colorScheme.error,
+                    ),
+                  );
+                }
+              }
+            },
+            child: Text(AppLocalizations.of(context)!.deleteBtn),
+          ),
+        ],
       ),
     );
   }
@@ -809,8 +937,9 @@ class _InfoTile extends StatelessWidget {
 
 class _VacantRoomCard extends StatelessWidget {
   final VoidCallback onMoveIn;
+  final bool isArchived;
 
-  const _VacantRoomCard({required this.onMoveIn});
+  const _VacantRoomCard({required this.onMoveIn, this.isArchived = false});
 
   @override
   Widget build(BuildContext context) {
@@ -842,15 +971,15 @@ class _VacantRoomCard extends StatelessWidget {
               .animate()
               .fadeIn(delay: 300.ms)
               .slideY(begin: 0.1, end: 0, curve: Curves.easeOutCubic),
-          const SizedBox(height: 24),
-          FilledButton.icon(
-                onPressed: onMoveIn,
-                icon: const Icon(Icons.person_add),
-                label: Text(AppLocalizations.of(context)!.moveInTenantBtn),
-              )
-              .animate()
-              .fadeIn(delay: 400.ms)
-              .slideY(begin: 0.1, end: 0, curve: Curves.easeOutCubic),
+          if (!isArchived)
+            FilledButton.icon(
+                  onPressed: onMoveIn,
+                  icon: const Icon(Icons.person_add),
+                  label: Text(AppLocalizations.of(context)!.moveInTenantBtn),
+                )
+                .animate()
+                .fadeIn(delay: 400.ms)
+                .slideY(begin: 0.1, end: 0, curve: Curves.easeOutCubic),
         ],
       ),
     );

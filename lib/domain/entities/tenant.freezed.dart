@@ -55,6 +55,7 @@ mixin _$Tenant {
   String? get currentRoomNumber => throw _privateConstructorUsedError;
   String? get currentPropertyName => throw _privateConstructorUsedError;
   bool get isCurrentlyOccupying => throw _privateConstructorUsedError;
+  bool get isArchived => throw _privateConstructorUsedError;
 
   /// Serializes this Tenant to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -98,6 +99,7 @@ abstract class $TenantCopyWith<$Res> {
     String? currentRoomNumber,
     String? currentPropertyName,
     bool isCurrentlyOccupying,
+    bool isArchived,
   });
 }
 
@@ -143,6 +145,7 @@ class _$TenantCopyWithImpl<$Res, $Val extends Tenant>
     Object? currentRoomNumber = freezed,
     Object? currentPropertyName = freezed,
     Object? isCurrentlyOccupying = null,
+    Object? isArchived = null,
   }) {
     return _then(
       _value.copyWith(
@@ -254,6 +257,10 @@ class _$TenantCopyWithImpl<$Res, $Val extends Tenant>
                 ? _value.isCurrentlyOccupying
                 : isCurrentlyOccupying // ignore: cast_nullable_to_non_nullable
                       as bool,
+            isArchived: null == isArchived
+                ? _value.isArchived
+                : isArchived // ignore: cast_nullable_to_non_nullable
+                      as bool,
           )
           as $Val,
     );
@@ -296,6 +303,7 @@ abstract class _$$TenantImplCopyWith<$Res> implements $TenantCopyWith<$Res> {
     String? currentRoomNumber,
     String? currentPropertyName,
     bool isCurrentlyOccupying,
+    bool isArchived,
   });
 }
 
@@ -340,6 +348,7 @@ class __$$TenantImplCopyWithImpl<$Res>
     Object? currentRoomNumber = freezed,
     Object? currentPropertyName = freezed,
     Object? isCurrentlyOccupying = null,
+    Object? isArchived = null,
   }) {
     return _then(
       _$TenantImpl(
@@ -451,6 +460,10 @@ class __$$TenantImplCopyWithImpl<$Res>
             ? _value.isCurrentlyOccupying
             : isCurrentlyOccupying // ignore: cast_nullable_to_non_nullable
                   as bool,
+        isArchived: null == isArchived
+            ? _value.isArchived
+            : isArchived // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -487,6 +500,7 @@ class _$TenantImpl implements _Tenant {
     this.currentRoomNumber,
     this.currentPropertyName,
     this.isCurrentlyOccupying = false,
+    this.isArchived = false,
   });
 
   factory _$TenantImpl.fromJson(Map<String, dynamic> json) =>
@@ -555,10 +569,13 @@ class _$TenantImpl implements _Tenant {
   @override
   @JsonKey()
   final bool isCurrentlyOccupying;
+  @override
+  @JsonKey()
+  final bool isArchived;
 
   @override
   String toString() {
-    return 'Tenant(id: $id, name: $name, phone: $phone, aadharNumber: $aadharNumber, photoPath: $photoPath, isPoliceVerified: $isPoliceVerified, policeVerificationDocPath: $policeVerificationDocPath, createdAt: $createdAt, fatherName: $fatherName, age: $age, gender: $gender, secondaryPhone: $secondaryPhone, permanentAddressLine: $permanentAddressLine, permanentCity: $permanentCity, permanentState: $permanentState, permanentPincode: $permanentPincode, companyName: $companyName, officeAddress: $officeAddress, aadhaarFrontPhotoPath: $aadhaarFrontPhotoPath, aadhaarBackPhotoPath: $aadhaarBackPhotoPath, introducerName: $introducerName, introducerAddress: $introducerAddress, introducerPhone: $introducerPhone, currentRoomId: $currentRoomId, currentRoomNumber: $currentRoomNumber, currentPropertyName: $currentPropertyName, isCurrentlyOccupying: $isCurrentlyOccupying)';
+    return 'Tenant(id: $id, name: $name, phone: $phone, aadharNumber: $aadharNumber, photoPath: $photoPath, isPoliceVerified: $isPoliceVerified, policeVerificationDocPath: $policeVerificationDocPath, createdAt: $createdAt, fatherName: $fatherName, age: $age, gender: $gender, secondaryPhone: $secondaryPhone, permanentAddressLine: $permanentAddressLine, permanentCity: $permanentCity, permanentState: $permanentState, permanentPincode: $permanentPincode, companyName: $companyName, officeAddress: $officeAddress, aadhaarFrontPhotoPath: $aadhaarFrontPhotoPath, aadhaarBackPhotoPath: $aadhaarBackPhotoPath, introducerName: $introducerName, introducerAddress: $introducerAddress, introducerPhone: $introducerPhone, currentRoomId: $currentRoomId, currentRoomNumber: $currentRoomNumber, currentPropertyName: $currentPropertyName, isCurrentlyOccupying: $isCurrentlyOccupying, isArchived: $isArchived)';
   }
 
   @override
@@ -617,7 +634,9 @@ class _$TenantImpl implements _Tenant {
             (identical(other.currentPropertyName, currentPropertyName) ||
                 other.currentPropertyName == currentPropertyName) &&
             (identical(other.isCurrentlyOccupying, isCurrentlyOccupying) ||
-                other.isCurrentlyOccupying == isCurrentlyOccupying));
+                other.isCurrentlyOccupying == isCurrentlyOccupying) &&
+            (identical(other.isArchived, isArchived) ||
+                other.isArchived == isArchived));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -651,6 +670,7 @@ class _$TenantImpl implements _Tenant {
     currentRoomNumber,
     currentPropertyName,
     isCurrentlyOccupying,
+    isArchived,
   ]);
 
   /// Create a copy of Tenant
@@ -696,6 +716,7 @@ abstract class _Tenant implements Tenant {
     final String? currentRoomNumber,
     final String? currentPropertyName,
     final bool isCurrentlyOccupying,
+    final bool isArchived,
   }) = _$TenantImpl;
 
   factory _Tenant.fromJson(Map<String, dynamic> json) = _$TenantImpl.fromJson;
@@ -754,6 +775,8 @@ abstract class _Tenant implements Tenant {
   String? get currentPropertyName;
   @override
   bool get isCurrentlyOccupying;
+  @override
+  bool get isArchived;
 
   /// Create a copy of Tenant
   /// with the given fields replaced by the non-null parameter values.

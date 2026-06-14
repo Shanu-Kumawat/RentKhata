@@ -19,22 +19,35 @@ class TenantDao extends DatabaseAccessor<AppDatabase> with _$TenantDaoMixin {
   // ========== Tenant Operations ==========
 
   /// Get all tenants
-  Future<List<TenantEntity>> getAllTenants() => select(tenants).get();
+  Future<List<TenantEntity>> getAllTenants({bool includeArchived = false}) {
+    if (includeArchived) {
+      return select(tenants).get();
+    }
+    return (select(tenants)..where((t) => t.isArchived.equals(false))).get();
+  }
 
   /// Watch all tenants
-  Stream<List<TenantEntity>> watchAllTenants() => select(tenants).watch();
+  Stream<List<TenantEntity>> watchAllTenants({bool includeArchived = false}) {
+    if (includeArchived) {
+      return select(tenants).watch();
+    }
+    return (select(tenants)..where((t) => t.isArchived.equals(false))).watch();
+  }
 
   /// Get tenant by ID
   Future<TenantEntity?> getTenantById(int id) =>
       (select(tenants)..where((t) => t.id.equals(id))).getSingleOrNull();
 
   /// Search tenants by name or phone
-  Future<List<TenantEntity>> searchTenants(String query) {
+  Future<List<TenantEntity>> searchTenants(String query, {bool includeArchived = false}) {
     final lowerQuery = '%${query.toLowerCase()}%';
-    return (select(tenants)..where(
+    final dbQuery = select(tenants)..where(
           (t) => t.name.lower().like(lowerQuery) | t.phone.like('%$query%'),
-        ))
-        .get();
+        );
+    if (!includeArchived) {
+      dbQuery.where((t) => t.isArchived.equals(false));
+    }
+    return dbQuery.get();
   }
 
   /// Insert a tenant
@@ -48,6 +61,11 @@ class TenantDao extends DatabaseAccessor<AppDatabase> with _$TenantDaoMixin {
   /// Delete a tenant
   Future<int> deleteTenant(int id) =>
       (delete(tenants)..where((t) => t.id.equals(id))).go();
+
+  /// Archive a tenant
+  Future<int> archiveTenant(int id, {bool isArchived = true}) =>
+      (update(tenants)..where((t) => t.id.equals(id)))
+          .write(TenantsCompanion(isArchived: Value(isArchived)));
 
   // ========== Custom Field Operations ==========
 

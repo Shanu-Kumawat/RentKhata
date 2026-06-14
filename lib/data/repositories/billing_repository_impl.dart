@@ -130,9 +130,7 @@ class BillingRepositoryImpl implements BillingRepository {
     final pendingAmount = entity.amount - paidAmount;
 
     // Get occupancy info for denormalized fields
-    final occupancy = await _tenantDao.getActiveOccupancies().then(
-      (list) => list.where((o) => o.id == entity.occupancyId).firstOrNull,
-    );
+    final occupancy = await _tenantDao.getOccupancyById(entity.occupancyId);
 
     String? roomNumber;
     String? tenantName;
@@ -503,47 +501,41 @@ class BillingRepositoryImpl implements BillingRepository {
     String? notes,
     DateTime? paymentDate,
   }) async {
-    // Get billId from existing payment record by querying all bills
-    int? billId;
-    final allBills = await _billingDao.getAllBills();
-    for (final bill in allBills) {
-      final payments = await _billingDao.getPaymentsForBill(bill.id);
-      if (payments.any((p) => p.id == paymentId)) {
-        billId = bill.id;
-        final oldP = payments.firstWhere((p) => p.id == paymentId);
-        // Store old amount for audit
-        final oldAmount = oldP.amount;
+    final oldP = await _billingDao.getPaymentById(paymentId);
+    if (oldP != null) {
+      final billId = oldP.billId;
+      final oldAmount = oldP.amount;
 
-        final payment = PaymentsCompanion(
-          id: Value(paymentId),
-          amount: Value(amount),
-          paymentMode: Value(_paymentModeToDb(paymentMode)),
-          notes: Value(notes),
-          paymentDate: Value(paymentDate ?? DateTime.now()),
-          updatedAt: Value(DateTime.now()),
-          originalAmount: Value(oldAmount.toString()),
+      final payment = PaymentsCompanion(
+        id: Value(paymentId),
+        amount: Value(amount),
+        paymentMode: Value(_paymentModeToDb(paymentMode)),
+        notes: Value(notes),
+        paymentDate: Value(paymentDate ?? DateTime.now()),
+        updatedAt: Value(DateTime.now()),
+        originalAmount: Value(oldAmount.toString()),
+      );
+      final result = await _billingDao.updatePayment(payment);
+
+      if (result) {
+        // Recalculate bill status
+        await _billingDao.recalculateBillStatus(billId);
+
+        // Log audit entry
+        await _billingDao.insertAuditLog(
+          entityType: db_audit.AuditEntityType.payment,
+          entityId: paymentId,
+          action: db_audit.AuditAction.update,
+          oldValue: oldAmount.toString(),
+          newValue: amount.toString(),
+          notes: 'Payment updated: $oldAmount → $amount',
         );
-        final result = await _billingDao.updatePayment(payment);
-
-        if (result) {
-          // Recalculate bill status
-          await _billingDao.recalculateBillStatus(billId);
-
-          // Log audit entry
-          await _billingDao.insertAuditLog(
-            entityType: db_audit.AuditEntityType.payment,
-            entityId: paymentId,
-            action: db_audit.AuditAction.update,
-            oldValue: oldAmount.toString(),
-            newValue: amount.toString(),
-            notes: 'Payment updated: $oldAmount → $amount',
-          );
-        }
-        return result;
       }
+      return result;
     }
 
-    // Fallback if payment not found in any bill
+    // Fallback if payment not found
+
     final payment = PaymentsCompanion(
       id: Value(paymentId),
       amount: Value(amount),
@@ -558,18 +550,9 @@ class BillingRepositoryImpl implements BillingRepository {
   @override
   Future<bool> deletePayment(int id) async {
     // Find the payment and its bill for audit and status update
-    int? billId;
-    double? oldAmount;
-    final allBills = await _billingDao.getAllBills();
-    for (final bill in allBills) {
-      final payments = await _billingDao.getPaymentsForBill(bill.id);
-      final payment = payments.where((p) => p.id == id).firstOrNull;
-      if (payment != null) {
-        billId = bill.id;
-        oldAmount = payment.amount;
-        break;
-      }
-    }
+    final payment = await _billingDao.getPaymentById(id);
+    final billId = payment?.billId;
+    final oldAmount = payment?.amount;
 
     final result = await _billingDao.deletePayment(id);
 

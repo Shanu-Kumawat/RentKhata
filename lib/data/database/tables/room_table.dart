@@ -29,4 +29,7 @@ class Rooms extends Table {
 
   /// Created timestamp
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  /// Archived status
+  BoolColumn get isArchived => boolean().withDefault(const Constant(false))();
 }

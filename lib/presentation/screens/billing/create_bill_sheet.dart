@@ -501,7 +501,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
     return Row(
       children: [
         Expanded(
-          flex: 2,
+          flex: 3,
           child: DropdownButtonFormField<int>(
             initialValue: _billingMonth,
             decoration: InputDecoration(
@@ -515,7 +515,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
         ),
         const SizedBox(width: 12),
         Expanded(
-          flex: 1,
+          flex: 2,
           child: DropdownButtonFormField<int>(
             initialValue: _billingYear,
             decoration: InputDecoration(

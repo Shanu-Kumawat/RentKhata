@@ -31,7 +31,7 @@ final scheduleAllNotificationsProvider =
 // ignore: unused_element
 typedef ScheduleAllNotificationsRef = AutoDisposeFutureProviderRef<void>;
 String _$notificationStartupSchedulerHash() =>
-    r'7f022301874cf6e1313e4274507d27d648d2af0c';
+    r'90a57e9f5b67cc34f6fd5db68f0959cc4e9ba1c2';
 
 /// Provider that ensures notifications are scheduled on app startup.
 ///

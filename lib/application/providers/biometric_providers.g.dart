@@ -84,7 +84,7 @@ final appLockStateProvider =
 
 typedef _$AppLockState = AutoDisposeNotifier<bool>;
 String _$biometricSettingsNotifierHash() =>
-    r'f1adff6fae0274d682abae83a769a31277996906';
+    r'f8782306b5a3ead1f0ccd4ad62c3c7c565bf6248';
 
 /// Notifier for managing biometric settings.
 ///

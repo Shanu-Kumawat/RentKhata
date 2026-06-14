@@ -28,6 +28,7 @@ mixin _$Property {
   DateTime get createdAt => throw _privateConstructorUsedError;
   int get roomCount => throw _privateConstructorUsedError;
   int get occupiedRoomCount => throw _privateConstructorUsedError;
+  bool get isArchived => throw _privateConstructorUsedError;
 
   /// Serializes this Property to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -52,6 +53,7 @@ abstract class $PropertyCopyWith<$Res> {
     DateTime createdAt,
     int roomCount,
     int occupiedRoomCount,
+    bool isArchived,
   });
 }
 
@@ -77,6 +79,7 @@ class _$PropertyCopyWithImpl<$Res, $Val extends Property>
     Object? createdAt = null,
     Object? roomCount = null,
     Object? occupiedRoomCount = null,
+    Object? isArchived = null,
   }) {
     return _then(
       _value.copyWith(
@@ -108,6 +111,10 @@ class _$PropertyCopyWithImpl<$Res, $Val extends Property>
                 ? _value.occupiedRoomCount
                 : occupiedRoomCount // ignore: cast_nullable_to_non_nullable
                       as int,
+            isArchived: null == isArchived
+                ? _value.isArchived
+                : isArchived // ignore: cast_nullable_to_non_nullable
+                      as bool,
           )
           as $Val,
     );
@@ -131,6 +138,7 @@ abstract class _$$PropertyImplCopyWith<$Res>
     DateTime createdAt,
     int roomCount,
     int occupiedRoomCount,
+    bool isArchived,
   });
 }
 
@@ -155,6 +163,7 @@ class __$$PropertyImplCopyWithImpl<$Res>
     Object? createdAt = null,
     Object? roomCount = null,
     Object? occupiedRoomCount = null,
+    Object? isArchived = null,
   }) {
     return _then(
       _$PropertyImpl(
@@ -186,6 +195,10 @@ class __$$PropertyImplCopyWithImpl<$Res>
             ? _value.occupiedRoomCount
             : occupiedRoomCount // ignore: cast_nullable_to_non_nullable
                   as int,
+        isArchived: null == isArchived
+            ? _value.isArchived
+            : isArchived // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -202,6 +215,7 @@ class _$PropertyImpl implements _Property {
     required this.createdAt,
     this.roomCount = 0,
     this.occupiedRoomCount = 0,
+    this.isArchived = false,
   });
 
   factory _$PropertyImpl.fromJson(Map<String, dynamic> json) =>
@@ -223,10 +237,13 @@ class _$PropertyImpl implements _Property {
   @override
   @JsonKey()
   final int occupiedRoomCount;
+  @override
+  @JsonKey()
+  final bool isArchived;
 
   @override
   String toString() {
-    return 'Property(id: $id, name: $name, address: $address, photoPath: $photoPath, createdAt: $createdAt, roomCount: $roomCount, occupiedRoomCount: $occupiedRoomCount)';
+    return 'Property(id: $id, name: $name, address: $address, photoPath: $photoPath, createdAt: $createdAt, roomCount: $roomCount, occupiedRoomCount: $occupiedRoomCount, isArchived: $isArchived)';
   }
 
   @override
@@ -244,7 +261,9 @@ class _$PropertyImpl implements _Property {
             (identical(other.roomCount, roomCount) ||
                 other.roomCount == roomCount) &&
             (identical(other.occupiedRoomCount, occupiedRoomCount) ||
-                other.occupiedRoomCount == occupiedRoomCount));
+                other.occupiedRoomCount == occupiedRoomCount) &&
+            (identical(other.isArchived, isArchived) ||
+                other.isArchived == isArchived));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -258,6 +277,7 @@ class _$PropertyImpl implements _Property {
     createdAt,
     roomCount,
     occupiedRoomCount,
+    isArchived,
   );
 
   /// Create a copy of Property
@@ -283,6 +303,7 @@ abstract class _Property implements Property {
     required final DateTime createdAt,
     final int roomCount,
     final int occupiedRoomCount,
+    final bool isArchived,
   }) = _$PropertyImpl;
 
   factory _Property.fromJson(Map<String, dynamic> json) =
@@ -302,6 +323,8 @@ abstract class _Property implements Property {
   int get roomCount;
   @override
   int get occupiedRoomCount;
+  @override
+  bool get isArchived;
 
   /// Create a copy of Property
   /// with the given fields replaced by the non-null parameter values.

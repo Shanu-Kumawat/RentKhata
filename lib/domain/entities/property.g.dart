@@ -15,6 +15,7 @@ _$PropertyImpl _$$PropertyImplFromJson(Map<String, dynamic> json) =>
       createdAt: DateTime.parse(json['createdAt'] as String),
       roomCount: (json['roomCount'] as num?)?.toInt() ?? 0,
       occupiedRoomCount: (json['occupiedRoomCount'] as num?)?.toInt() ?? 0,
+      isArchived: json['isArchived'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$$PropertyImplToJson(_$PropertyImpl instance) =>
@@ -26,4 +27,5 @@ Map<String, dynamic> _$$PropertyImplToJson(_$PropertyImpl instance) =>
       'createdAt': instance.createdAt.toIso8601String(),
       'roomCount': instance.roomCount,
       'occupiedRoomCount': instance.occupiedRoomCount,
+      'isArchived': instance.isArchived,
     };

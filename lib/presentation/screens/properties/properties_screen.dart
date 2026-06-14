@@ -12,16 +12,48 @@ import '../../../domain/entities/property.dart';
 import 'package:rent_khata/l10n/app_localizations.dart';
 
 /// Screen displaying all properties.
-class PropertiesScreen extends ConsumerWidget {
+class PropertiesScreen extends ConsumerStatefulWidget {
   const PropertiesScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final propertiesAsync = ref.watch(propertiesStreamProvider);
+  ConsumerState<PropertiesScreen> createState() => _PropertiesScreenState();
+}
+
+class _PropertiesScreenState extends ConsumerState<PropertiesScreen> {
+  bool _showArchived = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final propertiesAsync = ref.watch(propertiesStreamProvider(includeArchived: _showArchived));
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.properties)),
+      appBar: AppBar(
+        title: Text(l10n.properties),
+        actions: [
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              if (value == 'toggle_archived') {
+                setState(() {
+                  _showArchived = !_showArchived;
+                });
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 'toggle_archived',
+                child: Row(
+                  children: [
+                    Icon(_showArchived ? Icons.visibility_off_outlined : Icons.visibility_outlined),
+                    const SizedBox(width: 8),
+                    Text(_showArchived ? l10n.hideArchived : l10n.showArchived),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
       body: propertiesAsync.when(
         data: (properties) => properties.isEmpty
             ? _buildEmptyState(context)

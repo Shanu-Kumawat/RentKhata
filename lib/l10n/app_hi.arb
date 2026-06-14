@@ -1115,5 +1115,14 @@
   "errorGeneric": "त्रुटि",
   "chooseFromGalleryBtn": "गैलरी से चुनें",
   "sharePaymentLinkBtn": "भुगतान लिंक साझा करें",
-  "meterTrackingExplanation": "अपनी निर्धारित दर के आधार पर बिजली शुल्क की स्वचालित गणना करने के लिए रीडिंग दर्ज करें।"
+  "meterTrackingExplanation": "अपनी निर्धारित दर के आधार पर बिजली शुल्क की स्वचालित गणना करने के लिए रीडिंग दर्ज करें।",
+  "archiveProperty": "प्रॉपर्टी आर्काइव करें",
+  "unarchiveProperty": "प्रॉपर्टी अन-आर्काइव करें",
+  "archiveRoom": "कमरा आर्काइव करें",
+  "unarchiveRoom": "कमरा अन-आर्काइव करें",
+  "archiveTenant": "किरायेदार आर्काइव करें",
+  "unarchiveTenant": "किरायेदार अन-आर्काइव करें",
+  "showArchived": "आर्काइव दिखाएं",
+  "hideArchived": "आर्काइव छिपाएं",
+  "archivedBadge": "आर्काइव्ड"
 }

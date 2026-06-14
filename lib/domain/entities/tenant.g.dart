@@ -34,6 +34,7 @@ _$TenantImpl _$$TenantImplFromJson(Map<String, dynamic> json) => _$TenantImpl(
   currentRoomNumber: json['currentRoomNumber'] as String?,
   currentPropertyName: json['currentPropertyName'] as String?,
   isCurrentlyOccupying: json['isCurrentlyOccupying'] as bool? ?? false,
+  isArchived: json['isArchived'] as bool? ?? false,
 );
 
 Map<String, dynamic> _$$TenantImplToJson(_$TenantImpl instance) =>
@@ -65,6 +66,7 @@ Map<String, dynamic> _$$TenantImplToJson(_$TenantImpl instance) =>
       'currentRoomNumber': instance.currentRoomNumber,
       'currentPropertyName': instance.currentPropertyName,
       'isCurrentlyOccupying': instance.isCurrentlyOccupying,
+      'isArchived': instance.isArchived,
     };
 
 _$CustomFieldImpl _$$CustomFieldImplFromJson(Map<String, dynamic> json) =>

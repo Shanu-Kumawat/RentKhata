@@ -10,16 +10,16 @@ abstract class TenantRepository {
   // ========== Tenant Operations ==========
 
   /// Get all tenants
-  Future<List<Tenant>> getAllTenants();
+  Future<List<Tenant>> getAllTenants({bool includeArchived = false});
 
   /// Watch all tenants
-  Stream<List<Tenant>> watchAllTenants();
+  Stream<List<Tenant>> watchAllTenants({bool includeArchived = false});
 
   /// Get tenant by ID
   Future<Tenant?> getTenantById(int id);
 
   /// Search tenants by name or phone
-  Future<List<Tenant>> searchTenants(String query);
+  Future<List<Tenant>> searchTenants(String query, {bool includeArchived = false});
 
   /// Create a new tenant
   Future<int> createTenant({
@@ -57,6 +57,9 @@ abstract class TenantRepository {
 
   /// Delete a tenant
   Future<bool> deleteTenant(int id);
+
+  /// Archive/Unarchive a tenant
+  Future<bool> archiveTenant(int id, {bool isArchived = true});
 
   // ========== Custom Field Operations ==========
 

@@ -17,15 +17,22 @@ import 'add_property_screen.dart';
 import 'package:rent_khata/l10n/app_localizations.dart';
 
 /// Property detail screen showing rooms.
-class PropertyDetailScreen extends ConsumerWidget {
+class PropertyDetailScreen extends ConsumerStatefulWidget {
   final int propertyId;
 
   const PropertyDetailScreen({super.key, required this.propertyId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final propertyAsync = ref.watch(propertyProvider(propertyId));
-    final roomsAsync = ref.watch(roomsForPropertyStreamProvider(propertyId));
+  ConsumerState<PropertyDetailScreen> createState() => _PropertyDetailScreenState();
+}
+
+class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
+  bool _showArchived = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final propertyAsync = ref.watch(propertyProvider(widget.propertyId));
+    final roomsAsync = ref.watch(roomsForPropertyStreamProvider(widget.propertyId, includeArchived: _showArchived));
 
     return propertyAsync.when(
       data: (property) {
@@ -41,7 +48,27 @@ class PropertyDetailScreen extends ConsumerWidget {
         }
         return Scaffold(
           appBar: AppBar(
-            title: Text(property.name),
+            title: Row(
+              children: [
+                Expanded(child: Text(property.name)),
+                if (property.isArchived)
+                  Container(
+                    margin: const EdgeInsets.only(left: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.errorContainer,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      AppLocalizations.of(context)!.archivedBadge,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Theme.of(context).colorScheme.onErrorContainer,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
             actions: [
               IconButton(
                 icon: const Icon(Icons.edit_outlined),
@@ -51,9 +78,35 @@ class PropertyDetailScreen extends ConsumerWidget {
                 onSelected: (value) {
                   if (value == 'delete') {
                     _confirmDelete(context, ref, property);
+                  } else if (value == 'archive') {
+                    _toggleArchive(context, ref, property);
+                  } else if (value == 'toggle_archived_rooms') {
+                    setState(() {
+                      _showArchived = !_showArchived;
+                    });
                   }
                 },
                 itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: 'toggle_archived_rooms',
+                    child: Row(
+                      children: [
+                        Icon(_showArchived ? Icons.visibility_off_outlined : Icons.visibility_outlined),
+                        const SizedBox(width: 8),
+                        Text(_showArchived ? AppLocalizations.of(context)!.hideArchived : AppLocalizations.of(context)!.showArchived),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: 'archive',
+                    child: Row(
+                      children: [
+                        Icon(property.isArchived ? Icons.unarchive_outlined : Icons.archive_outlined),
+                        const SizedBox(width: 8),
+                        Text(property.isArchived ? AppLocalizations.of(context)!.unarchiveProperty : AppLocalizations.of(context)!.archiveProperty),
+                      ],
+                    ),
+                  ),
                   PopupMenuItem(
                     value: 'delete',
                     child: Row(
@@ -240,6 +293,35 @@ class PropertyDetailScreen extends ConsumerWidget {
       ),
     );
   }
+
+  Future<void> _toggleArchive(BuildContext context, WidgetRef ref, Property property) async {
+    final repo = ref.read(propertyRepositoryProvider);
+    final newState = !property.isArchived;
+    try {
+      await repo.archiveProperty(property.id, isArchived: newState);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(newState ? AppLocalizations.of(context)!.archiveProperty : AppLocalizations.of(context)!.unarchiveProperty),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        if (newState) {
+          // If archived, pop back to previous screen
+          context.pop();
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString().replaceAll('Bad state: ', '')),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    }
+  }
 }
 
 class _PropertyHeader extends StatelessWidget {
@@ -416,11 +498,33 @@ class _RoomCard extends StatelessWidget {
                         ),
                       )
                     else
-                      Text(
-                        AppLocalizations.of(context)!.vacant,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
+                      Row(
+                        children: [
+                          Text(
+                            AppLocalizations.of(context)!.vacant,
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                          if (room.isArchived) ...[
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.errorContainer,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                AppLocalizations.of(context)!.archivedBadge,
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: Theme.of(context).colorScheme.onErrorContainer,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                   ],
                 ),

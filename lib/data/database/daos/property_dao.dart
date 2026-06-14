@@ -16,12 +16,21 @@ class PropertyDao extends DatabaseAccessor<AppDatabase>
 
   // ========== Property Operations ==========
 
-  /// Get all properties
-  Future<List<PropertyEntity>> getAllProperties() => select(properties).get();
+  /// Get all properties (excluding archived by default)
+  Future<List<PropertyEntity>> getAllProperties({bool includeArchived = false}) {
+    if (includeArchived) {
+      return select(properties).get();
+    }
+    return (select(properties)..where((p) => p.isArchived.equals(false))).get();
+  }
 
-  /// Watch all properties
-  Stream<List<PropertyEntity>> watchAllProperties() =>
-      select(properties).watch();
+  /// Watch all properties (excluding archived by default)
+  Stream<List<PropertyEntity>> watchAllProperties({bool includeArchived = false}) {
+    if (includeArchived) {
+      return select(properties).watch();
+    }
+    return (select(properties)..where((p) => p.isArchived.equals(false))).watch();
+  }
 
   /// Get property by ID
   Future<PropertyEntity?> getPropertyById(int id) =>
@@ -39,22 +48,47 @@ class PropertyDao extends DatabaseAccessor<AppDatabase>
   Future<int> deleteProperty(int id) =>
       (delete(properties)..where((p) => p.id.equals(id))).go();
 
+  /// Archive a property
+  Future<int> archiveProperty(int id, {bool isArchived = true}) =>
+      (update(properties)..where((p) => p.id.equals(id)))
+          .write(PropertiesCompanion(isArchived: Value(isArchived)));
+
   // ========== Room Operations ==========
 
   /// Get all rooms for a property
-  Future<List<RoomEntity>> getRoomsForProperty(int propertyId) =>
-      (select(rooms)..where((r) => r.propertyId.equals(propertyId))).get();
+  Future<List<RoomEntity>> getRoomsForProperty(int propertyId, {bool includeArchived = false}) {
+    final query = select(rooms)..where((r) => r.propertyId.equals(propertyId));
+    if (!includeArchived) {
+      query.where((r) => r.isArchived.equals(false));
+    }
+    return query.get();
+  }
 
   /// Watch all rooms for a property
-  Stream<List<RoomEntity>> watchRoomsForProperty(int propertyId) =>
-      (select(rooms)..where((r) => r.propertyId.equals(propertyId))).watch();
+  Stream<List<RoomEntity>> watchRoomsForProperty(int propertyId, {bool includeArchived = false}) {
+    final query = select(rooms)..where((r) => r.propertyId.equals(propertyId));
+    if (!includeArchived) {
+      query.where((r) => r.isArchived.equals(false));
+    }
+    return query.watch();
+  }
 
   /// Get room by ID
   Future<RoomEntity?> getRoomById(int id) =>
       (select(rooms)..where((r) => r.id.equals(id))).getSingleOrNull();
 
   /// Get all rooms
-  Future<List<RoomEntity>> getAllRooms() => select(rooms).get();
+  Future<List<RoomEntity>> getAllRooms({bool includeArchived = false}) {
+    final query = select(rooms).join([
+      innerJoin(properties, properties.id.equalsExp(rooms.propertyId))
+    ]);
+
+    if (!includeArchived) {
+      query.where(rooms.isArchived.equals(false) & properties.isArchived.equals(false));
+    }
+
+    return query.map((row) => row.readTable(rooms)).get();
+  }
 
   /// Insert a room
   Future<int> insertRoom(RoomsCompanion room) => into(rooms).insert(room);
@@ -65,6 +99,11 @@ class PropertyDao extends DatabaseAccessor<AppDatabase>
   /// Delete a room
   Future<int> deleteRoom(int id) =>
       (delete(rooms)..where((r) => r.id.equals(id))).go();
+
+  /// Archive a room
+  Future<int> archiveRoom(int id, {bool isArchived = true}) =>
+      (update(rooms)..where((r) => r.id.equals(id)))
+          .write(RoomsCompanion(isArchived: Value(isArchived)));
 
   /// Get property with room count
   Future<List<({PropertyEntity property, int roomCount})>>

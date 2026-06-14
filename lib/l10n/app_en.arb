@@ -183,6 +183,17 @@
   "cancel": "Cancel",
   "delete": "Delete",
   "propertyDeleted": "Property deleted",
+  "deleteRoom": "Delete Room",
+  "deleteRoomTitle": "Delete Room?",
+  "confirmDeleteRoom": "Are you sure you want to delete room \"{roomNumber}\"? This action cannot be undone.",
+  "@confirmDeleteRoom": {
+    "placeholders": {
+      "roomNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "roomDeletedSuccess": "Room deleted",
   "occupancyCount": "{count} occupied",
   "@occupancyCount": {
     "placeholders": {
@@ -1444,5 +1455,14 @@
   "errorGeneric": "Error",
   "chooseFromGalleryBtn": "Choose from Gallery",
   "sharePaymentLinkBtn": "Share Payment Link",
-  "meterTrackingExplanation": "Enter readings to automatically calculate electricity charges based on your configured rate."
+  "meterTrackingExplanation": "Enter readings to automatically calculate electricity charges based on your configured rate.",
+  "archiveProperty": "Archive Property",
+  "unarchiveProperty": "Unarchive Property",
+  "archiveRoom": "Archive Room",
+  "unarchiveRoom": "Unarchive Room",
+  "archiveTenant": "Archive Tenant",
+  "unarchiveTenant": "Unarchive Tenant",
+  "showArchived": "Show Archived",
+  "hideArchived": "Hide Archived",
+  "archivedBadge": "Archived"
 }

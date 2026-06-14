@@ -66,6 +66,7 @@ class TenantRepositoryImpl implements TenantRepository {
       currentRoomNumber: roomNumber,
       currentPropertyName: propertyName,
       isCurrentlyOccupying: activeOccupancy != null,
+      isArchived: entity.isArchived,
     );
   }
 
@@ -111,14 +112,14 @@ class TenantRepositoryImpl implements TenantRepository {
   // ========== Tenant Operations ==========
 
   @override
-  Future<List<Tenant>> getAllTenants() async {
-    final entities = await _tenantDao.getAllTenants();
+  Future<List<Tenant>> getAllTenants({bool includeArchived = false}) async {
+    final entities = await _tenantDao.getAllTenants(includeArchived: includeArchived);
     return Future.wait(entities.map(_tenantToDomain));
   }
 
   @override
-  Stream<List<Tenant>> watchAllTenants() {
-    return _tenantDao.watchAllTenants().asyncMap(
+  Stream<List<Tenant>> watchAllTenants({bool includeArchived = false}) {
+    return _tenantDao.watchAllTenants(includeArchived: includeArchived).asyncMap(
       (entities) => Future.wait(entities.map(_tenantToDomain)),
     );
   }
@@ -130,8 +131,8 @@ class TenantRepositoryImpl implements TenantRepository {
   }
 
   @override
-  Future<List<Tenant>> searchTenants(String query) async {
-    final entities = await _tenantDao.searchTenants(query);
+  Future<List<Tenant>> searchTenants(String query, {bool includeArchived = false}) async {
+    final entities = await _tenantDao.searchTenants(query, includeArchived: includeArchived);
     return Future.wait(entities.map(_tenantToDomain));
   }
 
@@ -217,6 +218,7 @@ class TenantRepositoryImpl implements TenantRepository {
       introducerName: tenant.introducerName,
       introducerAddress: tenant.introducerAddress,
       introducerPhone: tenant.introducerPhone,
+      isArchived: tenant.isArchived,
     );
     return _tenantDao.updateTenant(entity);
   }
@@ -225,7 +227,7 @@ class TenantRepositoryImpl implements TenantRepository {
   Future<bool> deleteTenant(int id) async {
     final occupancies = await _tenantDao.getOccupanciesForTenant(id);
     if (occupancies.isNotEmpty) {
-      throw StateError('Cannot delete a tenant who has rental history. Please delete their history first.');
+      throw StateError('Cannot delete a tenant who has rental history. Please archive them instead to keep your financial records intact.');
     }
     
     // Cascade delete custom fields and documents
@@ -236,6 +238,19 @@ class TenantRepositoryImpl implements TenantRepository {
     }
 
     final result = await _tenantDao.deleteTenant(id);
+    return result > 0;
+  }
+
+  @override
+  Future<bool> archiveTenant(int id, {bool isArchived = true}) async {
+    if (isArchived) {
+      final occupancies = await _tenantDao.getOccupanciesForTenant(id);
+      final activeOccupancy = occupancies.where((o) => o.isActive).firstOrNull;
+      if (activeOccupancy != null) {
+        throw StateError('Cannot archive a tenant who is currently occupying a room. Move them out first.');
+      }
+    }
+    final result = await _tenantDao.archiveTenant(id, isArchived: isArchived);
     return result > 0;
   }
 

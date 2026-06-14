@@ -776,6 +776,30 @@ abstract class AppLocalizations {
   /// **'Property deleted'**
   String get propertyDeleted;
 
+  /// No description provided for @deleteRoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Room'**
+  String get deleteRoom;
+
+  /// No description provided for @deleteRoomTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Room?'**
+  String get deleteRoomTitle;
+
+  /// No description provided for @confirmDeleteRoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete room \"{roomNumber}\"? This action cannot be undone.'**
+  String confirmDeleteRoom(String roomNumber);
+
+  /// No description provided for @roomDeletedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Room deleted'**
+  String get roomDeletedSuccess;
+
   /// No description provided for @occupancyCount.
   ///
   /// In en, this message translates to:
@@ -5040,6 +5064,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter readings to automatically calculate electricity charges based on your configured rate.'**
   String get meterTrackingExplanation;
+
+  /// No description provided for @archiveProperty.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive Property'**
+  String get archiveProperty;
+
+  /// No description provided for @unarchiveProperty.
+  ///
+  /// In en, this message translates to:
+  /// **'Unarchive Property'**
+  String get unarchiveProperty;
+
+  /// No description provided for @archiveRoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive Room'**
+  String get archiveRoom;
+
+  /// No description provided for @unarchiveRoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Unarchive Room'**
+  String get unarchiveRoom;
+
+  /// No description provided for @archiveTenant.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive Tenant'**
+  String get archiveTenant;
+
+  /// No description provided for @unarchiveTenant.
+  ///
+  /// In en, this message translates to:
+  /// **'Unarchive Tenant'**
+  String get unarchiveTenant;
+
+  /// No description provided for @showArchived.
+  ///
+  /// In en, this message translates to:
+  /// **'Show Archived'**
+  String get showArchived;
+
+  /// No description provided for @hideArchived.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide Archived'**
+  String get hideArchived;
+
+  /// No description provided for @archivedBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived'**
+  String get archivedBadge;
 }
 
 class _AppLocalizationsDelegate

@@ -723,7 +723,7 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final tenantsAsync = ref.watch(tenantsProvider);
+    final tenantsAsync = ref.watch(tenantsProvider());
 
     return Padding(
       padding: EdgeInsets.only(

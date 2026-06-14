@@ -1683,7 +1683,7 @@ final ensureDefaultTemplatesProvider = AutoDisposeFutureProvider<bool>.internal(
 // ignore: unused_element
 typedef EnsureDefaultTemplatesRef = AutoDisposeFutureProviderRef<bool>;
 String _$billsByFinancialYearHash() =>
-    r'1cd136547e9b957721e31eb5a26de07b386508d0';
+    r'ba2c584985e02f5d28c1bac37ae229aea49e7071';
 
 /// Bills filtered by the Selected Financial Year
 ///

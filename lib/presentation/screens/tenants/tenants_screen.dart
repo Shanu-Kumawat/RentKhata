@@ -23,6 +23,7 @@ class TenantsScreen extends ConsumerStatefulWidget {
 class _TenantsScreenState extends ConsumerState<TenantsScreen> {
   final _searchController = TextEditingController();
   String _searchQuery = '';
+  bool _showArchived = false;
 
   @override
   void dispose() {
@@ -33,13 +34,38 @@ class _TenantsScreenState extends ConsumerState<TenantsScreen> {
   @override
   Widget build(BuildContext context) {
     final tenantsAsync = _searchQuery.isEmpty
-        ? ref.watch(tenantsStreamProvider)
-        : ref.watch(searchTenantsProvider(_searchQuery));
+        ? ref.watch(tenantsStreamProvider(includeArchived: _showArchived))
+        : ref.watch(searchTenantsProvider(_searchQuery, includeArchived: _showArchived));
 
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.tenants)),
+      appBar: AppBar(
+        title: Text(l10n.tenants),
+        actions: [
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              if (value == 'toggle_archived') {
+                setState(() {
+                  _showArchived = !_showArchived;
+                });
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 'toggle_archived',
+                child: Row(
+                  children: [
+                    Icon(_showArchived ? Icons.visibility_off_outlined : Icons.visibility_outlined),
+                    const SizedBox(width: 8),
+                    Text(_showArchived ? l10n.hideArchived : l10n.showArchived),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
       body: Column(
         children: [
           // Search bar

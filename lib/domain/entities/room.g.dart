@@ -19,6 +19,7 @@ _$RoomImpl _$$RoomImplFromJson(Map<String, dynamic> json) => _$RoomImpl(
   currentTenantName: json['currentTenantName'] as String?,
   currentOccupancyId: (json['currentOccupancyId'] as num?)?.toInt(),
   isOccupied: json['isOccupied'] as bool? ?? false,
+  isArchived: json['isArchived'] as bool? ?? false,
 );
 
 Map<String, dynamic> _$$RoomImplToJson(_$RoomImpl instance) =>
@@ -34,4 +35,5 @@ Map<String, dynamic> _$$RoomImplToJson(_$RoomImpl instance) =>
       'currentTenantName': instance.currentTenantName,
       'currentOccupancyId': instance.currentOccupancyId,
       'isOccupied': instance.isOccupied,
+      'isArchived': instance.isArchived,
     };

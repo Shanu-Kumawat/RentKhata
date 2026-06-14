@@ -7,7 +7,7 @@ part of 'notification_settings_providers.dart';
 // **************************************************************************
 
 String _$notificationSettingsNotifierHash() =>
-    r'4b3a9af4957f594d7d294a7beb1d0f65c9829a77';
+    r'0d8cda82a4ef42574b3702d337c756e2aba863dc';
 
 /// Provider for managing notification settings
 ///

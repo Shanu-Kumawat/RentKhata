@@ -9,10 +9,10 @@ abstract class PropertyRepository {
   // ========== Property Operations ==========
 
   /// Get all properties
-  Future<List<Property>> getAllProperties();
+  Future<List<Property>> getAllProperties({bool includeArchived = false});
 
   /// Watch all properties
-  Stream<List<Property>> watchAllProperties();
+  Stream<List<Property>> watchAllProperties({bool includeArchived = false});
 
   /// Get property by ID
   Future<Property?> getPropertyById(int id);
@@ -30,19 +30,22 @@ abstract class PropertyRepository {
   /// Delete a property
   Future<bool> deleteProperty(int id);
 
+  /// Archive/Unarchive a property
+  Future<bool> archiveProperty(int id, {bool isArchived = true});
+
   // ========== Room Operations ==========
 
   /// Get all rooms for a property
-  Future<List<Room>> getRoomsForProperty(int propertyId);
+  Future<List<Room>> getRoomsForProperty(int propertyId, {bool includeArchived = false});
 
   /// Watch rooms for a property
-  Stream<List<Room>> watchRoomsForProperty(int propertyId);
+  Stream<List<Room>> watchRoomsForProperty(int propertyId, {bool includeArchived = false});
 
   /// Get room by ID
   Future<Room?> getRoomById(int id);
 
   /// Get all rooms
-  Future<List<Room>> getAllRooms();
+  Future<List<Room>> getAllRooms({bool includeArchived = false});
 
   /// Create a new room
   Future<int> createRoom({
@@ -58,4 +61,7 @@ abstract class PropertyRepository {
 
   /// Delete a room
   Future<bool> deleteRoom(int id);
+
+  /// Archive/Unarchive a room
+  Future<bool> archiveRoom(int id, {bool isArchived = true});
 }

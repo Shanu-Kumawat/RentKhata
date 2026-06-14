@@ -11,6 +11,7 @@ import 'repository_providers.dart';
 import 'tenant_providers.dart';
 import 'occupancy_providers.dart';
 import 'billing_providers.dart';
+import 'property_providers.dart';
 
 part 'billing_cycle_providers.g.dart';
 
@@ -282,8 +283,6 @@ Future<List<BillingAttentionItem>> billingStatusFor(
 ) async {
   final config = await ref.watch(billingAttentionConfigProvider.future);
   final settings = await ref.watch(billSettingsProvider.future);
-  final tenantRepo = ref.watch(tenantRepositoryProvider);
-  final propertyRepo = ref.watch(propertyRepositoryProvider);
 
   // Get occupancy details
   final occupancy = await ref.watch(occupancyProvider(occupancyId).future);
@@ -292,13 +291,13 @@ Future<List<BillingAttentionItem>> billingStatusFor(
   }
 
   // Get room and property info
-  final room = await propertyRepo.getRoomById(occupancy.roomId);
+  final room = await ref.watch(roomProvider(occupancy.roomId).future);
   if (room == null) return [];
 
-  final property = await propertyRepo.getPropertyById(room.propertyId);
+  final property = await ref.watch(propertyProvider(room.propertyId).future);
 
   // Get tenant info
-  final tenant = await tenantRepo.getTenantById(occupancy.tenantId);
+  final tenant = await ref.watch(tenantProvider(occupancy.tenantId).future);
   if (tenant == null) return [];
 
   // Check which bill types have date-to-date enabled

@@ -17,6 +17,7 @@ class Property with _$Property {
     required DateTime createdAt,
     @Default(0) int roomCount,
     @Default(0) int occupiedRoomCount,
+    @Default(false) bool isArchived,
   }) = _Property;
 
   factory Property.fromJson(Map<String, dynamic> json) =>

@@ -80,7 +80,27 @@ class _TenantDetailContent extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(tenant.name),
+        title: Row(
+          children: [
+            Expanded(child: Text(tenant.name)),
+            if (tenant.isArchived)
+              Container(
+                margin: const EdgeInsets.only(left: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.errorContainer,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  AppLocalizations.of(context)!.archivedBadge,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(context).colorScheme.onErrorContainer,
+                  ),
+                ),
+              ),
+          ],
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.edit_outlined),
@@ -90,9 +110,21 @@ class _TenantDetailContent extends ConsumerWidget {
             onSelected: (value) {
               if (value == 'delete') {
                 _confirmDelete(context, ref);
+              } else if (value == 'archive') {
+                _toggleArchive(context, ref);
               }
             },
             itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 'archive',
+                child: Row(
+                  children: [
+                    Icon(tenant.isArchived ? Icons.unarchive_outlined : Icons.archive_outlined),
+                    const SizedBox(width: 8),
+                    Text(tenant.isArchived ? AppLocalizations.of(context)!.unarchiveTenant : AppLocalizations.of(context)!.archiveTenant),
+                  ],
+                ),
+              ),
               PopupMenuItem(
                 value: 'delete',
                 child: Row(
@@ -510,6 +542,35 @@ class _TenantDetailContent extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _toggleArchive(BuildContext context, WidgetRef ref) async {
+    final repo = ref.read(tenantRepositoryProvider);
+    final newState = !tenant.isArchived;
+    try {
+      await repo.archiveTenant(tenant.id, isArchived: newState);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(newState ? AppLocalizations.of(context)!.archiveTenant : AppLocalizations.of(context)!.unarchiveTenant),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        if (newState) {
+          // Pop back to the list since it's now archived
+          context.pop();
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString().replaceAll('Bad state: ', '')),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    }
   }
 }
 

@@ -591,6 +591,21 @@ class $PropertiesTable extends Properties
     requiredDuringInsert: false,
     defaultValue: currentDateAndTime,
   );
+  static const VerificationMeta _isArchivedMeta = const VerificationMeta(
+    'isArchived',
+  );
+  @override
+  late final GeneratedColumn<bool> isArchived = GeneratedColumn<bool>(
+    'is_archived',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_archived" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -598,6 +613,7 @@ class $PropertiesTable extends Properties
     address,
     photoPath,
     createdAt,
+    isArchived,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -640,6 +656,12 @@ class $PropertiesTable extends Properties
         createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
       );
     }
+    if (data.containsKey('is_archived')) {
+      context.handle(
+        _isArchivedMeta,
+        isArchived.isAcceptableOrUnknown(data['is_archived']!, _isArchivedMeta),
+      );
+    }
     return context;
   }
 
@@ -669,6 +691,10 @@ class $PropertiesTable extends Properties
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
       )!,
+      isArchived: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_archived'],
+      )!,
     );
   }
 
@@ -693,12 +719,16 @@ class PropertyEntity extends DataClass implements Insertable<PropertyEntity> {
 
   /// Created timestamp
   final DateTime createdAt;
+
+  /// Archived status
+  final bool isArchived;
   const PropertyEntity({
     required this.id,
     required this.name,
     this.address,
     this.photoPath,
     required this.createdAt,
+    required this.isArchived,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -712,6 +742,7 @@ class PropertyEntity extends DataClass implements Insertable<PropertyEntity> {
       map['photo_path'] = Variable<String>(photoPath);
     }
     map['created_at'] = Variable<DateTime>(createdAt);
+    map['is_archived'] = Variable<bool>(isArchived);
     return map;
   }
 
@@ -726,6 +757,7 @@ class PropertyEntity extends DataClass implements Insertable<PropertyEntity> {
           ? const Value.absent()
           : Value(photoPath),
       createdAt: Value(createdAt),
+      isArchived: Value(isArchived),
     );
   }
 
@@ -740,6 +772,7 @@ class PropertyEntity extends DataClass implements Insertable<PropertyEntity> {
       address: serializer.fromJson<String?>(json['address']),
       photoPath: serializer.fromJson<String?>(json['photoPath']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      isArchived: serializer.fromJson<bool>(json['isArchived']),
     );
   }
   @override
@@ -751,6 +784,7 @@ class PropertyEntity extends DataClass implements Insertable<PropertyEntity> {
       'address': serializer.toJson<String?>(address),
       'photoPath': serializer.toJson<String?>(photoPath),
       'createdAt': serializer.toJson<DateTime>(createdAt),
+      'isArchived': serializer.toJson<bool>(isArchived),
     };
   }
 
@@ -760,12 +794,14 @@ class PropertyEntity extends DataClass implements Insertable<PropertyEntity> {
     Value<String?> address = const Value.absent(),
     Value<String?> photoPath = const Value.absent(),
     DateTime? createdAt,
+    bool? isArchived,
   }) => PropertyEntity(
     id: id ?? this.id,
     name: name ?? this.name,
     address: address.present ? address.value : this.address,
     photoPath: photoPath.present ? photoPath.value : this.photoPath,
     createdAt: createdAt ?? this.createdAt,
+    isArchived: isArchived ?? this.isArchived,
   );
   PropertyEntity copyWithCompanion(PropertiesCompanion data) {
     return PropertyEntity(
@@ -774,6 +810,9 @@ class PropertyEntity extends DataClass implements Insertable<PropertyEntity> {
       address: data.address.present ? data.address.value : this.address,
       photoPath: data.photoPath.present ? data.photoPath.value : this.photoPath,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      isArchived: data.isArchived.present
+          ? data.isArchived.value
+          : this.isArchived,
     );
   }
 
@@ -784,13 +823,15 @@ class PropertyEntity extends DataClass implements Insertable<PropertyEntity> {
           ..write('name: $name, ')
           ..write('address: $address, ')
           ..write('photoPath: $photoPath, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('isArchived: $isArchived')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, name, address, photoPath, createdAt);
+  int get hashCode =>
+      Object.hash(id, name, address, photoPath, createdAt, isArchived);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -799,7 +840,8 @@ class PropertyEntity extends DataClass implements Insertable<PropertyEntity> {
           other.name == this.name &&
           other.address == this.address &&
           other.photoPath == this.photoPath &&
-          other.createdAt == this.createdAt);
+          other.createdAt == this.createdAt &&
+          other.isArchived == this.isArchived);
 }
 
 class PropertiesCompanion extends UpdateCompanion<PropertyEntity> {
@@ -808,12 +850,14 @@ class PropertiesCompanion extends UpdateCompanion<PropertyEntity> {
   final Value<String?> address;
   final Value<String?> photoPath;
   final Value<DateTime> createdAt;
+  final Value<bool> isArchived;
   const PropertiesCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.address = const Value.absent(),
     this.photoPath = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.isArchived = const Value.absent(),
   });
   PropertiesCompanion.insert({
     this.id = const Value.absent(),
@@ -821,6 +865,7 @@ class PropertiesCompanion extends UpdateCompanion<PropertyEntity> {
     this.address = const Value.absent(),
     this.photoPath = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.isArchived = const Value.absent(),
   }) : name = Value(name);
   static Insertable<PropertyEntity> custom({
     Expression<int>? id,
@@ -828,6 +873,7 @@ class PropertiesCompanion extends UpdateCompanion<PropertyEntity> {
     Expression<String>? address,
     Expression<String>? photoPath,
     Expression<DateTime>? createdAt,
+    Expression<bool>? isArchived,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -835,6 +881,7 @@ class PropertiesCompanion extends UpdateCompanion<PropertyEntity> {
       if (address != null) 'address': address,
       if (photoPath != null) 'photo_path': photoPath,
       if (createdAt != null) 'created_at': createdAt,
+      if (isArchived != null) 'is_archived': isArchived,
     });
   }
 
@@ -844,6 +891,7 @@ class PropertiesCompanion extends UpdateCompanion<PropertyEntity> {
     Value<String?>? address,
     Value<String?>? photoPath,
     Value<DateTime>? createdAt,
+    Value<bool>? isArchived,
   }) {
     return PropertiesCompanion(
       id: id ?? this.id,
@@ -851,6 +899,7 @@ class PropertiesCompanion extends UpdateCompanion<PropertyEntity> {
       address: address ?? this.address,
       photoPath: photoPath ?? this.photoPath,
       createdAt: createdAt ?? this.createdAt,
+      isArchived: isArchived ?? this.isArchived,
     );
   }
 
@@ -872,6 +921,9 @@ class PropertiesCompanion extends UpdateCompanion<PropertyEntity> {
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
+    if (isArchived.present) {
+      map['is_archived'] = Variable<bool>(isArchived.value);
+    }
     return map;
   }
 
@@ -882,7 +934,8 @@ class PropertiesCompanion extends UpdateCompanion<PropertyEntity> {
           ..write('name: $name, ')
           ..write('address: $address, ')
           ..write('photoPath: $photoPath, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('isArchived: $isArchived')
           ..write(')'))
         .toString();
   }
@@ -985,6 +1038,21 @@ class $RoomsTable extends Rooms with TableInfo<$RoomsTable, RoomEntity> {
     requiredDuringInsert: false,
     defaultValue: currentDateAndTime,
   );
+  static const VerificationMeta _isArchivedMeta = const VerificationMeta(
+    'isArchived',
+  );
+  @override
+  late final GeneratedColumn<bool> isArchived = GeneratedColumn<bool>(
+    'is_archived',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_archived" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -994,6 +1062,7 @@ class $RoomsTable extends Rooms with TableInfo<$RoomsTable, RoomEntity> {
     hasElectricityMeter,
     currentElectricityRate,
     createdAt,
+    isArchived,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1056,6 +1125,12 @@ class $RoomsTable extends Rooms with TableInfo<$RoomsTable, RoomEntity> {
         createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
       );
     }
+    if (data.containsKey('is_archived')) {
+      context.handle(
+        _isArchivedMeta,
+        isArchived.isAcceptableOrUnknown(data['is_archived']!, _isArchivedMeta),
+      );
+    }
     return context;
   }
 
@@ -1093,6 +1168,10 @@ class $RoomsTable extends Rooms with TableInfo<$RoomsTable, RoomEntity> {
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
       )!,
+      isArchived: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_archived'],
+      )!,
     );
   }
 
@@ -1123,6 +1202,9 @@ class RoomEntity extends DataClass implements Insertable<RoomEntity> {
 
   /// Created timestamp
   final DateTime createdAt;
+
+  /// Archived status
+  final bool isArchived;
   const RoomEntity({
     required this.id,
     required this.propertyId,
@@ -1131,6 +1213,7 @@ class RoomEntity extends DataClass implements Insertable<RoomEntity> {
     required this.hasElectricityMeter,
     required this.currentElectricityRate,
     required this.createdAt,
+    required this.isArchived,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1142,6 +1225,7 @@ class RoomEntity extends DataClass implements Insertable<RoomEntity> {
     map['has_electricity_meter'] = Variable<bool>(hasElectricityMeter);
     map['current_electricity_rate'] = Variable<double>(currentElectricityRate);
     map['created_at'] = Variable<DateTime>(createdAt);
+    map['is_archived'] = Variable<bool>(isArchived);
     return map;
   }
 
@@ -1154,6 +1238,7 @@ class RoomEntity extends DataClass implements Insertable<RoomEntity> {
       hasElectricityMeter: Value(hasElectricityMeter),
       currentElectricityRate: Value(currentElectricityRate),
       createdAt: Value(createdAt),
+      isArchived: Value(isArchived),
     );
   }
 
@@ -1174,6 +1259,7 @@ class RoomEntity extends DataClass implements Insertable<RoomEntity> {
         json['currentElectricityRate'],
       ),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      isArchived: serializer.fromJson<bool>(json['isArchived']),
     );
   }
   @override
@@ -1189,6 +1275,7 @@ class RoomEntity extends DataClass implements Insertable<RoomEntity> {
         currentElectricityRate,
       ),
       'createdAt': serializer.toJson<DateTime>(createdAt),
+      'isArchived': serializer.toJson<bool>(isArchived),
     };
   }
 
@@ -1200,6 +1287,7 @@ class RoomEntity extends DataClass implements Insertable<RoomEntity> {
     bool? hasElectricityMeter,
     double? currentElectricityRate,
     DateTime? createdAt,
+    bool? isArchived,
   }) => RoomEntity(
     id: id ?? this.id,
     propertyId: propertyId ?? this.propertyId,
@@ -1209,6 +1297,7 @@ class RoomEntity extends DataClass implements Insertable<RoomEntity> {
     currentElectricityRate:
         currentElectricityRate ?? this.currentElectricityRate,
     createdAt: createdAt ?? this.createdAt,
+    isArchived: isArchived ?? this.isArchived,
   );
   RoomEntity copyWithCompanion(RoomsCompanion data) {
     return RoomEntity(
@@ -1227,6 +1316,9 @@ class RoomEntity extends DataClass implements Insertable<RoomEntity> {
           ? data.currentElectricityRate.value
           : this.currentElectricityRate,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      isArchived: data.isArchived.present
+          ? data.isArchived.value
+          : this.isArchived,
     );
   }
 
@@ -1239,7 +1331,8 @@ class RoomEntity extends DataClass implements Insertable<RoomEntity> {
           ..write('baseRent: $baseRent, ')
           ..write('hasElectricityMeter: $hasElectricityMeter, ')
           ..write('currentElectricityRate: $currentElectricityRate, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('isArchived: $isArchived')
           ..write(')'))
         .toString();
   }
@@ -1253,6 +1346,7 @@ class RoomEntity extends DataClass implements Insertable<RoomEntity> {
     hasElectricityMeter,
     currentElectricityRate,
     createdAt,
+    isArchived,
   );
   @override
   bool operator ==(Object other) =>
@@ -1264,7 +1358,8 @@ class RoomEntity extends DataClass implements Insertable<RoomEntity> {
           other.baseRent == this.baseRent &&
           other.hasElectricityMeter == this.hasElectricityMeter &&
           other.currentElectricityRate == this.currentElectricityRate &&
-          other.createdAt == this.createdAt);
+          other.createdAt == this.createdAt &&
+          other.isArchived == this.isArchived);
 }
 
 class RoomsCompanion extends UpdateCompanion<RoomEntity> {
@@ -1275,6 +1370,7 @@ class RoomsCompanion extends UpdateCompanion<RoomEntity> {
   final Value<bool> hasElectricityMeter;
   final Value<double> currentElectricityRate;
   final Value<DateTime> createdAt;
+  final Value<bool> isArchived;
   const RoomsCompanion({
     this.id = const Value.absent(),
     this.propertyId = const Value.absent(),
@@ -1283,6 +1379,7 @@ class RoomsCompanion extends UpdateCompanion<RoomEntity> {
     this.hasElectricityMeter = const Value.absent(),
     this.currentElectricityRate = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.isArchived = const Value.absent(),
   });
   RoomsCompanion.insert({
     this.id = const Value.absent(),
@@ -1292,6 +1389,7 @@ class RoomsCompanion extends UpdateCompanion<RoomEntity> {
     this.hasElectricityMeter = const Value.absent(),
     this.currentElectricityRate = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.isArchived = const Value.absent(),
   }) : propertyId = Value(propertyId),
        roomNumber = Value(roomNumber);
   static Insertable<RoomEntity> custom({
@@ -1302,6 +1400,7 @@ class RoomsCompanion extends UpdateCompanion<RoomEntity> {
     Expression<bool>? hasElectricityMeter,
     Expression<double>? currentElectricityRate,
     Expression<DateTime>? createdAt,
+    Expression<bool>? isArchived,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1313,6 +1412,7 @@ class RoomsCompanion extends UpdateCompanion<RoomEntity> {
       if (currentElectricityRate != null)
         'current_electricity_rate': currentElectricityRate,
       if (createdAt != null) 'created_at': createdAt,
+      if (isArchived != null) 'is_archived': isArchived,
     });
   }
 
@@ -1324,6 +1424,7 @@ class RoomsCompanion extends UpdateCompanion<RoomEntity> {
     Value<bool>? hasElectricityMeter,
     Value<double>? currentElectricityRate,
     Value<DateTime>? createdAt,
+    Value<bool>? isArchived,
   }) {
     return RoomsCompanion(
       id: id ?? this.id,
@@ -1334,6 +1435,7 @@ class RoomsCompanion extends UpdateCompanion<RoomEntity> {
       currentElectricityRate:
           currentElectricityRate ?? this.currentElectricityRate,
       createdAt: createdAt ?? this.createdAt,
+      isArchived: isArchived ?? this.isArchived,
     );
   }
 
@@ -1363,6 +1465,9 @@ class RoomsCompanion extends UpdateCompanion<RoomEntity> {
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
+    if (isArchived.present) {
+      map['is_archived'] = Variable<bool>(isArchived.value);
+    }
     return map;
   }
 
@@ -1375,7 +1480,8 @@ class RoomsCompanion extends UpdateCompanion<RoomEntity> {
           ..write('baseRent: $baseRent, ')
           ..write('hasElectricityMeter: $hasElectricityMeter, ')
           ..write('currentElectricityRate: $currentElectricityRate, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('isArchived: $isArchived')
           ..write(')'))
         .toString();
   }
@@ -1644,6 +1750,21 @@ class $TenantsTable extends Tenants
     requiredDuringInsert: false,
     defaultValue: currentDateAndTime,
   );
+  static const VerificationMeta _isArchivedMeta = const VerificationMeta(
+    'isArchived',
+  );
+  @override
+  late final GeneratedColumn<bool> isArchived = GeneratedColumn<bool>(
+    'is_archived',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_archived" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -1669,6 +1790,7 @@ class $TenantsTable extends Tenants
     introducerAddress,
     introducerPhone,
     createdAt,
+    isArchived,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1864,6 +1986,12 @@ class $TenantsTable extends Tenants
         createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
       );
     }
+    if (data.containsKey('is_archived')) {
+      context.handle(
+        _isArchivedMeta,
+        isArchived.isAcceptableOrUnknown(data['is_archived']!, _isArchivedMeta),
+      );
+    }
     return context;
   }
 
@@ -1965,6 +2093,10 @@ class $TenantsTable extends Tenants
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
       )!,
+      isArchived: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_archived'],
+      )!,
     );
   }
 
@@ -2043,6 +2175,9 @@ class TenantEntity extends DataClass implements Insertable<TenantEntity> {
 
   /// Created timestamp
   final DateTime createdAt;
+
+  /// Archived status
+  final bool isArchived;
   const TenantEntity({
     required this.id,
     required this.name,
@@ -2067,6 +2202,7 @@ class TenantEntity extends DataClass implements Insertable<TenantEntity> {
     this.introducerAddress,
     this.introducerPhone,
     required this.createdAt,
+    required this.isArchived,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -2134,6 +2270,7 @@ class TenantEntity extends DataClass implements Insertable<TenantEntity> {
       map['introducer_phone'] = Variable<String>(introducerPhone);
     }
     map['created_at'] = Variable<DateTime>(createdAt);
+    map['is_archived'] = Variable<bool>(isArchived);
     return map;
   }
 
@@ -2199,6 +2336,7 @@ class TenantEntity extends DataClass implements Insertable<TenantEntity> {
           ? const Value.absent()
           : Value(introducerPhone),
       createdAt: Value(createdAt),
+      isArchived: Value(isArchived),
     );
   }
 
@@ -2241,6 +2379,7 @@ class TenantEntity extends DataClass implements Insertable<TenantEntity> {
       ),
       introducerPhone: serializer.fromJson<String?>(json['introducerPhone']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      isArchived: serializer.fromJson<bool>(json['isArchived']),
     );
   }
   @override
@@ -2274,6 +2413,7 @@ class TenantEntity extends DataClass implements Insertable<TenantEntity> {
       'introducerAddress': serializer.toJson<String?>(introducerAddress),
       'introducerPhone': serializer.toJson<String?>(introducerPhone),
       'createdAt': serializer.toJson<DateTime>(createdAt),
+      'isArchived': serializer.toJson<bool>(isArchived),
     };
   }
 
@@ -2301,6 +2441,7 @@ class TenantEntity extends DataClass implements Insertable<TenantEntity> {
     Value<String?> introducerAddress = const Value.absent(),
     Value<String?> introducerPhone = const Value.absent(),
     DateTime? createdAt,
+    bool? isArchived,
   }) => TenantEntity(
     id: id ?? this.id,
     name: name ?? this.name,
@@ -2349,6 +2490,7 @@ class TenantEntity extends DataClass implements Insertable<TenantEntity> {
         ? introducerPhone.value
         : this.introducerPhone,
     createdAt: createdAt ?? this.createdAt,
+    isArchived: isArchived ?? this.isArchived,
   );
   TenantEntity copyWithCompanion(TenantsCompanion data) {
     return TenantEntity(
@@ -2407,6 +2549,9 @@ class TenantEntity extends DataClass implements Insertable<TenantEntity> {
           ? data.introducerPhone.value
           : this.introducerPhone,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      isArchived: data.isArchived.present
+          ? data.isArchived.value
+          : this.isArchived,
     );
   }
 
@@ -2435,7 +2580,8 @@ class TenantEntity extends DataClass implements Insertable<TenantEntity> {
           ..write('introducerName: $introducerName, ')
           ..write('introducerAddress: $introducerAddress, ')
           ..write('introducerPhone: $introducerPhone, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('isArchived: $isArchived')
           ..write(')'))
         .toString();
   }
@@ -2465,6 +2611,7 @@ class TenantEntity extends DataClass implements Insertable<TenantEntity> {
     introducerAddress,
     introducerPhone,
     createdAt,
+    isArchived,
   ]);
   @override
   bool operator ==(Object other) =>
@@ -2492,7 +2639,8 @@ class TenantEntity extends DataClass implements Insertable<TenantEntity> {
           other.introducerName == this.introducerName &&
           other.introducerAddress == this.introducerAddress &&
           other.introducerPhone == this.introducerPhone &&
-          other.createdAt == this.createdAt);
+          other.createdAt == this.createdAt &&
+          other.isArchived == this.isArchived);
 }
 
 class TenantsCompanion extends UpdateCompanion<TenantEntity> {
@@ -2519,6 +2667,7 @@ class TenantsCompanion extends UpdateCompanion<TenantEntity> {
   final Value<String?> introducerAddress;
   final Value<String?> introducerPhone;
   final Value<DateTime> createdAt;
+  final Value<bool> isArchived;
   const TenantsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
@@ -2543,6 +2692,7 @@ class TenantsCompanion extends UpdateCompanion<TenantEntity> {
     this.introducerAddress = const Value.absent(),
     this.introducerPhone = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.isArchived = const Value.absent(),
   });
   TenantsCompanion.insert({
     this.id = const Value.absent(),
@@ -2568,6 +2718,7 @@ class TenantsCompanion extends UpdateCompanion<TenantEntity> {
     this.introducerAddress = const Value.absent(),
     this.introducerPhone = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.isArchived = const Value.absent(),
   }) : name = Value(name);
   static Insertable<TenantEntity> custom({
     Expression<int>? id,
@@ -2593,6 +2744,7 @@ class TenantsCompanion extends UpdateCompanion<TenantEntity> {
     Expression<String>? introducerAddress,
     Expression<String>? introducerPhone,
     Expression<DateTime>? createdAt,
+    Expression<bool>? isArchived,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -2622,6 +2774,7 @@ class TenantsCompanion extends UpdateCompanion<TenantEntity> {
       if (introducerAddress != null) 'introducer_address': introducerAddress,
       if (introducerPhone != null) 'introducer_phone': introducerPhone,
       if (createdAt != null) 'created_at': createdAt,
+      if (isArchived != null) 'is_archived': isArchived,
     });
   }
 
@@ -2649,6 +2802,7 @@ class TenantsCompanion extends UpdateCompanion<TenantEntity> {
     Value<String?>? introducerAddress,
     Value<String?>? introducerPhone,
     Value<DateTime>? createdAt,
+    Value<bool>? isArchived,
   }) {
     return TenantsCompanion(
       id: id ?? this.id,
@@ -2676,6 +2830,7 @@ class TenantsCompanion extends UpdateCompanion<TenantEntity> {
       introducerAddress: introducerAddress ?? this.introducerAddress,
       introducerPhone: introducerPhone ?? this.introducerPhone,
       createdAt: createdAt ?? this.createdAt,
+      isArchived: isArchived ?? this.isArchived,
     );
   }
 
@@ -2759,6 +2914,9 @@ class TenantsCompanion extends UpdateCompanion<TenantEntity> {
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
+    if (isArchived.present) {
+      map['is_archived'] = Variable<bool>(isArchived.value);
+    }
     return map;
   }
 
@@ -2787,7 +2945,8 @@ class TenantsCompanion extends UpdateCompanion<TenantEntity> {
           ..write('introducerName: $introducerName, ')
           ..write('introducerAddress: $introducerAddress, ')
           ..write('introducerPhone: $introducerPhone, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('isArchived: $isArchived')
           ..write(')'))
         .toString();
   }
@@ -12049,6 +12208,7 @@ typedef $$PropertiesTableCreateCompanionBuilder =
       Value<String?> address,
       Value<String?> photoPath,
       Value<DateTime> createdAt,
+      Value<bool> isArchived,
     });
 typedef $$PropertiesTableUpdateCompanionBuilder =
     PropertiesCompanion Function({
@@ -12057,6 +12217,7 @@ typedef $$PropertiesTableUpdateCompanionBuilder =
       Value<String?> address,
       Value<String?> photoPath,
       Value<DateTime> createdAt,
+      Value<bool> isArchived,
     });
 
 final class $$PropertiesTableReferences
@@ -12132,6 +12293,11 @@ class $$PropertiesTableFilterComposer
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isArchived => $composableBuilder(
+    column: $table.isArchived,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -12219,6 +12385,11 @@ class $$PropertiesTableOrderingComposer
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get isArchived => $composableBuilder(
+    column: $table.isArchived,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$PropertiesTableAnnotationComposer
@@ -12244,6 +12415,11 @@ class $$PropertiesTableAnnotationComposer
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<bool> get isArchived => $composableBuilder(
+    column: $table.isArchived,
+    builder: (column) => column,
+  );
 
   Expression<T> roomsRefs<T extends Object>(
     Expression<T> Function($$RoomsTableAnnotationComposer a) f,
@@ -12329,12 +12505,14 @@ class $$PropertiesTableTableManager
                 Value<String?> address = const Value.absent(),
                 Value<String?> photoPath = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<bool> isArchived = const Value.absent(),
               }) => PropertiesCompanion(
                 id: id,
                 name: name,
                 address: address,
                 photoPath: photoPath,
                 createdAt: createdAt,
+                isArchived: isArchived,
               ),
           createCompanionCallback:
               ({
@@ -12343,12 +12521,14 @@ class $$PropertiesTableTableManager
                 Value<String?> address = const Value.absent(),
                 Value<String?> photoPath = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<bool> isArchived = const Value.absent(),
               }) => PropertiesCompanion.insert(
                 id: id,
                 name: name,
                 address: address,
                 photoPath: photoPath,
                 createdAt: createdAt,
+                isArchived: isArchived,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -12433,6 +12613,7 @@ typedef $$RoomsTableCreateCompanionBuilder =
       Value<bool> hasElectricityMeter,
       Value<double> currentElectricityRate,
       Value<DateTime> createdAt,
+      Value<bool> isArchived,
     });
 typedef $$RoomsTableUpdateCompanionBuilder =
     RoomsCompanion Function({
@@ -12443,6 +12624,7 @@ typedef $$RoomsTableUpdateCompanionBuilder =
       Value<bool> hasElectricityMeter,
       Value<double> currentElectricityRate,
       Value<DateTime> createdAt,
+      Value<bool> isArchived,
     });
 
 final class $$RoomsTableReferences
@@ -12561,6 +12743,11 @@ class $$RoomsTableFilterComposer extends Composer<_$AppDatabase, $RoomsTable> {
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isArchived => $composableBuilder(
+    column: $table.isArchived,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -12702,6 +12889,11 @@ class $$RoomsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get isArchived => $composableBuilder(
+    column: $table.isArchived,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$PropertiesTableOrderingComposer get propertyId {
     final $$PropertiesTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -12758,6 +12950,11 @@ class $$RoomsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<bool> get isArchived => $composableBuilder(
+    column: $table.isArchived,
+    builder: (column) => column,
+  );
 
   $$PropertiesTableAnnotationComposer get propertyId {
     final $$PropertiesTableAnnotationComposer composer = $composerBuilder(
@@ -12898,6 +13095,7 @@ class $$RoomsTableTableManager
                 Value<bool> hasElectricityMeter = const Value.absent(),
                 Value<double> currentElectricityRate = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<bool> isArchived = const Value.absent(),
               }) => RoomsCompanion(
                 id: id,
                 propertyId: propertyId,
@@ -12906,6 +13104,7 @@ class $$RoomsTableTableManager
                 hasElectricityMeter: hasElectricityMeter,
                 currentElectricityRate: currentElectricityRate,
                 createdAt: createdAt,
+                isArchived: isArchived,
               ),
           createCompanionCallback:
               ({
@@ -12916,6 +13115,7 @@ class $$RoomsTableTableManager
                 Value<bool> hasElectricityMeter = const Value.absent(),
                 Value<double> currentElectricityRate = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<bool> isArchived = const Value.absent(),
               }) => RoomsCompanion.insert(
                 id: id,
                 propertyId: propertyId,
@@ -12924,6 +13124,7 @@ class $$RoomsTableTableManager
                 hasElectricityMeter: hasElectricityMeter,
                 currentElectricityRate: currentElectricityRate,
                 createdAt: createdAt,
+                isArchived: isArchived,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -13094,6 +13295,7 @@ typedef $$TenantsTableCreateCompanionBuilder =
       Value<String?> introducerAddress,
       Value<String?> introducerPhone,
       Value<DateTime> createdAt,
+      Value<bool> isArchived,
     });
 typedef $$TenantsTableUpdateCompanionBuilder =
     TenantsCompanion Function({
@@ -13120,6 +13322,7 @@ typedef $$TenantsTableUpdateCompanionBuilder =
       Value<String?> introducerAddress,
       Value<String?> introducerPhone,
       Value<DateTime> createdAt,
+      Value<bool> isArchived,
     });
 
 final class $$TenantsTableReferences
@@ -13302,6 +13505,11 @@ class $$TenantsTableFilterComposer
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isArchived => $composableBuilder(
+    column: $table.isArchived,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -13504,6 +13712,11 @@ class $$TenantsTableOrderingComposer
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get isArchived => $composableBuilder(
+    column: $table.isArchived,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$TenantsTableAnnotationComposer
@@ -13615,6 +13828,11 @@ class $$TenantsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<bool> get isArchived => $composableBuilder(
+    column: $table.isArchived,
+    builder: (column) => column,
+  );
 
   Expression<T> customFieldsRefs<T extends Object>(
     Expression<T> Function($$CustomFieldsTableAnnotationComposer a) f,
@@ -13747,6 +13965,7 @@ class $$TenantsTableTableManager
                 Value<String?> introducerAddress = const Value.absent(),
                 Value<String?> introducerPhone = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<bool> isArchived = const Value.absent(),
               }) => TenantsCompanion(
                 id: id,
                 name: name,
@@ -13771,6 +13990,7 @@ class $$TenantsTableTableManager
                 introducerAddress: introducerAddress,
                 introducerPhone: introducerPhone,
                 createdAt: createdAt,
+                isArchived: isArchived,
               ),
           createCompanionCallback:
               ({
@@ -13797,6 +14017,7 @@ class $$TenantsTableTableManager
                 Value<String?> introducerAddress = const Value.absent(),
                 Value<String?> introducerPhone = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<bool> isArchived = const Value.absent(),
               }) => TenantsCompanion.insert(
                 id: id,
                 name: name,
@@ -13821,6 +14042,7 @@ class $$TenantsTableTableManager
                 introducerAddress: introducerAddress,
                 introducerPhone: introducerPhone,
                 createdAt: createdAt,
+                isArchived: isArchived,
               ),
           withReferenceMapper: (p0) => p0
               .map(

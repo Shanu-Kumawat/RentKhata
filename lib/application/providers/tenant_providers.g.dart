@@ -6,45 +6,7 @@ part of 'tenant_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$tenantsStreamHash() => r'18a4fb419c8bc4984f9b3856bb77f2b53a474283';
-
-/// Watch all tenants (auto-updates when data changes).
-///
-/// Copied from [tenantsStream].
-@ProviderFor(tenantsStream)
-final tenantsStreamProvider = AutoDisposeStreamProvider<List<Tenant>>.internal(
-  tenantsStream,
-  name: r'tenantsStreamProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$tenantsStreamHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef TenantsStreamRef = AutoDisposeStreamProviderRef<List<Tenant>>;
-String _$tenantsHash() => r'f996f116e03f8649e5617715f76dfb6a0136541b';
-
-/// Get all tenants (future).
-///
-/// Copied from [tenants].
-@ProviderFor(tenants)
-final tenantsProvider = AutoDisposeFutureProvider<List<Tenant>>.internal(
-  tenants,
-  name: r'tenantsProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$tenantsHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef TenantsRef = AutoDisposeFutureProviderRef<List<Tenant>>;
-String _$tenantHash() => r'f9720b1f62257995bdd0633fee46cef003acac52';
+String _$tenantsStreamHash() => r'82316b6be462e70fb62b1588f8cf2ad51ae2a4a1';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -66,6 +28,271 @@ class _SystemHash {
     return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
   }
 }
+
+/// Watch all tenants (auto-updates when data changes).
+///
+/// Copied from [tenantsStream].
+@ProviderFor(tenantsStream)
+const tenantsStreamProvider = TenantsStreamFamily();
+
+/// Watch all tenants (auto-updates when data changes).
+///
+/// Copied from [tenantsStream].
+class TenantsStreamFamily extends Family<AsyncValue<List<Tenant>>> {
+  /// Watch all tenants (auto-updates when data changes).
+  ///
+  /// Copied from [tenantsStream].
+  const TenantsStreamFamily();
+
+  /// Watch all tenants (auto-updates when data changes).
+  ///
+  /// Copied from [tenantsStream].
+  TenantsStreamProvider call({bool includeArchived = false}) {
+    return TenantsStreamProvider(includeArchived: includeArchived);
+  }
+
+  @override
+  TenantsStreamProvider getProviderOverride(
+    covariant TenantsStreamProvider provider,
+  ) {
+    return call(includeArchived: provider.includeArchived);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'tenantsStreamProvider';
+}
+
+/// Watch all tenants (auto-updates when data changes).
+///
+/// Copied from [tenantsStream].
+class TenantsStreamProvider extends AutoDisposeStreamProvider<List<Tenant>> {
+  /// Watch all tenants (auto-updates when data changes).
+  ///
+  /// Copied from [tenantsStream].
+  TenantsStreamProvider({bool includeArchived = false})
+    : this._internal(
+        (ref) => tenantsStream(
+          ref as TenantsStreamRef,
+          includeArchived: includeArchived,
+        ),
+        from: tenantsStreamProvider,
+        name: r'tenantsStreamProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$tenantsStreamHash,
+        dependencies: TenantsStreamFamily._dependencies,
+        allTransitiveDependencies:
+            TenantsStreamFamily._allTransitiveDependencies,
+        includeArchived: includeArchived,
+      );
+
+  TenantsStreamProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.includeArchived,
+  }) : super.internal();
+
+  final bool includeArchived;
+
+  @override
+  Override overrideWith(
+    Stream<List<Tenant>> Function(TenantsStreamRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: TenantsStreamProvider._internal(
+        (ref) => create(ref as TenantsStreamRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        includeArchived: includeArchived,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeStreamProviderElement<List<Tenant>> createElement() {
+    return _TenantsStreamProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is TenantsStreamProvider &&
+        other.includeArchived == includeArchived;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, includeArchived.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin TenantsStreamRef on AutoDisposeStreamProviderRef<List<Tenant>> {
+  /// The parameter `includeArchived` of this provider.
+  bool get includeArchived;
+}
+
+class _TenantsStreamProviderElement
+    extends AutoDisposeStreamProviderElement<List<Tenant>>
+    with TenantsStreamRef {
+  _TenantsStreamProviderElement(super.provider);
+
+  @override
+  bool get includeArchived => (origin as TenantsStreamProvider).includeArchived;
+}
+
+String _$tenantsHash() => r'4c42bb6a95b745d372222f02d185a2ace3f342ab';
+
+/// Get all tenants (future).
+///
+/// Copied from [tenants].
+@ProviderFor(tenants)
+const tenantsProvider = TenantsFamily();
+
+/// Get all tenants (future).
+///
+/// Copied from [tenants].
+class TenantsFamily extends Family<AsyncValue<List<Tenant>>> {
+  /// Get all tenants (future).
+  ///
+  /// Copied from [tenants].
+  const TenantsFamily();
+
+  /// Get all tenants (future).
+  ///
+  /// Copied from [tenants].
+  TenantsProvider call({bool includeArchived = false}) {
+    return TenantsProvider(includeArchived: includeArchived);
+  }
+
+  @override
+  TenantsProvider getProviderOverride(covariant TenantsProvider provider) {
+    return call(includeArchived: provider.includeArchived);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'tenantsProvider';
+}
+
+/// Get all tenants (future).
+///
+/// Copied from [tenants].
+class TenantsProvider extends AutoDisposeFutureProvider<List<Tenant>> {
+  /// Get all tenants (future).
+  ///
+  /// Copied from [tenants].
+  TenantsProvider({bool includeArchived = false})
+    : this._internal(
+        (ref) => tenants(ref as TenantsRef, includeArchived: includeArchived),
+        from: tenantsProvider,
+        name: r'tenantsProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$tenantsHash,
+        dependencies: TenantsFamily._dependencies,
+        allTransitiveDependencies: TenantsFamily._allTransitiveDependencies,
+        includeArchived: includeArchived,
+      );
+
+  TenantsProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.includeArchived,
+  }) : super.internal();
+
+  final bool includeArchived;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<Tenant>> Function(TenantsRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: TenantsProvider._internal(
+        (ref) => create(ref as TenantsRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        includeArchived: includeArchived,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<Tenant>> createElement() {
+    return _TenantsProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is TenantsProvider && other.includeArchived == includeArchived;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, includeArchived.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin TenantsRef on AutoDisposeFutureProviderRef<List<Tenant>> {
+  /// The parameter `includeArchived` of this provider.
+  bool get includeArchived;
+}
+
+class _TenantsProviderElement
+    extends AutoDisposeFutureProviderElement<List<Tenant>>
+    with TenantsRef {
+  _TenantsProviderElement(super.provider);
+
+  @override
+  bool get includeArchived => (origin as TenantsProvider).includeArchived;
+}
+
+String _$tenantHash() => r'f9720b1f62257995bdd0633fee46cef003acac52';
 
 /// Get a single tenant by ID.
 /// This provider auto-refreshes when tenantsStream emits new data.
@@ -197,7 +424,7 @@ class _TenantProviderElement extends AutoDisposeFutureProviderElement<Tenant?>
   int get id => (origin as TenantProvider).id;
 }
 
-String _$searchTenantsHash() => r'e97fd7d47f44992282b1e11be0a047cde08eb307';
+String _$searchTenantsHash() => r'91859be1e8d1f46abf50cf85b054f3933bafc14a';
 
 /// Search tenants.
 ///
@@ -217,15 +444,15 @@ class SearchTenantsFamily extends Family<AsyncValue<List<Tenant>>> {
   /// Search tenants.
   ///
   /// Copied from [searchTenants].
-  SearchTenantsProvider call(String query) {
-    return SearchTenantsProvider(query);
+  SearchTenantsProvider call(String query, {bool includeArchived = false}) {
+    return SearchTenantsProvider(query, includeArchived: includeArchived);
   }
 
   @override
   SearchTenantsProvider getProviderOverride(
     covariant SearchTenantsProvider provider,
   ) {
-    return call(provider.query);
+    return call(provider.query, includeArchived: provider.includeArchived);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -250,9 +477,13 @@ class SearchTenantsProvider extends AutoDisposeFutureProvider<List<Tenant>> {
   /// Search tenants.
   ///
   /// Copied from [searchTenants].
-  SearchTenantsProvider(String query)
+  SearchTenantsProvider(String query, {bool includeArchived = false})
     : this._internal(
-        (ref) => searchTenants(ref as SearchTenantsRef, query),
+        (ref) => searchTenants(
+          ref as SearchTenantsRef,
+          query,
+          includeArchived: includeArchived,
+        ),
         from: searchTenantsProvider,
         name: r'searchTenantsProvider',
         debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -262,6 +493,7 @@ class SearchTenantsProvider extends AutoDisposeFutureProvider<List<Tenant>> {
         allTransitiveDependencies:
             SearchTenantsFamily._allTransitiveDependencies,
         query: query,
+        includeArchived: includeArchived,
       );
 
   SearchTenantsProvider._internal(
@@ -272,9 +504,11 @@ class SearchTenantsProvider extends AutoDisposeFutureProvider<List<Tenant>> {
     required super.debugGetCreateSourceHash,
     required super.from,
     required this.query,
+    required this.includeArchived,
   }) : super.internal();
 
   final String query;
+  final bool includeArchived;
 
   @override
   Override overrideWith(
@@ -290,6 +524,7 @@ class SearchTenantsProvider extends AutoDisposeFutureProvider<List<Tenant>> {
         allTransitiveDependencies: null,
         debugGetCreateSourceHash: null,
         query: query,
+        includeArchived: includeArchived,
       ),
     );
   }
@@ -301,13 +536,16 @@ class SearchTenantsProvider extends AutoDisposeFutureProvider<List<Tenant>> {
 
   @override
   bool operator ==(Object other) {
-    return other is SearchTenantsProvider && other.query == query;
+    return other is SearchTenantsProvider &&
+        other.query == query &&
+        other.includeArchived == includeArchived;
   }
 
   @override
   int get hashCode {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
     hash = _SystemHash.combine(hash, query.hashCode);
+    hash = _SystemHash.combine(hash, includeArchived.hashCode);
 
     return _SystemHash.finish(hash);
   }
@@ -318,6 +556,9 @@ class SearchTenantsProvider extends AutoDisposeFutureProvider<List<Tenant>> {
 mixin SearchTenantsRef on AutoDisposeFutureProviderRef<List<Tenant>> {
   /// The parameter `query` of this provider.
   String get query;
+
+  /// The parameter `includeArchived` of this provider.
+  bool get includeArchived;
 }
 
 class _SearchTenantsProviderElement
@@ -327,6 +568,8 @@ class _SearchTenantsProviderElement
 
   @override
   String get query => (origin as SearchTenantsProvider).query;
+  @override
+  bool get includeArchived => (origin as SearchTenantsProvider).includeArchived;
 }
 
 String _$customFieldsForTenantHash() =>

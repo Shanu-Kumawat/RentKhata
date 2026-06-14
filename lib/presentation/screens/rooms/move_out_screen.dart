@@ -520,6 +520,8 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
         ref.invalidate(tenantsStreamProvider);
         ref.invalidate(tenantProvider(widget.occupancy.tenantId));
         ref.invalidate(dashboardSummaryProvider); // Refresh dashboard
+        ref.invalidate(unpaidBillsProvider); // Refresh unpaid bills
+        ref.invalidate(billsProvider); // Refresh all bills
 
         Navigator.pop(context); // Close sheet
         Navigator.pop(context); // Close Room Detail

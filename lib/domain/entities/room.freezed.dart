@@ -33,6 +33,7 @@ mixin _$Room {
   String? get currentTenantName => throw _privateConstructorUsedError;
   int? get currentOccupancyId => throw _privateConstructorUsedError;
   bool get isOccupied => throw _privateConstructorUsedError;
+  bool get isArchived => throw _privateConstructorUsedError;
 
   /// Serializes this Room to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -60,6 +61,7 @@ abstract class $RoomCopyWith<$Res> {
     String? currentTenantName,
     int? currentOccupancyId,
     bool isOccupied,
+    bool isArchived,
   });
 }
 
@@ -89,6 +91,7 @@ class _$RoomCopyWithImpl<$Res, $Val extends Room>
     Object? currentTenantName = freezed,
     Object? currentOccupancyId = freezed,
     Object? isOccupied = null,
+    Object? isArchived = null,
   }) {
     return _then(
       _value.copyWith(
@@ -136,6 +139,10 @@ class _$RoomCopyWithImpl<$Res, $Val extends Room>
                 ? _value.isOccupied
                 : isOccupied // ignore: cast_nullable_to_non_nullable
                       as bool,
+            isArchived: null == isArchived
+                ? _value.isArchived
+                : isArchived // ignore: cast_nullable_to_non_nullable
+                      as bool,
           )
           as $Val,
     );
@@ -162,6 +169,7 @@ abstract class _$$RoomImplCopyWith<$Res> implements $RoomCopyWith<$Res> {
     String? currentTenantName,
     int? currentOccupancyId,
     bool isOccupied,
+    bool isArchived,
   });
 }
 
@@ -188,6 +196,7 @@ class __$$RoomImplCopyWithImpl<$Res>
     Object? currentTenantName = freezed,
     Object? currentOccupancyId = freezed,
     Object? isOccupied = null,
+    Object? isArchived = null,
   }) {
     return _then(
       _$RoomImpl(
@@ -235,6 +244,10 @@ class __$$RoomImplCopyWithImpl<$Res>
             ? _value.isOccupied
             : isOccupied // ignore: cast_nullable_to_non_nullable
                   as bool,
+        isArchived: null == isArchived
+            ? _value.isArchived
+            : isArchived // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -255,6 +268,7 @@ class _$RoomImpl implements _Room {
     this.currentTenantName,
     this.currentOccupancyId,
     this.isOccupied = false,
+    this.isArchived = false,
   });
 
   factory _$RoomImpl.fromJson(Map<String, dynamic> json) =>
@@ -287,10 +301,13 @@ class _$RoomImpl implements _Room {
   @override
   @JsonKey()
   final bool isOccupied;
+  @override
+  @JsonKey()
+  final bool isArchived;
 
   @override
   String toString() {
-    return 'Room(id: $id, propertyId: $propertyId, roomNumber: $roomNumber, baseRent: $baseRent, hasElectricityMeter: $hasElectricityMeter, currentElectricityRate: $currentElectricityRate, createdAt: $createdAt, propertyName: $propertyName, currentTenantName: $currentTenantName, currentOccupancyId: $currentOccupancyId, isOccupied: $isOccupied)';
+    return 'Room(id: $id, propertyId: $propertyId, roomNumber: $roomNumber, baseRent: $baseRent, hasElectricityMeter: $hasElectricityMeter, currentElectricityRate: $currentElectricityRate, createdAt: $createdAt, propertyName: $propertyName, currentTenantName: $currentTenantName, currentOccupancyId: $currentOccupancyId, isOccupied: $isOccupied, isArchived: $isArchived)';
   }
 
   @override
@@ -318,7 +335,9 @@ class _$RoomImpl implements _Room {
             (identical(other.currentOccupancyId, currentOccupancyId) ||
                 other.currentOccupancyId == currentOccupancyId) &&
             (identical(other.isOccupied, isOccupied) ||
-                other.isOccupied == isOccupied));
+                other.isOccupied == isOccupied) &&
+            (identical(other.isArchived, isArchived) ||
+                other.isArchived == isArchived));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -336,6 +355,7 @@ class _$RoomImpl implements _Room {
     currentTenantName,
     currentOccupancyId,
     isOccupied,
+    isArchived,
   );
 
   /// Create a copy of Room
@@ -365,6 +385,7 @@ abstract class _Room implements Room {
     final String? currentTenantName,
     final int? currentOccupancyId,
     final bool isOccupied,
+    final bool isArchived,
   }) = _$RoomImpl;
 
   factory _Room.fromJson(Map<String, dynamic> json) = _$RoomImpl.fromJson;
@@ -391,6 +412,8 @@ abstract class _Room implements Room {
   int? get currentOccupancyId;
   @override
   bool get isOccupied;
+  @override
+  bool get isArchived;
 
   /// Create a copy of Room
   /// with the given fields replaced by the non-null parameter values.

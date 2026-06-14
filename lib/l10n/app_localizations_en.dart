@@ -372,6 +372,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get propertyDeleted => 'Property deleted';
 
   @override
+  String get deleteRoom => 'Delete Room';
+
+  @override
+  String get deleteRoomTitle => 'Delete Room?';
+
+  @override
+  String confirmDeleteRoom(String roomNumber) {
+    return 'Are you sure you want to delete room \"$roomNumber\"? This action cannot be undone.';
+  }
+
+  @override
+  String get roomDeletedSuccess => 'Room deleted';
+
+  @override
   String occupancyCount(int count) {
     return '$count occupied';
   }
@@ -2691,4 +2705,31 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get meterTrackingExplanation =>
       'Enter readings to automatically calculate electricity charges based on your configured rate.';
+
+  @override
+  String get archiveProperty => 'Archive Property';
+
+  @override
+  String get unarchiveProperty => 'Unarchive Property';
+
+  @override
+  String get archiveRoom => 'Archive Room';
+
+  @override
+  String get unarchiveRoom => 'Unarchive Room';
+
+  @override
+  String get archiveTenant => 'Archive Tenant';
+
+  @override
+  String get unarchiveTenant => 'Unarchive Tenant';
+
+  @override
+  String get showArchived => 'Show Archived';
+
+  @override
+  String get hideArchived => 'Hide Archived';
+
+  @override
+  String get archivedBadge => 'Archived';
 }

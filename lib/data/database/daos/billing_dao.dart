@@ -78,6 +78,10 @@ class BillingDao extends DatabaseAccessor<AppDatabase> with _$BillingDaoMixin {
             ..orderBy([(p) => OrderingTerm.desc(p.paymentDate)]))
           .get();
 
+  /// Get payment by ID
+  Future<PaymentEntity?> getPaymentById(int id) =>
+      (select(payments)..where((p) => p.id.equals(id))).getSingleOrNull();
+
   /// Watch payments for a bill
   Stream<List<PaymentEntity>> watchPaymentsForBill(int billId) =>
       (select(payments)
@@ -138,10 +142,17 @@ class BillingDao extends DatabaseAccessor<AppDatabase> with _$BillingDaoMixin {
   /// Get all unpaid bills (bills with pending balance)
   Future<List<({BillEntity bill, double pendingAmount})>>
   getUnpaidBills() async {
-    final allBills = await getAllBills();
+    // Only fetch bills that are not fully paid or voided
+    final candidateBills = await (select(bills)
+          ..where((b) => b.status.isNotIn([
+                BillStatus.paid.name,
+                BillStatus.voided.name,
+              ])))
+        .get();
+        
     final unpaid = <({BillEntity bill, double pendingAmount})>[];
 
-    for (final bill in allBills) {
+    for (final bill in candidateBills) {
       final pending = await getPendingBalanceForBill(bill.id);
       if (pending > 0) {
         unpaid.add((bill: bill, pendingAmount: pending));

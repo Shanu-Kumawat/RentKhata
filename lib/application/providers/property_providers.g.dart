@@ -6,46 +6,7 @@ part of 'property_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$propertiesStreamHash() => r'194b2650a01845bf6d18c30969dc6cd087d35f5a';
-
-/// Watch all properties (auto-updates when data changes).
-///
-/// Copied from [propertiesStream].
-@ProviderFor(propertiesStream)
-final propertiesStreamProvider =
-    AutoDisposeStreamProvider<List<Property>>.internal(
-      propertiesStream,
-      name: r'propertiesStreamProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$propertiesStreamHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef PropertiesStreamRef = AutoDisposeStreamProviderRef<List<Property>>;
-String _$propertiesHash() => r'6c0be876712e61a8cd6e2b4dd77403fe6fc07c84';
-
-/// Get all properties (future).
-///
-/// Copied from [properties].
-@ProviderFor(properties)
-final propertiesProvider = AutoDisposeFutureProvider<List<Property>>.internal(
-  properties,
-  name: r'propertiesProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$propertiesHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef PropertiesRef = AutoDisposeFutureProviderRef<List<Property>>;
-String _$propertyHash() => r'99b0313e500b30aa7c85467463c46ad76a402939';
+String _$propertiesStreamHash() => r'6ab818bee5e75906384535197bfe9175a406aafc';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -67,6 +28,277 @@ class _SystemHash {
     return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
   }
 }
+
+/// Watch all properties (auto-updates when data changes).
+///
+/// Copied from [propertiesStream].
+@ProviderFor(propertiesStream)
+const propertiesStreamProvider = PropertiesStreamFamily();
+
+/// Watch all properties (auto-updates when data changes).
+///
+/// Copied from [propertiesStream].
+class PropertiesStreamFamily extends Family<AsyncValue<List<Property>>> {
+  /// Watch all properties (auto-updates when data changes).
+  ///
+  /// Copied from [propertiesStream].
+  const PropertiesStreamFamily();
+
+  /// Watch all properties (auto-updates when data changes).
+  ///
+  /// Copied from [propertiesStream].
+  PropertiesStreamProvider call({bool includeArchived = false}) {
+    return PropertiesStreamProvider(includeArchived: includeArchived);
+  }
+
+  @override
+  PropertiesStreamProvider getProviderOverride(
+    covariant PropertiesStreamProvider provider,
+  ) {
+    return call(includeArchived: provider.includeArchived);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'propertiesStreamProvider';
+}
+
+/// Watch all properties (auto-updates when data changes).
+///
+/// Copied from [propertiesStream].
+class PropertiesStreamProvider
+    extends AutoDisposeStreamProvider<List<Property>> {
+  /// Watch all properties (auto-updates when data changes).
+  ///
+  /// Copied from [propertiesStream].
+  PropertiesStreamProvider({bool includeArchived = false})
+    : this._internal(
+        (ref) => propertiesStream(
+          ref as PropertiesStreamRef,
+          includeArchived: includeArchived,
+        ),
+        from: propertiesStreamProvider,
+        name: r'propertiesStreamProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$propertiesStreamHash,
+        dependencies: PropertiesStreamFamily._dependencies,
+        allTransitiveDependencies:
+            PropertiesStreamFamily._allTransitiveDependencies,
+        includeArchived: includeArchived,
+      );
+
+  PropertiesStreamProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.includeArchived,
+  }) : super.internal();
+
+  final bool includeArchived;
+
+  @override
+  Override overrideWith(
+    Stream<List<Property>> Function(PropertiesStreamRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: PropertiesStreamProvider._internal(
+        (ref) => create(ref as PropertiesStreamRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        includeArchived: includeArchived,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeStreamProviderElement<List<Property>> createElement() {
+    return _PropertiesStreamProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is PropertiesStreamProvider &&
+        other.includeArchived == includeArchived;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, includeArchived.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin PropertiesStreamRef on AutoDisposeStreamProviderRef<List<Property>> {
+  /// The parameter `includeArchived` of this provider.
+  bool get includeArchived;
+}
+
+class _PropertiesStreamProviderElement
+    extends AutoDisposeStreamProviderElement<List<Property>>
+    with PropertiesStreamRef {
+  _PropertiesStreamProviderElement(super.provider);
+
+  @override
+  bool get includeArchived =>
+      (origin as PropertiesStreamProvider).includeArchived;
+}
+
+String _$propertiesHash() => r'd9293378bf075de59d8d757e477389db206abe46';
+
+/// Get all properties (future).
+///
+/// Copied from [properties].
+@ProviderFor(properties)
+const propertiesProvider = PropertiesFamily();
+
+/// Get all properties (future).
+///
+/// Copied from [properties].
+class PropertiesFamily extends Family<AsyncValue<List<Property>>> {
+  /// Get all properties (future).
+  ///
+  /// Copied from [properties].
+  const PropertiesFamily();
+
+  /// Get all properties (future).
+  ///
+  /// Copied from [properties].
+  PropertiesProvider call({bool includeArchived = false}) {
+    return PropertiesProvider(includeArchived: includeArchived);
+  }
+
+  @override
+  PropertiesProvider getProviderOverride(
+    covariant PropertiesProvider provider,
+  ) {
+    return call(includeArchived: provider.includeArchived);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'propertiesProvider';
+}
+
+/// Get all properties (future).
+///
+/// Copied from [properties].
+class PropertiesProvider extends AutoDisposeFutureProvider<List<Property>> {
+  /// Get all properties (future).
+  ///
+  /// Copied from [properties].
+  PropertiesProvider({bool includeArchived = false})
+    : this._internal(
+        (ref) =>
+            properties(ref as PropertiesRef, includeArchived: includeArchived),
+        from: propertiesProvider,
+        name: r'propertiesProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$propertiesHash,
+        dependencies: PropertiesFamily._dependencies,
+        allTransitiveDependencies: PropertiesFamily._allTransitiveDependencies,
+        includeArchived: includeArchived,
+      );
+
+  PropertiesProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.includeArchived,
+  }) : super.internal();
+
+  final bool includeArchived;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<Property>> Function(PropertiesRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: PropertiesProvider._internal(
+        (ref) => create(ref as PropertiesRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        includeArchived: includeArchived,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<Property>> createElement() {
+    return _PropertiesProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is PropertiesProvider &&
+        other.includeArchived == includeArchived;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, includeArchived.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin PropertiesRef on AutoDisposeFutureProviderRef<List<Property>> {
+  /// The parameter `includeArchived` of this provider.
+  bool get includeArchived;
+}
+
+class _PropertiesProviderElement
+    extends AutoDisposeFutureProviderElement<List<Property>>
+    with PropertiesRef {
+  _PropertiesProviderElement(super.provider);
+
+  @override
+  bool get includeArchived => (origin as PropertiesProvider).includeArchived;
+}
+
+String _$propertyHash() => r'99b0313e500b30aa7c85467463c46ad76a402939';
 
 /// Get a single property by ID.
 /// This provider auto-refreshes when propertiesStream emits new data.
@@ -202,7 +434,7 @@ class _PropertyProviderElement
 }
 
 String _$roomsForPropertyStreamHash() =>
-    r'ec174991dcf9e30c1c37319223ab9c5949d992d6';
+    r'e4114f03a7252d55eb8a7aaa4f3cac209a04007a';
 
 /// Watch rooms for a property (auto-updates when data changes).
 ///
@@ -222,15 +454,21 @@ class RoomsForPropertyStreamFamily extends Family<AsyncValue<List<Room>>> {
   /// Watch rooms for a property (auto-updates when data changes).
   ///
   /// Copied from [roomsForPropertyStream].
-  RoomsForPropertyStreamProvider call(int propertyId) {
-    return RoomsForPropertyStreamProvider(propertyId);
+  RoomsForPropertyStreamProvider call(
+    int propertyId, {
+    bool includeArchived = false,
+  }) {
+    return RoomsForPropertyStreamProvider(
+      propertyId,
+      includeArchived: includeArchived,
+    );
   }
 
   @override
   RoomsForPropertyStreamProvider getProviderOverride(
     covariant RoomsForPropertyStreamProvider provider,
   ) {
-    return call(provider.propertyId);
+    return call(provider.propertyId, includeArchived: provider.includeArchived);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -256,11 +494,12 @@ class RoomsForPropertyStreamProvider
   /// Watch rooms for a property (auto-updates when data changes).
   ///
   /// Copied from [roomsForPropertyStream].
-  RoomsForPropertyStreamProvider(int propertyId)
+  RoomsForPropertyStreamProvider(int propertyId, {bool includeArchived = false})
     : this._internal(
         (ref) => roomsForPropertyStream(
           ref as RoomsForPropertyStreamRef,
           propertyId,
+          includeArchived: includeArchived,
         ),
         from: roomsForPropertyStreamProvider,
         name: r'roomsForPropertyStreamProvider',
@@ -271,6 +510,7 @@ class RoomsForPropertyStreamProvider
         allTransitiveDependencies:
             RoomsForPropertyStreamFamily._allTransitiveDependencies,
         propertyId: propertyId,
+        includeArchived: includeArchived,
       );
 
   RoomsForPropertyStreamProvider._internal(
@@ -281,9 +521,11 @@ class RoomsForPropertyStreamProvider
     required super.debugGetCreateSourceHash,
     required super.from,
     required this.propertyId,
+    required this.includeArchived,
   }) : super.internal();
 
   final int propertyId;
+  final bool includeArchived;
 
   @override
   Override overrideWith(
@@ -299,6 +541,7 @@ class RoomsForPropertyStreamProvider
         allTransitiveDependencies: null,
         debugGetCreateSourceHash: null,
         propertyId: propertyId,
+        includeArchived: includeArchived,
       ),
     );
   }
@@ -311,13 +554,15 @@ class RoomsForPropertyStreamProvider
   @override
   bool operator ==(Object other) {
     return other is RoomsForPropertyStreamProvider &&
-        other.propertyId == propertyId;
+        other.propertyId == propertyId &&
+        other.includeArchived == includeArchived;
   }
 
   @override
   int get hashCode {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
     hash = _SystemHash.combine(hash, propertyId.hashCode);
+    hash = _SystemHash.combine(hash, includeArchived.hashCode);
 
     return _SystemHash.finish(hash);
   }
@@ -328,6 +573,9 @@ class RoomsForPropertyStreamProvider
 mixin RoomsForPropertyStreamRef on AutoDisposeStreamProviderRef<List<Room>> {
   /// The parameter `propertyId` of this provider.
   int get propertyId;
+
+  /// The parameter `includeArchived` of this provider.
+  bool get includeArchived;
 }
 
 class _RoomsForPropertyStreamProviderElement
@@ -337,9 +585,12 @@ class _RoomsForPropertyStreamProviderElement
 
   @override
   int get propertyId => (origin as RoomsForPropertyStreamProvider).propertyId;
+  @override
+  bool get includeArchived =>
+      (origin as RoomsForPropertyStreamProvider).includeArchived;
 }
 
-String _$roomsForPropertyHash() => r'162287f60d48bfdb5516a8d338e46e92e32c8b5f';
+String _$roomsForPropertyHash() => r'd8a800aee5516e42ac98a674265e75eff48419f6';
 
 /// Get rooms for a property.
 ///
@@ -359,15 +610,21 @@ class RoomsForPropertyFamily extends Family<AsyncValue<List<Room>>> {
   /// Get rooms for a property.
   ///
   /// Copied from [roomsForProperty].
-  RoomsForPropertyProvider call(int propertyId) {
-    return RoomsForPropertyProvider(propertyId);
+  RoomsForPropertyProvider call(
+    int propertyId, {
+    bool includeArchived = false,
+  }) {
+    return RoomsForPropertyProvider(
+      propertyId,
+      includeArchived: includeArchived,
+    );
   }
 
   @override
   RoomsForPropertyProvider getProviderOverride(
     covariant RoomsForPropertyProvider provider,
   ) {
-    return call(provider.propertyId);
+    return call(provider.propertyId, includeArchived: provider.includeArchived);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -392,9 +649,13 @@ class RoomsForPropertyProvider extends AutoDisposeFutureProvider<List<Room>> {
   /// Get rooms for a property.
   ///
   /// Copied from [roomsForProperty].
-  RoomsForPropertyProvider(int propertyId)
+  RoomsForPropertyProvider(int propertyId, {bool includeArchived = false})
     : this._internal(
-        (ref) => roomsForProperty(ref as RoomsForPropertyRef, propertyId),
+        (ref) => roomsForProperty(
+          ref as RoomsForPropertyRef,
+          propertyId,
+          includeArchived: includeArchived,
+        ),
         from: roomsForPropertyProvider,
         name: r'roomsForPropertyProvider',
         debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -404,6 +665,7 @@ class RoomsForPropertyProvider extends AutoDisposeFutureProvider<List<Room>> {
         allTransitiveDependencies:
             RoomsForPropertyFamily._allTransitiveDependencies,
         propertyId: propertyId,
+        includeArchived: includeArchived,
       );
 
   RoomsForPropertyProvider._internal(
@@ -414,9 +676,11 @@ class RoomsForPropertyProvider extends AutoDisposeFutureProvider<List<Room>> {
     required super.debugGetCreateSourceHash,
     required super.from,
     required this.propertyId,
+    required this.includeArchived,
   }) : super.internal();
 
   final int propertyId;
+  final bool includeArchived;
 
   @override
   Override overrideWith(
@@ -432,6 +696,7 @@ class RoomsForPropertyProvider extends AutoDisposeFutureProvider<List<Room>> {
         allTransitiveDependencies: null,
         debugGetCreateSourceHash: null,
         propertyId: propertyId,
+        includeArchived: includeArchived,
       ),
     );
   }
@@ -443,13 +708,16 @@ class RoomsForPropertyProvider extends AutoDisposeFutureProvider<List<Room>> {
 
   @override
   bool operator ==(Object other) {
-    return other is RoomsForPropertyProvider && other.propertyId == propertyId;
+    return other is RoomsForPropertyProvider &&
+        other.propertyId == propertyId &&
+        other.includeArchived == includeArchived;
   }
 
   @override
   int get hashCode {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
     hash = _SystemHash.combine(hash, propertyId.hashCode);
+    hash = _SystemHash.combine(hash, includeArchived.hashCode);
 
     return _SystemHash.finish(hash);
   }
@@ -460,6 +728,9 @@ class RoomsForPropertyProvider extends AutoDisposeFutureProvider<List<Room>> {
 mixin RoomsForPropertyRef on AutoDisposeFutureProviderRef<List<Room>> {
   /// The parameter `propertyId` of this provider.
   int get propertyId;
+
+  /// The parameter `includeArchived` of this provider.
+  bool get includeArchived;
 }
 
 class _RoomsForPropertyProviderElement
@@ -469,6 +740,9 @@ class _RoomsForPropertyProviderElement
 
   @override
   int get propertyId => (origin as RoomsForPropertyProvider).propertyId;
+  @override
+  bool get includeArchived =>
+      (origin as RoomsForPropertyProvider).includeArchived;
 }
 
 String _$roomHash() => r'b1f13c8bc207dbffa8ba998915e0bcc51e71ba46';
@@ -603,24 +877,135 @@ class _RoomProviderElement extends AutoDisposeFutureProviderElement<Room?>
   int get id => (origin as RoomProvider).id;
 }
 
-String _$allRoomsHash() => r'9775cec47f5205245bb65cb81f1e95c8f7d91727';
+String _$allRoomsHash() => r'44808788912a91ebbbacb5686013278bdd7c4ad5';
 
 /// Get all rooms.
 ///
 /// Copied from [allRooms].
 @ProviderFor(allRooms)
-final allRoomsProvider = AutoDisposeFutureProvider<List<Room>>.internal(
-  allRooms,
-  name: r'allRoomsProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$allRoomsHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+const allRoomsProvider = AllRoomsFamily();
+
+/// Get all rooms.
+///
+/// Copied from [allRooms].
+class AllRoomsFamily extends Family<AsyncValue<List<Room>>> {
+  /// Get all rooms.
+  ///
+  /// Copied from [allRooms].
+  const AllRoomsFamily();
+
+  /// Get all rooms.
+  ///
+  /// Copied from [allRooms].
+  AllRoomsProvider call({bool includeArchived = false}) {
+    return AllRoomsProvider(includeArchived: includeArchived);
+  }
+
+  @override
+  AllRoomsProvider getProviderOverride(covariant AllRoomsProvider provider) {
+    return call(includeArchived: provider.includeArchived);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'allRoomsProvider';
+}
+
+/// Get all rooms.
+///
+/// Copied from [allRooms].
+class AllRoomsProvider extends AutoDisposeFutureProvider<List<Room>> {
+  /// Get all rooms.
+  ///
+  /// Copied from [allRooms].
+  AllRoomsProvider({bool includeArchived = false})
+    : this._internal(
+        (ref) => allRooms(ref as AllRoomsRef, includeArchived: includeArchived),
+        from: allRoomsProvider,
+        name: r'allRoomsProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$allRoomsHash,
+        dependencies: AllRoomsFamily._dependencies,
+        allTransitiveDependencies: AllRoomsFamily._allTransitiveDependencies,
+        includeArchived: includeArchived,
+      );
+
+  AllRoomsProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.includeArchived,
+  }) : super.internal();
+
+  final bool includeArchived;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<Room>> Function(AllRoomsRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: AllRoomsProvider._internal(
+        (ref) => create(ref as AllRoomsRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        includeArchived: includeArchived,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<Room>> createElement() {
+    return _AllRoomsProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is AllRoomsProvider &&
+        other.includeArchived == includeArchived;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, includeArchived.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef AllRoomsRef = AutoDisposeFutureProviderRef<List<Room>>;
+mixin AllRoomsRef on AutoDisposeFutureProviderRef<List<Room>> {
+  /// The parameter `includeArchived` of this provider.
+  bool get includeArchived;
+}
+
+class _AllRoomsProviderElement
+    extends AutoDisposeFutureProviderElement<List<Room>>
+    with AllRoomsRef {
+  _AllRoomsProviderElement(super.provider);
+
+  @override
+  bool get includeArchived => (origin as AllRoomsProvider).includeArchived;
+}
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
