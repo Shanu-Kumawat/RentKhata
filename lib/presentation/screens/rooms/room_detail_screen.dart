@@ -92,7 +92,7 @@ class RoomDetailScreen extends ConsumerWidget {
         appBar: AppBar(
           title: Text(AppLocalizations.of(context)!.errorPrefix.trim()),
         ),
-        body: Center(child: Text('Error: $e')),
+        body: Center(child: Text('${AppLocalizations.of(context)!.errorPrefix}$e')),
       ),
     );
   }
@@ -234,7 +234,7 @@ class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
           }
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, s) => Center(child: Text('Error: $e')),
+        error: (e, s) => Center(child: Text('${AppLocalizations.of(context)!.errorPrefix}$e')),
       ),
     );
   }
@@ -321,6 +321,8 @@ class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
       }
     }
 
+    final globalElectricityRate = await ref.read(currentElectricityRateProvider.future);
+
     if (!mounted) return;
 
     final result = await showModalBottomSheet<bool>(
@@ -333,7 +335,7 @@ class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
         roomNumber: widget.room.roomNumber,
         agreedRent: occupancy.agreedRent,
         hasElectricityMeter: widget.room.hasElectricityMeter,
-        electricityRate: widget.room.currentElectricityRate,
+        electricityRate: globalElectricityRate,
         suggestedPeriodStart: effectiveCycleStart,
         suggestedPeriodEnd: effectiveCycleEnd,
         billingStartDate: occupancy.effectiveBillingStartDate,
@@ -425,7 +427,7 @@ class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error generating statement: $e'),
+            content: Text('${AppLocalizations.of(context)!.errorPrefix}$e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -515,27 +517,6 @@ class _RoomInfoCard extends StatelessWidget {
                 ),
               ],
             ),
-            if (room.hasElectricityMeter) ...[
-              const SizedBox(height: 12),
-              const Divider(),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  const Icon(
-                    Icons.bolt_outlined,
-                    size: 16,
-                    color: AppColors.warning,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Electricity meter @ ${formatCurrency(room.currentElectricityRate)}/unit',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            ],
           ],
         ),
       ),
@@ -976,7 +957,7 @@ class _BillsSection extends ConsumerWidget {
             );
           },
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, s) => Text('Error: $e'),
+          error: (e, s) => Text('${AppLocalizations.of(context)!.errorPrefix}$e'),
         ),
       ],
     );

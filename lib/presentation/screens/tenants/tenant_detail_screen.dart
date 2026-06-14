@@ -870,7 +870,7 @@ class _FullscreenImageViewer extends StatelessWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error sharing: $e')));
+        ).showSnackBar(SnackBar(content: Text('${AppLocalizations.of(context)!.errorPrefix}$e')));
       }
     }
   }
@@ -1025,7 +1025,7 @@ class _OccupancyHistorySection extends StatelessWidget {
           error: (e, _) => Card(
             child: Padding(
               padding: const EdgeInsets.all(24),
-              child: Center(child: Text('Error: $e')),
+              child: Center(child: Text('${AppLocalizations.of(context)!.errorPrefix}$e')),
             ),
           ),
         ),
@@ -1279,7 +1279,7 @@ class _FamilyMembersSection extends ConsumerWidget {
                 ],
               ),
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(child: Text('Error: $e')),
+              error: (e, _) => Center(child: Text('${AppLocalizations.of(context)!.errorPrefix}$e')),
             ),
           ),
         ],
@@ -1648,7 +1648,7 @@ class _CustomFieldsSectionState extends ConsumerState<_CustomFieldsSection> {
                           .toList(),
                     ),
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, s) => Text('Error: $e'),
+              error: (e, s) => Text('${AppLocalizations.of(context)!.errorPrefix}$e'),
             ),
           ],
         ),
@@ -1796,7 +1796,7 @@ class _DocumentsSection extends ConsumerWidget {
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Text('Error: $e'),
+              error: (e, _) => Text('${AppLocalizations.of(context)!.errorPrefix}$e'),
             ),
           ],
         ),

@@ -74,7 +74,7 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error saving document: $e')));
+        ).showSnackBar(SnackBar(content: Text('${AppLocalizations.of(context)!.errorPrefix}$e')));
         setState(() => _isSaving = false);
       }
     }

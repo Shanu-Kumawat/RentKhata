@@ -175,7 +175,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           // Since BillDetailScreen requires a Bill, we throw or show an error
           return Scaffold(
             appBar: AppBar(title: Text(AppLocalizations.of(context)!.errorGeneric)),
-            body: const Center(child: Text('Bill not found in navigation state')),
+            body: Center(child: Text(AppLocalizations.of(context)!.errorGeneric)),
           );
         },
       ),

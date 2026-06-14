@@ -75,7 +75,7 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ).showSnackBar(SnackBar(content: Text('${AppLocalizations.of(context)!.errorPrefix}$e')));
         setState(() => _isLoading = false);
       }
     }

@@ -2625,7 +2625,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get addNameUpiSubtitle =>
-      'एंबेडेड QR कोड के साथ पेशेवर चालान बनाने के लिए अपना नाम और UPI ID जोड़ें।';
+      'अपने किरायेदारों को पेशेवर रसीदें जारी करने के लिए अपना बिलिंग प्रोफ़ाइल सेट करें।';
 
   @override
   String get continueToBillBtn => 'बिल पर जारी रखें';
@@ -2634,7 +2634,11 @@ class AppLocalizationsHi extends AppLocalizations {
   String get yourNameBusinessNameLabel => 'आपका नाम या व्यवसाय का नाम';
 
   @override
-  String get upiIdOptionalLabel => 'UPI ID (वैकल्पिक लेकिन अनुशंसित)';
+  String get upiIdOptionalLabel => 'यूपीआई आईडी';
+
+  @override
+  String get upiInvoiceHelperText =>
+      'आपके इनवॉइस में एक स्कैन करने योग्य क्यूआर कोड जोड़ता है, जिससे किरायेदारों के लिए आपको सीधे भुगतान करना 3 गुना तेज़ हो जाता है।';
 
   @override
   String get occupancyDetailsTitle => 'अधिभोग विवरण';

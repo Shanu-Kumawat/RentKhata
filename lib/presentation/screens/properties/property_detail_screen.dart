@@ -84,7 +84,7 @@ class PropertyDetailScreen extends ConsumerWidget {
                       : _buildRoomsList(context, rooms),
                   loading: () =>
                       const Center(child: CircularProgressIndicator()),
-                  error: (e, s) => Center(child: Text('Error: $e')),
+                  error: (e, s) => Center(child: Text('${AppLocalizations.of(context)!.errorPrefix}$e')),
                 ),
               ),
             ],

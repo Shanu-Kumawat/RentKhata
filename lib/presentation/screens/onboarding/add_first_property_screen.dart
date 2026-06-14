@@ -91,7 +91,7 @@ class _AddFirstPropertyScreenState
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error adding property: $e')));
+        ).showSnackBar(SnackBar(content: Text('${AppLocalizations.of(context)!.errorPrefix}$e')));
         setState(() => _isLoading = false);
       }
     }

@@ -2,7 +2,6 @@
 library;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../application/providers/occupancy_providers.dart';
@@ -18,6 +17,8 @@ import '../../../services/pdf_service.dart';
 import '../../../application/providers/repository_providers.dart';
 import '../pdf/pdf_preview_screen.dart';
 import '../billing/bill_detail_screen.dart';
+import '../../../services/ledger_service.dart';
+import '../../../domain/entities/ledger.dart';
 
 /// Screen showing complete historical details of an occupancy period.
 class OccupancyDetailScreen extends ConsumerWidget {
@@ -36,13 +37,7 @@ class OccupancyDetailScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.share_outlined),
             tooltip: 'Share Details',
-            onPressed: () {
-              HapticFeedback.lightImpact();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(AppLocalizations.of(context)!.shareFunctionalityComingSoon),
-                ),
-              );
-            },
+            onPressed: () => _generateAndShareKhataStatement(context, ref, occupancyId),
           ),
         ],
       ),
@@ -54,7 +49,7 @@ class OccupancyDetailScreen extends ConsumerWidget {
           return _OccupancyDetailContent(detail: detail);
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, s) => Center(child: Text('Error: $e')),
+        error: (e, s) => Center(child: Text('${AppLocalizations.of(context)!.errorPrefix}$e')),
       ),
     );
   }
@@ -885,7 +880,7 @@ class _DepositSettlementCard extends StatelessWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error generating receipt: $e')));
+        ).showSnackBar(SnackBar(content: Text('${AppLocalizations.of(context)!.errorPrefix}$e')));
       }
     }
   }
@@ -1080,5 +1075,58 @@ class _BillListState extends State<_BillList> {
           ),
       ],
     );
+  }
+}
+
+Future<void> _generateAndShareKhataStatement(
+  BuildContext context,
+  WidgetRef ref,
+  int occupancyId,
+) async {
+  final l10n = AppLocalizations.of(context)!;
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (_) => const Center(child: CircularProgressIndicator()),
+  );
+
+  try {
+    final LedgerStatement? ledgerStatement = await ref.read(
+      ledgerStatementProvider(occupancyId).future,
+    );
+    if (ledgerStatement == null) throw Exception(l10n.ledgerNotFound);
+
+    final pdfFile = await PdfService.generateTenantLedgerPdf(
+      ledgerStatement,
+      l10n,
+    );
+
+    if (context.mounted) Navigator.pop(context);
+
+    if (!context.mounted) return;
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => PdfPreviewScreen(
+          pdfFile: pdfFile,
+          title: l10n.khataStatement,
+          shareSubject: l10n.khataStatement,
+          shareText:
+              'Dear ${ledgerStatement.tenantName},\n\nPlease find your generated Khata Statement attached.',
+          suggestedFileName: pdfFile.path.split('/').last,
+        ),
+      ),
+    );
+  } catch (e) {
+    if (context.mounted) Navigator.pop(context);
+
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${AppLocalizations.of(context)!.errorPrefix}$e'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
   }
 }

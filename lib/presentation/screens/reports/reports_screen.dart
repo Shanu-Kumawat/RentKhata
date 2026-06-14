@@ -811,7 +811,7 @@ class _PendingBillsTab extends ConsumerWidget {
             )
           : _buildBillsList(context, bills),
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, s) => Center(child: Text('Error: $e')),
+      error: (e, s) => Center(child: Text('${AppLocalizations.of(context)!.errorPrefix}$e')),
     );
   }
 
@@ -886,7 +886,7 @@ class _HistoryTab extends ConsumerWidget {
         return _buildBillsList(context, paidBills);
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, s) => Center(child: Text('Error: $e')),
+      error: (e, s) => Center(child: Text('${AppLocalizations.of(context)!.errorPrefix}$e')),
     );
   }
 
@@ -1435,7 +1435,7 @@ class _PremiumBillCard extends ConsumerWidget {
         if (context.mounted) {
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(SnackBar(content: Text('Error: $e')));
+          ).showSnackBar(SnackBar(content: Text('${AppLocalizations.of(context)!.errorPrefix}$e')));
         }
       }
     }
@@ -1674,7 +1674,7 @@ class _BillDetailsSheet extends ConsumerWidget {
                     },
                     loading: () =>
                         const Center(child: CircularProgressIndicator()),
-                    error: (e, _) => Center(child: Text('Error: $e')),
+                    error: (e, _) => Center(child: Text('${AppLocalizations.of(context)!.errorPrefix}$e')),
                   ),
                 ],
               ),
@@ -1916,7 +1916,7 @@ class _EditPaymentSheetState extends ConsumerState<_EditPaymentSheet> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ).showSnackBar(SnackBar(content: Text('${AppLocalizations.of(context)!.errorPrefix}$e')));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -2025,7 +2025,7 @@ class _ExpensesTab extends ConsumerWidget {
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => Center(child: Text('Error: $e')),
+      error: (e, _) => Center(child: Text('${AppLocalizations.of(context)!.errorPrefix}$e')),
     );
   }
 }

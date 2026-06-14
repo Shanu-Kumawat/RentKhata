@@ -493,7 +493,7 @@ class _LivePropertyStatusList extends ConsumerWidget {
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, __) => Text('Error: $e'),
+      error: (e, __) => Text('${AppLocalizations.of(context)!.errorPrefix}$e'),
     );
   }
 }

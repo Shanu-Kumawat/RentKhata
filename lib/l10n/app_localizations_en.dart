@@ -2622,7 +2622,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addNameUpiSubtitle =>
-      'Add your Name and UPI ID to generate professional invoices with embedded QR codes.';
+      'Set up your billing profile to issue professional receipts to your tenants.';
 
   @override
   String get continueToBillBtn => 'Continue to Bill';
@@ -2631,7 +2631,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get yourNameBusinessNameLabel => 'Your Name or Business Name';
 
   @override
-  String get upiIdOptionalLabel => 'UPI ID (Optional but recommended)';
+  String get upiIdOptionalLabel => 'UPI ID';
+
+  @override
+  String get upiInvoiceHelperText =>
+      'Adds a scannable QR code to your invoices, making it 3x faster for tenants to pay you directly.';
 
   @override
   String get occupancyDetailsTitle => 'Occupancy Details';

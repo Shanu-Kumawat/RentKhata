@@ -166,7 +166,7 @@ class _ContextualProfileSheetState
                 const SizedBox(height: 16),
 
                 Text(
-                  "Let's formalize your bills!",
+                  AppLocalizations.of(context)!.letsMakeItProfessionalTitle,
                   textAlign: TextAlign.center,
                   style: theme.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.w800,
@@ -177,7 +177,7 @@ class _ContextualProfileSheetState
                 const SizedBox(height: 8),
 
                 Text(
-                  "Add your Name and UPI ID to generate professional invoices with embedded QR codes.",
+                  AppLocalizations.of(context)!.addNameUpiSubtitle,
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
@@ -221,6 +221,12 @@ class _ContextualProfileSheetState
                     filled: true,
                     fillColor: theme.colorScheme.surfaceContainerHighest
                         .withValues(alpha: 0.3),
+                    helperText: AppLocalizations.of(context)!.upiInvoiceHelperText,
+                    helperMaxLines: 5,
+                    helperStyle: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                      height: 1.2,
+                    ),
                   ),
                   validator: validateUpiId,
                   textInputAction: TextInputAction.done,

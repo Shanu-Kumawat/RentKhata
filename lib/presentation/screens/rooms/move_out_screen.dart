@@ -416,7 +416,7 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
                   );
                 },
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (e, s) => Center(child: Text('Error: $e')),
+                error: (e, s) => Center(child: Text('${AppLocalizations.of(context)!.errorPrefix}$e')),
               ),
             ),
           ],
@@ -541,7 +541,7 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ).showSnackBar(SnackBar(content: Text('${AppLocalizations.of(context)!.errorPrefix}$e')));
       }
       setState(() => _isLoading = false);
     }

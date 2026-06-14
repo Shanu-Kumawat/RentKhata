@@ -82,7 +82,7 @@ class _AddRoomSheetState extends ConsumerState<AddRoomSheet> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ).showSnackBar(SnackBar(content: Text('${AppLocalizations.of(context)!.errorPrefix}$e')));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);

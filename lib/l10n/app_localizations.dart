@@ -4906,7 +4906,7 @@ abstract class AppLocalizations {
   /// No description provided for @addNameUpiSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Add your Name and UPI ID to generate professional invoices with embedded QR codes.'**
+  /// **'Set up your billing profile to issue professional receipts to your tenants.'**
   String get addNameUpiSubtitle;
 
   /// No description provided for @continueToBillBtn.
@@ -4924,8 +4924,14 @@ abstract class AppLocalizations {
   /// No description provided for @upiIdOptionalLabel.
   ///
   /// In en, this message translates to:
-  /// **'UPI ID (Optional but recommended)'**
+  /// **'UPI ID'**
   String get upiIdOptionalLabel;
+
+  /// No description provided for @upiInvoiceHelperText.
+  ///
+  /// In en, this message translates to:
+  /// **'Adds a scannable QR code to your invoices, making it 3x faster for tenants to pay you directly.'**
+  String get upiInvoiceHelperText;
 
   /// No description provided for @occupancyDetailsTitle.
   ///

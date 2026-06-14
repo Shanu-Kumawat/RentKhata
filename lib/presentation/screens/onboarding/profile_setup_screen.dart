@@ -61,7 +61,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error saving profile: $e')));
+        ).showSnackBar(SnackBar(content: Text('${AppLocalizations.of(context)!.errorPrefix}$e')));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -182,7 +182,12 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                       labelText: AppLocalizations.of(context)!.upiIdLabel,
                       hintText: AppLocalizations.of(context)!.upiIdHint,
                       prefixIcon: const Icon(Icons.account_balance_wallet_outlined),
-                      helperText: AppLocalizations.of(context)!.upiHelperText,
+                      helperText: AppLocalizations.of(context)!.upiInvoiceHelperText,
+                      helperMaxLines: 5,
+                      helperStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                            height: 1.2,
+                          ),
                     ),
                     keyboardType: TextInputType.emailAddress,
                     validator: validateUpiId,

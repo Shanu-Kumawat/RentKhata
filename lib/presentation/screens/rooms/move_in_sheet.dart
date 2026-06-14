@@ -173,8 +173,6 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
         _moveInDate = date;
         // Auto-update billing start based on smart default
         _billingStartDate = _calculateSmartBillingStart(date);
-        // Auto-suggest 11 months for new agreement
-        _agreementEndDate ??= DateTime(date.year, date.month + 11, date.day);
       });
     }
   }
@@ -182,9 +180,7 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
   Future<void> _selectAgreementEndDate() async {
     final date = await showDatePicker(
       context: context,
-      initialDate:
-          _agreementEndDate ??
-          DateTime(_moveInDate.year, _moveInDate.month + 11, _moveInDate.day),
+      initialDate: _agreementEndDate ?? _moveInDate,
       firstDate: _moveInDate,
       lastDate: DateTime(2050),
     );
@@ -359,7 +355,7 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ).showSnackBar(SnackBar(content: Text('${AppLocalizations.of(context)!.errorPrefix}$e')));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -1297,7 +1293,7 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, s) => Text('Error: $e'),
+      error: (e, s) => Text('${AppLocalizations.of(context)!.errorPrefix}$e'),
     );
   }
 

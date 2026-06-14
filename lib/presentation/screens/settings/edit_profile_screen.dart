@@ -166,9 +166,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  l10n.upiIdHelperText,
+                  l10n.upiInvoiceHelperText,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                    height: 1.2,
                   ),
                 ),
                 const SizedBox(height: 32),

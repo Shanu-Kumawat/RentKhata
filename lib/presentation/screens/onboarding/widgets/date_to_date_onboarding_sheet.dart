@@ -67,7 +67,7 @@ class _DateToDateOnboardingSheetState extends ConsumerState<DateToDateOnboarding
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error saving preferences: $e')),
+          SnackBar(content: Text('${AppLocalizations.of(context)!.errorPrefix}$e')),
         );
         setState(() => _isLoading = false);
       }
