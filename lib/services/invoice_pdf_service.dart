@@ -14,6 +14,7 @@ import '../domain/entities/payment.dart';
 import 'upi_qr_service.dart';
 import 'image_service.dart';
 import 'pdf/pdf_template.dart';
+import '../core/utils/l10n_helpers.dart';
 
 /// Helper to sanitize filenames
 String _sanitizeFilename(String name) {
@@ -302,7 +303,7 @@ class InvoicePdfService {
                             crossAxisAlignment: pw.CrossAxisAlignment.start,
                             children: [
                               pw.Text(
-                                bill.billType.name.toUpperCase(),
+                                l10n != null ? getBillTypeLabel(l10n, bill.billType).toUpperCase() : bill.billType.name.toUpperCase(),
                                 style: const pw.TextStyle(
                                   fontSize: 12,
                                   color: PdfColors.black,
