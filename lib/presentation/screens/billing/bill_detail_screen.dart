@@ -564,11 +564,9 @@ class _BillDetailContent extends ConsumerWidget {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(
-                        AppLocalizations.of(
-                          context,
-                        )!.errorDeletingBill(e.toString()),
-                      ),
+                      content: Text(e.toString().replaceAll('Bad state: ', '')),
+                      backgroundColor: Theme.of(context).colorScheme.error,
+                      duration: const Duration(seconds: 4),
                     ),
                   );
                 }

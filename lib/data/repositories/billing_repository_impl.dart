@@ -353,6 +353,15 @@ class BillingRepositoryImpl implements BillingRepository {
 
   @override
   Future<bool> deleteBill(int id) async {
+    // Check if bill has payments
+    final payments = await _billingDao.getPaymentsForBill(id);
+    if (payments.isNotEmpty) {
+      throw StateError('Cannot delete a bill that has recorded payments. Please delete the payments first.');
+    }
+
+    // Cascade delete meter photos
+    await _billingDao.deleteMeterPhotosForBill(id);
+
     // Get bill info before deletion for audit
     final bill = await _billingDao.getBillById(id);
 

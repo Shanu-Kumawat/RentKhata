@@ -111,6 +111,10 @@ class PropertyRepositoryImpl implements PropertyRepository {
 
   @override
   Future<bool> deleteProperty(int id) async {
+    final rooms = await _propertyDao.getRoomsForProperty(id);
+    if (rooms.isNotEmpty) {
+      throw StateError('Cannot delete a property that contains rooms. Please delete the rooms first.');
+    }
     final result = await _propertyDao.deleteProperty(id);
     return result > 0;
   }
@@ -190,6 +194,10 @@ class PropertyRepositoryImpl implements PropertyRepository {
 
   @override
   Future<bool> deleteRoom(int id) async {
+    final occupancies = await _tenantDao.getOccupanciesForRoom(id);
+    if (occupancies.isNotEmpty) {
+      throw StateError('Cannot delete a room that has tenant history. Please archive or remove tenant history first.');
+    }
     final result = await _propertyDao.deleteRoom(id);
     return result > 0;
   }

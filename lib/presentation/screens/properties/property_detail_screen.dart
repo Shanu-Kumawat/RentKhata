@@ -205,18 +205,30 @@ class PropertyDetailScreen extends ConsumerWidget {
           FilledButton(
             onPressed: () async {
               Navigator.pop(context);
-              await ref
-                  .read(propertyRepositoryProvider)
-                  .deleteProperty(property.id);
-              if (context.mounted) {
-                context.pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      AppLocalizations.of(context)!.propertyDeleted,
+              try {
+                await ref
+                    .read(propertyRepositoryProvider)
+                    .deleteProperty(property.id);
+                if (context.mounted) {
+                  context.pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        AppLocalizations.of(context)!.propertyDeleted,
+                      ),
                     ),
-                  ),
-                );
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(e.toString().replaceAll('Bad state: ', '')),
+                      backgroundColor: Theme.of(context).colorScheme.error,
+                      duration: const Duration(seconds: 4),
+                    ),
+                  );
+                }
               }
             },
             style: FilledButton.styleFrom(

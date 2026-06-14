@@ -223,6 +223,18 @@ class TenantRepositoryImpl implements TenantRepository {
 
   @override
   Future<bool> deleteTenant(int id) async {
+    final occupancies = await _tenantDao.getOccupanciesForTenant(id);
+    if (occupancies.isNotEmpty) {
+      throw StateError('Cannot delete a tenant who has rental history. Please delete their history first.');
+    }
+    
+    // Cascade delete custom fields and documents
+    await _tenantDao.deleteCustomFieldsForTenant(id);
+    final documents = await _documentDao.getDocumentsForTenant(id);
+    for (final doc in documents) {
+      await _documentDao.deleteDocument(doc.id);
+    }
+
     final result = await _tenantDao.deleteTenant(id);
     return result > 0;
   }

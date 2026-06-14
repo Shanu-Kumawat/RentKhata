@@ -482,12 +482,24 @@ class _TenantDetailContent extends ConsumerWidget {
           FilledButton(
             onPressed: () async {
               Navigator.pop(ctx);
-              await ref.read(tenantRepositoryProvider).deleteTenant(tenant.id);
-              if (context.mounted) {
-                context.pop();
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.tenantDeletedSuccess)));
+              try {
+                await ref.read(tenantRepositoryProvider).deleteTenant(tenant.id);
+                if (context.mounted) {
+                  context.pop();
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.tenantDeletedSuccess)));
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(e.toString().replaceAll('Bad state: ', '')),
+                      backgroundColor: Theme.of(context).colorScheme.error,
+                      duration: const Duration(seconds: 4),
+                    ),
+                  );
+                }
               }
             },
             style: FilledButton.styleFrom(

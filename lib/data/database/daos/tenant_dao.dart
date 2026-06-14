@@ -81,6 +81,10 @@ class TenantDao extends DatabaseAccessor<AppDatabase> with _$TenantDaoMixin {
   Future<OccupancyEntity?> getOccupancyById(int id) =>
       (select(occupancies)..where((o) => o.id.equals(id))).getSingleOrNull();
 
+  /// Get all occupancies for a room
+  Future<List<OccupancyEntity>> getOccupanciesForRoom(int roomId) =>
+      (select(occupancies)..where((o) => o.roomId.equals(roomId))).get();
+
   /// Get active occupancy for a room
   Future<OccupancyEntity?> getActiveOccupancyForRoom(int roomId) =>
       (select(occupancies)
