@@ -53,6 +53,7 @@ class ReceiptDialog extends StatelessWidget {
     final isFullyPaid = bill.isFullyPaid;
 
     return Dialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 500),
@@ -75,44 +76,44 @@ class ReceiptDialog extends StatelessWidget {
                   top: Radius.circular(20),
                 ),
               ),
-              child: Stack(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          isFullyPaid ? Icons.check_circle : Icons.receipt_long,
-                          color: Colors.white,
-                          size: 48,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        isFullyPaid
-                            ? AppLocalizations.of(context)!.paymentComplete
-                            : AppLocalizations.of(context)!.paymentRecorded,
-                        style: theme.textTheme.headlineSmall?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        isFullyPaid
-                            ? AppLocalizations.of(context)!.billFullyPaidLabel
-                            : AppLocalizations.of(
-                                context,
-                              )!.partialPaymentRecorded,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: Colors.white70,
-                        ),
-                      ),
-                    ],
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      isFullyPaid ? Icons.check_circle : Icons.receipt_long,
+                      color: Colors.white,
+                      size: 48,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    isFullyPaid
+                        ? AppLocalizations.of(context)!.paymentComplete
+                        : AppLocalizations.of(context)!.paymentRecorded,
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    isFullyPaid
+                        ? AppLocalizations.of(context)!.billFullyPaidLabel
+                        : AppLocalizations.of(
+                            context,
+                          )!.partialPaymentRecorded,
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: Colors.white70,
+                    ),
                   ),
                 ],
               ),

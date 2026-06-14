@@ -99,6 +99,7 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
       final title = await showDialog<String>(
         context: context,
         builder: (context) => AlertDialog(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
           title: Text(AppLocalizations.of(context)!.documentTitle),
           content: TextField(
             controller: titleController,
@@ -394,6 +395,7 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
     return showDialog<bool>(
       context: context,
       builder: (context) => Dialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         child: Container(
           constraints: const BoxConstraints(maxWidth: 400),
@@ -417,6 +419,7 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
               const SizedBox(height: 20),
               Text(
                 AppLocalizations.of(context)!.incompleteProfile,
+                textAlign: TextAlign.center,
                 style: Theme.of(
                   context,
                 ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
@@ -424,6 +427,7 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
               const SizedBox(height: 8),
               Text(
                 '${missingFields.length} fields are not filled',
+                textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: AppColors.onSurfaceVariant,
                 ),

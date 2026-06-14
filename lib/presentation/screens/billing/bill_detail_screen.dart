@@ -473,6 +473,7 @@ class _BillDetailContent extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
         title: Text(AppLocalizations.of(context)!.voidBillTitle),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -523,6 +524,7 @@ class _BillDetailContent extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
         title: Text(AppLocalizations.of(context)!.deleteBillTitle),
         content: Text(
           AppLocalizations.of(
@@ -983,6 +985,7 @@ class _ElectricityDetailsCard extends ConsumerWidget {
                   showDialog(
                     context: context,
                     builder: (context) => Dialog(
+                      insetPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -1343,6 +1346,7 @@ class _PaymentTile extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
         title: Text(AppLocalizations.of(context)!.deletePaymentTitle),
         content: Text(
           AppLocalizations.of(context)!.confirmDeletePayment(

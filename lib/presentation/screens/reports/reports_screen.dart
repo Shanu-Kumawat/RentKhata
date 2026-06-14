@@ -1702,6 +1702,7 @@ class _BillDetailsSheet extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
         title: const Text('Delete Payment?'),
         content: Text('Delete ${formatCurrency(payment.amount)} payment?'),
         actions: [

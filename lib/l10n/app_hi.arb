@@ -500,7 +500,7 @@
       }
     }
   },
-  "invoiceConsumption": "खपत: {units} यूनिट @ ₹{rate}",
+  "invoiceConsumption": "खपत: {units} यूनिट @ Rs. {rate}",
   "@invoiceConsumption": {
     "placeholders": {
       "units": {

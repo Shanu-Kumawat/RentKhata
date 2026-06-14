@@ -198,6 +198,7 @@ class UpiQrDialog extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => Dialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
         child: UpiQrDialog(
           payeeName: payeeName,
           upiId: upiId,

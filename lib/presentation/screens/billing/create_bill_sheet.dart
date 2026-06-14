@@ -634,6 +634,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
         final proceed = await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
+            insetPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
             title: Text(AppLocalizations.of(context)!.billAlreadyExists),
             content: Text(
               AppLocalizations.of(context)!.duplicateBillMessage(

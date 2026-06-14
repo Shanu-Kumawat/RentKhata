@@ -344,6 +344,7 @@ class _TemplateEditorState extends ConsumerState<_TemplateEditor> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
         title: Text(l10n.resetToDefault),
         content: Text(l10n.resetTemplateWarning),
         actions: [

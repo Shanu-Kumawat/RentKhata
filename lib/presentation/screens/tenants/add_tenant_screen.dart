@@ -84,6 +84,7 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
       final title = await showDialog<String>(
         context: context,
         builder: (context) => AlertDialog(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
           title: const Text('Document Title'),
           content: TextField(
             controller: titleController,

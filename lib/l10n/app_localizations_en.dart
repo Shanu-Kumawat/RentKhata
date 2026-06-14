@@ -834,7 +834,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String invoiceConsumption(String units, String rate) {
-    return 'Consumption: $units units @ ₹$rate';
+    return 'Consumption: $units units @ Rs. $rate';
   }
 
   @override

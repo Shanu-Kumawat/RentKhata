@@ -65,6 +65,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
         title: Text(l10n.restoreBackupTitle),
         content: Text(l10n.restoreBackupWarning),
         actions: [
@@ -116,6 +117,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
         final confirmed = await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
+            insetPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
             title: Text(l10n.restoreBackupTitle),
             content: Text(l10n.restoreBackupWarning),
             actions: [
@@ -158,6 +160,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
         title: Text(l10n.restoreSuccessTitle),
         content: Text(l10n.backupRestoredSuccess),
         actions: [

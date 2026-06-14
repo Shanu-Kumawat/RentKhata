@@ -469,6 +469,7 @@ class _TenantDetailContent extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
         title: const Text('Delete Tenant?'),
         content: Text(
           'Are you sure you want to delete ${tenant.name}? This action cannot be undone.',
@@ -1294,6 +1295,7 @@ class _FamilyMembersSection extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
         title: const Text('Delete Family Member?'),
         content: const Text('This action cannot be undone.'),
         actions: [
@@ -1827,6 +1829,7 @@ class _DocumentsSection extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
         title: const Text('Delete Document?'),
         content: Text('Are you sure you want to delete "${doc.title}"?'),
         actions: [

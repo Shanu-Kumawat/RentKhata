@@ -501,7 +501,7 @@
       }
     }
   },
-  "invoiceConsumption": "Consumption: {units} units @ ₹{rate}",
+  "invoiceConsumption": "Consumption: {units} units @ Rs. {rate}",
   "@invoiceConsumption": {
     "placeholders": {
       "units": {

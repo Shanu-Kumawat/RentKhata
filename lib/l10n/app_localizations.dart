@@ -1600,7 +1600,7 @@ abstract class AppLocalizations {
   /// No description provided for @invoiceConsumption.
   ///
   /// In en, this message translates to:
-  /// **'Consumption: {units} units @ ₹{rate}'**
+  /// **'Consumption: {units} units @ Rs. {rate}'**
   String invoiceConsumption(String units, String rate);
 
   /// No description provided for @invoiceUpiTerms.

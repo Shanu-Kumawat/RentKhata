@@ -192,6 +192,7 @@ class PropertyDetailScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
         title: Text(AppLocalizations.of(context)!.deletePropertyTitle),
         content: Text(
           AppLocalizations.of(context)!.confirmDeleteProperty(property.name),

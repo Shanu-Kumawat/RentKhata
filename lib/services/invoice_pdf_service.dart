@@ -117,7 +117,7 @@ class InvoicePdfService {
                     ),
                     pw.SizedBox(height: 8),
                     pw.Text(
-                      '₹${bill.pendingAmount.toStringAsFixed(2)}',
+                      'Rs. ${bill.pendingAmount.toStringAsFixed(2)}',
                       style: pw.TextStyle(
                         fontSize: 48,
                         fontWeight: pw.FontWeight.bold,
@@ -161,7 +161,7 @@ class InvoicePdfService {
                           pw.SizedBox(height: 4),
                           if (bill.roomNumber != null)
                             pw.Text(
-                              '${l10n?.pdfRoom ?? "Room"}: ${bill.roomNumber} • ${bill.propertyName ?? ""}',
+                              '${l10n?.pdfRoom ?? "Room"}: ${bill.roomNumber} | ${bill.propertyName ?? ""}',
                               style: const pw.TextStyle(
                                 fontSize: 12,
                                 color: PdfColors.black,
@@ -324,7 +324,7 @@ class InvoicePdfService {
                                         ),
                                       ),
                                       pw.Text(
-                                        l10n?.invoiceConsumption((bill.electricityCurrReading! - bill.electricityPrevReading!).toStringAsFixed(0), (bill.electricityRateAtBilling ?? 0).toString()) ?? 'Consumption: ${(bill.electricityCurrReading! - bill.electricityPrevReading!).toStringAsFixed(0)} units @ ₹${bill.electricityRateAtBilling ?? 0}',
+                                        l10n?.invoiceConsumption((bill.electricityCurrReading! - bill.electricityPrevReading!).toStringAsFixed(0), (bill.electricityRateAtBilling ?? 0).toString()) ?? 'Consumption: ${(bill.electricityCurrReading! - bill.electricityPrevReading!).toStringAsFixed(0)} units @ Rs. ${bill.electricityRateAtBilling ?? 0}',
                                         style: const pw.TextStyle(
                                           fontSize: 10,
                                           color: PdfColors.grey700,
@@ -349,7 +349,7 @@ class InvoicePdfService {
                         pw.Expanded(
                           flex: 1,
                           child: pw.Text(
-                            '₹${bill.amount.toStringAsFixed(2)}',
+                            'Rs. ${bill.amount.toStringAsFixed(2)}',
                             textAlign: pw.TextAlign.right,
                             style: const pw.TextStyle(
                               fontSize: 12,
@@ -374,13 +374,13 @@ class InvoicePdfService {
                       // Subtotal / Total Amount
                       _buildTotalRow(
                         l10n?.pdfTotalAmount ?? 'Total Amount',
-                        '₹${bill.amount.toStringAsFixed(2)}',
+                        'Rs. ${bill.amount.toStringAsFixed(2)}',
                       ),
                       if (bill.paidAmount > 0) ...[
                         pw.SizedBox(height: 4),
                         _buildTotalRow(
                           l10n?.pdfAmountPaid ?? 'Amount Paid',
-                          '- ₹${bill.paidAmount.toStringAsFixed(2)}',
+                          '- Rs. ${bill.paidAmount.toStringAsFixed(2)}',
                           color: PdfColors.green700,
                         ),
                       ],
@@ -472,7 +472,7 @@ class InvoicePdfService {
                           pw.Padding(
                             padding: const pw.EdgeInsets.symmetric(vertical: 4),
                             child: pw.Text(
-                              '₹${payment.amount.toStringAsFixed(2)}',
+                              'Rs. ${payment.amount.toStringAsFixed(2)}',
                               textAlign: pw.TextAlign.right,
                               style: const pw.TextStyle(fontSize: 10),
                             ),
@@ -840,7 +840,7 @@ class InvoicePdfService {
                     ),
                     pw.SizedBox(height: 4),
                     pw.Text(
-                      '₹${payment.amount.toStringAsFixed(2)}',
+                      'Rs. ${payment.amount.toStringAsFixed(2)}',
                       style: pw.TextStyle(
                         fontSize: 40,
                         fontWeight: pw.FontWeight.bold,
