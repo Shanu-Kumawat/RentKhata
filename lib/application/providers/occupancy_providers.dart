@@ -8,6 +8,8 @@ import '../../domain/entities/bill.dart';
 import '../../data/database/app_database.dart';
 import 'repository_providers.dart';
 import 'database_provider.dart';
+import 'tenant_providers.dart';
+import 'billing_providers.dart';
 
 part 'occupancy_providers.g.dart';
 
@@ -33,6 +35,9 @@ class OccupancyDetail {
 /// Get occupancy by ID with room and tenant info.
 @riverpod
 Future<Occupancy?> occupancy(Ref ref, int occupancyId) async {
+  // Watch tenants stream to auto-update when occupancy, tenant, or property data changes
+  ref.watch(tenantsStreamProvider());
+
   final db = ref.watch(appDatabaseProvider);
   final entity = await db.tenantDao.getOccupancyById(occupancyId);
   if (entity == null) return null;
@@ -78,6 +83,9 @@ Future<OccupancyDetail?> occupancyDetail(Ref ref, int occupancyId) async {
 
   final db = ref.watch(appDatabaseProvider);
   final billingRepo = ref.watch(billingRepositoryProvider);
+
+  // Watch bills stream to auto-refresh bills and totals when payments happen
+  ref.watch(billsForOccupancyStreamProvider(occupancyId));
 
   // Get bills for this occupancy
   final bills = await billingRepo.getBillsForOccupancy(occupancyId);

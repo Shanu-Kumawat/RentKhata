@@ -90,6 +90,19 @@ class PropertyDao extends DatabaseAccessor<AppDatabase>
     return query.map((row) => row.readTable(rooms)).get();
   }
 
+  /// Watch all rooms
+  Stream<List<RoomEntity>> watchAllRooms({bool includeArchived = false}) {
+    final query = select(rooms).join([
+      innerJoin(properties, properties.id.equalsExp(rooms.propertyId))
+    ]);
+
+    if (!includeArchived) {
+      query.where(rooms.isArchived.equals(false) & properties.isArchived.equals(false));
+    }
+
+    return query.map((row) => row.readTable(rooms)).watch();
+  }
+
   /// Insert a room
   Future<int> insertRoom(RoomsCompanion room) => into(rooms).insert(room);
 

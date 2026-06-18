@@ -47,6 +47,9 @@ abstract class PropertyRepository {
   /// Get all rooms
   Future<List<Room>> getAllRooms({bool includeArchived = false});
 
+  /// Watch all rooms
+  Stream<List<Room>> watchAllRooms({bool includeArchived = false});
+
   /// Create a new room
   Future<int> createRoom({
     required int propertyId,

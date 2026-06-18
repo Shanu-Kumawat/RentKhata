@@ -180,6 +180,18 @@ class PropertyRepositoryImpl implements PropertyRepository {
   }
 
   @override
+  Stream<List<Room>> watchAllRooms({bool includeArchived = false}) {
+    return _propertyDao.watchAllRooms(includeArchived: includeArchived).asyncMap((
+      entities,
+    ) async {
+      return Future.wait(entities.map((e) async {
+        final property = await _propertyDao.getPropertyById(e.propertyId);
+        return _roomToDomain(e, propertyName: property?.name);
+      }));
+    });
+  }
+
+  @override
   Future<int> createRoom({
     required int propertyId,
     required String roomNumber,

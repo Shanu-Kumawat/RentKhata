@@ -22,6 +22,8 @@ Stream<List<Tenant>> tenantsStream(Ref ref, {bool includeArchived = false}) {
 /// Get all tenants (future).
 @riverpod
 Future<List<Tenant>> tenants(Ref ref, {bool includeArchived = false}) {
+  // Watch stream to auto-refresh all UI relying on the future provider
+  ref.watch(tenantsStreamProvider(includeArchived: includeArchived));
   final repo = ref.watch(tenantRepositoryProvider);
   return repo.getAllTenants(includeArchived: includeArchived);
 }
@@ -39,6 +41,8 @@ Future<Tenant?> tenant(Ref ref, int id) async {
 /// Search tenants.
 @riverpod
 Future<List<Tenant>> searchTenants(Ref ref, String query, {bool includeArchived = false}) {
+  // Watch stream so search results refresh if a tenant is added/edited while searching
+  ref.watch(tenantsStreamProvider(includeArchived: includeArchived));
   if (query.isEmpty) return ref.watch(tenantsProvider(includeArchived: includeArchived).future);
   final repo = ref.watch(tenantRepositoryProvider);
   return repo.searchTenants(query, includeArchived: includeArchived);
@@ -64,6 +68,7 @@ Stream<List<Occupancy>> activeOccupanciesStream(Ref ref) {
 /// Get active occupancies.
 @riverpod
 Future<List<Occupancy>> activeOccupancies(Ref ref) {
+  ref.watch(activeOccupanciesStreamProvider);
   final repo = ref.watch(tenantRepositoryProvider);
   return repo.getActiveOccupancies();
 }

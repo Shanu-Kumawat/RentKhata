@@ -75,6 +75,7 @@ Stream<List<Bill>> billsStream(Ref ref) {
 /// Auto-refreshes when the stream emits.
 @riverpod
 Future<List<Bill>> bills(Ref ref) {
+  ref.watch(billsStreamProvider);
   final repo = ref.watch(billingRepositoryProvider);
   return repo.getAllBills();
 }
@@ -106,13 +107,9 @@ Future<Bill?> bill(Ref ref, int id) {
 /// Get a bill by ID with auto-refresh (watches occupancy stream for updates).
 @riverpod
 Future<Bill?> billById(Ref ref, int id) async {
-  // Get the bill first to know its occupancy
+  // Watch the entire bills stream to auto-refresh since we don't know occupancyId yet
+  ref.watch(billsStreamProvider);
   final repo = ref.watch(billingRepositoryProvider);
-  final bill = await repo.getBillById(id);
-  if (bill != null) {
-    // Watch the occupancy bills stream to auto-refresh
-    ref.watch(billsForOccupancyStreamProvider(bill.occupancyId));
-  }
   return repo.getBillById(id);
 }
 
@@ -144,6 +141,7 @@ Stream<List<Payment>> paymentsForBillStream(Ref ref, int billId) {
 /// Auto-refreshes via periodic check.
 @riverpod
 Future<List<Bill>> unpaidBills(Ref ref) {
+  ref.watch(billsStreamProvider);
   final repo = ref.watch(billingRepositoryProvider);
   return repo.getUnpaidBills();
 }
@@ -229,8 +227,8 @@ Future<List<Bill>> billsByFinancialYear(Ref ref) async {
   final startDate = DateTime(startYear, 4, 1);
   final endDate = DateTime(startYear + 1, 3, 31, 23, 59, 59);
 
-  // Auto-refresh via unpaidBillsProvider
-  ref.watch(unpaidBillsProvider);
+  // Auto-refresh via billsStreamProvider
+  ref.watch(billsStreamProvider);
 
   final allBills = await repo.getAllBills();
   return allBills.where((b) {

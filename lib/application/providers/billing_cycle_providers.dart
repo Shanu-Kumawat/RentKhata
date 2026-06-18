@@ -45,6 +45,10 @@ BillingCycle currentBillingCycle(Ref ref, Occupancy occupancy) {
 @riverpod
 Future<BillingCycle> nextBillingCycleFor(Ref ref, int occupancyId) async {
   final billingRepo = ref.watch(billingRepositoryProvider);
+  
+  // Watch bills stream to auto-refresh when a bill is added
+  // MUST be called synchronously before any await
+  ref.watch(billsForOccupancyStreamProvider(occupancyId));
 
   // Get the occupancy to find move-in date
   final occupancy = await ref.watch(occupancyProvider(occupancyId).future);
@@ -133,6 +137,10 @@ Future<BillingCycle> nextBillingCycleForBillType(
 ) async {
   final billingRepo = ref.watch(billingRepositoryProvider);
 
+  // Watch bills stream to auto-refresh when a bill is added
+  // MUST be called synchronously before any await
+  ref.watch(billsForOccupancyStreamProvider(occupancyId));
+
   // Get the occupancy to find move-in date
   final occupancy = await ref.watch(occupancyProvider(occupancyId).future);
   if (occupancy == null) {
@@ -213,6 +221,10 @@ Future<List<BillingCycle>> allUnbilledCyclesForBillType(
   BillType billType,
 ) async {
   final billingRepo = ref.watch(billingRepositoryProvider);
+
+  // Watch bills stream to auto-refresh when a bill is added
+  // MUST be called synchronously before any await
+  ref.watch(billsForOccupancyStreamProvider(occupancyId));
 
   // Get the occupancy to find move-in date
   final occupancy = await ref.watch(occupancyProvider(occupancyId).future);

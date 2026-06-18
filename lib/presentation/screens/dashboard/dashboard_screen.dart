@@ -503,7 +503,7 @@ class _SmartEmptyState extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final allRoomsAsync = ref.watch(allRoomsProvider());
+    final allRoomsAsync = ref.watch(allRoomsStreamProvider());
     final propertiesAsync = ref.watch(propertiesStreamProvider());
 
     if (allRoomsAsync.isLoading || propertiesAsync.isLoading) {

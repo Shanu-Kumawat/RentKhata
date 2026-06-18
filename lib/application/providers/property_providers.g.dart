@@ -6,7 +6,7 @@ part of 'property_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$propertiesStreamHash() => r'6ab818bee5e75906384535197bfe9175a406aafc';
+String _$propertiesStreamHash() => r'bd4dd734751ee8c2435f1c949485ae83ad0a4c9e';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -165,7 +165,7 @@ class _PropertiesStreamProviderElement
       (origin as PropertiesStreamProvider).includeArchived;
 }
 
-String _$propertiesHash() => r'd9293378bf075de59d8d757e477389db206abe46';
+String _$propertiesHash() => r'2414d0af4a83bf21d2ec6fbbb62540a089d03bc1';
 
 /// Get all properties (future).
 ///
@@ -298,7 +298,7 @@ class _PropertiesProviderElement
   bool get includeArchived => (origin as PropertiesProvider).includeArchived;
 }
 
-String _$propertyHash() => r'99b0313e500b30aa7c85467463c46ad76a402939';
+String _$propertyHash() => r'2d59509db54fa0c6ee6784951dfb958fda8533ef';
 
 /// Get a single property by ID.
 /// This provider auto-refreshes when propertiesStream emits new data.
@@ -434,7 +434,7 @@ class _PropertyProviderElement
 }
 
 String _$roomsForPropertyStreamHash() =>
-    r'e4114f03a7252d55eb8a7aaa4f3cac209a04007a';
+    r'def0e58df56c2c3faf6d5a2acb5822f676150c55';
 
 /// Watch rooms for a property (auto-updates when data changes).
 ///
@@ -590,7 +590,7 @@ class _RoomsForPropertyStreamProviderElement
       (origin as RoomsForPropertyStreamProvider).includeArchived;
 }
 
-String _$roomsForPropertyHash() => r'd8a800aee5516e42ac98a674265e75eff48419f6';
+String _$roomsForPropertyHash() => r'f4a7fffcedd48827589981709b5b7a34cd3e87d1';
 
 /// Get rooms for a property.
 ///
@@ -745,7 +745,7 @@ class _RoomsForPropertyProviderElement
       (origin as RoomsForPropertyProvider).includeArchived;
 }
 
-String _$roomHash() => r'b1f13c8bc207dbffa8ba998915e0bcc51e71ba46';
+String _$roomHash() => r'e5fe5aad57f9a60fa784920f1067b6e9ef40f6bd';
 
 /// Get a single room by ID.
 /// This provider auto-refreshes when room data changes.
@@ -877,7 +877,7 @@ class _RoomProviderElement extends AutoDisposeFutureProviderElement<Room?>
   int get id => (origin as RoomProvider).id;
 }
 
-String _$allRoomsHash() => r'44808788912a91ebbbacb5686013278bdd7c4ad5';
+String _$allRoomsHash() => r'4dfa7e1f0ec6d866841099a33a8d01a774f5f09d';
 
 /// Get all rooms.
 ///
@@ -1005,6 +1005,143 @@ class _AllRoomsProviderElement
 
   @override
   bool get includeArchived => (origin as AllRoomsProvider).includeArchived;
+}
+
+String _$allRoomsStreamHash() => r'caf5a6ae8db6667820868a243e87ab98b393ac5c';
+
+/// Watch all rooms (auto-updates when data changes).
+///
+/// Copied from [allRoomsStream].
+@ProviderFor(allRoomsStream)
+const allRoomsStreamProvider = AllRoomsStreamFamily();
+
+/// Watch all rooms (auto-updates when data changes).
+///
+/// Copied from [allRoomsStream].
+class AllRoomsStreamFamily extends Family<AsyncValue<List<Room>>> {
+  /// Watch all rooms (auto-updates when data changes).
+  ///
+  /// Copied from [allRoomsStream].
+  const AllRoomsStreamFamily();
+
+  /// Watch all rooms (auto-updates when data changes).
+  ///
+  /// Copied from [allRoomsStream].
+  AllRoomsStreamProvider call({bool includeArchived = false}) {
+    return AllRoomsStreamProvider(includeArchived: includeArchived);
+  }
+
+  @override
+  AllRoomsStreamProvider getProviderOverride(
+    covariant AllRoomsStreamProvider provider,
+  ) {
+    return call(includeArchived: provider.includeArchived);
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'allRoomsStreamProvider';
+}
+
+/// Watch all rooms (auto-updates when data changes).
+///
+/// Copied from [allRoomsStream].
+class AllRoomsStreamProvider extends AutoDisposeStreamProvider<List<Room>> {
+  /// Watch all rooms (auto-updates when data changes).
+  ///
+  /// Copied from [allRoomsStream].
+  AllRoomsStreamProvider({bool includeArchived = false})
+    : this._internal(
+        (ref) => allRoomsStream(
+          ref as AllRoomsStreamRef,
+          includeArchived: includeArchived,
+        ),
+        from: allRoomsStreamProvider,
+        name: r'allRoomsStreamProvider',
+        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+            ? null
+            : _$allRoomsStreamHash,
+        dependencies: AllRoomsStreamFamily._dependencies,
+        allTransitiveDependencies:
+            AllRoomsStreamFamily._allTransitiveDependencies,
+        includeArchived: includeArchived,
+      );
+
+  AllRoomsStreamProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.includeArchived,
+  }) : super.internal();
+
+  final bool includeArchived;
+
+  @override
+  Override overrideWith(
+    Stream<List<Room>> Function(AllRoomsStreamRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: AllRoomsStreamProvider._internal(
+        (ref) => create(ref as AllRoomsStreamRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        includeArchived: includeArchived,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeStreamProviderElement<List<Room>> createElement() {
+    return _AllRoomsStreamProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is AllRoomsStreamProvider &&
+        other.includeArchived == includeArchived;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, includeArchived.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin AllRoomsStreamRef on AutoDisposeStreamProviderRef<List<Room>> {
+  /// The parameter `includeArchived` of this provider.
+  bool get includeArchived;
+}
+
+class _AllRoomsStreamProviderElement
+    extends AutoDisposeStreamProviderElement<List<Room>>
+    with AllRoomsStreamRef {
+  _AllRoomsStreamProviderElement(super.provider);
+
+  @override
+  bool get includeArchived =>
+      (origin as AllRoomsStreamProvider).includeArchived;
 }
 
 // ignore_for_file: type=lint

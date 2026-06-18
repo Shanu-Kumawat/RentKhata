@@ -513,7 +513,7 @@ class _MoveOutScreenState extends ConsumerState<MoveOutScreen> {
       // Trigger updates
       if (mounted) {
         ref.invalidate(roomProvider(widget.occupancy.roomId));
-        ref.invalidate(allRoomsProvider);
+        ref.invalidate(allRoomsStreamProvider);
         ref.invalidate(propertiesStreamProvider);
         ref.invalidate(roomsForPropertyStreamProvider(widget.room.propertyId));
         ref.invalidate(tenantsProvider);

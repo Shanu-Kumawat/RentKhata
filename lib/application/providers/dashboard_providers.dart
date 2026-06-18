@@ -44,10 +44,7 @@ class DashboardSummary {
 /// Watches stream providers to auto-refresh when data changes.
 @riverpod
 Future<DashboardSummary> dashboardSummary(Ref ref) async {
-  // Watch the stream providers to trigger auto-refresh
-  ref.watch(propertiesStreamProvider());
-
-  final properties = await ref.watch(propertiesProvider().future);
+  final properties = await ref.watch(propertiesStreamProvider().future);
   final unpaidBills = await ref.watch(unpaidBillsProvider.future);
   final billingRepo = ref.watch(billingRepositoryProvider);
 
@@ -118,6 +115,7 @@ Future<bool> isFirstLaunch(Ref ref) async {
 /// Get landlord profile.
 @riverpod
 Future<Landlord?> landlord(Ref ref) {
+  ref.watch(landlordStreamProvider);
   final repo = ref.watch(landlordRepositoryProvider);
   return repo.getLandlord();
 }
@@ -154,6 +152,9 @@ Future<FilteredFinancialSummary> filteredFinancials(Ref ref) async {
   final month = ref.watch(dashboardMonthProvider);
   final billingRepo = ref.watch(billingRepositoryProvider);
   final unpaidBills = await ref.watch(unpaidBillsProvider.future);
+  
+  // Watch bills stream to ensure we update when any bill/payment changes
+  ref.watch(billsStreamProvider);
 
   // Calculate collected for the selected month
   final startOfMonth = DateTime(month.year, month.month, 1);
@@ -220,7 +221,7 @@ Future<List<RoomStatusItem>> roomStatusList(Ref ref) async {
   // Watch unpaid bills to update status when bills change
   // Note: unpaidBillsProvider is auto-refreshing periodically via its own implementation or when we invalidate it
   final unpaidBills = await ref.watch(unpaidBillsProvider.future);
-  final rooms = await ref.watch(allRoomsProvider().future);
+  final rooms = await ref.watch(allRoomsStreamProvider().future);
 
   // Filter only occupied rooms for "Live Status"
   final activeRooms = rooms.where((r) => r.isOccupied).toList();

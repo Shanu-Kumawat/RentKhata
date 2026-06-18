@@ -6,7 +6,7 @@ part of 'occupancy_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$occupancyHash() => r'5b183be3bf78afe5d4dd2940b6a63755e6e0fcd5';
+String _$occupancyHash() => r'58a467335440e72ac5ceccf7e306ef331adc1fa1';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -156,7 +156,7 @@ class _OccupancyProviderElement
   int get occupancyId => (origin as OccupancyProvider).occupancyId;
 }
 
-String _$occupancyDetailHash() => r'5cbf9f80cfe26f27688ada19eddceaecb3cd66f3';
+String _$occupancyDetailHash() => r'a128c0a7b1297d0c54c2613a421f187b1d2151a2';
 
 /// Get complete occupancy detail with all related data.
 ///

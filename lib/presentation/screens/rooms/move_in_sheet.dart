@@ -346,7 +346,7 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
         ref.invalidate(tenantsStreamProvider);
         ref.invalidate(tenantProvider(tenantId));
         ref.invalidate(roomProvider(widget.roomId));
-        ref.invalidate(allRoomsProvider);
+        ref.invalidate(allRoomsStreamProvider);
         ref.invalidate(propertiesStreamProvider);
         ref.invalidate(roomsForPropertyStreamProvider(widget.room.propertyId));
         ref.invalidate(dashboardSummaryProvider);

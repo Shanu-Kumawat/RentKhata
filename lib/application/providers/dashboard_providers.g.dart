@@ -6,7 +6,7 @@ part of 'dashboard_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$dashboardSummaryHash() => r'8327fb279e4f5525413c4e424730148cf6319ac3';
+String _$dashboardSummaryHash() => r'a80b517b9226568b829b6bb47057131d68299c49';
 
 /// Provides dashboard summary.
 /// Watches stream providers to auto-refresh when data changes.
@@ -65,7 +65,7 @@ final isFirstLaunchProvider = AutoDisposeFutureProvider<bool>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef IsFirstLaunchRef = AutoDisposeFutureProviderRef<bool>;
-String _$landlordHash() => r'5421deb575717001fd10e677d400fddf307b1c33';
+String _$landlordHash() => r'afad6822db8ae00a4ddde075fcd590d61dce5802';
 
 /// Get landlord profile.
 ///
@@ -85,7 +85,7 @@ final landlordProvider = AutoDisposeFutureProvider<Landlord?>.internal(
 // ignore: unused_element
 typedef LandlordRef = AutoDisposeFutureProviderRef<Landlord?>;
 String _$filteredFinancialsHash() =>
-    r'a1732ab3d1a5dc5336c76d84981a8ece321f18c9';
+    r'767adb6cfad1d5d70853b451d9762d198101929e';
 
 /// Provides financial summary filtered by month.
 ///
@@ -106,7 +106,7 @@ final filteredFinancialsProvider =
 // ignore: unused_element
 typedef FilteredFinancialsRef =
     AutoDisposeFutureProviderRef<FilteredFinancialSummary>;
-String _$roomStatusListHash() => r'451243cd07675fa0fb561126da0ea6895fe79b72';
+String _$roomStatusListHash() => r'29d56ffdc9010685a50b19d2f3b357ed4e896c3e';
 
 /// Provides list of rooms with their status.
 ///

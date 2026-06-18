@@ -163,7 +163,7 @@ class _TenantsStreamProviderElement
   bool get includeArchived => (origin as TenantsStreamProvider).includeArchived;
 }
 
-String _$tenantsHash() => r'4c42bb6a95b745d372222f02d185a2ace3f342ab';
+String _$tenantsHash() => r'7babaef629690f48e4764a0852be4fa490ca2268';
 
 /// Get all tenants (future).
 ///
@@ -292,7 +292,7 @@ class _TenantsProviderElement
   bool get includeArchived => (origin as TenantsProvider).includeArchived;
 }
 
-String _$tenantHash() => r'f9720b1f62257995bdd0633fee46cef003acac52';
+String _$tenantHash() => r'e540cb9c25ef1267afd97979a63f46b45bc064bd';
 
 /// Get a single tenant by ID.
 /// This provider auto-refreshes when tenantsStream emits new data.
@@ -424,7 +424,7 @@ class _TenantProviderElement extends AutoDisposeFutureProviderElement<Tenant?>
   int get id => (origin as TenantProvider).id;
 }
 
-String _$searchTenantsHash() => r'91859be1e8d1f46abf50cf85b054f3933bafc14a';
+String _$searchTenantsHash() => r'91ed5da9d6d3686a2640c44475334f041faf347e';
 
 /// Search tenants.
 ///
@@ -573,7 +573,7 @@ class _SearchTenantsProviderElement
 }
 
 String _$customFieldsForTenantHash() =>
-    r'e5b07e3da553b91742556c860c0bdbb001e6191c';
+    r'92fc7169c6eecc7de4b877f94e754932946a9472';
 
 /// Get custom fields for a tenant.
 /// This auto-refreshes when tenants change.
@@ -738,7 +738,7 @@ final activeOccupanciesStreamProvider =
 // ignore: unused_element
 typedef ActiveOccupanciesStreamRef =
     AutoDisposeStreamProviderRef<List<Occupancy>>;
-String _$activeOccupanciesHash() => r'3b207c06e9645f041894acd667422224984a86da';
+String _$activeOccupanciesHash() => r'5ce64fc0a8e5e36b06a61ae45468ad8e3fdd768f';
 
 /// Get active occupancies.
 ///
@@ -1143,7 +1143,7 @@ class _OccupancyForRoomProviderElement
   int get roomId => (origin as OccupancyForRoomProvider).roomId;
 }
 
-String _$tenantForRoomHash() => r'b778d52bae27778a34748146eb19073eb001ef4d';
+String _$tenantForRoomHash() => r'e980bd6eb4dc968c47af7deecc30f809ea3a36d7';
 
 /// Get tenant for a room.
 /// This provider auto-refreshes when tenant data changes.

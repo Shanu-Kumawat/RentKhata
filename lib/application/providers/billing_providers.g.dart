@@ -220,7 +220,7 @@ final billsStreamProvider = AutoDisposeStreamProvider<List<Bill>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef BillsStreamRef = AutoDisposeStreamProviderRef<List<Bill>>;
-String _$billsHash() => r'5d30177a5827db81d9fb2da8f8f6c0908cb253fb';
+String _$billsHash() => r'b4a18ba14a83c89c3e0c26f7a2d86b0c9ce6aa7e';
 
 /// Get all bills.
 /// Auto-refreshes when the stream emits.
@@ -1177,7 +1177,7 @@ class _PaymentsForBillStreamProviderElement
   int get billId => (origin as PaymentsForBillStreamProvider).billId;
 }
 
-String _$unpaidBillsHash() => r'f4f09294bfc8c7e275a7deb918838a883069e465';
+String _$unpaidBillsHash() => r'7cd4cac99cb33fa924a9f6df50593bcb3f3514ad';
 
 /// Get unpaid bills.
 /// Auto-refreshes via periodic check.
@@ -1683,7 +1683,7 @@ final ensureDefaultTemplatesProvider = AutoDisposeFutureProvider<bool>.internal(
 // ignore: unused_element
 typedef EnsureDefaultTemplatesRef = AutoDisposeFutureProviderRef<bool>;
 String _$billsByFinancialYearHash() =>
-    r'ba2c584985e02f5d28c1bac37ae229aea49e7071';
+    r'5809ab4cde3c0d0d721b9a16b7476f0ea3240954';
 
 /// Bills filtered by the Selected Financial Year
 ///
