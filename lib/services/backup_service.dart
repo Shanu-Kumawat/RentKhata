@@ -3,7 +3,7 @@ library;
 
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:archive/archive.dart';
 import 'package:path/path.dart' as p;
 import '../data/database/app_database.dart';
@@ -41,9 +41,9 @@ class BackupService {
     final backupFileName = 'rentkhata_backup_$timestamp.zip';
     final backupPath = '$backupDirPath/$backupFileName';
 
-    // Close database before backup
-    await _database.close();
-
+    // Do not close database during backup to prevent breaking active Riverpod providers.
+    // SQLite allows copying the file safely while open in most cases.
+    
     try {
       // Read database file
       final dbFile = File(dbPath);
@@ -88,14 +88,28 @@ class BackupService {
     }
   }
 
-  /// Share backup file
-  Future<void> shareBackup() async {
+  /// Save backup externally
+  Future<bool> saveBackupExternally({String dialogTitle = 'Save Backup'}) async {
     final backupFile = await createBackup();
-    await Share.shareXFiles(
-      [XFile(backupFile.path)],
-      subject: 'RentKhata Backup',
-      text: 'RentKhata database backup created on ${DateTime.now()}',
+    final fileName = p.basename(backupFile.path);
+    final bytes = await backupFile.readAsBytes();
+
+    final result = await FilePicker.platform.saveFile(
+      dialogTitle: dialogTitle,
+      fileName: fileName,
+      type: FileType.custom,
+      allowedExtensions: ['zip'],
+      bytes: bytes,
     );
+
+    if (result == null) {
+      // User cancelled the save operation
+      // Delete the generated local backup to avoid clutter
+      await backupFile.delete();
+      return false;
+    }
+
+    return true;
   }
 
   /// Restore database from backup file
@@ -147,7 +161,7 @@ class BackupService {
     final dbArchiveFile = archive.files.firstWhere(
       (file) => file.name == DbConstants.databaseName,
       orElse: () => throw Exception(
-        'Invalid backup file: rent_khata.sqlite not found inside.',
+        'Invalid backup file: rent_khata.db not found inside.',
       ),
     );
 

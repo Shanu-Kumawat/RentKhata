@@ -42,9 +42,11 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
     try {
       final db = ref.read(appDatabaseProvider);
       final service = BackupService(db);
-      await service.shareBackup();
+      final success = await service.saveBackupExternally(
+        dialogTitle: l10n.createShareBackup,
+      );
       await _loadBackups();
-      if (mounted) {
+      if (mounted && success) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text(l10n.backupCreatedShare)));
@@ -232,7 +234,12 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
                 ),
               ),
               title: Text(l10n.createShareBackup),
-              subtitle: Text(l10n.saveDataToFile),
+              subtitle: Text(
+                l10n.saveDataToFile,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+              ),
               trailing: _isCreatingBackup
                   ? const SizedBox(
                       width: 24,
@@ -260,7 +267,12 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
                 ),
               ),
               title: Text(l10n.restoreFromDevice),
-              subtitle: Text(l10n.restoreFromDeviceSubtitle),
+              subtitle: Text(
+                l10n.restoreFromDeviceSubtitle,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+              ),
               trailing: const Icon(Icons.chevron_right),
               onTap: _isCreatingBackup ? null : _restoreFromExternalFile,
             ),
@@ -303,13 +315,15 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
                     Text(
                       l10n.noLocalBackups,
                       style: Theme.of(context).textTheme.titleMedium,
+                      textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 8),
                     Text(
                       l10n.createBackupToKeepSafe,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                      textAlign: TextAlign.center,
                     ),
                   ],
                 ),
@@ -335,6 +349,7 @@ class _BackupTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final fileName = file.path.split('/').last;
     final stat = file.statSync();
 
@@ -353,7 +368,7 @@ class _BackupTile extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.restore),
               onPressed: onRestore,
-              tooltip: 'Restore',
+              tooltip: l10n.restoreBtn,
             ),
             IconButton(
               icon: Icon(
@@ -361,7 +376,7 @@ class _BackupTile extends StatelessWidget {
                 color: Theme.of(context).colorScheme.error,
               ),
               onPressed: onDelete,
-              tooltip: 'Delete',
+              tooltip: l10n.deleteBtn,
             ),
           ],
         ),

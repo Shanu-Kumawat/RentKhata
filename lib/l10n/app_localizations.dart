@@ -2764,25 +2764,25 @@ abstract class AppLocalizations {
   /// No description provided for @backupAndRestoreSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Backup And Restore Subtitle'**
+  /// **'Manage your data securely'**
   String get backupAndRestoreSubtitle;
 
   /// No description provided for @backupCreatedShare.
   ///
   /// In en, this message translates to:
-  /// **'Backup Created Share'**
+  /// **'Backup saved successfully'**
   String get backupCreatedShare;
 
   /// No description provided for @backupInfoText.
   ///
   /// In en, this message translates to:
-  /// **'Backup Info Text'**
+  /// **'Save your data externally to ensure you don\'t lose it if you uninstall the app or change devices.'**
   String get backupInfoText;
 
   /// No description provided for @backupRestoredSuccess.
   ///
   /// In en, this message translates to:
-  /// **'Backup Restored Success'**
+  /// **'Backup restored successfully!'**
   String get backupRestoredSuccess;
 
   /// No description provided for @billDueSoon.
@@ -2854,13 +2854,13 @@ abstract class AppLocalizations {
   /// No description provided for @createBackupToKeepSafe.
   ///
   /// In en, this message translates to:
-  /// **'Create Backup To Keep Safe'**
+  /// **'Create an external backup to ensure your data is always safe and can be easily restored at any time'**
   String get createBackupToKeepSafe;
 
   /// No description provided for @createShareBackup.
   ///
   /// In en, this message translates to:
-  /// **'Create Share Backup'**
+  /// **'Save Backup'**
   String get createShareBackup;
 
   /// No description provided for @criticalUrgentAttention.
@@ -3238,49 +3238,49 @@ abstract class AppLocalizations {
   /// No description provided for @restoreBackupTitle.
   ///
   /// In en, this message translates to:
-  /// **'Restore Backup Title'**
+  /// **'Restore Backup'**
   String get restoreBackupTitle;
 
   /// No description provided for @restoreBackupWarning.
   ///
   /// In en, this message translates to:
-  /// **'Restore Backup Warning'**
+  /// **'This will completely overwrite your current data. Are you sure you want to continue?'**
   String get restoreBackupWarning;
 
   /// No description provided for @restoreBtn.
   ///
   /// In en, this message translates to:
-  /// **'Restore Btn'**
+  /// **'Restore'**
   String get restoreBtn;
 
   /// No description provided for @restoreFailedPrefix.
   ///
   /// In en, this message translates to:
-  /// **'Restore Failed Prefix'**
+  /// **'Restore failed'**
   String get restoreFailedPrefix;
 
   /// No description provided for @restoreFromDevice.
   ///
   /// In en, this message translates to:
-  /// **'Restore From Device'**
+  /// **'Restore Backup'**
   String get restoreFromDevice;
 
   /// No description provided for @restoreFromDeviceSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Restore From Device Subtitle'**
+  /// **'Load an existing backup from your phone'**
   String get restoreFromDeviceSubtitle;
 
   /// No description provided for @restoreSuccessTitle.
   ///
   /// In en, this message translates to:
-  /// **'Restore Success Title'**
+  /// **'Restore Successful'**
   String get restoreSuccessTitle;
 
   /// No description provided for @saveDataToFile.
   ///
   /// In en, this message translates to:
-  /// **'Save Data To File'**
+  /// **'Save your database to a ZIP file'**
   String get saveDataToFile;
 
   /// No description provided for @saveProfile.

@@ -1457,16 +1457,17 @@ class AppLocalizationsHi extends AppLocalizations {
       'प्रवेश की तारीख के आधार पर बिलिंग अवधि की गणना करें।';
 
   @override
-  String get backupAndRestoreSubtitle => '[HI] Backup And Restore Subtitle';
+  String get backupAndRestoreSubtitle => 'अपना डेटा सुरक्षित रखें';
 
   @override
-  String get backupCreatedShare => '[HI] Backup Created Share';
+  String get backupCreatedShare => 'बैकअप सफलतापूर्वक सेव किया गया';
 
   @override
-  String get backupInfoText => '[HI] Backup Info Text';
+  String get backupInfoText =>
+      'यदि आप ऐप अनइंस्टॉल करते हैं या डिवाइस बदलते हैं, तो डेटा न खोने के लिए अपने डेटा को बाहरी रूप से सुरक्षित करें।';
 
   @override
-  String get backupRestoredSuccess => '[HI] Backup Restored Success';
+  String get backupRestoredSuccess => 'बैकअप सफलतापूर्वक रिस्टोर किया गया!';
 
   @override
   String get billDueSoon => '[HI] Bill Due Soon';
@@ -1502,10 +1503,11 @@ class AppLocalizationsHi extends AppLocalizations {
   String get changesSavedAutomatically => '[HI] Changes Saved Automatically';
 
   @override
-  String get createBackupToKeepSafe => '[HI] Create Backup To Keep Safe';
+  String get createBackupToKeepSafe =>
+      'यह सुनिश्चित करने के लिए कि आपका डेटा हमेशा सुरक्षित रहे और किसी भी समय आसानी से रिस्टोर किया जा सके, एक बाहरी बैकअप बनाएं';
 
   @override
-  String get createShareBackup => '[HI] Create Share Backup';
+  String get createShareBackup => 'बैकअप सेव करें';
 
   @override
   String get criticalUrgentAttention => '[HI] Critical Urgent Attention';
@@ -1707,28 +1709,29 @@ class AppLocalizationsHi extends AppLocalizations {
   String get restartNowBtn => '[HI] Restart Now Btn';
 
   @override
-  String get restoreBackupTitle => '[HI] Restore Backup Title';
+  String get restoreBackupTitle => 'बैकअप रिस्टोर करें';
 
   @override
-  String get restoreBackupWarning => '[HI] Restore Backup Warning';
+  String get restoreBackupWarning =>
+      'यह आपके वर्तमान डेटा को पूरी तरह से बदल देगा। क्या आप वाकई जारी रखना चाहते हैं?';
 
   @override
-  String get restoreBtn => '[HI] Restore Btn';
+  String get restoreBtn => 'रिस्टोर करें';
 
   @override
-  String get restoreFailedPrefix => '[HI] Restore Failed Prefix';
+  String get restoreFailedPrefix => 'रिस्टोर विफल';
 
   @override
-  String get restoreFromDevice => '[HI] Restore From Device';
+  String get restoreFromDevice => 'बैकअप रिस्टोर करें';
 
   @override
-  String get restoreFromDeviceSubtitle => '[HI] Restore From Device Subtitle';
+  String get restoreFromDeviceSubtitle => 'अपने फ़ोन से मौजूदा बैकअप लोड करें';
 
   @override
-  String get restoreSuccessTitle => '[HI] Restore Success Title';
+  String get restoreSuccessTitle => 'रिस्टोर सफल';
 
   @override
-  String get saveDataToFile => '[HI] Save Data To File';
+  String get saveDataToFile => 'अपने डेटाबेस को ज़िप फ़ाइल में सेव करें';
 
   @override
   String get saveProfile => '[HI] Save Profile';

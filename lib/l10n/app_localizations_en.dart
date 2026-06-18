@@ -1453,16 +1453,17 @@ class AppLocalizationsEn extends AppLocalizations {
       'Auto-calculate billing period based on move-in date.';
 
   @override
-  String get backupAndRestoreSubtitle => 'Backup And Restore Subtitle';
+  String get backupAndRestoreSubtitle => 'Manage your data securely';
 
   @override
-  String get backupCreatedShare => 'Backup Created Share';
+  String get backupCreatedShare => 'Backup saved successfully';
 
   @override
-  String get backupInfoText => 'Backup Info Text';
+  String get backupInfoText =>
+      'Save your data externally to ensure you don\'t lose it if you uninstall the app or change devices.';
 
   @override
-  String get backupRestoredSuccess => 'Backup Restored Success';
+  String get backupRestoredSuccess => 'Backup restored successfully!';
 
   @override
   String get billDueSoon => 'Bill Due Soon';
@@ -1498,10 +1499,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get changesSavedAutomatically => 'Changes Saved Automatically';
 
   @override
-  String get createBackupToKeepSafe => 'Create Backup To Keep Safe';
+  String get createBackupToKeepSafe =>
+      'Create an external backup to ensure your data is always safe and can be easily restored at any time';
 
   @override
-  String get createShareBackup => 'Create Share Backup';
+  String get createShareBackup => 'Save Backup';
 
   @override
   String get criticalUrgentAttention => 'Critical Urgent Attention';
@@ -1703,28 +1705,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get restartNowBtn => 'Restart Now Btn';
 
   @override
-  String get restoreBackupTitle => 'Restore Backup Title';
+  String get restoreBackupTitle => 'Restore Backup';
 
   @override
-  String get restoreBackupWarning => 'Restore Backup Warning';
+  String get restoreBackupWarning =>
+      'This will completely overwrite your current data. Are you sure you want to continue?';
 
   @override
-  String get restoreBtn => 'Restore Btn';
+  String get restoreBtn => 'Restore';
 
   @override
-  String get restoreFailedPrefix => 'Restore Failed Prefix';
+  String get restoreFailedPrefix => 'Restore failed';
 
   @override
-  String get restoreFromDevice => 'Restore From Device';
+  String get restoreFromDevice => 'Restore Backup';
 
   @override
-  String get restoreFromDeviceSubtitle => 'Restore From Device Subtitle';
+  String get restoreFromDeviceSubtitle =>
+      'Load an existing backup from your phone';
 
   @override
-  String get restoreSuccessTitle => 'Restore Success Title';
+  String get restoreSuccessTitle => 'Restore Successful';
 
   @override
-  String get saveDataToFile => 'Save Data To File';
+  String get saveDataToFile => 'Save your database to a ZIP file';
 
   @override
   String get saveProfile => 'Save Profile';

@@ -59,12 +59,21 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
     setState(() => _isSaving = true);
 
     try {
+      final imageService = ImageService();
+      final persistentFileName = await imageService.saveFileToAppDirectory(
+        _selectedFile!,
+        isImage: _fileType == 'image',
+      );
+
+      if (persistentFileName == null) {
+        throw Exception('Failed to save document file securely.');
+      }
       await ref
           .read(tenantRepositoryProvider)
           .addDocument(
             tenantId: widget.tenantId,
             title: _titleController.text.trim(),
-            filePath: _selectedFile!.path,
+            filePath: persistentFileName,
             fileType: _fileType,
           );
       if (mounted) {
@@ -214,7 +223,7 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
                   ],
                 )
               : Image.file(
-                  File(ImageService.resolveImagePathSync(_selectedFile!.path)),
+                  _selectedFile!,
                   fit: BoxFit.cover,
                 ),
         ),

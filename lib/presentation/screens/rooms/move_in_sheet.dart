@@ -20,6 +20,8 @@ import '../../../data/database/tables/family_member_table.dart';
 import '../../widgets/image_picker_widget.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rent_khata/l10n/app_localizations.dart';
+import 'dart:io';
+import '../../../services/image_service.dart';
 
 /// Bottom sheet for moving a tenant into a room.
 class MoveInSheet extends ConsumerStatefulWidget {
@@ -129,13 +131,22 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
 
   Future<void> _saveDocuments(int tenantId) async {
     final repo = ref.read(tenantRepositoryProvider);
+    final imageService = ImageService();
+    
     for (final doc in _documents) {
-      await repo.addDocument(
-        tenantId: tenantId,
-        title: doc['title']!,
-        filePath: doc['path']!,
-        fileType: 'image',
+      final persistentFileName = await imageService.saveFileToAppDirectory(
+        File(doc['path']!), 
+        isImage: true,
       );
+      
+      if (persistentFileName != null) {
+        await repo.addDocument(
+          tenantId: tenantId,
+          title: doc['title']!,
+          filePath: persistentFileName,
+          fileType: 'image',
+        );
+      }
     }
   }
 

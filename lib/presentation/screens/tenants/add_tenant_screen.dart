@@ -9,10 +9,12 @@ import 'package:image_picker/image_picker.dart';
 import '../../../application/providers/repository_providers.dart';
 import '../../../application/providers/tenant_providers.dart';
 
+import 'dart:io';
 import '../../../core/utils/validators.dart';
 import '../../../domain/entities/tenant.dart';
 import 'package:rent_khata/l10n/app_localizations.dart';
 import '../../widgets/image_picker_widget.dart';
+import '../../../services/image_service.dart';
 
 /// Screen to add or edit a tenant with comprehensive profile.
 class AddTenantScreen extends ConsumerStatefulWidget {
@@ -115,13 +117,23 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
 
   Future<void> _saveDocuments(int tenantId) async {
     final repo = ref.read(tenantRepositoryProvider);
+    final imageService = ImageService();
+    
     for (final doc in _documents) {
-      await repo.addDocument(
-        tenantId: tenantId,
-        title: doc['title']!,
-        filePath: doc['path']!,
-        fileType: 'image',
+      // In AddTenantScreen, documents are currently images from the gallery
+      final persistentFileName = await imageService.saveFileToAppDirectory(
+        File(doc['path']!), 
+        isImage: true,
       );
+      
+      if (persistentFileName != null) {
+        await repo.addDocument(
+          tenantId: tenantId,
+          title: doc['title']!,
+          filePath: persistentFileName,
+          fileType: 'image',
+        );
+      }
     }
   }
 

@@ -60,6 +60,30 @@ class ImageService {
     }
   }
 
+  /// Saves a raw file (like a PDF or pre-picked image) to the app's persistent
+  /// storage directory so it is safely backed up. Returns the relative filename.
+  Future<String?> saveFileToAppDirectory(File file, {bool isImage = true}) async {
+    if (isImage) {
+      return await _compressAndSave(file);
+    } else {
+      try {
+        final appDir = await getApplicationDocumentsDirectory();
+        final imagesDir = Directory(p.join(appDir.path, 'images'));
+        if (!await imagesDir.exists()) {
+          await imagesDir.create(recursive: true);
+        }
+        final ext = p.extension(file.path);
+        final fileName = 'doc_${DateTime.now().millisecondsSinceEpoch}$ext';
+        final targetPath = p.join(imagesDir.path, fileName);
+        
+        final savedFile = await file.copy(targetPath);
+        return p.basename(savedFile.path);
+      } catch (e) {
+        return null;
+      }
+    }
+  }
+
   /// Compresses the image, saves it to the app's images directory,
   /// and returns only the relative filename for DB storage.
   Future<String?> _compressAndSave(File file) async {
