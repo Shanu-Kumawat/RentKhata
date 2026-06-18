@@ -400,7 +400,7 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
                   keyboardType: TextInputType.number,
                   validator: (v) => validatePositiveNumber(
                     v,
-                    AppLocalizations.of(context)!.amountLabel,
+                    AppLocalizations.of(context)!,
                   ),
                 ),
                 const SizedBox(height: 16),

@@ -366,7 +366,7 @@ class AppLocalizationsHi extends AppLocalizations {
   }
 
   @override
-  String get cancel => 'रद्द करें';
+  String get cancel => 'कैंसल';
 
   @override
   String get delete => 'हटाएं';
@@ -440,7 +440,7 @@ class AppLocalizationsHi extends AppLocalizations {
   }
 
   @override
-  String get save => 'सहेजें';
+  String get save => 'सेव करें';
 
   @override
   String get share => 'साझा करें';
@@ -682,7 +682,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get advance => 'अग्रिम';
 
   @override
-  String get currentLabel => 'वर्तमान';
+  String get currentLabel => 'अभी लागू';
 
   @override
   String cycleExceedsAgreementWarning(String date) {
@@ -1340,7 +1340,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get moveOutDate => 'बाहर निकलने की तिथि';
 
   @override
-  String get errorPrefix => 'त्रुटि: ';
+  String get errorPrefix => 'समस्या: ';
 
   @override
   String get ledgerNotFound => 'खाता नहीं मिला';
@@ -1438,14 +1438,15 @@ class AppLocalizationsHi extends AppLocalizations {
       'यह कंप्यूटर द्वारा तैयार किया गया विवरण है और इसके लिए भौतिक हस्ताक्षर की आवश्यकता नहीं है।';
 
   @override
-  String get aboutLabel => '[HI] About Label';
+  String get aboutLabel => 'ऐप के बारे में';
 
   @override
-  String get aboutRentKhataDescription => '[HI] About Rent Khata Description';
+  String get aboutRentKhataDescription =>
+      'रेंट खाता: किरायेदारों का हिसाब-किताब रखें आसानी से';
 
   @override
   String alertDaysBeforeCycle(int count) {
-    return '[HI] Alert $count days before';
+    return 'महीना पूरा होने से $count दिन पहले अलर्ट करें';
   }
 
   @override
@@ -1470,37 +1471,40 @@ class AppLocalizationsHi extends AppLocalizations {
   String get backupRestoredSuccess => 'बैकअप सफलतापूर्वक रिस्टोर किया गया!';
 
   @override
-  String get billDueSoon => '[HI] Bill Due Soon';
+  String get billDueSoon => 'बिल भरने की तारीख नज़दीक है';
 
   @override
-  String get billFullyPaid => '[HI] Bill Fully Paid';
+  String get billFullyPaid => 'बिल का पूरा भुगतान हो गया';
 
   @override
-  String get billFullyPaidSubtitle => '[HI] Bill Fully Paid Subtitle';
+  String get billFullyPaidSubtitle => 'कोई बकाया राशि नहीं है';
 
   @override
-  String get billingCycleEnding => '[HI] Billing Cycle Ending';
+  String get billingCycleEnding => 'महीना पूरा होने वाला है';
 
   @override
-  String get billingLabel => '[HI] Billing Label';
+  String get billingLabel => 'बिलिंग';
 
   @override
-  String get billingReminders => '[HI] Billing Reminders';
+  String get billingReminders => 'बिलिंग से जुड़े रिमाइंडर्स';
 
   @override
-  String get biometricFallbackInfo => '[HI] Biometric Fallback Info';
+  String get biometricFallbackInfo =>
+      'फिंगरप्रिंट काम न करने पर पिन का इस्तेमाल करें';
 
   @override
-  String get biometricLock => '[HI] Biometric Lock';
+  String get biometricLock => 'ऐप लॉक';
 
   @override
-  String get biometricLockSubtitle => '[HI] Biometric Lock Subtitle';
+  String get biometricLockSubtitle =>
+      'ऐप को फिंगरप्रिंट या फेस आईडी से सुरक्षित रखें';
 
   @override
-  String get biometricsNotAvailable => '[HI] Biometrics Not Available';
+  String get biometricsNotAvailable =>
+      'आपके फ़ोन में फिंगरप्रिंट या फेस लॉक की सुविधा नहीं है';
 
   @override
-  String get changesSavedAutomatically => '[HI] Changes Saved Automatically';
+  String get changesSavedAutomatically => 'बदलाव अपने आप सेव हो जाते हैं';
 
   @override
   String get createBackupToKeepSafe =>
@@ -1510,203 +1514,209 @@ class AppLocalizationsHi extends AppLocalizations {
   String get createShareBackup => 'बैकअप सेव करें';
 
   @override
-  String get criticalUrgentAttention => '[HI] Critical Urgent Attention';
+  String get criticalUrgentAttention => 'अति आवश्यक (अर्जेंट)';
 
   @override
-  String get currentRate => '[HI] Current Rate';
+  String get currentRate => 'अभी की दर';
 
   @override
-  String get dataLabel => '[HI] Data Label';
+  String get dataLabel => 'डेटा और बैकअप';
 
   @override
   String daysCount(int count) {
-    return '[HI] $count days';
+    return '$count दिन';
   }
 
   @override
   String get deviceDoesNotSupportBiometrics =>
-      '[HI] Device Does Not Support Biometrics';
+      'आपके डिवाइस में फिंगरप्रिंट या फेस लॉक सपोर्ट नहीं करता';
 
   @override
-  String get discard => '[HI] Discard';
+  String get discard => 'हटाएं';
 
   @override
-  String get dueDateOffsetSubtitle => '[HI] Due Date Offset Subtitle';
+  String get dueDateOffsetSubtitle =>
+      'महीना पूरा होने के बाद बिल भरने की आखिरी तारीख तय करें';
 
   @override
   String dueDaysAfterCycle(int count) {
-    return '[HI] Due $count days after cycle ends';
+    return 'महीना पूरा होने के $count दिन बाद बिल भरना है';
   }
 
   @override
-  String get dueSoonAlert => '[HI] Due Soon Alert';
+  String get dueSoonAlert => 'देय तिथि (Due Date) से पहले अलर्ट';
 
   @override
-  String get dueSoonAlertSubtitle => '[HI] Due Soon Alert Subtitle';
+  String get dueSoonAlertSubtitle => 'आखिरी तारीख निकलने से पहले याद दिलाएं';
 
   @override
-  String get editProfile => '[HI] Edit Profile';
+  String get editProfile => 'प्रोफ़ाइल अपडेट करें';
 
   @override
   String effectiveFrom(String date) {
-    return '[HI] Effective from $date';
+    return '$date से लागू';
   }
 
   @override
-  String get electricityMeterBills => '[HI] Electricity Meter Bills';
+  String get electricityMeterBills => 'बिजली के बिल';
 
   @override
-  String get electricityRateInfoText => '[HI] Electricity Rate Info Text';
+  String get electricityRateInfoText =>
+      'यह बिजली की दर सभी नए बिलों पर लागू होगी। पहले से बने बिलों पर इसका कोई प्रभाव नहीं पड़ेगा।';
 
   @override
-  String get electricityRatesSubtitle => '[HI] Electricity Rates Subtitle';
+  String get electricityRatesSubtitle => 'बिजली की दरें सेट करें';
 
   @override
-  String get enableAppLock => '[HI] Enable App Lock';
+  String get enableAppLock => 'ऐप लॉक चालू करें';
 
   @override
-  String get enterValidRate => '[HI] Enter Valid Rate';
+  String get enterValidRate => 'कृपया सही दर डालें';
 
   @override
-  String get firstReminderAfterDueDate => '[HI] First Reminder After Due Date';
+  String get firstReminderAfterDueDate => 'आखिरी तारीख के बाद पहला रिमाइंडर';
 
   @override
-  String get generalSettingsLabel => '[HI] General Settings Label';
+  String get generalSettingsLabel => 'सामान्य सेटिंग्स';
 
   @override
-  String get localBackups => '[HI] Local Backups';
+  String get localBackups => 'फ़ोन में बैकअप';
 
   @override
-  String get lockAfterInactivity => '[HI] Lock After Inactivity';
+  String get lockAfterInactivity => 'इस्तेमाल न करने पर लॉक करें';
 
   @override
-  String get lockOnExit => '[HI] Lock On Exit';
+  String get lockOnExit => 'ऐप बंद करने पर लॉक करें';
 
   @override
-  String get lockOnExitSubtitle => '[HI] Lock On Exit Subtitle';
+  String get lockOnExitSubtitle => 'ऐप से बाहर निकलते ही ऐप लॉक हो जाएगा';
 
   @override
-  String get maintenanceCharges => '[HI] Maintenance Charges';
+  String get maintenanceCharges => 'रखरखाव (मेंटेनेंस) शुल्क';
 
   @override
-  String get messageBody => '[HI] Message Body';
+  String get messageBody => 'संदेश';
 
   @override
-  String get messageTemplatesSubtitle => '[HI] Message Templates Subtitle';
+  String get messageTemplatesSubtitle =>
+      'SMS और WhatsApp मैसेज को अपने हिसाब से बदलें';
 
   @override
   String minutes(int count) {
-    return '[HI] $count minutes';
+    return '$count मिनट';
   }
 
   @override
-  String get mobileNumberHint => '[HI] Mobile Number Hint';
+  String get mobileNumberHint => 'अपना मोबाइल नंबर डालें';
 
   @override
-  String get monthlyRentBills => '[HI] Monthly Rent Bills';
+  String get monthlyRentBills => 'महीने के किराये का बिल';
 
   @override
-  String get monthlySummary => '[HI] Monthly Summary';
+  String get monthlySummary => 'महीने का हिसाब (सारांश)';
 
   @override
-  String get monthlySummarySubtitle => '[HI] Monthly Summary Subtitle';
+  String get monthlySummarySubtitle => 'महीने के अंत में पूरी रिपोर्ट पाएं';
 
   @override
-  String get never => '[HI] Never';
+  String get never => 'कभी नहीं';
 
   @override
-  String get noBiometricsEnrolled => '[HI] No Biometrics Enrolled';
+  String get noBiometricsEnrolled =>
+      'फ़ोन में कोई फिंगरप्रिंट या फेस आईडी सेट नहीं है';
 
   @override
-  String get noLocalBackups => '[HI] No Local Backups';
+  String get noLocalBackups => 'कोई लोकल बैकअप नहीं है';
 
   @override
-  String get noRateHistory => '[HI] No Rate History';
+  String get noRateHistory => 'पुरानी दरों का कोई रिकॉर्ड नहीं है';
 
   @override
-  String get notEnabled => '[HI] Not Enabled';
+  String get notEnabled => 'चालू नहीं है';
 
   @override
-  String get notificationSettings => '[HI] Notification Settings';
+  String get notificationSettings => 'नोटिफ़िकेशन सेटिंग्स';
 
   @override
-  String get notificationTime => '[HI] Notification Time';
+  String get notificationTime => 'नोटिफ़िकेशन का समय';
 
   @override
-  String get notificationsWorking => '[HI] Notifications Working';
+  String get notificationsWorking => 'नोटिफ़िकेशन चालू हैं';
 
   @override
-  String get oneDayOverdue => '[HI] One Day Overdue';
+  String get oneDayOverdue => 'एक दिन की देरी';
 
   @override
-  String get oneMinute => '[HI] One Minute';
+  String get oneMinute => 'एक मिनट';
 
   @override
-  String get oneWeekOverdue => '[HI] One Week Overdue';
+  String get oneWeekOverdue => 'एक हफ़्ते की देरी';
 
   @override
-  String get overdueFollowUps => '[HI] Overdue Follow Ups';
+  String get overdueFollowUps => 'पेंडिंग बिल के लिए याद दिलाएं';
 
   @override
-  String get paymentNotifications => '[HI] Payment Notifications';
+  String get paymentNotifications => 'पेमेंट के नोटिफ़िकेशन';
 
   @override
-  String get paymentReceived => '[HI] Payment Received';
+  String get paymentReceived => 'पेमेंट मिल गया';
 
   @override
-  String get paymentReceivedSubtitle => '[HI] Payment Received Subtitle';
+  String get paymentReceivedSubtitle =>
+      'पेमेंट मिलने पर कन्फर्मेशन मैसेज भेजें';
 
   @override
-  String get permissionDenied => '[HI] Permission Denied';
+  String get permissionDenied => 'इजाज़त नहीं मिली';
 
   @override
-  String get profileUpdated => '[HI] Profile Updated';
+  String get profileUpdated => 'प्रोफ़ाइल अपडेट हो गई';
 
   @override
-  String get quietHours => '[HI] Quiet Hours';
+  String get quietHours => 'नोटिफ़िकेशन बंद रखने का समय (शांत घंटे)';
 
   @override
-  String get rateHistory => '[HI] Rate History';
+  String get rateHistory => 'पुरानी दरें';
 
   @override
-  String get ratePerUnitLabel => '[HI] Rate Per Unit Label';
+  String get ratePerUnitLabel => 'प्रति यूनिट दर (₹ में)';
 
   @override
-  String get rateUpdated => '[HI] Rate Updated';
+  String get rateUpdated => 'दर अपडेट हो गई है';
 
   @override
-  String get receiptLabel => '[HI] Receipt Label';
+  String get receiptLabel => 'रसीद';
 
   @override
   String remindDaysBeforeCycleEnds(int days) {
-    return '[HI] Remind $days days before cycle ends';
+    return 'महीना पूरा होने से $days दिन पहले याद दिलाएं';
   }
 
   @override
   String remindDaysBeforeDueDate(int days) {
-    return '[HI] Remind $days days before due date';
+    return 'आखिरी तारीख से $days दिन पहले याद दिलाएं';
   }
 
   @override
-  String get reminderLabel => '[HI] Reminder Label';
+  String get reminderLabel => 'रिमाइंडर';
 
   @override
-  String get reminderSettingsSubtitle => '[HI] Reminder Settings Subtitle';
+  String get reminderSettingsSubtitle => 'रिमाइंडर्स की सेटिंग्स';
 
   @override
-  String get requireBiometric => '[HI] Require Biometric';
+  String get requireBiometric => 'फिंगरप्रिंट/फेस आईडी ज़रूरी है';
 
   @override
-  String get resetBtn => '[HI] Reset Btn';
+  String get resetBtn => 'रीसेट करें';
 
   @override
-  String get resetTemplateWarning => '[HI] Reset Template Warning';
+  String get resetTemplateWarning =>
+      'क्या आप इस मैसेज को पहले जैसा (डिफ़ॉल्ट) करना चाहते हैं?';
 
   @override
-  String get resetToDefault => '[HI] Reset To Default';
+  String get resetToDefault => 'पहले जैसा करें';
 
   @override
-  String get restartNowBtn => '[HI] Restart Now Btn';
+  String get restartNowBtn => 'अभी ऐप रीस्टार्ट करें';
 
   @override
   String get restoreBackupTitle => 'बैकअप रिस्टोर करें';
@@ -1734,81 +1744,85 @@ class AppLocalizationsHi extends AppLocalizations {
   String get saveDataToFile => 'अपने डेटाबेस को ज़िप फ़ाइल में सेव करें';
 
   @override
-  String get saveProfile => '[HI] Save Profile';
+  String get saveProfile => 'प्रोफ़ाइल सेव करें';
 
   @override
-  String get secondReminder => '[HI] Second Reminder';
+  String get secondReminder => 'दूसरा रिमाइंडर';
 
   @override
-  String get sendTestNotification => '[HI] Send Test Notification';
+  String get sendTestNotification => 'एक टेस्ट नोटिफ़िकेशन भेजें';
 
   @override
-  String get setNewRate => '[HI] Set New Rate';
+  String get setNewRate => 'नई दर सेट करें';
 
   @override
-  String get setupFingerprintFirst => '[HI] Setup Fingerprint First';
+  String get setupFingerprintFirst =>
+      'कृपया पहले फ़ोन की सेटिंग्स में फिंगरप्रिंट सेट करें';
 
   @override
-  String get template => '[HI] Template';
+  String get template => 'संदेश का टेम्पलेट';
 
   @override
-  String get templateAlreadyDefault => '[HI] Template Already Default';
+  String get templateAlreadyDefault =>
+      'यह संदेश पहले से ही डिफ़ॉल्ट रूप में है';
 
   @override
-  String get templatePlaceholders => '[HI] Template Placeholders';
+  String get templatePlaceholders =>
+      'आप संदेश में इन शब्दों का इस्तेमाल कर सकते हैं:';
 
   @override
-  String get templateResetSuccess => '[HI] Template Reset Success';
+  String get templateResetSuccess => 'मैसेज सफलतापूर्वक रीसेट हो गया';
 
   @override
-  String get templateSavedSuccess => '[HI] Template Saved Success';
+  String get templateSavedSuccess => 'मैसेज सफलतापूर्वक सेव हो गया';
 
   @override
   String templateUsedWhenSharing(String type) {
-    return '[HI] Template used when sharing $type';
+    return '$type भेजते समय यही मैसेज जाएगा';
   }
 
   @override
-  String get testNotificationTitle => '[HI] Test Notification Title';
+  String get testNotificationTitle => 'टेस्ट नोटिफ़िकेशन';
 
   @override
-  String get threeDaysOverdue => '[HI] Three Days Overdue';
+  String get threeDaysOverdue => 'तीन दिन की देरी';
 
   @override
-  String get twoWeeksOverdue => '[HI] Two Weeks Overdue';
+  String get twoWeeksOverdue => 'दो हफ़्ते की देरी';
 
   @override
-  String get unit => '[HI] Unit';
+  String get unit => 'यूनिट';
 
   @override
-  String get updateRate => '[HI] Update Rate';
+  String get updateRate => 'दर अपडेट करें';
 
   @override
-  String get upiId => '[HI] Upi Id';
+  String get upiId => 'UPI आईडी';
 
   @override
-  String get upiIdHelperText => '[HI] Upi Id Helper Text';
+  String get upiIdHelperText =>
+      'किरायेदारों से सीधे खाते में पेमेंट पाने के लिए अपनी UPI आईडी डालें';
 
   @override
   String get upiIdHint => 'उदा. yourname@upi';
 
   @override
   String versionLabel(String version) {
-    return '[HI] Version $version';
+    return 'वर्ज़न $version';
   }
 
   @override
-  String get weeklyReminder => '[HI] Weekly Reminder';
+  String get weeklyReminder => 'हर हफ़्ते याद दिलाएं';
 
   @override
-  String get yourName => '[HI] Your Name';
+  String get yourName => 'आपका नाम';
 
   @override
   String get documentPdf => 'document.pdf';
 
   @override
   String errorSharingMessage(String error) {
-    return '[HI] संदेश साझा करने में विफल: $error';
+    return 'मैसेज भेजने में कोई परेशानी हुई: $error';
   }
 
   @override
@@ -1824,36 +1838,36 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get couldNotSavePdf =>
-      '[HI] PDF सहेजने में विफल। कृपया पुन: प्रयास करें।';
+      'पीडीएफ़ सेव नहीं हो सका। कृपया दोबारा कोशिश करें।';
 
   @override
-  String get unableToLoadPdfPreview => '[HI] PDF प्रीव्यू लोड करने में असमर्थ';
+  String get unableToLoadPdfPreview => 'पीडीएफ़ का प्रीव्यू नहीं दिख रहा है';
 
   @override
-  String get shareReceipt => '[HI] रसीद साझा करें';
+  String get shareReceipt => 'रसीद भेजें';
 
   @override
-  String get chooseHowToShare => '[HI] चुनें कि आप कैसे साझा करना चाहते हैं';
+  String get chooseHowToShare => 'चुनें कि आप रसीद कैसे भेजना चाहते हैं';
 
   @override
-  String get sendAsMessage => '[HI] संदेश के रूप में भेजें';
+  String get sendAsMessage => 'SMS या WhatsApp से भेजें';
 
   @override
-  String get quickTextWithDetails => '[HI] विवरण के साथ त्वरित पाठ';
+  String get quickTextWithDetails => 'छोटे मैसेज के रूप में';
 
   @override
-  String get sharePdf => '[HI] PDF साझा करें';
+  String get sharePdf => 'पीडीएफ़ भेजें';
 
   @override
-  String get formalDocument => '[HI] औपचारिक दस्तावेज़';
+  String get formalDocument => 'पीडीएफ़ दस्तावेज़ के रूप में';
 
   @override
   String errorGeneratingPdf(String error) {
-    return '[HI] PDF जनरेट करने में त्रुटि: $error';
+    return 'पीडीएफ़ बनाने में परेशानी हुई: $error';
   }
 
   @override
-  String get paymentReceipt => '[HI] भुगतान रसीद';
+  String get paymentReceipt => 'भुगतान की रसीद';
 
   @override
   String get notificationPermissionTitle => 'भुगतान कभी न भूलें';
@@ -2739,4 +2753,82 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get archivedBadge => 'आर्काइव्ड';
+
+  @override
+  String get validatePhoneRequired => 'फ़ोन नंबर आवश्यक है';
+
+  @override
+  String get validatePhoneInvalid => 'एक मान्य 10-अंकीय फ़ोन नंबर दर्ज करें';
+
+  @override
+  String get validateUpiInvalid => 'एक मान्य UPI ID दर्ज करें (उदा. name@upi)';
+
+  @override
+  String get validateAadharInvalid => 'एक मान्य 12-अंकीय आधार नंबर दर्ज करें';
+
+  @override
+  String validateRequiredField(String fieldName) {
+    return '$fieldName आवश्यक है';
+  }
+
+  @override
+  String get validatePositiveNumberInvalid =>
+      'एक मान्य धनात्मक संख्या दर्ज करें';
+
+  @override
+  String get showLess => 'कम दिखाएं';
+
+  @override
+  String get viewHistory => 'इतिहास देखें';
+
+  @override
+  String get activeStatus => 'सक्रिय';
+
+  @override
+  String get pastStayStatus => 'पुराना निवास';
+
+  @override
+  String billsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count बिल',
+      one: '1 बिल',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get netProfit => 'शुद्ध लाभ';
+
+  @override
+  String get netLoss => 'शुद्ध हानि';
+
+  @override
+  String get statusPaid => 'भुगतान किया';
+
+  @override
+  String get statusOverdue => 'बकाया';
+
+  @override
+  String get amountSettled => 'राशि का निपटान';
+
+  @override
+  String get amountDue => 'देय राशि';
+
+  @override
+  String expiredDaysAgo(int days) {
+    return '$days दिन पहले समाप्त हो गया';
+  }
+
+  @override
+  String expiringInDays(int days) {
+    return '$days दिनों में समाप्त हो रहा है';
+  }
+
+  @override
+  String get fieldRequired => 'आवश्यक';
+
+  @override
+  String get financialYearPrefix => 'वि.व. ';
 }

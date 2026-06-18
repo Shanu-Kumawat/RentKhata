@@ -348,7 +348,7 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
                             ),
                           ),
                         ),
-                        validator: (v) => validatePositiveNumber(v, 'Amount'),
+                        validator: (v) => validatePositiveNumber(v, AppLocalizations.of(context)!),
                       ),
                     ),
                     // "Full Amount" Chip

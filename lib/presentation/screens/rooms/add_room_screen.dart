@@ -130,7 +130,7 @@ class _AddRoomSheetState extends ConsumerState<AddRoomSheet> {
                   hintText: AppLocalizations.of(context)!.roomNumberHint,
                   prefixIcon: const Icon(Icons.meeting_room_outlined),
                 ),
-                validator: (v) => validateRequired(v, 'Room number'),
+                validator: (v) => validateRequired(v, AppLocalizations.of(context)!, AppLocalizations.of(context)!.roomNumberLabel),
               ),
               const SizedBox(height: 16),
 
@@ -143,7 +143,7 @@ class _AddRoomSheetState extends ConsumerState<AddRoomSheet> {
                   prefixIcon: const Icon(Icons.currency_rupee),
                 ),
                 keyboardType: TextInputType.number,
-                validator: (v) => validatePositiveNumber(v, 'Rent'),
+                validator: (v) => validatePositiveNumber(v, AppLocalizations.of(context)!),
               ),
               const SizedBox(height: 16),
 

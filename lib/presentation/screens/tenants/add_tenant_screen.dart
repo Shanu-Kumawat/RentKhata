@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_picker/image_picker.dart';
 import '../../../application/providers/repository_providers.dart';
 import '../../../application/providers/tenant_providers.dart';
 
@@ -14,8 +13,9 @@ import '../../../core/utils/validators.dart';
 import '../../../domain/entities/tenant.dart';
 import 'package:rent_khata/l10n/app_localizations.dart';
 import '../../widgets/image_picker_widget.dart';
+import '../../widgets/file_preview_dialog.dart';
 import '../../../services/image_service.dart';
-
+import 'add_document_sheet.dart';
 /// Screen to add or edit a tenant with comprehensive profile.
 class AddTenantScreen extends ConsumerStatefulWidget {
   final Tenant? tenant;
@@ -68,50 +68,54 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
 
   bool get isEditing => widget.tenant != null;
 
+  final List<int> _deletedDocumentIds = [];
+
   @override
   void initState() {
     super.initState();
     if (widget.tenant != null) {
       _populateFromTenant(widget.tenant!);
+      _fetchExistingDocuments();
     }
   }
-  // ... (omitted methods)
 
-  Future<void> _pickDocument() async {
-    final pickedFile = await ImagePicker().pickImage(
-      source: ImageSource.gallery,
-    );
-    if (pickedFile != null) {
-      if (!mounted) return;
-      final titleController = TextEditingController();
-      final title = await showDialog<String>(
-        context: context,
-        builder: (context) => AlertDialog(
-          insetPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
-          title: Text(AppLocalizations.of(context)!.documentTitleLabel),
-          content: TextField(
-            controller: titleController,
-            decoration: const InputDecoration(hintText: 'e.g. PAN Card'),
-            autofocus: true,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(AppLocalizations.of(context)!.cancelBtn),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.pop(context, titleController.text),
-              child: Text(AppLocalizations.of(context)!.addBtn),
-            ),
-          ],
-        ),
-      );
-
-      if (title != null && title.isNotEmpty) {
+  Future<void> _fetchExistingDocuments() async {
+    try {
+      final docs = await ref.read(tenantDocumentsProvider(widget.tenant!.id).future);
+      if (mounted) {
         setState(() {
-          _documents.add({'path': pickedFile.path, 'title': title});
+          for (final d in docs) {
+            _documents.add({
+              'id': d.id.toString(),
+              'path': d.filePath,
+              'title': d.title,
+              'type': d.fileType ?? 'image',
+              'isExisting': 'true',
+            });
+          }
         });
       }
+    } catch (e) {
+      // Ignore error, just don't populate
+    }
+  }
+
+  Future<void> _pickDocument() async {
+    final result = await showModalBottomSheet<Map<String, dynamic>>(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => const AddDocumentSheet(),
+    );
+
+    if (result != null) {
+      setState(() {
+        _documents.add({
+          'path': result['path'] as String,
+          'title': result['title'] as String,
+          'type': result['type'] as String,
+          'isExisting': 'false',
+        });
+      });
     }
   }
 
@@ -119,11 +123,17 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
     final repo = ref.read(tenantRepositoryProvider);
     final imageService = ImageService();
     
+    for (final id in _deletedDocumentIds) {
+      await repo.deleteDocument(id);
+    }
+    
     for (final doc in _documents) {
-      // In AddTenantScreen, documents are currently images from the gallery
+      if (doc['isExisting'] == 'true') continue;
+      
+      final isImage = doc['type'] == 'image';
       final persistentFileName = await imageService.saveFileToAppDirectory(
         File(doc['path']!), 
-        isImage: true,
+        isImage: isImage,
       );
       
       if (persistentFileName != null) {
@@ -131,7 +141,7 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
           tenantId: tenantId,
           title: doc['title']!,
           filePath: persistentFileName,
-          fileType: 'image',
+          fileType: doc['type']!,
         );
       }
     }
@@ -353,7 +363,7 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
                     prefixIcon: Icon(Icons.person_outline),
                   ),
                   textCapitalization: TextCapitalization.words,
-                  validator: (v) => validateRequired(v, 'Name'),
+                  validator: (v) => validateRequired(v, AppLocalizations.of(context)!, AppLocalizations.of(context)!.nameRequiredLabel),
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
@@ -416,7 +426,7 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
                   ),
                   keyboardType: TextInputType.phone,
                   validator: (v) =>
-                      v?.isEmpty ?? true ? null : validatePhone(v),
+                      v?.isEmpty ?? true ? null : validatePhone(v, AppLocalizations.of(context)!),
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
@@ -522,7 +532,7 @@ labelText: AppLocalizations.of(context)!.stateLabel),
                   ),
                   keyboardType: TextInputType.number,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  validator: validateAadhar,
+                  validator: (v) => validateAadhar(v, AppLocalizations.of(context)!),
                 ),
                 const SizedBox(height: 20),
                 Text(
@@ -637,46 +647,111 @@ labelText: AppLocalizations.of(context)!.stateLabel),
             const SizedBox(height: 16),
 
             // Additional Documents Section
-            _buildSectionCard(
-              title: AppLocalizations.of(context)!.additionalDocumentsTitle,
-              icon: Icons.folder_outlined,
-              children: [
-                if (_documents.isEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: Text(
-                      AppLocalizations.of(context)!.noDocumentsAddedYet,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.folder_outlined,
+                          color: Theme.of(context).colorScheme.primary,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          AppLocalizations.of(context)!.additionalDocumentsTitle,
+                          style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        const Spacer(),
+                        TextButton.icon(
+                          onPressed: _pickDocument,
+                          icon: const Icon(Icons.add, size: 18),
+                          label: Text(AppLocalizations.of(context)!.addBtn),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    if (_documents.isEmpty)
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          child: Text(
+                            AppLocalizations.of(context)!.noDocumentsAddedYet,
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                ),
+                          ),
+                        ),
+                      )
+                    else
+                      ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: _documents.length,
+                        separatorBuilder: (_, __) => const Divider(),
+                        itemBuilder: (context, index) {
+                          final doc = _documents[index];
+                          final rawPath = doc['path'] ?? '';
+                          final isExisting = doc['isExisting'] == 'true';
+                          final absolutePath = isExisting ? ImageService.resolveImagePathSync(rawPath) : rawPath;
+                          final isImage = doc['type'] == 'image' || 
+                                          absolutePath.toLowerCase().endsWith('.jpg') ||
+                                          absolutePath.toLowerCase().endsWith('.jpeg') ||
+                                          absolutePath.toLowerCase().endsWith('.png');
+                          return ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            leading: Container(
+                              height: 40,
+                              width: 40,
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: isImage
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Image.file(
+                                        File(absolutePath),
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (_, __, ___) => const Icon(Icons.broken_image, size: 20),
+                                      ),
+                                    )
+                                  : const Icon(Icons.description, size: 20),
+                            ),
+                            title: Text(
+                              doc['title'] ?? '',
+                              style: const TextStyle(fontWeight: FontWeight.w500),
+                            ),
+                            subtitle: Text(
+                              rawPath.split('/').last,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                            trailing: IconButton(
+                              icon: Icon(
+                                Icons.delete_outline,
+                                color: Theme.of(context).colorScheme.error,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  final removed = _documents.removeAt(index);
+                                  if (removed['isExisting'] == 'true') {
+                                    _deletedDocumentIds.add(int.parse(removed['id']!));
+                                  }
+                                });
+                              },
+                            ),
+                            onTap: () => FilePreviewDialog.show(context, absolutePath),
+                          );
+                        },
                       ),
-                    ),
-                  ),
-                ..._documents.asMap().entries.map((entry) {
-                  final index = entry.key;
-                  final doc = entry.value;
-                  return ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: const Icon(Icons.description_outlined),
-                    title: Text(doc['title'] ?? ''),
-                    subtitle: Text(
-                      doc['path']?.split('/').last ?? '',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.close, size: 20),
-                      onPressed: () =>
-                          setState(() => _documents.removeAt(index)),
-                    ),
-                  );
-                }),
-                const SizedBox(height: 8),
-                OutlinedButton.icon(
-                  onPressed: _pickDocument,
-                  icon: const Icon(Icons.add),
-                  label: Text(AppLocalizations.of(context)!.addDocumentBtn),
+                  ],
                 ),
-              ],
+              ),
             ),
             const SizedBox(height: 32),
 

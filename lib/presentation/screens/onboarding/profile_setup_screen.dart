@@ -141,7 +141,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                       prefixIcon: const Icon(Icons.person_outline),
                     ),
                     textCapitalization: TextCapitalization.words,
-                    validator: (v) => validateRequired(v, 'Name'),
+                    validator: (v) => validateRequired(v, AppLocalizations.of(context)!, AppLocalizations.of(context)!.nameRequiredLabel),
                   )
                   .animate()
                   .fadeIn(delay: 300.ms, duration: 400.ms)
@@ -163,7 +163,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                     ),
                     keyboardType: TextInputType.phone,
                     validator: (v) =>
-                        v?.isEmpty ?? true ? null : validatePhone(v),
+                        v?.isEmpty ?? true ? null : validatePhone(v, AppLocalizations.of(context)!),
                   )
                   .animate()
                   .fadeIn(delay: 400.ms, duration: 400.ms)
@@ -190,7 +190,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                           ),
                     ),
                     keyboardType: TextInputType.emailAddress,
-                    validator: validateUpiId,
+                    validator: (v) => validateUpiId(v, AppLocalizations.of(context)!),
                   )
                   .animate()
                   .fadeIn(delay: 500.ms, duration: 400.ms)

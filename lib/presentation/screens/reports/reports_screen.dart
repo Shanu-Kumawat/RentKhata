@@ -96,7 +96,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
                     final y = DateTime.now().year - 2 + index;
                     return DropdownMenuItem(
                       value: y,
-                      child: Text('FY $y-${(y + 1).toString().substring(2)}'),
+                      child: Text('${AppLocalizations.of(context)!.financialYearPrefix}$y-${(y + 1).toString().substring(2)}'),
                     );
                   }),
                 ),
@@ -282,7 +282,7 @@ class _OverviewTab extends ConsumerWidget {
                                 amount: data.collected,
                                 icon: Icons.arrow_downward_rounded,
                                 accentColor: AppColors.success,
-                                subtitle: 'FY $yearStr',
+                                subtitle: '${AppLocalizations.of(context)!.financialYearPrefix}$yearStr',
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -508,7 +508,7 @@ class _NetProfitCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      isProfitable ? 'NET PROFIT' : 'NET LOSS',
+                      isProfitable ? AppLocalizations.of(context)!.netProfit : AppLocalizations.of(context)!.netLoss,
                       style: const TextStyle(
                         color: Colors.white70,
                         fontSize: 12,
@@ -541,7 +541,7 @@ class _NetProfitCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'FY $yearStr',
+                      '${AppLocalizations.of(context)!.financialYearPrefix}$yearStr',
                       style: const TextStyle(
                         color: Colors.white60,
                         fontSize: 13,
@@ -1041,10 +1041,10 @@ class _PremiumBillCard extends ConsumerWidget {
                       ),
                       child: Text(
                         bill.isFullyPaid
-                            ? 'PAID'
+                            ? AppLocalizations.of(context)!.statusPaid
                             : bill.isOverdue
-                            ? 'OVERDUE'
-                            : 'PENDING',
+                            ? AppLocalizations.of(context)!.statusOverdue
+                            : AppLocalizations.of(context)!.pending,
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w900,
@@ -1162,7 +1162,7 @@ class _PremiumBillCard extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            bill.isFullyPaid ? 'Amount Settled' : 'Amount Due',
+                            bill.isFullyPaid ? AppLocalizations.of(context)!.amountSettled : AppLocalizations.of(context)!.amountDue,
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
                               fontWeight: FontWeight.w600,

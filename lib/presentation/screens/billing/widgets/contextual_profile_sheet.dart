@@ -228,7 +228,7 @@ class _ContextualProfileSheetState
                       height: 1.2,
                     ),
                   ),
-                  validator: validateUpiId,
+                  validator: (v) => validateUpiId(v, AppLocalizations.of(context)!),
                   textInputAction: TextInputAction.done,
                   onFieldSubmitted: (_) => _saveProfile(),
                 ).animate().fadeIn(delay: 500.ms).slideX(begin: 0.1),

@@ -8,9 +8,9 @@ import '../../../application/providers/repository_providers.dart';
 import 'package:rent_khata/l10n/app_localizations.dart';
 
 class AddDocumentSheet extends ConsumerStatefulWidget {
-  final int tenantId;
+  final int? tenantId;
 
-  const AddDocumentSheet({super.key, required this.tenantId});
+  const AddDocumentSheet({super.key, this.tenantId});
 
   @override
   ConsumerState<AddDocumentSheet> createState() => _AddDocumentSheetState();
@@ -59,25 +59,35 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
     setState(() => _isSaving = true);
 
     try {
-      final imageService = ImageService();
-      final persistentFileName = await imageService.saveFileToAppDirectory(
-        _selectedFile!,
-        isImage: _fileType == 'image',
-      );
+      if (widget.tenantId != null) {
+        final imageService = ImageService();
+        final persistentFileName = await imageService.saveFileToAppDirectory(
+          _selectedFile!,
+          isImage: _fileType == 'image',
+        );
 
-      if (persistentFileName == null) {
-        throw Exception('Failed to save document file securely.');
-      }
-      await ref
-          .read(tenantRepositoryProvider)
-          .addDocument(
-            tenantId: widget.tenantId,
-            title: _titleController.text.trim(),
-            filePath: persistentFileName,
-            fileType: _fileType,
-          );
-      if (mounted) {
-        Navigator.pop(context, true);
+        if (persistentFileName == null) {
+          throw Exception('Failed to save document file securely.');
+        }
+        await ref
+            .read(tenantRepositoryProvider)
+            .addDocument(
+              tenantId: widget.tenantId!,
+              title: _titleController.text.trim(),
+              filePath: persistentFileName,
+              fileType: _fileType,
+            );
+        if (mounted) {
+          Navigator.pop(context, true);
+        }
+      } else {
+        if (mounted) {
+          Navigator.pop(context, {
+            'path': _selectedFile!.path,
+            'title': _titleController.text.trim(),
+            'type': _fileType,
+          });
+        }
       }
     } catch (e) {
       if (mounted) {

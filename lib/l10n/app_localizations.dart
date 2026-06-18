@@ -5118,6 +5118,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Archived'**
   String get archivedBadge;
+
+  /// No description provided for @validatePhoneRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number is required'**
+  String get validatePhoneRequired;
+
+  /// No description provided for @validatePhoneInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid 10-digit phone number'**
+  String get validatePhoneInvalid;
+
+  /// No description provided for @validateUpiInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid UPI ID (e.g., name@upi)'**
+  String get validateUpiInvalid;
+
+  /// No description provided for @validateAadharInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid 12-digit Aadhar number'**
+  String get validateAadharInvalid;
+
+  /// No description provided for @validateRequiredField.
+  ///
+  /// In en, this message translates to:
+  /// **'{fieldName} is required'**
+  String validateRequiredField(String fieldName);
+
+  /// No description provided for @validatePositiveNumberInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid positive number'**
+  String get validatePositiveNumberInvalid;
+
+  /// No description provided for @showLess.
+  ///
+  /// In en, this message translates to:
+  /// **'Show Less'**
+  String get showLess;
+
+  /// No description provided for @viewHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'View History'**
+  String get viewHistory;
+
+  /// No description provided for @activeStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get activeStatus;
+
+  /// No description provided for @pastStayStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Past Stay'**
+  String get pastStayStatus;
+
+  /// No description provided for @billsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 bill} other{{count} bills}}'**
+  String billsCount(int count);
+
+  /// No description provided for @netProfit.
+  ///
+  /// In en, this message translates to:
+  /// **'NET PROFIT'**
+  String get netProfit;
+
+  /// No description provided for @netLoss.
+  ///
+  /// In en, this message translates to:
+  /// **'NET LOSS'**
+  String get netLoss;
+
+  /// No description provided for @statusPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'PAID'**
+  String get statusPaid;
+
+  /// No description provided for @statusOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'OVERDUE'**
+  String get statusOverdue;
+
+  /// No description provided for @amountSettled.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount Settled'**
+  String get amountSettled;
+
+  /// No description provided for @amountDue.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount Due'**
+  String get amountDue;
+
+  /// No description provided for @expiredDaysAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired {days} days ago'**
+  String expiredDaysAgo(int days);
+
+  /// No description provided for @expiringInDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Expiring in {days} days'**
+  String expiringInDays(int days);
+
+  /// No description provided for @fieldRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Required'**
+  String get fieldRequired;
+
+  /// No description provided for @financialYearPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'FY '**
+  String get financialYearPrefix;
 }
 
 class _AppLocalizationsDelegate

@@ -123,7 +123,7 @@ class _AddPropertyScreenState extends ConsumerState<AddPropertyScreen> {
                   prefixIcon: const Icon(Icons.business_outlined),
                 ),
                 textCapitalization: TextCapitalization.words,
-                validator: (v) => validateRequired(v, 'Property name'),
+                validator: (v) => validateRequired(v, AppLocalizations.of(context)!, AppLocalizations.of(context)!.propertyNameRequiredLabel),
               ),
               const SizedBox(height: 20),
 

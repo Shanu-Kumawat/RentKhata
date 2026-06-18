@@ -19,7 +19,7 @@ import '../../../domain/entities/tenant.dart';
 import '../../../domain/entities/occupancy.dart';
 import '../../../domain/entities/document.dart';
 import '../../../services/image_service.dart';
-import 'package:open_file/open_file.dart';
+import '../../widgets/file_preview_dialog.dart';
 import 'add_tenant_screen.dart';
 import 'add_document_sheet.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -1847,21 +1847,12 @@ class _DocumentsSection extends ConsumerWidget {
                         DateFormat('dd MMM yyyy').format(doc.createdAt),
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.visibility_outlined),
-                            onPressed: () => _viewDocument(context, doc),
-                          ),
-                          IconButton(
-                            icon: Icon(
-                              Icons.delete_outline,
-                              color: Theme.of(context).colorScheme.error,
-                            ),
-                            onPressed: () => _deleteDocument(context, ref, doc),
-                          ),
-                        ],
+                      trailing: IconButton(
+                        icon: Icon(
+                          Icons.delete_outline,
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                        onPressed: () => _deleteDocument(context, ref, doc),
                       ),
                       onTap: () => _viewDocument(context, doc),
                     );
@@ -1890,12 +1881,8 @@ class _DocumentsSection extends ConsumerWidget {
   }
 
   void _viewDocument(BuildContext context, Document doc) {
-    if (doc.fileType == 'image') {
-      OpenFile.open(doc.filePath);
-    } else {
-      // Fallback for other types
-      OpenFile.open(doc.filePath);
-    }
+    final absolutePath = ImageService.resolveImagePathSync(doc.filePath);
+    FilePreviewDialog.show(context, absolutePath);
   }
 
   void _deleteDocument(

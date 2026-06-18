@@ -1464,5 +1464,54 @@
   "unarchiveTenant": "Unarchive Tenant",
   "showArchived": "Show Archived",
   "hideArchived": "Hide Archived",
-  "archivedBadge": "Archived"
+  "archivedBadge": "Archived",
+  "validatePhoneRequired": "Phone number is required",
+  "validatePhoneInvalid": "Enter a valid 10-digit phone number",
+  "validateUpiInvalid": "Enter a valid UPI ID (e.g., name@upi)",
+  "validateAadharInvalid": "Enter a valid 12-digit Aadhar number",
+  "validateRequiredField": "{fieldName} is required",
+  "@validateRequiredField": {
+    "placeholders": {
+      "fieldName": {
+        "type": "String"
+      }
+    }
+  },
+  "validatePositiveNumberInvalid": "Enter a valid positive number",
+  "showLess": "Show Less",
+  "viewHistory": "View History",
+  "activeStatus": "Active",
+  "pastStayStatus": "Past Stay",
+  "billsCount": "{count, plural, =1{1 bill} other{{count} bills}}",
+  "@billsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "netProfit": "NET PROFIT",
+  "netLoss": "NET LOSS",
+  "statusPaid": "PAID",
+  "statusOverdue": "OVERDUE",
+  "amountSettled": "Amount Settled",
+  "amountDue": "Amount Due",
+  "expiredDaysAgo": "Expired {days} days ago",
+  "@expiredDaysAgo": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "expiringInDays": "Expiring in {days} days",
+  "@expiringInDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "fieldRequired": "Required",
+  "financialYearPrefix": "FY "
 }

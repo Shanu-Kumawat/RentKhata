@@ -128,7 +128,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     labelText: l10n.yourName,
                     prefixIcon: const Icon(Icons.person_outline),
                   ),
-                  validator: (v) => validateRequired(v, l10n.nameLabel),
+                  validator: (v) => validateRequired(v, l10n, l10n.nameLabel),
                   onChanged: (_) => setState(() {}),
                 ),
                 const SizedBox(height: 16),
@@ -144,7 +144,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   keyboardType: TextInputType.phone,
                   validator: (v) {
                     if (v == null || v.isEmpty) return null;
-                    return validatePhone(v);
+                    return validatePhone(v, l10n);
                   },
                 ),
                 const SizedBox(height: 16),
@@ -161,7 +161,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   ),
                   validator: (v) {
                     if (v == null || v.isEmpty) return null;
-                    return validateUpiId(v);
+                    return validateUpiId(v, l10n);
                   },
                 ),
                 const SizedBox(height: 8),

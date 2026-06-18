@@ -2736,4 +2736,81 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get archivedBadge => 'Archived';
+
+  @override
+  String get validatePhoneRequired => 'Phone number is required';
+
+  @override
+  String get validatePhoneInvalid => 'Enter a valid 10-digit phone number';
+
+  @override
+  String get validateUpiInvalid => 'Enter a valid UPI ID (e.g., name@upi)';
+
+  @override
+  String get validateAadharInvalid => 'Enter a valid 12-digit Aadhar number';
+
+  @override
+  String validateRequiredField(String fieldName) {
+    return '$fieldName is required';
+  }
+
+  @override
+  String get validatePositiveNumberInvalid => 'Enter a valid positive number';
+
+  @override
+  String get showLess => 'Show Less';
+
+  @override
+  String get viewHistory => 'View History';
+
+  @override
+  String get activeStatus => 'Active';
+
+  @override
+  String get pastStayStatus => 'Past Stay';
+
+  @override
+  String billsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count bills',
+      one: '1 bill',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get netProfit => 'NET PROFIT';
+
+  @override
+  String get netLoss => 'NET LOSS';
+
+  @override
+  String get statusPaid => 'PAID';
+
+  @override
+  String get statusOverdue => 'OVERDUE';
+
+  @override
+  String get amountSettled => 'Amount Settled';
+
+  @override
+  String get amountDue => 'Amount Due';
+
+  @override
+  String expiredDaysAgo(int days) {
+    return 'Expired $days days ago';
+  }
+
+  @override
+  String expiringInDays(int days) {
+    return 'Expiring in $days days';
+  }
+
+  @override
+  String get fieldRequired => 'Required';
+
+  @override
+  String get financialYearPrefix => 'FY ';
 }

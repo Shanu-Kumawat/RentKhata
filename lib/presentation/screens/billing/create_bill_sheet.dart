@@ -1048,9 +1048,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                                         _calculateElectricityCharges(),
                                     validator: (v) => validatePositiveNumber(
                                       v,
-                                      AppLocalizations.of(
-                                        context,
-                                      )!.currentReading,
+                                      AppLocalizations.of(context)!,
                                     ),
                                   ),
                                 ),
@@ -1324,7 +1322,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                     keyboardType: TextInputType.number,
                     validator: (v) => validatePositiveNumber(
                       v,
-                      AppLocalizations.of(context)!.amount,
+                      AppLocalizations.of(context)!,
                     ),
                   ),
                   const SizedBox(height: 16),

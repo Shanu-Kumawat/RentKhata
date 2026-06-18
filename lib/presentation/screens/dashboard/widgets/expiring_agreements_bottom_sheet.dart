@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../application/providers/tenant_providers.dart';
 import '../../../../core/theme/app_colors.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
 
 class ExpiringAgreementsBottomSheet extends StatelessWidget {
   final List<AgreementExpirationStatus> expiringAgreements;
@@ -124,8 +125,8 @@ class _ExpiringAgreementTile extends StatelessWidget {
       ),
       subtitle: Text(
         isExpired
-            ? 'Expired ${-status.daysRemaining} days ago'
-            : 'Expiring in ${status.daysRemaining} days',
+            ? AppLocalizations.of(context)!.expiredDaysAgo(-status.daysRemaining)
+            : AppLocalizations.of(context)!.expiringInDays(status.daysRemaining),
         style: TextStyle(
           fontSize: 12,
           color: statusColor,

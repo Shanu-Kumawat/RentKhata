@@ -239,7 +239,7 @@ class _AddFirstPropertyScreenState
                           ),
                         ),
                         textCapitalization: TextCapitalization.words,
-                        validator: (v) => validateRequired(v, 'Property name'),
+                        validator: (v) => validateRequired(v, AppLocalizations.of(context)!, AppLocalizations.of(context)!.propertyNameRequiredLabel),
                         onFieldSubmitted: (_) => _saveProperty(),
                       ),
                     )

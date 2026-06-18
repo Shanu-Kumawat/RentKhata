@@ -82,7 +82,7 @@ class _OccupancyDetailContent extends StatelessWidget {
             title: 'Bills & Payments',
             icon: Icons.receipt_long_outlined,
             action: detail.bills.isNotEmpty
-                ? '${detail.bills.length} bills'
+                ? AppLocalizations.of(context)!.billsCount(detail.bills.length)
                 : null,
           ),
           const SizedBox(height: 12),
@@ -216,7 +216,7 @@ class _OccupancyInfoCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    isActive ? 'Active' : 'Past Stay',
+                    isActive ? AppLocalizations.of(context)!.activeStatus : AppLocalizations.of(context)!.pastStayStatus,
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
                       color: isActive
                           ? Theme.of(context).colorScheme.primary
@@ -1071,7 +1071,7 @@ class _BillListState extends State<_BillList> {
               _showAll ? Icons.expand_less : Icons.expand_more,
               size: 18,
             ),
-            label: Text(_showAll ? 'Show Less' : 'View History'),
+            label: Text(_showAll ? AppLocalizations.of(context)!.showLess : AppLocalizations.of(context)!.viewHistory),
           ),
       ],
     );

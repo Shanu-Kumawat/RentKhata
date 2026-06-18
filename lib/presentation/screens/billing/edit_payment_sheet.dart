@@ -200,7 +200,7 @@ class _EditPaymentSheetState extends ConsumerState<EditPaymentSheet> {
                   prefixIcon: Icon(Icons.currency_rupee),
                 ),
                 keyboardType: TextInputType.number,
-                validator: (v) => validatePositiveNumber(v, 'Amount'),
+                validator: (v) => validatePositiveNumber(v, AppLocalizations.of(context)!),
               ),
               const SizedBox(height: 16),
 
