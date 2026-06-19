@@ -19,6 +19,11 @@ class BillingDao extends DatabaseAccessor<AppDatabase> with _$BillingDaoMixin {
 
   // ========== Bill Operations ==========
 
+  /// Watch all bills
+  Stream<List<BillEntity>> watchAllBills() {
+    return select(bills).watch();
+  }
+
   /// Get all bills
   Future<List<BillEntity>> getAllBills() => select(bills).get();
 

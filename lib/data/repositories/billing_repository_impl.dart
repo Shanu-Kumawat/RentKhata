@@ -195,6 +195,13 @@ class BillingRepositoryImpl implements BillingRepository {
   }
 
   @override
+  Stream<List<Bill>> watchAllBills() {
+    return _billingDao.watchAllBills().asyncMap((entities) async {
+      return Future.wait(entities.map(_billToDomain));
+    });
+  }
+
+  @override
   Future<List<Bill>> getBillsForOccupancy(int occupancyId) async {
     final entities = await _billingDao.getBillsForOccupancy(occupancyId);
     return Future.wait(entities.map(_billToDomain));

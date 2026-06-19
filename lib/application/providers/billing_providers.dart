@@ -62,13 +62,8 @@ Future<bool> shouldUseDateToDate(Ref ref, BillType billType) async {
 
 @riverpod
 Stream<List<Bill>> billsStream(Ref ref) {
-  // There's no direct stream for all bills in repository,
-  // but we can create one by watching unpaid bills
   final repo = ref.watch(billingRepositoryProvider);
-  // Return a stream that updates periodically
-  return Stream.periodic(const Duration(seconds: 2)).asyncMap((_) async {
-    return repo.getAllBills();
-  });
+  return repo.watchAllBills();
 }
 
 /// Get all bills.

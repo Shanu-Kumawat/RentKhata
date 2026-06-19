@@ -13,6 +13,9 @@ abstract class BillingRepository {
   /// Get all bills
   Future<List<Bill>> getAllBills();
 
+  /// Watch all bills
+  Stream<List<Bill>> watchAllBills();
+
   /// Get bills for an occupancy
   Future<List<Bill>> getBillsForOccupancy(int occupancyId);
 
