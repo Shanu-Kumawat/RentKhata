@@ -21,6 +21,7 @@ import 'message_templates_screen.dart';
 import 'billing_cycle_settings_screen.dart';
 import 'notification_settings_screen.dart';
 import 'biometric_settings_screen.dart';
+import 'widgets/animated_review_dialog.dart';
 
 /// Settings screen.
 class SettingsScreen extends ConsumerWidget {
@@ -219,6 +220,15 @@ class SettingsScreen extends ConsumerWidget {
                   _createRoute(const AboutScreen()),
                 ),
               ),
+              if (const bool.fromEnvironment('dart.vm.product') == false)
+                _SettingsTile(
+                  icon: Icons.star_rate_rounded,
+                  title: 'Test Review Prompt (Debug)',
+                  subtitle: 'Force show the rating dialog',
+                  onTap: () async {
+                    await AnimatedReviewDialog.show(context);
+                  },
+                ),
             ],
           ),
 

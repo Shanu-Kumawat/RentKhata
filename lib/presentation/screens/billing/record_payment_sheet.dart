@@ -8,6 +8,8 @@ import '../../../application/providers/billing_providers.dart';
 import '../../../application/providers/dashboard_providers.dart';
 import '../../../application/providers/analytics_provider.dart';
 import '../../../application/providers/notification_settings_providers.dart';
+import '../../../application/providers/review_provider.dart';
+import '../settings/widgets/animated_review_dialog.dart';
 
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/validators.dart';
@@ -99,6 +101,11 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
       if (mounted) {
         // Log custom analytics event
         ref.read(analyticsServiceProvider).logPaymentRecorded(amount: amount, method: _paymentMode.name);
+
+        // Update Review Service Action Count
+        final reviewService = ref.read(reviewServiceProvider);
+        await reviewService.recordAction();
+        final shouldShowReview = await reviewService.shouldShowReviewPrompt();
 
         // Invalidate providers to refresh UI
         ref.invalidate(billsForOccupancyProvider(widget.bill.occupancyId));
@@ -203,6 +210,14 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
           landlordName: landlordName,
           landlordPhone: landlordPhone,
         );
+
+        // Show review prompt if eligible after receipt is dismissed
+        if (shouldShowReview && mounted) {
+          await AnimatedReviewDialog.show(
+            context,
+            triggerContext: ReviewTriggerContext.payment,
+          );
+        }
       }
     } catch (e) {
       if (mounted) {

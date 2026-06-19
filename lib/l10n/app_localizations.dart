@@ -104,6 +104,54 @@ abstract class AppLocalizations {
   /// **'RentKhata'**
   String get appTitle;
 
+  /// No description provided for @reviewTitleBill.
+  ///
+  /// In en, this message translates to:
+  /// **'Bill Generated Successfully! 🎉'**
+  String get reviewTitleBill;
+
+  /// No description provided for @reviewTitlePayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Recorded! 💸'**
+  String get reviewTitlePayment;
+
+  /// No description provided for @reviewTitleDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Enjoying RentKhata?'**
+  String get reviewTitleDefault;
+
+  /// No description provided for @reviewSubtitleBillPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'m a solo developer working nights and weekends to make managing your properties easier. If RentKhata just saved you 5 minutes of work today, leaving a 5-star review is the best way you can pay me back!'**
+  String get reviewSubtitleBillPayment;
+
+  /// No description provided for @reviewSubtitleDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Hi! I\'m an independent developer building this app single-handedly.\n\nYour 5-star review means the world to me and helps keep the app alive and improving!'**
+  String get reviewSubtitleDefault;
+
+  /// No description provided for @reviewRateButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate 5 Stars'**
+  String get reviewRateButton;
+
+  /// No description provided for @reviewTakes5s.
+  ///
+  /// In en, this message translates to:
+  /// **'Takes 5s '**
+  String get reviewTakes5s;
+
+  /// No description provided for @reviewSuggestionButton.
+  ///
+  /// In en, this message translates to:
+  /// **'I have a suggestion'**
+  String get reviewSuggestionButton;
+
   /// No description provided for @welcomeTitle.
   ///
   /// In en, this message translates to:

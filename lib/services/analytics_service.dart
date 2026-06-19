@@ -38,4 +38,40 @@ class AnalyticsService {
       method: 'system_share',
     );
   }
+
+  // ==========================================
+  // In-App Review Marketing Funnel Tracking
+  // ==========================================
+
+  /// Call this when the review prompt dialog is shown to the user
+  Future<void> logReviewPromptShown({required String context}) async {
+    await _analytics.logEvent(
+      name: 'review_prompt_shown',
+      parameters: {'trigger_context': context},
+    );
+  }
+
+  /// Call this when the user clicks 'Rate 5 Stars'
+  Future<void> logReviewPromptRateClicked({required String context}) async {
+    await _analytics.logEvent(
+      name: 'review_prompt_rate_clicked',
+      parameters: {'trigger_context': context},
+    );
+  }
+
+  /// Call this when the user clicks 'I have a suggestion' (Negative review trapped)
+  Future<void> logReviewPromptSuggestionClicked({required String context}) async {
+    await _analytics.logEvent(
+      name: 'review_prompt_suggestion_clicked',
+      parameters: {'trigger_context': context},
+    );
+  }
+
+  /// Call this when the user dismisses the dialog via 'X' without taking action
+  Future<void> logReviewPromptDismissed({required String context}) async {
+    await _analytics.logEvent(
+      name: 'review_prompt_dismissed',
+      parameters: {'trigger_context': context},
+    );
+  }
 }

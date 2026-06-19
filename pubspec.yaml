@@ -62,7 +62,7 @@ dependencies:
   # Notifications
   flutter_local_notifications: ^18.0.1
   timezone: ^0.10.0
-  shared_preferences: ^2.5.4
+  shared_preferences: ^2.5.5
   open_file: ^3.5.11
   file_picker: ^10.3.10
   flutter_animate: ^4.5.2
@@ -72,6 +72,7 @@ dependencies:
   firebase_core: ^4.11.0
   firebase_crashlytics: ^5.2.4
   firebase_analytics: ^12.4.3
+  in_app_review: ^2.0.12
 
 dev_dependencies:
   flutter_test:

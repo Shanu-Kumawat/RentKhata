@@ -12,6 +12,32 @@ class AppLocalizationsHi extends AppLocalizations {
   String get appTitle => 'रेंटखाता';
 
   @override
+  String get reviewTitleBill => 'बिल सफलतापूर्वक बन गया! 🎉';
+
+  @override
+  String get reviewTitlePayment => 'भुगतान दर्ज हो गया! 💸';
+
+  @override
+  String get reviewTitleDefault => 'RentKhata कैसा लग रहा है?';
+
+  @override
+  String get reviewSubtitleBillPayment =>
+      'मैं एक सोलो डेवलपर हूं जो आपकी संपत्तियों के प्रबंधन को आसान बनाने के लिए दिन-रात काम कर रहा हूं। अगर RentKhata ने आज आपके 5 मिनट बचाए हैं, तो 5-स्टार रिव्यू देना सबसे अच्छा तरीका है जिससे आप मुझे सपोर्ट कर सकते हैं!';
+
+  @override
+  String get reviewSubtitleDefault =>
+      'नमस्ते! मैं एक स्वतंत्र डेवलपर हूं जो इस ऐप को अकेले बना रहा हूं।\n\nआपका 5-स्टार रिव्यू मेरे लिए दुनिया है और ऐप को जीवित और बेहतर बनाए रखने में मदद करता है!';
+
+  @override
+  String get reviewRateButton => '5 स्टार रेट करें';
+
+  @override
+  String get reviewTakes5s => '5 सेकंड लगेंगे ';
+
+  @override
+  String get reviewSuggestionButton => 'मेरे पास एक सुझाव है';
+
+  @override
   String get welcomeTitle => 'सुगम किराया प्रबंधन';
 
   @override

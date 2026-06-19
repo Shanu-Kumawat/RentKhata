@@ -12,6 +12,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTitle => 'RentKhata';
 
   @override
+  String get reviewTitleBill => 'Bill Generated Successfully! 🎉';
+
+  @override
+  String get reviewTitlePayment => 'Payment Recorded! 💸';
+
+  @override
+  String get reviewTitleDefault => 'Enjoying RentKhata?';
+
+  @override
+  String get reviewSubtitleBillPayment =>
+      'I\'m a solo developer working nights and weekends to make managing your properties easier. If RentKhata just saved you 5 minutes of work today, leaving a 5-star review is the best way you can pay me back!';
+
+  @override
+  String get reviewSubtitleDefault =>
+      'Hi! I\'m an independent developer building this app single-handedly.\n\nYour 5-star review means the world to me and helps keep the app alive and improving!';
+
+  @override
+  String get reviewRateButton => 'Rate 5 Stars';
+
+  @override
+  String get reviewTakes5s => 'Takes 5s ';
+
+  @override
+  String get reviewSuggestionButton => 'I have a suggestion';
+
+  @override
   String get welcomeTitle => 'Effortless Rent Management';
 
   @override
