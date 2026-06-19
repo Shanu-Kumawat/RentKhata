@@ -28,6 +28,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get setUpProfile => 'Set up profile';
 
   @override
+  String get byContinuingYouAgree => 'By continuing, you agree to our ';
+
+  @override
+  String get termsOfService => 'Terms of Service';
+
+  @override
+  String get and => ' and ';
+
+  @override
+  String get privacyPolicy => 'Privacy Policy';
+
+  @override
+  String get helpAndSupport => 'Help & Support';
+
+  @override
+  String get openSourceLicenses => 'Open Source Licenses';
+
+  @override
+  String couldNotOpenLink(String error) {
+    return 'Could not open link: $error';
+  }
+
+  @override
   String get loading => 'Loading...';
 
   @override
@@ -1438,7 +1461,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aboutLabel => 'About Label';
 
   @override
-  String get aboutRentKhataDescription => 'About Rent Khata Description';
+  String get aboutRentKhataDescription =>
+      'Proudly built for Indian landlords. RentKhata is a secure, 100% offline app to manage your properties, tenants, and rent payments right from your phone.';
 
   @override
   String alertDaysBeforeCycle(int count) {

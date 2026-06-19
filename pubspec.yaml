@@ -68,6 +68,7 @@ dependencies:
   flutter_animate: ^4.5.2
   flutter_svg: ^2.2.4
   lottie: ^3.3.3
+  package_info_plus: ^9.0.1
 
 dev_dependencies:
   flutter_test:

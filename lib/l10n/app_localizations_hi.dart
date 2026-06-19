@@ -28,6 +28,29 @@ class AppLocalizationsHi extends AppLocalizations {
   String get setUpProfile => 'प्रोफ़ाइल सेट करें';
 
   @override
+  String get byContinuingYouAgree => 'जारी रखकर, आप हमारी ';
+
+  @override
+  String get termsOfService => 'सेवा की शर्तों';
+
+  @override
+  String get and => ' और ';
+
+  @override
+  String get privacyPolicy => 'गोपनीयता नीति';
+
+  @override
+  String get helpAndSupport => 'सहायता और समर्थन';
+
+  @override
+  String get openSourceLicenses => 'ओपन सोर्स लाइसेंस';
+
+  @override
+  String couldNotOpenLink(String error) {
+    return 'लिंक नहीं खुल सका: $error';
+  }
+
+  @override
   String get loading => 'लोड हो रहा है...';
 
   @override
@@ -1442,7 +1465,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get aboutRentKhataDescription =>
-      'रेंट खाता: किरायेदारों का हिसाब-किताब रखें आसानी से';
+      'विशेष रूप से भारतीय मकान मालिकों के लिए बनाया गया। रेंटखाता (RentKhata) एक सुरक्षित और 100% ऑफ़लाइन ऐप है जिससे आप अपने फोन से प्रॉपर्टी, किरायेदारों और किराए का हिसाब रख सकते हैं।';
 
   @override
   String alertDaysBeforeCycle(int count) {

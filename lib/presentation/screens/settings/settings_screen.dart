@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../widgets/bouncing_scale_wrapper.dart';
+import 'about_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rent_khata/l10n/app_localizations.dart';
 import '../../../services/image_service.dart';
@@ -213,26 +214,10 @@ class SettingsScreen extends ConsumerWidget {
                 icon: Icons.info_outline,
                 title: l10n.aboutRentKhata,
                 subtitle: l10n.versionLabel('1.0.0'),
-                onTap: () {
-                  showAboutDialog(
-                    context: context,
-                    applicationName: 'RentKhata',
-                    applicationVersion: '1.0.0',
-                    applicationIcon: Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(
-                        Icons.home_work_rounded,
-                        color: Colors.white,
-                      ),
-                    ),
-                    children: [Text(l10n.aboutRentKhataDescription)],
-                  );
-                },
+                onTap: () => Navigator.push(
+                  context,
+                  _createRoute(const AboutScreen()),
+                ),
               ),
             ],
           ),

@@ -134,6 +134,48 @@ abstract class AppLocalizations {
   /// **'Set up profile'**
   String get setUpProfile;
 
+  /// No description provided for @byContinuingYouAgree.
+  ///
+  /// In en, this message translates to:
+  /// **'By continuing, you agree to our '**
+  String get byContinuingYouAgree;
+
+  /// No description provided for @termsOfService.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of Service'**
+  String get termsOfService;
+
+  /// No description provided for @and.
+  ///
+  /// In en, this message translates to:
+  /// **' and '**
+  String get and;
+
+  /// No description provided for @privacyPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get privacyPolicy;
+
+  /// No description provided for @helpAndSupport.
+  ///
+  /// In en, this message translates to:
+  /// **'Help & Support'**
+  String get helpAndSupport;
+
+  /// No description provided for @openSourceLicenses.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Source Licenses'**
+  String get openSourceLicenses;
+
+  /// No description provided for @couldNotOpenLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open link: {error}'**
+  String couldNotOpenLink(String error);
+
   /// No description provided for @loading.
   ///
   /// In en, this message translates to:
@@ -2740,7 +2782,7 @@ abstract class AppLocalizations {
   /// No description provided for @aboutRentKhataDescription.
   ///
   /// In en, this message translates to:
-  /// **'About Rent Khata Description'**
+  /// **'Proudly built for Indian landlords. RentKhata is a secure, 100% offline app to manage your properties, tenants, and rent payments right from your phone.'**
   String get aboutRentKhataDescription;
 
   /// No description provided for @alertDaysBeforeCycle.

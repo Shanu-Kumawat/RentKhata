@@ -6,6 +6,13 @@
   "startOrganizing": "व्यवस्थित करना शुरू करें",
   "settings": "सेटिंग्स",
   "setUpProfile": "प्रोफ़ाइल सेट करें",
+  "byContinuingYouAgree": "जारी रखकर, आप हमारी ",
+  "termsOfService": "सेवा की शर्तों",
+  "and": " और ",
+  "privacyPolicy": "गोपनीयता नीति",
+  "helpAndSupport": "सहायता और समर्थन",
+  "openSourceLicenses": "ओपन सोर्स लाइसेंस",
+  "couldNotOpenLink": "लिंक नहीं खुल सका: {error}",
   "loading": "लोड हो रहा है...",
   "error": "त्रुटि: {error}",
   "appearance": "रूप-रंग",
@@ -429,7 +436,7 @@
   "landlordSignature": "मकान मालिक के हस्ताक्षर",
   "computerGeneratedMsg": "यह कंप्यूटर द्वारा तैयार किया गया विवरण है और इसके लिए भौतिक हस्ताक्षर की आवश्यकता नहीं है।",
   "aboutLabel": "ऐप के बारे में",
-  "aboutRentKhataDescription": "रेंट खाता: किरायेदारों का हिसाब-किताब रखें आसानी से",
+  "aboutRentKhataDescription": "विशेष रूप से भारतीय मकान मालिकों के लिए बनाया गया। रेंटखाता (RentKhata) एक सुरक्षित और 100% ऑफ़लाइन ऐप है जिससे आप अपने फोन से प्रॉपर्टी, किरायेदारों और किराए का हिसाब रख सकते हैं।",
   "alertDaysBeforeCycle": "महीना पूरा होने से {count} दिन पहले अलर्ट करें",
   "@alertDaysBeforeCycle": {
     "placeholders": {
