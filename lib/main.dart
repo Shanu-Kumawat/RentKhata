@@ -16,27 +16,45 @@ import 'services/image_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  final firebaseReady = await _runStartupStep(() async {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  });
 
-  // Pass all uncaught "fatal" errors from the framework to Crashlytics
-  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+  if (firebaseReady) {
+    // Pass all uncaught "fatal" errors from the framework to Crashlytics
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
 
-  // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
-  PlatformDispatcher.instance.onError = (error, stack) {
-    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-    return true;
-  };
+    // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
+    PlatformDispatcher.instance.onError = (error, stack) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      return true;
+    };
+  }
 
-  // Initialize notification service
-  await LocalNotificationService().initialize();
+  await _runStartupStep(() async {
+    await LocalNotificationService().initialize();
+  });
 
   // Cache document directory for synchronous path resolution
-  final appDir = await getApplicationDocumentsDirectory();
-  ImageService.appDocumentDirPath = appDir.path;
+  await _runStartupStep(() async {
+    final appDir = await getApplicationDocumentsDirectory();
+    ImageService.appDocumentDirPath = appDir.path;
+  });
 
   runApp(const ProviderScope(child: RentKhataApp()));
 }
 
+Future<bool> _runStartupStep(
+  Future<void> Function() action,
+) async {
+  try {
+    await action();
+    return true;
+  } catch (error, stackTrace) {
+    debugPrint('Startup step failed: $error');
+    debugPrintStack(stackTrace: stackTrace);
+    return false;
+  }
+}

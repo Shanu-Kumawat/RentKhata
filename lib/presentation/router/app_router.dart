@@ -4,6 +4,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../application/providers/analytics_provider.dart';
 import '../../domain/entities/bill.dart';
 import '../screens/onboarding/splash_screen.dart';
 import '../screens/onboarding/language_selection_screen.dart';
@@ -79,9 +80,12 @@ CustomTransitionPage<void> _onboardingTransition(Widget child) {
 
 /// Router provider
 final routerProvider = Provider<GoRouter>((ref) {
+  final observer = ref.watch(firebaseAnalyticsObserverProvider);
+  
   return GoRouter(
     navigatorKey: rootNavigatorKey,
     initialLocation: AppRoutes.splash,
+    observers: observer != null ? [observer] : [],
     routes: [
       // ========== Onboarding Routes (outside shell) ==========
       GoRoute(

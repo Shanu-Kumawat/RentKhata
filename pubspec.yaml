@@ -34,7 +34,6 @@ dependencies:
   json_annotation: ^4.9.0
 
   # Image handling
-  flutter_image_compress: ^2.3.0
   image_picker: ^1.1.2
 
   # QR & Sharing
@@ -49,12 +48,8 @@ dependencies:
   # Backup
   archive: ^4.0.4
 
-  # Onboarding
-  showcaseview: ^3.0.0
-
   # Utilities
   intl: ^0.20.2
-  uuid: ^4.5.1
 
   # Security
   local_auth: ^2.3.0
@@ -66,8 +61,6 @@ dependencies:
   open_file: ^3.5.11
   file_picker: ^10.3.10
   flutter_animate: ^4.5.2
-  flutter_svg: ^2.2.4
-  lottie: ^3.3.3
   package_info_plus: ^9.0.1
   firebase_core: ^4.11.0
   firebase_crashlytics: ^5.2.4

@@ -9,6 +9,7 @@ import '../../../../application/providers/notification_settings_providers.dart';
 import '../../../../data/database/tables/notification_setting_table.dart';
 import '../../../../services/local_notification_service.dart';
 import '../../../../services/biometric_service.dart';
+import '../../../../services/notification_scheduler.dart';
 import '../../../router/app_router.dart';
 
 enum PermissionVariant { biometrics, notifications }
@@ -95,7 +96,7 @@ class PremiumPermissionSheet extends ConsumerWidget {
 
     if (variant == PermissionVariant.notifications) {
       final notifService = LocalNotificationService();
-      final granted = await notifService.requestPermission();
+      final granted = await notifService.requestExactPermissions();
       
       if (context.mounted) {
         if (granted) {
@@ -104,6 +105,7 @@ class PremiumPermissionSheet extends ConsumerWidget {
           for (final type in NotificationType.values) {
             await notifier.setEnabled(type, true);
           }
+          await ref.read(notificationStartupSchedulerProvider.notifier).reschedule();
           scaffoldMessenger.showSnackBar(
             SnackBar(
               content: Text(l10n.notificationsEnabledSuccess),

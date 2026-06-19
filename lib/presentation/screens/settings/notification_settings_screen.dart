@@ -94,7 +94,7 @@ class _NotificationSettingsScreenState
           );
 
       // Re-schedule based on new settings
-      final hasPermission = await notificationService.requestPermission();
+      final hasPermission = await notificationService.requestExactPermissions();
       await _checkSystemPermission();
       if (hasPermission) {
         await ref.read(notificationStartupSchedulerProvider.notifier).reschedule();
@@ -230,7 +230,7 @@ class _NotificationSettingsScreenState
                       ),
                       onPressed: () async {
                         final service = LocalNotificationService();
-                        final granted = await service.requestPermission();
+                        final granted = await service.requestExactPermissions();
                         if (granted) {
                           await _checkSystemPermission();
                         } else {
@@ -610,7 +610,7 @@ class _NotificationSettingsScreenState
       final notificationService = LocalNotificationService();
       // Ensure initialized
       await notificationService.initialize();
-      final granted = await notificationService.requestPermission();
+      final granted = await notificationService.requestExactPermissions();
       if (!granted) {
         if (mounted) {
           ScaffoldMessenger.of(
