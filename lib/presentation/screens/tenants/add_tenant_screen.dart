@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../application/providers/repository_providers.dart';
 import '../../../application/providers/tenant_providers.dart';
+import '../../../application/providers/analytics_provider.dart';
 
 import 'dart:io';
 import '../../../core/utils/validators.dart';
@@ -316,6 +317,9 @@ class _AddTenantScreenState extends ConsumerState<AddTenantScreen> {
       ref.invalidate(tenantsProvider);
       if (isEditing) {
         ref.invalidate(tenantProvider(widget.tenant!.id));
+      } else {
+        // Log event for new tenant
+        ref.read(analyticsServiceProvider).logTenantCreated();
       }
 
       if (mounted) {

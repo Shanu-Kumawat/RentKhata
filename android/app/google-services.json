@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "248178802987",
+    "project_id": "rentkhata-india",
+    "storage_bucket": "rentkhata-india.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:248178802987:android:f80dbfc1e3201cf4ce856e",
+        "android_client_info": {
+          "package_name": "com.rentkhata.rent_khata"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA3u_YogAkrEvrpQWBFP2pg6HkXBbFaOiw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

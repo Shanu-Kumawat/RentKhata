@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../application/providers/repository_providers.dart';
 import '../../../application/providers/billing_providers.dart';
 import '../../../application/providers/dashboard_providers.dart';
+import '../../../application/providers/analytics_provider.dart';
 import '../../../application/providers/notification_settings_providers.dart';
 
 import '../../../core/utils/currency_formatter.dart';
@@ -96,6 +97,9 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
       );
 
       if (mounted) {
+        // Log custom analytics event
+        ref.read(analyticsServiceProvider).logPaymentRecorded(amount: amount, method: _paymentMode.name);
+
         // Invalidate providers to refresh UI
         ref.invalidate(billsForOccupancyProvider(widget.bill.occupancyId));
         ref.invalidate(

@@ -13,7 +13,11 @@ We do not have access to your data. We do not transmit, sync, or upload your per
 Because RentKhata operates locally, we do not collect personal information such as names, phone numbers, or financial records on our servers. 
 
 ### Analytics and Crash Reporting
-To improve the stability and performance of the app, we may use third-party services (such as Firebase Crashlytics) to collect anonymous crash reports. These reports contain technical information about the crash (e.g., device model, OS version, stack trace) but **do not contain any user data, tenant information, or personal identifiers**.
+To improve the stability, performance, and user experience of the app, we use third-party services provided by Google:
+- **Firebase Crashlytics:** Collects anonymous crash reports. These reports contain technical information about the crash (e.g., device model, OS version, stack trace) to help us fix bugs.
+- **Google Analytics for Firebase:** Collects anonymous usage data (e.g., daily active users, session durations, and counts of features used like generating a bill or adding a tenant). 
+
+**Important:** These tools only collect aggregated and anonymous metadata. They **do not contain any personal data, tenant details, financial figures, or anything you type into the app**.
 
 ## 3. Data Storage and Security
 Your data is stored securely on your device. We recommend using the device's built-in security features (such as screen locks or biometrics) and utilizing RentKhata's local backup feature to prevent data loss. You are solely responsible for securing your device and managing your backups.

@@ -10,6 +10,7 @@ import '../../../application/providers/billing_providers.dart';
 import '../../../application/providers/dashboard_providers.dart';
 import '../../../application/providers/billing_cycle_providers.dart';
 import '../../../application/providers/database_provider.dart';
+import '../../../application/providers/analytics_provider.dart';
 import '../../../application/providers/notification_settings_providers.dart';
 
 import '../../../core/utils/currency_formatter.dart';
@@ -733,6 +734,9 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
       }
 
       if (mounted) {
+        // Log custom analytics event
+        ref.read(analyticsServiceProvider).logBillGenerated(amount: double.parse(_amountController.text));
+
         // Invalidate providers to refresh UI
         ref.invalidate(billsForOccupancyProvider(widget.occupancyId));
         ref.invalidate(unpaidBillsProvider);

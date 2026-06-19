@@ -128,7 +128,7 @@ class _AboutScreenState extends ConsumerState<AboutScreen> {
                     applicationIcon: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Image.asset(
-                        'assets/logo/logo_transparent.png',
+                        'assets/logo/logo_primary_with_bg.png',
                         width: 48,
                         height: 48,
                       ),
