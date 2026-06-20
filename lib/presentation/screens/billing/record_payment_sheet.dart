@@ -201,11 +201,14 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
         }
 
         if (!mounted) return;
+        final parentContext = Navigator.of(context).context;
         Navigator.pop(context);
+
+        if (!parentContext.mounted) return;
 
         // Show receipt dialog with landlord name
         await ReceiptDialog.show(
-          context: context,
+          context: parentContext,
           bill: updatedBill,
           latestPayment: payment,
           landlordName: landlordName,
@@ -213,11 +216,14 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
         );
 
         // Show review prompt if eligible after receipt is dismissed
-        if (shouldShowReview && mounted) {
-          await AnimatedReviewDialog.show(
-            context,
-            triggerContext: ReviewTriggerContext.payment,
-          );
+        if (shouldShowReview) {
+          await Future.delayed(const Duration(seconds: 1));
+          if (parentContext.mounted) {
+            await AnimatedReviewDialog.show(
+              parentContext,
+              triggerContext: ReviewTriggerContext.payment,
+            );
+          }
         }
       }
     } catch (e) {

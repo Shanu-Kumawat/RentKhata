@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:confetti/confetti.dart';
 import 'package:rent_khata/l10n/app_localizations.dart';
 import '../../../../application/providers/review_provider.dart';
 import '../../../../application/providers/analytics_provider.dart';
@@ -49,6 +50,10 @@ class _AnimatedReviewDialogState extends ConsumerState<AnimatedReviewDialog> wit
 
   // Floating star animation
   late final AnimationController _floatController;
+  late final AnimationController _sparkleController;
+
+  // Confetti controller
+  late final ConfettiController _confettiController;
 
   // Shimmer animation controller
   late final AnimationController _shimmerController;
@@ -85,6 +90,11 @@ class _AnimatedReviewDialogState extends ConsumerState<AnimatedReviewDialog> wit
       duration: const Duration(milliseconds: 2000),
     )..repeat(reverse: true);
 
+    _sparkleController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 8000), // Slower cycle
+    )..repeat();
+
     // Premium Shimmer Animation (loops)
     _shimmerController = AnimationController(
       vsync: this,
@@ -99,19 +109,28 @@ class _AnimatedReviewDialogState extends ConsumerState<AnimatedReviewDialog> wit
       ),
     );
 
-    // Start stars animation immediately
+    // Setup confetti (short duration for a massive single burst)
+    _confettiController = ConfettiController(duration: const Duration(seconds: 1));
+
+    // Start animations immediately
     _starController.forward();
+    _confettiController.play();
   }
+
+  bool _actionTaken = false;
 
   @override
   void dispose() {
     _starController.dispose();
     _floatController.dispose();
+    _sparkleController.dispose();
     _shimmerController.dispose();
+    _confettiController.dispose();
     super.dispose();
   }
 
   Future<void> _handleRate() async {
+    _actionTaken = true;
     ref.read(analyticsServiceProvider).logReviewPromptRateClicked(context: widget.triggerContext.name);
     
     final service = ref.read(reviewServiceProvider);
@@ -120,6 +139,7 @@ class _AnimatedReviewDialogState extends ConsumerState<AnimatedReviewDialog> wit
   }
 
   Future<void> _handleSuggestion() async {
+    _actionTaken = true;
     ref.read(analyticsServiceProvider).logReviewPromptSuggestionClicked(context: widget.triggerContext.name);
 
     final service = ref.read(reviewServiceProvider);
@@ -135,6 +155,7 @@ class _AnimatedReviewDialogState extends ConsumerState<AnimatedReviewDialog> wit
   }
 
   Future<void> _handleClose() async {
+    _actionTaken = true;
     ref.read(analyticsServiceProvider).logReviewPromptDismissed(context: widget.triggerContext.name);
 
     final service = ref.read(reviewServiceProvider);
@@ -186,10 +207,23 @@ class _AnimatedReviewDialogState extends ConsumerState<AnimatedReviewDialog> wit
       end: Alignment.bottomRight,
     );
 
-    return Center(
-      child: Material(
-        color: Colors.transparent,
-        child: Container(
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop && !_actionTaken) {
+          // The user dismissed the dialog using the system back button/gesture!
+          // We must record this as a decline so the repeat cycle logic still applies.
+          ref.read(analyticsServiceProvider).logReviewPromptDismissed(context: widget.triggerContext.name);
+          final service = ref.read(reviewServiceProvider);
+          await service.recordDecline();
+        }
+      },
+      child: Stack(
+      children: [
+        Center(
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
           // Reduced horizontal margin to make the container wider
           margin: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
@@ -228,6 +262,8 @@ class _AnimatedReviewDialogState extends ConsumerState<AnimatedReviewDialog> wit
                   ),
                 ),
               ),
+
+              // Confetti blast was moved to top level
               
               Padding(
                 padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
@@ -264,14 +300,37 @@ class _AnimatedReviewDialogState extends ConsumerState<AnimatedReviewDialog> wit
                           return ScaleTransition(
                             scale: _starAnimations[index],
                             child: AnimatedBuilder(
-                              animation: _floatController,
+                              animation: Listenable.merge([_floatController, _sparkleController]),
                               builder: (context, child) {
                                 // Add a floating sine wave offset, staggered by index so they wave
                                 final floatOffset = math.sin((_floatController.value * math.pi * 2) + (index * 1.5)) * 4.0;
+                                
+                                // New sparkle logic (random-feeling pulse & spin)
+                                // We use a continuous sine wave mixed with the star index to create unique moments of "sparkle"
+                                final sparkleValue = math.sin(_sparkleController.value * math.pi * 2 + (index * 2.3));
+                                
+                                double extraScale = 1.0;
+                                double extraRotation = 0.0;
+                                
+                                // Only sparkle when the sine wave peaks (lowered threshold to make it last longer)
+                                if (sparkleValue > 0.7) {
+                                  // Map 0.7 -> 1.0 to an intensity from 0.0 -> 1.0
+                                  final intensity = (sparkleValue - 0.7) / 0.3;
+                                  extraScale = 1.0 + (0.2 * intensity); // Grow up to 20%
+                                  // Wiggle left and right based on intensity curve (slower wiggle)
+                                  extraRotation = math.sin(intensity * math.pi * 3) * 0.15; 
+                                }
+
                                 return Transform.translate(
                                   // Keep the previous squeeze translation AND add the float offset
                                   offset: Offset((index - 2) * -4.0, floatOffset),
-                                  child: child,
+                                  child: Transform.scale(
+                                    scale: extraScale,
+                                    child: Transform.rotate(
+                                      angle: extraRotation,
+                                      child: child,
+                                    ),
+                                  ),
                                 );
                               },
                               child: RotationTransition(
@@ -507,6 +566,33 @@ class _AnimatedReviewDialogState extends ConsumerState<AnimatedReviewDialog> wit
           ),
         ),
       ),
+    ),
+    
+    // Confetti massive blast from the center covering the whole screen
+    IgnorePointer(
+      child: Align(
+        alignment: const Alignment(0.0, -0.6), // 20% below top center
+        child: ConfettiWidget(
+        confettiController: _confettiController,
+        blastDirectionality: BlastDirectionality.explosive, // blast in all directions!
+        maxBlastForce: 50, // huge blast force
+        minBlastForce: 10,
+        emissionFrequency: 0.1, // denser bursts
+        numberOfParticles: 50, // lots of particles
+        gravity: 0.25, // slightly heavier to fall beautifully
+        colors: const [
+          Colors.green,
+          Colors.blue,
+          Colors.pink,
+          Colors.orange,
+          Colors.purple,
+          Color(0xFFFFC107)
+        ],
+      ),
+    ),
+    ),
+    ],
+    ),
     );
   }
 }
