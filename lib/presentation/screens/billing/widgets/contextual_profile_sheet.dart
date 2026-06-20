@@ -12,13 +12,11 @@ class ContextualProfileSheet extends ConsumerStatefulWidget {
 
   /// Shows the bottom sheet if Name or UPI are missing, and returns `true` if they exist or get created.
   static Future<bool> ensureProfile(BuildContext context, WidgetRef ref) async {
-    final landlord = await ref.read(landlordProvider.future);
+    final repo = ref.read(landlordRepositoryProvider);
+    final landlord = await repo.getLandlord();
 
-    // We already have name & UPI. Proceed.
-    if (landlord != null &&
-        landlord.name.isNotEmpty &&
-        landlord.upiId != null &&
-        landlord.upiId!.isNotEmpty) {
+    // We already have name. Proceed (UPI is optional).
+    if (landlord != null && landlord.name.isNotEmpty) {
       return true;
     }
 
@@ -44,6 +42,7 @@ class _ContextualProfileSheetState
     extends ConsumerState<ContextualProfileSheet> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
+  final _phoneController = TextEditingController();
   final _upiController = TextEditingController();
   bool _isLoading = false;
 
@@ -54,9 +53,11 @@ class _ContextualProfileSheetState
   }
 
   Future<void> _loadExistingData() async {
-    final landlord = await ref.read(landlordProvider.future);
+    final repo = ref.read(landlordRepositoryProvider);
+    final landlord = await repo.getLandlord();
     if (landlord != null) {
       _nameController.text = landlord.name;
+      _phoneController.text = landlord.phone ?? '';
       _upiController.text = landlord.upiId ?? '';
     }
   }
@@ -64,6 +65,7 @@ class _ContextualProfileSheetState
   @override
   void dispose() {
     _nameController.dispose();
+    _phoneController.dispose();
     _upiController.dispose();
     super.dispose();
   }
@@ -80,7 +82,7 @@ class _ContextualProfileSheetState
       await repo.upsertLandlord(
         name: _nameController.text.trim(),
         upiId: _upiController.text.trim(),
-        phone: existing?.phone,
+        phone: _phoneController.text.trim(),
         photoPath: existing?.photoPath,
       );
 
@@ -206,6 +208,40 @@ class _ContextualProfileSheetState
                       : null,
                   textInputAction: TextInputAction.next,
                 ).animate().fadeIn(delay: 400.ms).slideX(begin: 0.1),
+
+                const SizedBox(height: 16),
+
+                TextFormField(
+                  controller: _phoneController,
+                  keyboardType: TextInputType.phone,
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.phoneOptionalLabel,
+                    hintText: AppLocalizations.of(context)!.phoneNumberHint,
+                    prefixIcon: const Icon(Icons.phone_rounded),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    filled: true,
+                    fillColor: theme.colorScheme.surfaceContainerHighest
+                        .withValues(alpha: 0.3),
+                    helperText: AppLocalizations.of(context)!.phonePdfExplanation,
+                    helperMaxLines: 3,
+                    helperStyle: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                      height: 1.2,
+                    ),
+                  ),
+                  validator: (v) {
+                    if (v != null && v.trim().isNotEmpty) {
+                      final cleaned = v.replaceAll(RegExp(r'[\s-]'), '');
+                      if (!RegExp(r'^[6-9]\d{9}$').hasMatch(cleaned)) {
+                        return AppLocalizations.of(context)!.validatePhoneInvalid;
+                      }
+                    }
+                    return null;
+                  },
+                  textInputAction: TextInputAction.next,
+                ).animate().fadeIn(delay: 450.ms).slideX(begin: 0.1),
 
                 const SizedBox(height: 16),
 

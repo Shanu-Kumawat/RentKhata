@@ -4,8 +4,8 @@
   "reviewTitleBill": "Bill Generated Successfully! 🎉",
   "reviewTitlePayment": "Payment Recorded! 💸",
   "reviewTitleDefault": "Enjoying RentKhata?",
-  "reviewSubtitleBillPayment": "I'm a solo developer working nights and weekends to make managing your properties easier. If RentKhata just saved you 5 minutes of work today, leaving a 5-star review is the best way you can pay me back!",
-  "reviewSubtitleDefault": "Hi! I'm an independent developer building this app single-handedly.\n\nYour 5-star review means the world to me and helps keep the app alive and improving!",
+  "reviewSubtitleBillPayment": "I'm a **solo developer** working **nights and weekends** to make managing your properties easier.\n\nIf RentKhata just saved you 5 minutes of work today, leaving a **5-star review** is the best way you can pay me back!",
+  "reviewSubtitleDefault": "Hi! I'm an **independent developer** building this app single-handedly.\n\nYour **5-star review** means the world to me and helps keep the app alive and improving!",
   "reviewRateButton": "Rate 5 Stars",
   "reviewTakes5s": "Takes 5s ",
   "reviewSuggestionButton": "I have a suggestion",
@@ -1379,6 +1379,10 @@
   "nameRequiredLabel": "Name *",
   "relationshipRequiredLabel": "Relationship *",
   "phoneOptionalLabel": "Phone",
+  "phonePdfExplanation": "Your phone number will be displayed on PDF invoices to help tenants contact you easily.",
+  "@phonePdfExplanation": {
+    "description": "Helper text explaining why we collect landlord phone number"
+  },
   "fullNameRequiredLabel": "Full Name *",
   "guardianNameOptionalLabel": "Father's/Spouse's Name (Optional)",
   "twelveDigitNumberHint": "12-digit number",

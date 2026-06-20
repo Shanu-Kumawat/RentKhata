@@ -9,7 +9,6 @@ import 'package:go_router/go_router.dart';
 import '../../../application/providers/property_providers.dart';
 import '../../../application/providers/tenant_providers.dart';
 import '../../../application/providers/billing_providers.dart';
-import '../../../application/providers/dashboard_providers.dart';
 import '../../../application/providers/repository_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../widgets/share_bottom_sheet.dart';
@@ -34,6 +33,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'move_in_sheet.dart';
 import 'add_room_screen.dart';
 import 'move_out_screen.dart';
+import '../../../application/providers/review_provider.dart';
+import '../settings/widgets/animated_review_dialog.dart';
 
 /// Room detail screen showing occupancy, bills, and actions.
 class RoomDetailScreen extends ConsumerWidget {
@@ -451,10 +452,12 @@ class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
 
     final globalElectricityRate = await ref.read(currentElectricityRateProvider.future);
 
-    if (!mounted) return;
+    if (!context.mounted) return;
+
+    final BuildContext currentContext = context;
 
     final result = await showModalBottomSheet<bool>(
-      context: context,
+      context: currentContext,
       isScrollControlled: true,
       useSafeArea: true,
       builder: (context) => CreateBillSheet(
@@ -473,12 +476,33 @@ class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
     );
 
     if (result == true) {
-      if (!mounted) return;
+      if (!currentContext.mounted) return;
       final billingRepo = ref.read(billingRepositoryProvider);
       final allBills = await billingRepo.getAllBills();
-      if (!mounted) return;
+      if (!currentContext.mounted) return;
+      
+      bool didShowNotificationSheet = false;
       if (allBills.length == 1) {
-        await PremiumPermissionSheet.showNotifications(context, ref);
+        didShowNotificationSheet = true;
+        // Await the entire notification permission workflow
+        await PremiumPermissionSheet.showNotifications(currentContext, ref);
+      }
+      
+      if (!currentContext.mounted) return;
+      
+      // If notification sheet was shown, wait a moment before potentially showing the review prompt
+      // This prevents the review prompt from jumping immediately after they close the sheet
+      if (didShowNotificationSheet) {
+        await Future.delayed(const Duration(seconds: 3));
+      }
+      
+      if (!currentContext.mounted) return;
+      
+      // Check if we should show the review prompt
+      final reviewService = ref.read(reviewServiceProvider);
+      if (await reviewService.shouldShowReviewPrompt()) {
+         if (!currentContext.mounted) return;
+         await AnimatedReviewDialog.show(currentContext, triggerContext: ReviewTriggerContext.bill);
       }
     }
   }
@@ -1426,9 +1450,10 @@ class _BillTile extends ConsumerWidget {
   void _sendReminder(BuildContext context, WidgetRef ref) async {
     final l10n = AppLocalizations.of(context)!;
 
-    final landlord = await ref.read(landlordProvider.future);
+    final landlordRepo = ref.read(landlordRepositoryProvider);
+    final landlord = await landlordRepo.getLandlord();
     final landlordName = landlord?.name ?? l10n.landlord;
-    final repo = ref.read(billingRepositoryProvider);
+    final billingRepo = ref.read(billingRepositoryProvider);
 
     if (!context.mounted) return;
 
@@ -1436,14 +1461,14 @@ class _BillTile extends ConsumerWidget {
       context: context,
       contentType: ShareContentType.invoice,
       onShareAsMessage: () async {
-        final shareService = ShareService(repo);
+        final shareService = ShareService(billingRepo);
         await shareService.shareInvoice(
           bill: bill,
           landlordName: landlordName,
           landlordUpi: landlord?.upiId,
           l10n: l10n,
         );
-        await repo.markBillAsSent(bill.id);
+        await billingRepo.markBillAsSent(bill.id);
       },
       onShareAsPdf: () async {
         try {
@@ -1465,7 +1490,7 @@ class _BillTile extends ConsumerWidget {
             bytes: bytes,
             filename: file.path.split('/').last,
           );
-          await repo.markBillAsSent(bill.id);
+          await billingRepo.markBillAsSent(bill.id);
         } catch (e) {
           if (!context.mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
@@ -1482,11 +1507,12 @@ class _BillTile extends ConsumerWidget {
 
   void _shareReceipt(BuildContext context, WidgetRef ref) async {
     final l10n = AppLocalizations.of(context)!;
-    final landlord = await ref.read(landlordProvider.future);
+    final landlordRepo = ref.read(landlordRepositoryProvider);
+    final landlord = await landlordRepo.getLandlord();
     final landlordName = landlord?.name ?? l10n.landlord;
 
-    final repo = ref.read(billingRepositoryProvider);
-    final payments = await repo.getPaymentsForBill(bill.id);
+    final billingRepo = ref.read(billingRepositoryProvider);
+    final payments = await billingRepo.getPaymentsForBill(bill.id);
     final latestPayment = payments.isNotEmpty ? payments.last : null;
 
     if (!context.mounted) return;
@@ -1497,7 +1523,7 @@ class _BillTile extends ConsumerWidget {
       context: context,
       contentType: isPaid ? ShareContentType.receipt : ShareContentType.invoice,
       onShareAsMessage: () async {
-        final shareService = ShareService(repo);
+        final shareService = ShareService(billingRepo);
         if (isPaid && latestPayment != null) {
           await shareService.shareReceipt(
             bill: bill,

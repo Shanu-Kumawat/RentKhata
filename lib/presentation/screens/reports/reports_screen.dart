@@ -10,7 +10,6 @@ import 'widgets/animated_history_graphic.dart';
 import 'widgets/animated_expense_graphic.dart';
 import 'package:intl/intl.dart';
 import '../../../application/providers/billing_providers.dart';
-import '../../../application/providers/dashboard_providers.dart';
 import '../../../application/providers/repository_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/currency_formatter.dart';
@@ -1411,7 +1410,8 @@ class _PremiumBillCard extends ConsumerWidget {
 
       try {
         final l10n = AppLocalizations.of(context);
-        final landlord = await ref.read(landlordProvider.future);
+        final landlordRepo = ref.read(landlordRepositoryProvider);
+        final landlord = await landlordRepo.getLandlord();
         final pdfService = InvoicePdfService();
         final pdfFile = await pdfService.generateInvoice(
           bill: bill,

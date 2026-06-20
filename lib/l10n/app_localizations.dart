@@ -125,13 +125,13 @@ abstract class AppLocalizations {
   /// No description provided for @reviewSubtitleBillPayment.
   ///
   /// In en, this message translates to:
-  /// **'I\'m a solo developer working nights and weekends to make managing your properties easier. If RentKhata just saved you 5 minutes of work today, leaving a 5-star review is the best way you can pay me back!'**
+  /// **'I\'m a **solo developer** working **nights and weekends** to make managing your properties easier.\n\nIf RentKhata just saved you 5 minutes of work today, leaving a **5-star review** is the best way you can pay me back!'**
   String get reviewSubtitleBillPayment;
 
   /// No description provided for @reviewSubtitleDefault.
   ///
   /// In en, this message translates to:
-  /// **'Hi! I\'m an independent developer building this app single-handedly.\n\nYour 5-star review means the world to me and helps keep the app alive and improving!'**
+  /// **'Hi! I\'m an **independent developer** building this app single-handedly.\n\nYour **5-star review** means the world to me and helps keep the app alive and improving!'**
   String get reviewSubtitleDefault;
 
   /// No description provided for @reviewRateButton.
@@ -4560,6 +4560,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Phone'**
   String get phoneOptionalLabel;
+
+  /// Helper text explaining why we collect landlord phone number
+  ///
+  /// In en, this message translates to:
+  /// **'Your phone number will be displayed on PDF invoices to help tenants contact you easily.'**
+  String get phonePdfExplanation;
 
   /// No description provided for @fullNameRequiredLabel.
   ///

@@ -142,6 +142,28 @@ class _AnimatedReviewDialogState extends ConsumerState<AnimatedReviewDialog> wit
     if (mounted) Navigator.of(context).pop();
   }
 
+  Widget _buildRichText(String text, TextStyle defaultStyle, Color highlightColor) {
+    final spans = <TextSpan>[];
+    final parts = text.split('**');
+    for (int i = 0; i < parts.length; i++) {
+      if (i % 2 == 1) {
+        spans.add(TextSpan(
+          text: parts[i],
+          style: defaultStyle.copyWith(
+            fontWeight: FontWeight.bold,
+            color: highlightColor,
+          ),
+        ));
+      } else {
+        spans.add(TextSpan(text: parts[i], style: defaultStyle));
+      }
+    }
+    return RichText(
+      textAlign: TextAlign.center,
+      text: TextSpan(children: spans),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -291,17 +313,17 @@ class _AnimatedReviewDialogState extends ConsumerState<AnimatedReviewDialog> wit
                     const SizedBox(height: 12),
                     
                     // Subtitle
-                    Text(
+                    _buildRichText(
                       widget.triggerContext != ReviewTriggerContext.settings 
                         ? AppLocalizations.of(context)!.reviewSubtitleBillPayment
                         : AppLocalizations.of(context)!.reviewSubtitleDefault,
-                      style: theme.textTheme.bodyMedium?.copyWith(
+                      theme.textTheme.bodyMedium!.copyWith(
                         color: colorScheme.onSurfaceVariant,
                         height: 1.6,
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
                       ),
-                      textAlign: TextAlign.center,
+                      colorScheme.primary,
                     ),
                     const SizedBox(height: 36),
                     

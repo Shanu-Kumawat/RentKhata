@@ -12,7 +12,6 @@ import '../../../application/providers/billing_cycle_providers.dart';
 import '../../../application/providers/database_provider.dart';
 import '../../../application/providers/analytics_provider.dart';
 import '../../../application/providers/review_provider.dart';
-import '../settings/widgets/animated_review_dialog.dart';
 import '../../../application/providers/notification_settings_providers.dart';
 
 import '../../../core/utils/currency_formatter.dart';
@@ -742,7 +741,6 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
         // Update Review Service Action Count
         final reviewService = ref.read(reviewServiceProvider);
         await reviewService.recordAction();
-        final shouldShowReview = await reviewService.shouldShowReviewPrompt();
 
         if (!mounted) return;
 
@@ -752,14 +750,6 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
         ref.invalidate(dashboardSummaryProvider);
         ref.invalidate(billingAttentionListProvider); // Refresh attention list!
         Navigator.pop(context, true);
-
-        // Show review prompt if eligible
-        if (shouldShowReview) {
-          await AnimatedReviewDialog.show(
-            context,
-            triggerContext: ReviewTriggerContext.bill,
-          );
-        }
 
         if (!mounted) return;
 

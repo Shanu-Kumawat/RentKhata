@@ -116,7 +116,8 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
         ref.invalidate(dashboardSummaryProvider);
 
         // Get landlord name for receipt
-        final landlord = await ref.read(landlordProvider.future);
+        final landlordRepo = ref.read(landlordRepositoryProvider);
+        final landlord = await landlordRepo.getLandlord();
         final landlordName = landlord?.name;
         final landlordPhone = landlord?.phone;
 
