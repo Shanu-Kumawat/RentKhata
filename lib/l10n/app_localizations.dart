@@ -1229,7 +1229,7 @@ abstract class AppLocalizations {
   /// No description provided for @meterPhotoAdded.
   ///
   /// In en, this message translates to:
-  /// **'Meter photo added successfully'**
+  /// **'Added successfully'**
   String get meterPhotoAdded;
 
   /// No description provided for @errorAddingPhoto.

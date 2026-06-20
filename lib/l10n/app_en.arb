@@ -310,7 +310,7 @@
   "addMeterPhoto": "Add Meter Photo",
   "takePhoto": "Take Photo",
   "chooseFromGallery": "Choose from Gallery",
-  "meterPhotoAdded": "Meter photo added successfully",
+  "meterPhotoAdded": "Added successfully",
   "errorAddingPhoto": "Error adding photo: {error}",
   "@errorAddingPhoto": {
     "placeholders": {

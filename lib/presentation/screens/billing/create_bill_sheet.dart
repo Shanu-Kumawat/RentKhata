@@ -86,6 +86,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
   double _electricityRate = 0;
   // Stores only the relative filename (e.g. 'img_123.jpg'), not the absolute path.
   String? _meterPhoto;
+  bool _billSaved = false;
 
   // Mutable cycle state for navigation
   DateTime? _currentPeriodStart;
@@ -140,6 +141,11 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
 
   @override
   void dispose() {
+    // If the sheet is dismissed without saving, delete the orphaned photo to prevent storage leaks
+    if (!_billSaved && _meterPhoto != null) {
+      ImageService().deleteImage(_meterPhoto!);
+    }
+    
     _amountController.dispose();
     _prevReadingController.dispose();
     _currReadingController.dispose();
@@ -608,6 +614,10 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
       // pickAndSaveImage returns the relative filename for DB storage
       final fileName = await imageService.pickAndSaveImage(source: source);
       if (fileName != null) {
+        // Prevent storage leak by deleting the old photo if it exists
+        if (_meterPhoto != null) {
+          await imageService.deleteImage(_meterPhoto!);
+        }
         setState(() => _meterPhoto = fileName);
       }
     }
@@ -756,6 +766,8 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
         
         // Cache parent context before popping
         final parentContext = Navigator.of(context).context;
+        
+        _billSaved = true; // Mark as saved so dispose() doesn't delete the photo
         Navigator.pop(context, true);
 
         if (!parentContext.mounted) return;
@@ -1266,25 +1278,27 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                                                 ).colorScheme.onSurfaceVariant,
                                         ),
                                         const SizedBox(width: 6),
-                                        Text(
-                                          _meterPhoto != null
-                                              ? AppLocalizations.of(
-                                                  context,
-                                                )!.meterPhotoAdded
-                                              : AppLocalizations.of(
-                                                  context,
-                                                )!.addMeterPhoto,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleSmall
-                                              ?.copyWith(
-                                                color: _meterPhoto != null
-                                                    ? Theme.of(
-                                                        context,
-                                                      ).colorScheme.tertiary
-                                                    : null,
-                                                fontWeight: FontWeight.w600,
-                                              ),
+                                        Expanded(
+                                          child: Text(
+                                            _meterPhoto != null
+                                                ? AppLocalizations.of(
+                                                    context,
+                                                  )!.meterPhotoAdded
+                                                : AppLocalizations.of(
+                                                    context,
+                                                  )!.addMeterPhoto,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleSmall
+                                                ?.copyWith(
+                                                  color: _meterPhoto != null
+                                                      ? Theme.of(
+                                                          context,
+                                                        ).colorScheme.tertiary
+                                                      : null,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -1311,8 +1325,12 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                               ),
                               if (_meterPhoto != null)
                                 IconButton(
-                                  onPressed: () =>
-                                      setState(() => _meterPhoto = null),
+                                  onPressed: () {
+                                    if (_meterPhoto != null) {
+                                      ImageService().deleteImage(_meterPhoto!);
+                                    }
+                                    setState(() => _meterPhoto = null);
+                                  },
                                   icon: const Icon(Icons.close),
                                   color: Colors.grey,
                                   tooltip: AppLocalizations.of(

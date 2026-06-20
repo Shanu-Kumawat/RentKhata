@@ -184,7 +184,7 @@
   "addMeterPhoto": "मीटर की फोटो जोड़ें",
   "takePhoto": "फ़ोटो लें",
   "chooseFromGallery": "गैलरी से चुनें",
-  "meterPhotoAdded": "मीटर की फोटो सफलतापूर्वक जोड़ दी गई",
+  "meterPhotoAdded": "सफलतापूर्वक जोड़ दिया गया",
   "errorAddingPhoto": "फोटो जोड़ने में त्रुटि: {error}",
   "editPayment": "भुगतान संपादित करें",
   "deletePayment": "भुगतान हटाएं",

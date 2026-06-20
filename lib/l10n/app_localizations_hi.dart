@@ -617,7 +617,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get chooseFromGallery => 'गैलरी से चुनें';
 
   @override
-  String get meterPhotoAdded => 'मीटर की फोटो सफलतापूर्वक जोड़ दी गई';
+  String get meterPhotoAdded => 'सफलतापूर्वक जोड़ दिया गया';
 
   @override
   String errorAddingPhoto(String error) {
