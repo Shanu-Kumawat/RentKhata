@@ -22,6 +22,7 @@ import '../../../data/database/tables/notification_setting_table.dart';
 import '../../../services/image_service.dart';
 import '../../../services/billing_cycle_service.dart';
 import '../../../services/local_notification_service.dart';
+import '../../widgets/celebration_overlay.dart';
 import 'package:rent_khata/l10n/app_localizations.dart';
 import '../../../core/utils/l10n_helpers.dart';
 import 'widgets/contextual_profile_sheet.dart';
@@ -749,25 +750,31 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
         ref.invalidate(unpaidBillsProvider);
         ref.invalidate(dashboardSummaryProvider);
         ref.invalidate(billingAttentionListProvider); // Refresh attention list!
+        
+        // Show celebratory confetti!
+        CelebrationOverlay.show(context);
+        
+        // Cache parent context before popping
+        final parentContext = Navigator.of(context).context;
         Navigator.pop(context, true);
 
-        if (!mounted) return;
+        if (!parentContext.mounted) return;
 
         // Show appropriate message
         if (_selectedBillType == BillType.electricity &&
             _electricityRate != widget.electricityRate) {
-          ScaffoldMessenger.of(context).showSnackBar(
+          ScaffoldMessenger.of(parentContext).showSnackBar(
             SnackBar(
               content: Text(
                 AppLocalizations.of(
-                  context,
+                  parentContext,
                 )!.billCreatedWithRate(_electricityRate.toStringAsFixed(2)),
               ),
             ),
           );
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(AppLocalizations.of(context)!.billCreated)),
+          ScaffoldMessenger.of(parentContext).showSnackBar(
+            SnackBar(content: Text(AppLocalizations.of(parentContext)!.billCreated)),
           );
         }
 

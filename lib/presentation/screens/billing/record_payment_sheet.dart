@@ -18,6 +18,7 @@ import '../../../data/database/tables/notification_setting_table.dart';
 import '../../../domain/entities/bill.dart';
 import '../../../domain/entities/payment.dart';
 import '../../../services/local_notification_service.dart';
+import '../../widgets/celebration_overlay.dart';
 import 'receipt_dialog.dart';
 import 'package:rent_khata/l10n/app_localizations.dart';
 
@@ -202,6 +203,10 @@ class _RecordPaymentSheetState extends ConsumerState<RecordPaymentSheet> {
 
         if (!mounted) return;
         final parentContext = Navigator.of(context).context;
+        
+        // Show celebratory confetti!
+        CelebrationOverlay.show(context);
+        
         Navigator.pop(context);
 
         if (!parentContext.mounted) return;
