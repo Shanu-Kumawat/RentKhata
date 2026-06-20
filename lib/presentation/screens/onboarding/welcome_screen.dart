@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/gestures.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:rent_khata/l10n/app_localizations.dart';
 
 class WelcomeScreen extends ConsumerWidget {
@@ -247,6 +249,68 @@ class WelcomeScreen extends ConsumerWidget {
                         duration: 1500.ms,
                         color: Colors.white.withValues(alpha: 0.2),
                       ),
+
+                  const SizedBox(height: 24),
+                  
+                  // Agreement Text
+                  Center(
+                    child: RichText(
+                      textAlign: TextAlign.center,
+                      text: TextSpan(
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                        ),
+                        children: [
+                          TextSpan(text: AppLocalizations.of(context)!.byContinuingYouAgree),
+                          TextSpan(
+                            text: AppLocalizations.of(context)!.termsOfService,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.primary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () async {
+                                final uri = Uri.parse('https://yourwebsite.com/terms');
+                                try {
+                                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                                } catch (e) {
+                                  if (context.mounted) {
+                                    final l10n = AppLocalizations.of(context)!;
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text(l10n.couldNotOpenLink(e.toString()))),
+                                    );
+                                  }
+                                }
+                              },
+                          ),
+                          TextSpan(text: AppLocalizations.of(context)!.and),
+                          TextSpan(
+                            text: AppLocalizations.of(context)!.privacyPolicy,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.primary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () async {
+                                final uri = Uri.parse('https://yourwebsite.com/privacy');
+                                try {
+                                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                                } catch (e) {
+                                  if (context.mounted) {
+                                    final l10n = AppLocalizations.of(context)!;
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text(l10n.couldNotOpenLink(e.toString()))),
+                                    );
+                                  }
+                                }
+                              },
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                  .animate()
+                  .fadeIn(delay: 1200.ms, duration: 500.ms),
 
                   const SizedBox(height: 16),
                 ],
