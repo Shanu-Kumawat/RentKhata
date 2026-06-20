@@ -9,6 +9,8 @@ import '../../../application/providers/repository_providers.dart';
 import '../../../application/providers/billing_providers.dart';
 import '../../../application/providers/dashboard_providers.dart';
 import '../../../application/providers/billing_cycle_providers.dart';
+import '../../../domain/entities/bill.dart';
+import '../../../domain/entities/billing_status.dart';
 import '../../../application/providers/database_provider.dart';
 import '../../../application/providers/analytics_provider.dart';
 import '../../../application/providers/review_provider.dart';
@@ -16,7 +18,6 @@ import '../../../application/providers/notification_settings_providers.dart';
 
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/validators.dart';
-import '../../../domain/entities/bill.dart';
 import '../../../data/database/tables/bill_table.dart' as db;
 import '../../../data/database/tables/notification_setting_table.dart';
 import '../../../services/image_service.dart';
@@ -256,6 +257,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
               context,
               effectiveStart,
               effectiveEnd,
+              settings.dueDateOffsetDays,
             );
           },
         );
@@ -269,6 +271,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
     BuildContext context,
     DateTime start,
     DateTime end,
+    int dueDateOffsetDays,
   ) {
     final theme = Theme.of(context);
 
@@ -276,7 +279,15 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final isFutureCycle = start.isAfter(today);
-    final isPastCycle = end.isBefore(today);
+    
+    final effectiveDueDate = end.add(Duration(days: dueDateOffsetDays));
+    final isCycleOverdue = !isFutureCycle && today.isAfter(effectiveDueDate);
+    
+    final config = BillingAttentionConfig.defaultConfig;
+    final differenceToDue = effectiveDueDate.difference(today).inDays;
+    final isCycleDueSoon = !isFutureCycle && !isCycleOverdue && differenceToDue >= 0 && differenceToDue <= config.dueSoonThresholdDays && end.isBefore(today);
+    final isCyclePending = !isFutureCycle && !isCycleOverdue && !isCycleDueSoon && end.isBefore(today);
+    
     final canNavigate = widget.billingStartDate != null;
 
     final bool exceedsAgreement =
@@ -323,7 +334,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                   ],
                 ),
               ),
-              if (isPastCycle) ...[
+              if (isCycleOverdue) ...[
                 const SizedBox(width: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -340,6 +351,44 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                     AppLocalizations.of(context)!.overdueU,
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: Theme.of(context).colorScheme.error,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ] else if (isCycleDueSoon) ...[
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.amber.shade600.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    AppLocalizations.of(context)!.statusDueSoonCaps,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: Colors.amber.shade800,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ] else if (isCyclePending) ...[
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade600.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    AppLocalizations.of(context)!.statusPendingCaps,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: Colors.grey.shade700,
                       fontWeight: FontWeight.w600,
                     ),
                   ),

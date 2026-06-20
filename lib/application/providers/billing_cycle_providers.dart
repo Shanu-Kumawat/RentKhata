@@ -337,15 +337,18 @@ Future<List<BillingAttentionItem>> billingStatusFor(
 
     // Add an attention item for each unbilled cycle that needs attention
     for (final cycle in unbilledCycles) {
-      // Calculate days until cycle end
-      final daysUntilEnd = cycle.end.difference(today).inDays;
+      // Calculate effective due date
+      final effectiveDueDate = cycle.end.add(Duration(days: settings.dueDateOffsetDays));
+      final daysUntilDue = effectiveDueDate.difference(today).inDays;
 
-      // Determine status based on days until cycle end
+      // Determine status
       BillingCycleStatus status;
-      if (daysUntilEnd < 0) {
+      if (daysUntilDue < 0) {
         status = BillingCycleStatus.overdue;
-      } else if (daysUntilEnd <= config.dueSoonThresholdDays) {
+      } else if (daysUntilDue <= config.dueSoonThresholdDays && cycle.end.isBefore(today)) {
         status = BillingCycleStatus.dueSoon;
+      } else if (cycle.end.isBefore(today)) {
+        status = BillingCycleStatus.pending;
       } else {
         status = BillingCycleStatus.upToDate;
       }
@@ -362,7 +365,7 @@ Future<List<BillingAttentionItem>> billingStatusFor(
             cycleEnd: cycle.end,
             status: status,
             billType: billType,
-            daysUntilCycleEnd: daysUntilEnd,
+            daysUntilDueDate: daysUntilDue,
             agreedRent: occupancy.agreedRent,
             propertyName: property?.name,
           ),
@@ -413,7 +416,7 @@ Future<List<BillingAttentionItem>> billingAttentionList(Ref ref) async {
       return 1;
     }
     // Then by days until due (most urgent first)
-    return a.daysUntilCycleEnd.compareTo(b.daysUntilCycleEnd);
+    return a.daysUntilDueDate.compareTo(b.daysUntilDueDate);
   });
 
   return attentionItems;

@@ -32,8 +32,8 @@ mixin _$BillingAttentionItem {
   /// The bill type that needs attention
   BillType get billType => throw _privateConstructorUsedError;
 
-  /// Days until cycle ends. Negative values mean cycle is overdue.
-  int get daysUntilCycleEnd => throw _privateConstructorUsedError;
+  /// Days until bill is due. Negative values mean cycle is overdue.
+  int get daysUntilDueDate => throw _privateConstructorUsedError;
 
   /// The agreed rent amount for pre-filling bill
   double get agreedRent => throw _privateConstructorUsedError;
@@ -67,7 +67,7 @@ abstract class $BillingAttentionItemCopyWith<$Res> {
     DateTime cycleEnd,
     BillingCycleStatus status,
     BillType billType,
-    int daysUntilCycleEnd,
+    int daysUntilDueDate,
     double agreedRent,
     String? propertyName,
   });
@@ -99,7 +99,7 @@ class _$BillingAttentionItemCopyWithImpl<
     Object? cycleEnd = null,
     Object? status = null,
     Object? billType = null,
-    Object? daysUntilCycleEnd = null,
+    Object? daysUntilDueDate = null,
     Object? agreedRent = null,
     Object? propertyName = freezed,
   }) {
@@ -137,9 +137,9 @@ class _$BillingAttentionItemCopyWithImpl<
                 ? _value.billType
                 : billType // ignore: cast_nullable_to_non_nullable
                       as BillType,
-            daysUntilCycleEnd: null == daysUntilCycleEnd
-                ? _value.daysUntilCycleEnd
-                : daysUntilCycleEnd // ignore: cast_nullable_to_non_nullable
+            daysUntilDueDate: null == daysUntilDueDate
+                ? _value.daysUntilDueDate
+                : daysUntilDueDate // ignore: cast_nullable_to_non_nullable
                       as int,
             agreedRent: null == agreedRent
                 ? _value.agreedRent
@@ -173,7 +173,7 @@ abstract class _$$BillingAttentionItemImplCopyWith<$Res>
     DateTime cycleEnd,
     BillingCycleStatus status,
     BillType billType,
-    int daysUntilCycleEnd,
+    int daysUntilDueDate,
     double agreedRent,
     String? propertyName,
   });
@@ -201,7 +201,7 @@ class __$$BillingAttentionItemImplCopyWithImpl<$Res>
     Object? cycleEnd = null,
     Object? status = null,
     Object? billType = null,
-    Object? daysUntilCycleEnd = null,
+    Object? daysUntilDueDate = null,
     Object? agreedRent = null,
     Object? propertyName = freezed,
   }) {
@@ -239,9 +239,9 @@ class __$$BillingAttentionItemImplCopyWithImpl<$Res>
             ? _value.billType
             : billType // ignore: cast_nullable_to_non_nullable
                   as BillType,
-        daysUntilCycleEnd: null == daysUntilCycleEnd
-            ? _value.daysUntilCycleEnd
-            : daysUntilCycleEnd // ignore: cast_nullable_to_non_nullable
+        daysUntilDueDate: null == daysUntilDueDate
+            ? _value.daysUntilDueDate
+            : daysUntilDueDate // ignore: cast_nullable_to_non_nullable
                   as int,
         agreedRent: null == agreedRent
             ? _value.agreedRent
@@ -268,7 +268,7 @@ class _$BillingAttentionItemImpl extends _BillingAttentionItem {
     required this.cycleEnd,
     required this.status,
     required this.billType,
-    required this.daysUntilCycleEnd,
+    required this.daysUntilDueDate,
     required this.agreedRent,
     this.propertyName,
   }) : super._();
@@ -295,9 +295,9 @@ class _$BillingAttentionItemImpl extends _BillingAttentionItem {
   @override
   final BillType billType;
 
-  /// Days until cycle ends. Negative values mean cycle is overdue.
+  /// Days until bill is due. Negative values mean cycle is overdue.
   @override
-  final int daysUntilCycleEnd;
+  final int daysUntilDueDate;
 
   /// The agreed rent amount for pre-filling bill
   @override
@@ -309,7 +309,7 @@ class _$BillingAttentionItemImpl extends _BillingAttentionItem {
 
   @override
   String toString() {
-    return 'BillingAttentionItem(occupancyId: $occupancyId, roomId: $roomId, roomNumber: $roomNumber, tenantName: $tenantName, cycleStart: $cycleStart, cycleEnd: $cycleEnd, status: $status, billType: $billType, daysUntilCycleEnd: $daysUntilCycleEnd, agreedRent: $agreedRent, propertyName: $propertyName)';
+    return 'BillingAttentionItem(occupancyId: $occupancyId, roomId: $roomId, roomNumber: $roomNumber, tenantName: $tenantName, cycleStart: $cycleStart, cycleEnd: $cycleEnd, status: $status, billType: $billType, daysUntilDueDate: $daysUntilDueDate, agreedRent: $agreedRent, propertyName: $propertyName)';
   }
 
   @override
@@ -331,8 +331,8 @@ class _$BillingAttentionItemImpl extends _BillingAttentionItem {
             (identical(other.status, status) || other.status == status) &&
             (identical(other.billType, billType) ||
                 other.billType == billType) &&
-            (identical(other.daysUntilCycleEnd, daysUntilCycleEnd) ||
-                other.daysUntilCycleEnd == daysUntilCycleEnd) &&
+            (identical(other.daysUntilDueDate, daysUntilDueDate) ||
+                other.daysUntilDueDate == daysUntilDueDate) &&
             (identical(other.agreedRent, agreedRent) ||
                 other.agreedRent == agreedRent) &&
             (identical(other.propertyName, propertyName) ||
@@ -351,7 +351,7 @@ class _$BillingAttentionItemImpl extends _BillingAttentionItem {
     cycleEnd,
     status,
     billType,
-    daysUntilCycleEnd,
+    daysUntilDueDate,
     agreedRent,
     propertyName,
   );
@@ -384,7 +384,7 @@ abstract class _BillingAttentionItem extends BillingAttentionItem {
     required final DateTime cycleEnd,
     required final BillingCycleStatus status,
     required final BillType billType,
-    required final int daysUntilCycleEnd,
+    required final int daysUntilDueDate,
     required final double agreedRent,
     final String? propertyName,
   }) = _$BillingAttentionItemImpl;
@@ -412,9 +412,9 @@ abstract class _BillingAttentionItem extends BillingAttentionItem {
   @override
   BillType get billType;
 
-  /// Days until cycle ends. Negative values mean cycle is overdue.
+  /// Days until bill is due. Negative values mean cycle is overdue.
   @override
-  int get daysUntilCycleEnd;
+  int get daysUntilDueDate;
 
   /// The agreed rent amount for pre-filling bill
   @override

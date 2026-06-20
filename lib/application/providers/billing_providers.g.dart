@@ -203,7 +203,7 @@ class _ShouldUseDateToDateProviderElement
   BillType get billType => (origin as ShouldUseDateToDateProvider).billType;
 }
 
-String _$billsStreamHash() => r'ff0b76a409f8781ea546384d9cda27bac2e1528a';
+String _$billsStreamHash() => r'f82256080fbcbfa67f306c94eb75318a60b3bb8a';
 
 /// See also [billsStream].
 @ProviderFor(billsStream)
@@ -644,7 +644,7 @@ class _BillProviderElement extends AutoDisposeFutureProviderElement<Bill?>
   int get id => (origin as BillProvider).id;
 }
 
-String _$billByIdHash() => r'7e268cdfa9f749d52361c0e317416414204868e5';
+String _$billByIdHash() => r'392b977a5e140293f25c95ef55c11706f160d7ba';
 
 /// Get a bill by ID with auto-refresh (watches occupancy stream for updates).
 ///

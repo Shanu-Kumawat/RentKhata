@@ -1610,6 +1610,9 @@ class AppLocalizationsHi extends AppLocalizations {
   String get electricityMeterBills => 'बिजली के बिल';
 
   @override
+  String get electricityMeterReadings => 'बिजली मीटर रीडिंग';
+
+  @override
   String get electricityRateInfoText =>
       'यह बिजली की दर सभी नए बिलों पर लागू होगी। पहले से बने बिलों पर इसका कोई प्रभाव नहीं पड़ेगा।';
 
@@ -1696,10 +1699,10 @@ class AppLocalizationsHi extends AppLocalizations {
   String get oneDayOverdue => 'एक दिन की देरी';
 
   @override
-  String get oneMinute => 'एक मिनट';
+  String get oneWeekOverdue => 'एक हफ़्ते की देरी';
 
   @override
-  String get oneWeekOverdue => 'एक हफ़्ते की देरी';
+  String get oneMinute => 'एक मिनट';
 
   @override
   String get overdueFollowUps => 'पेंडिंग बिल के लिए याद दिलाएं';
@@ -2862,6 +2865,24 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get statusOverdue => 'बकाया';
+
+  @override
+  String get statusDueSoon => 'जल्द देय';
+
+  @override
+  String get statusAdvance => 'अग्रिम';
+
+  @override
+  String get statusPending => 'लंबित';
+
+  @override
+  String get statusDueSoonCaps => 'जल्द देय';
+
+  @override
+  String get statusAdvanceCaps => 'अग्रिम';
+
+  @override
+  String get statusPendingCaps => 'लंबित';
 
   @override
   String get amountSettled => 'राशि का निपटान';

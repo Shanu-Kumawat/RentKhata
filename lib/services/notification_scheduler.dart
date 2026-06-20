@@ -184,7 +184,7 @@ Future<void> scheduleAllNotifications(Ref ref) async {
     for (final item in attentionItems) {
       final shouldAlert =
           item.status == BillingCycleStatus.overdue ||
-          item.daysUntilCycleEnd <= leadDays;
+          item.daysUntilDueDate <= leadDays;
       if (!shouldAlert) continue;
 
       // Avoid duplicate alerts for multiple missed cycles of same type.
@@ -197,7 +197,7 @@ Future<void> scheduleAllNotifications(Ref ref) async {
         tenantName: item.tenantName,
         roomNumber: item.roomNumber,
         cycleEndDate: item.cycleEnd,
-        daysUntilCycleEnd: item.daysUntilCycleEnd,
+        daysUntilDueDate: item.daysUntilDueDate,
         notificationHour: settings.notificationHour,
       );
     }
@@ -274,7 +274,7 @@ Future<void> scheduleAllNotifications(Ref ref) async {
       final increasePercent =
           ((latestUnits - previousUnits) / previousUnits) * 100;
       final hasSpike =
-          increasePercent >= 35 && (latestUnits - previousUnits) >= 25;
+          increasePercent >= 50 && (latestUnits - previousUnits) >= 25;
       if (!hasSpike) continue;
 
       await notificationService.scheduleUtilityUsageAnomalyReminder(

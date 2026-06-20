@@ -830,8 +830,12 @@ class _RoomStatusTile extends StatelessWidget {
     switch (status) {
       case RoomStatusType.paid:
         return Theme.of(context).colorScheme.tertiary; // Success equivalent
+      case RoomStatusType.advance:
+        return Theme.of(context).colorScheme.primary; // Primary theme color
+      case RoomStatusType.pending:
+        return Colors.grey.shade600; // Pending equivalent
       case RoomStatusType.dueSoon:
-        return Theme.of(context).colorScheme.error; // Warning equivalent
+        return Colors.amber.shade600; // Warning equivalent
       case RoomStatusType.overdue:
         return Theme.of(context).colorScheme.error;
     }
@@ -841,8 +845,12 @@ class _RoomStatusTile extends StatelessWidget {
     switch (status) {
       case RoomStatusType.paid:
         return Theme.of(context).colorScheme.tertiary;
+      case RoomStatusType.advance:
+        return Theme.of(context).colorScheme.primary;
+      case RoomStatusType.pending:
+        return Colors.grey.shade600;
       case RoomStatusType.dueSoon:
-        return Theme.of(context).colorScheme.error;
+        return Colors.amber.shade600;
       case RoomStatusType.overdue:
         return Theme.of(context).colorScheme.error;
     }

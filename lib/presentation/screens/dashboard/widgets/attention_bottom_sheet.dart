@@ -87,32 +87,28 @@ class _BillingAttentionTile extends StatelessWidget {
 
   const _BillingAttentionTile({required this.item});
 
-  String _billTypeLabel(BillType type) => switch (type) {
-    BillType.rent => 'Rent',
-    BillType.electricity => 'Elec',
-    BillType.water => 'Water',
-    BillType.maintenance => 'Maint',
-    BillType.other => 'Other',
-  };
-
-  Color _billTypeColor(BuildContext context, BillType type) => switch (type) {
-    BillType.rent => Theme.of(context).colorScheme.primary,
-    BillType.electricity => Theme.of(context).colorScheme.error,
-    BillType.water => Colors.blue,
-    BillType.maintenance => Colors.green,
-    BillType.other => Colors.grey,
+  IconData _getBillIcon(BillType type) => switch (type) {
+    BillType.rent => Icons.home_outlined,
+    BillType.electricity => Icons.bolt_outlined,
+    BillType.water => Icons.water_drop_outlined,
+    BillType.maintenance => Icons.build_outlined,
+    BillType.other => Icons.receipt_outlined,
   };
 
   @override
   Widget build(BuildContext context) {
-    final isOverdue = item.status == BillingCycleStatus.overdue;
-    final statusColor = isOverdue
-        ? Theme.of(context).colorScheme.error
-        : AppColors.warning;
-    final statusTextColor = isOverdue
-        ? Theme.of(context).colorScheme.error
-        : AppColors.warning;
-    final billColor = _billTypeColor(context, item.billType);
+    final statusColor = switch (item.status) {
+      BillingCycleStatus.overdue => Theme.of(context).colorScheme.error,
+      BillingCycleStatus.dueSoon => Colors.amber.shade600,
+      BillingCycleStatus.pending => Colors.grey.shade500,
+      BillingCycleStatus.upToDate => Colors.transparent,
+    };
+    final statusTextColor = switch (item.status) {
+      BillingCycleStatus.overdue => Theme.of(context).colorScheme.error,
+      BillingCycleStatus.dueSoon => Colors.amber.shade800,
+      BillingCycleStatus.pending => Colors.grey.shade700,
+      BillingCycleStatus.upToDate => Colors.transparent,
+    };
 
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
@@ -126,43 +122,24 @@ class _BillingAttentionTile extends StatelessWidget {
         );
       },
       leading: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: billColor.withValues(alpha: 0.15),
-          borderRadius: BorderRadius.circular(4),
-          border: Border.all(color: billColor.withValues(alpha: 0.3)),
+          color: statusColor.withValues(alpha: 0.15),
+          shape: BoxShape.circle,
         ),
-        child: Text(
-          _billTypeLabel(item.billType),
-          style: TextStyle(
-            fontSize: 10,
-            fontWeight: FontWeight.w600,
-            color: billColor,
-          ),
+        child: Icon(
+          _getBillIcon(item.billType),
+          color: statusColor,
+          size: 20,
         ),
       ),
-      title: Row(
-        children: [
-          Container(
-            width: 6,
-            height: 6,
-            margin: const EdgeInsets.only(right: 6),
-            decoration: BoxDecoration(
-              color: statusColor,
-              shape: BoxShape.circle,
-            ),
-          ),
-          Expanded(
-            child: Text(
-              'Room ${item.roomNumber} - ${item.tenantName}',
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
+      title: Text(
+        'Room ${item.roomNumber} - ${item.tenantName}',
+        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+        overflow: TextOverflow.ellipsis,
       ),
       subtitle: Text(
-        item.cycleEndDescription,
+        item.dueDescription,
         style: TextStyle(
           fontSize: 12,
           color: statusTextColor,

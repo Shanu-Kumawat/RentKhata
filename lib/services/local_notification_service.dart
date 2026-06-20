@@ -182,6 +182,7 @@ class LocalNotificationService {
     required String body,
     required DateTime scheduledTime,
     String? payload,
+    bool repeatDaily = false,
   }) async {
     if (!_isInitialized) await initialize();
 
@@ -210,6 +211,7 @@ class LocalNotificationService {
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
+      matchDateTimeComponents: repeatDaily ? DateTimeComponents.time : null,
       payload: enrichedPayload,
     );
   }
@@ -465,19 +467,24 @@ class LocalNotificationService {
     if (!_isInitialized) await initialize();
 
     final alertDate = agreementEndDate.add(Duration(days: graceDays));
-    if (DateTime.now().isBefore(alertDate)) return;
+    final now = DateTime.now();
+    
+    final scheduledTime = now.isBefore(alertDate) 
+        ? _atHour(alertDate, notificationHour) 
+        : _nextAtHour(notificationHour);
 
-    final scheduledTime = _nextAtHour(notificationHour);
-    final daysExpired = DateTime.now().difference(agreementEndDate).inDays;
-    final expiredLabel = daysExpired <= 1
-        ? 'expired yesterday'
-        : 'expired $daysExpired days ago';
+    final daysExpired = now.difference(agreementEndDate).inDays;
+    // Fix text if it's not expired yet
+    final expiredLabel = now.isBefore(agreementEndDate)
+        ? 'has expired'
+        : (daysExpired <= 1 ? 'expired yesterday' : 'expired $daysExpired days ago');
 
     await scheduleNotification(
       id: _agreementExpiredReminderId(occupancyId),
       title: 'Agreement Expired - Room $roomNumber',
       body: '$tenantName\'s agreement $expiredLabel. Renew or close occupancy.',
       scheduledTime: scheduledTime,
+      repeatDaily: true,
       payload: 'agreement_expired:$occupancyId',
     );
   }
@@ -489,7 +496,7 @@ class LocalNotificationService {
     required String tenantName,
     required String roomNumber,
     required DateTime cycleEndDate,
-    required int daysUntilCycleEnd,
+    required int daysUntilDueDate,
     int notificationHour = 9,
   }) async {
     if (!_isInitialized) await initialize();
@@ -512,11 +519,11 @@ class LocalNotificationService {
     ];
     final cycleEndLabel =
         '${shortMonths[cycleEndDate.month - 1]} ${cycleEndDate.day}';
-    final urgencyLabel = daysUntilCycleEnd < 0
-        ? 'ended ${daysUntilCycleEnd.abs()} days ago'
-        : daysUntilCycleEnd == 0
-        ? 'ends today'
-        : 'ends in $daysUntilCycleEnd days';
+    final urgencyLabel = daysUntilDueDate < 0
+        ? 'overdue by ${daysUntilDueDate.abs()} days'
+        : daysUntilDueDate == 0
+        ? 'due today'
+        : 'due in $daysUntilDueDate days';
 
     await scheduleNotification(
       id: _billGenerationReminderId(occupancyId, billType),
@@ -524,6 +531,7 @@ class LocalNotificationService {
       body:
           '$tenantName\'s cycle $urgencyLabel (end: $cycleEndLabel). Create the bill now.',
       scheduledTime: scheduledTime,
+      repeatDaily: true,
       payload: 'bill_generation:$occupancyId:${billType.index}',
     );
   }
@@ -612,57 +620,36 @@ class LocalNotificationService {
 
     if (!_isInitialized) await initialize();
 
-    final allowedDays = escalationDays
-        .where((d) => d == 1 || d == 3 || d == 7 || d == 14)
-        .toSet();
+    final allowedDays = escalationDays.where((d) => d > 0).toSet();
     if (allowedDays.isEmpty) return;
 
     final tenantName = bill.tenantName ?? 'Tenant';
     final amount = bill.pendingAmount;
     final roomNumber = bill.roomNumber ?? 'Room';
 
-    // 1-day overdue reminder (first reminder)
-    if (allowedDays.contains(1)) {
-      await _scheduleOverdueReminder(
-        bill: bill,
-        daysOverdue: 1,
-        title: '📋 Payment Due - $roomNumber',
-        body: '$tenantName\'s ₹${amount.toStringAsFixed(0)} is now overdue.',
-        notificationHour: notificationHour,
-      );
-    }
+    for (final daysOverdue in allowedDays) {
+      String title;
+      String bodyPrefix;
+      
+      if (daysOverdue == 1) {
+        title = '📋 Payment Due - $roomNumber';
+        bodyPrefix = 'is now overdue';
+      } else if (daysOverdue <= 3) {
+        title = '⏰ Payment Reminder - $roomNumber';
+        bodyPrefix = 'is $daysOverdue days overdue';
+      } else if (daysOverdue <= 7) {
+        title = '⚠️ Overdue $daysOverdue Days - $roomNumber';
+        bodyPrefix = 'is $daysOverdue days overdue';
+      } else {
+        title = '🚨 Critical: $daysOverdue Days Overdue - $roomNumber';
+        bodyPrefix = 'is $daysOverdue days overdue!';
+      }
 
-    // 3-day overdue reminder
-    if (allowedDays.contains(3)) {
       await _scheduleOverdueReminder(
         bill: bill,
-        daysOverdue: 3,
-        title: '⏰ Payment Reminder - $roomNumber',
-        body: '$tenantName\'s ₹${amount.toStringAsFixed(0)} is 3 days overdue.',
-        notificationHour: notificationHour,
-      );
-    }
-
-    // 7-day overdue reminder (more urgent)
-    if (allowedDays.contains(7)) {
-      await _scheduleOverdueReminder(
-        bill: bill,
-        daysOverdue: 7,
-        title: '⚠️ Overdue 1 Week - $roomNumber',
-        body:
-            '₹${amount.toStringAsFixed(0)} from $tenantName is a week overdue.',
-        notificationHour: notificationHour,
-      );
-    }
-
-    // 14-day overdue reminder (critical)
-    if (allowedDays.contains(14)) {
-      await _scheduleOverdueReminder(
-        bill: bill,
-        daysOverdue: 14,
-        title: '🚨 Critical: 2 Weeks Overdue - $roomNumber',
-        body:
-            '₹${amount.toStringAsFixed(0)} from $tenantName is 2 weeks overdue!',
+        daysOverdue: daysOverdue,
+        title: title,
+        body: '$tenantName\'s ₹${amount.toStringAsFixed(0)} $bodyPrefix.',
         notificationHour: notificationHour,
       );
     }

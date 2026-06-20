@@ -12,6 +12,20 @@ class UnpaidBillsBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
+    // Calculate aggregated status color
+    Color headerColor = Colors.grey.shade600; // Default pending
+    if (unpaidBills.any((b) => b.isOverdue)) {
+      headerColor = theme.colorScheme.error;
+    } else if (unpaidBills.any((b) => b.isDueSoon)) {
+      headerColor = Colors.amber.shade600;
+    } else if (unpaidBills.any((b) => b.isPending)) {
+      headerColor = Colors.grey.shade600;
+    } else if (unpaidBills.every((b) => b.isAdvance)) {
+      headerColor = theme.colorScheme.primary;
+    }
+
     return SafeArea(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -21,9 +35,7 @@ class UnpaidBillsBottomSheet extends StatelessWidget {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Theme.of(
-                context,
-              ).colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -35,23 +47,19 @@ class UnpaidBillsBottomSheet extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.error.withValues(alpha: 0.1),
+                    color: headerColor.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     Icons.account_balance_wallet_outlined,
-                    color: Theme.of(context).colorScheme.error,
+                    color: headerColor,
                     size: 20,
                   ),
                 ),
                 const SizedBox(width: 12),
                 Text(
                   AppLocalizations.of(context)!.collectPayments,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                  style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -93,10 +101,27 @@ class _UnpaidBillTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isOverdue = bill.isOverdue;
-    final statusColor = isOverdue ? theme.colorScheme.error : AppColors.warning;
-
     final l10n = AppLocalizations.of(context)!;
+    
+    Color statusColor;
+    String statusText;
+
+    if (bill.isOverdue) {
+      statusColor = theme.colorScheme.error;
+      statusText = l10n.overdueSinceDate(
+        '${bill.dueDate?.day ?? ''}/${bill.dueDate?.month ?? ''}',
+      );
+    } else if (bill.isDueSoon) {
+      statusColor = Colors.amber.shade600;
+      statusText = l10n.statusDueSoon;
+    } else if (bill.isAdvance) {
+      statusColor = theme.colorScheme.primary;
+      statusText = l10n.statusAdvance;
+    } else {
+      statusColor = Colors.grey.shade600;
+      statusText = l10n.statusPending;
+    }
+
     final tenantName = bill.tenantName ?? l10n.unknownTenant;
     final roomName = bill.roomNumber ?? l10n.unknownRoom;
     final propertyName = bill.propertyName ?? '';
@@ -161,11 +186,7 @@ class _UnpaidBillTile extends StatelessWidget {
                       ),
                       Expanded(
                         child: Text(
-                          isOverdue
-                              ? l10n.overdueSinceDate(
-                                  '${bill.dueDate?.day ?? ''}/${bill.dueDate?.month ?? ''}',
-                                )
-                              : l10n.awaitingPayment,
+                          statusText,
                           style: theme.textTheme.labelSmall?.copyWith(
                             color: statusColor,
                             fontWeight: FontWeight.w600,

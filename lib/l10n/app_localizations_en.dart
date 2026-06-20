@@ -137,7 +137,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notifications => 'Notifications';
 
   @override
-  String get reminderSettings => 'Reminder Settings';
+  String get reminderSettings => 'Notification Settings';
 
   @override
   String get dueDateAndOverdue => 'Due date and overdue reminders';
@@ -1484,7 +1484,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'This is a computer-generated statement and does not require a physical signature.';
 
   @override
-  String get aboutLabel => 'About Label';
+  String get aboutLabel => 'About';
 
   @override
   String get aboutRentKhataDescription =>
@@ -1522,7 +1522,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get billFullyPaid => 'Bill Fully Paid';
 
   @override
-  String get billFullyPaidSubtitle => 'Bill Fully Paid Subtitle';
+  String get billFullyPaidSubtitle => 'Notify when a bill is fully paid';
 
   @override
   String get billingCycleEnding => 'Billing Cycle Ending';
@@ -1540,7 +1540,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get biometricLock => 'Biometric Lock';
 
   @override
-  String get biometricLockSubtitle => 'Biometric Lock Subtitle';
+  String get biometricLockSubtitle =>
+      'Require fingerprint or face scan to open the app';
 
   @override
   String get biometricsNotAvailable => 'Biometrics Not Available';
@@ -1562,7 +1563,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get currentRate => 'Current Rate';
 
   @override
-  String get dataLabel => 'Data Label';
+  String get dataLabel => 'Data';
 
   @override
   String daysCount(int count) {
@@ -1588,7 +1589,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dueSoonAlert => 'Due Soon Alert';
 
   @override
-  String get dueSoonAlertSubtitle => 'Due Soon Alert Subtitle';
+  String get dueSoonAlertSubtitle => 'Alert before a bill\'s due date';
 
   @override
   String get editProfile => 'Edit Profile';
@@ -1602,10 +1603,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get electricityMeterBills => 'Electricity Meter Bills';
 
   @override
+  String get electricityMeterReadings => 'Electricity Meter Readings';
+
+  @override
   String get electricityRateInfoText => 'Electricity Rate Info Text';
 
   @override
-  String get electricityRatesSubtitle => 'Electricity Rates Subtitle';
+  String get electricityRatesSubtitle =>
+      'Configure default rate per unit for electricity';
 
   @override
   String get enableAppLock => 'Enable App Lock';
@@ -1629,7 +1634,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lockOnExit => 'Lock On Exit';
 
   @override
-  String get lockOnExitSubtitle => 'Lock On Exit Subtitle';
+  String get lockOnExitSubtitle => 'Instantly lock the app when you leave it';
 
   @override
   String get maintenanceCharges => 'Maintenance Charges';
@@ -1638,7 +1643,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get messageBody => 'Message Body';
 
   @override
-  String get messageTemplatesSubtitle => 'Message Templates Subtitle';
+  String get messageTemplatesSubtitle => 'Customize WhatsApp and SMS templates';
 
   @override
   String minutes(int count) {
@@ -1655,7 +1660,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get monthlySummary => 'Monthly Summary';
 
   @override
-  String get monthlySummarySubtitle => 'Monthly Summary Subtitle';
+  String get monthlySummarySubtitle =>
+      'Get a summary of collections and pending dues';
 
   @override
   String get never => 'Never';
@@ -1685,10 +1691,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get oneDayOverdue => 'One Day Overdue';
 
   @override
-  String get oneMinute => 'One Minute';
+  String get oneWeekOverdue => 'One Week Overdue';
 
   @override
-  String get oneWeekOverdue => 'One Week Overdue';
+  String get oneMinute => 'One Minute';
 
   @override
   String get overdueFollowUps => 'Overdue Follow Ups';
@@ -1700,7 +1706,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paymentReceived => 'Payment Received';
 
   @override
-  String get paymentReceivedSubtitle => 'Payment Received Subtitle';
+  String get paymentReceivedSubtitle => 'Notify when a payment is logged';
 
   @override
   String get permissionDenied => 'Permission Denied';
@@ -1737,7 +1743,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reminderLabel => 'Reminder Label';
 
   @override
-  String get reminderSettingsSubtitle => 'Reminder Settings Subtitle';
+  String get reminderSettingsSubtitle =>
+      'Configure smart alerts and notifications';
 
   @override
   String get requireBiometric => 'Require Biometric';
@@ -1949,7 +1956,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String agreementExpiredAlertSubtitle(int days) {
-    return 'Remind after $days day(s) past agreement end date';
+    return 'Send daily alerts once an agreement has been expired for $days day(s)';
   }
 
   @override
@@ -1957,7 +1964,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String billNotGeneratedAlertSubtitle(int days) {
-    return 'Alert when cycle is overdue or within $days day(s) of ending';
+    return 'Alert when cycle is overdue or within $days day(s) of the expected due date';
   }
 
   @override
@@ -1999,7 +2006,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get utilityAnomalyAlertSubtitle =>
-      'Alerts when latest electricity usage spikes sharply';
+      'Alerts when latest electricity usage increases by 50% or more';
 
   @override
   String get sameAsMoveIn => 'Same as move-in';
@@ -2845,6 +2852,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get statusOverdue => 'OVERDUE';
+
+  @override
+  String get statusDueSoon => 'Due Soon';
+
+  @override
+  String get statusAdvance => 'Advance';
+
+  @override
+  String get statusPending => 'Pending';
+
+  @override
+  String get statusDueSoonCaps => 'DUE SOON';
+
+  @override
+  String get statusAdvanceCaps => 'ADVANCE';
+
+  @override
+  String get statusPendingCaps => 'PENDING';
 
   @override
   String get amountSettled => 'Amount Settled';

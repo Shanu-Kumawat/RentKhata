@@ -420,12 +420,13 @@ class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
           .toList();
 
       if (rentBills.isEmpty) {
-        // No rent bills exist - use current cycle from move-in date
-        final currentCycle = BillingCycleService.getCurrentCycle(
-          occupancy.moveInDate,
+        // No rent bills exist - start from the very first billing cycle
+        final firstCycle = BillingCycleService.getCycleByNumber(
+          occupancy.effectiveBillingStartDate,
+          0,
         );
-        effectiveCycleStart = currentCycle.start;
-        effectiveCycleEnd = currentCycle.end;
+        effectiveCycleStart = firstCycle.start;
+        effectiveCycleEnd = firstCycle.end;
       } else {
         // Find the latest rent bill and get the next cycle after it
         rentBills.sort((a, b) {
@@ -442,7 +443,7 @@ class _RoomDetailContentState extends ConsumerState<_RoomDetailContent> {
             DateTime(latestBill.billingYear, latestBill.billingMonth + 1, 0);
 
         final nextCycle = BillingCycleService.getNextCycleAfter(
-          occupancy.moveInDate,
+          occupancy.effectiveBillingStartDate,
           lastPeriodEnd,
         );
         effectiveCycleStart = nextCycle.start;
@@ -1138,7 +1139,11 @@ class _BillTile extends ConsumerWidget {
         ? Colors.orange
         : isOverdue
         ? AppColors.error
-        : AppColors.primary;
+        : bill.isDueSoon
+        ? Colors.amber.shade600
+        : bill.isAdvance
+        ? theme.colorScheme.primary
+        : Colors.grey.shade600;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
@@ -1154,42 +1159,62 @@ class _BillTile extends ConsumerWidget {
           children: [
             // Main Content Section
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // Icon Container
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: statusColor.withValues(alpha: 0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      _getBillIcon(bill.billType),
-                      color: statusColor,
-                      size: 24,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
                   // Bill Details
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          _getBillLabel(context, bill.billType),
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                        Row(
+                          children: [
+                            Icon(
+                              _getBillIcon(bill.billType),
+                              color: statusColor,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                _getBillLabel(context, bill.billType),
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 4),
-                        Text(
-                          bill.billingPeriod,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            bill.billingPeriod,
+                            softWrap: false,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
                           ),
                         ),
+                        if (bill.dueDate != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 2.0),
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                AppLocalizations.of(context)!.shareDueDate(
+                                  '${bill.dueDate!.day}/${bill.dueDate!.month}/${bill.dueDate!.year}',
+                                ),
+                                softWrap: false,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ),
+                          ),
                         if (isOverdue && !isPaid)
                           Padding(
                             padding: const EdgeInsets.only(top: 4.0),
@@ -1248,7 +1273,13 @@ class _BillTile extends ConsumerWidget {
                         Text(
                           isPaid
                               ? AppLocalizations.of(context)!.paidCaps
-                              : AppLocalizations.of(context)!.dueCaps,
+                              : bill.isOverdue
+                                  ? AppLocalizations.of(context)!.statusOverdue
+                                  : bill.isDueSoon
+                                      ? AppLocalizations.of(context)!.statusDueSoonCaps
+                                      : bill.isAdvance
+                                          ? AppLocalizations.of(context)!.statusAdvanceCaps
+                                          : AppLocalizations.of(context)!.statusPendingCaps,
                           style: theme.textTheme.labelSmall?.copyWith(
                             color: statusColor,
                             fontWeight: FontWeight.bold,
@@ -1430,7 +1461,7 @@ class _BillTile extends ConsumerWidget {
 
   String _getBillLabel(BuildContext context, BillType type) {
     return switch (type) {
-      BillType.rent => AppLocalizations.of(context)!.monthlyRentLabel,
+      BillType.rent => AppLocalizations.of(context)!.monthlyRent,
       BillType.electricity => AppLocalizations.of(
         context,
       )!.electricityBillLabel,

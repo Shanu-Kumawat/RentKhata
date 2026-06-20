@@ -2,6 +2,7 @@
 library;
 
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'billing_status.dart';
 
 part 'bill.freezed.dart';
 part 'bill.g.dart';
@@ -62,9 +63,38 @@ class Bill with _$Bill {
       status != BillStatus.voided &&
       (pendingAmount <= 0 || status == BillStatus.paid);
 
-  /// Check if bill is overdue
-  bool get isOverdue =>
-      !isFullyPaid && dueDate != null && DateTime.now().isAfter(dueDate!);
+  /// Check if bill is an advance bill (billing period hasn't started)
+  bool get isAdvance {
+    if (isFullyPaid || periodStartDate == null) return false;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final periodStart = DateTime(periodStartDate!.year, periodStartDate!.month, periodStartDate!.day);
+    return today.isBefore(periodStart);
+  }
+
+  /// Check if bill is overdue (past due date)
+  bool get isOverdue {
+    if (isFullyPaid || dueDate == null) return false;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final due = DateTime(dueDate!.year, dueDate!.month, dueDate!.day);
+    return today.isAfter(due);
+  }
+
+  /// Check if bill is due soon (within threshold days of due date)
+  bool get isDueSoon {
+    if (isFullyPaid || dueDate == null || isOverdue || isAdvance) return false;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final due = DateTime(dueDate!.year, dueDate!.month, dueDate!.day);
+    final difference = due.difference(today).inDays;
+    return difference >= 0 && difference <= BillingAttentionConfig.defaultConfig.dueSoonThresholdDays;
+  }
+
+  /// Check if bill is currently pending (cycle started, but not due soon yet)
+  bool get isPending {
+    return !isFullyPaid && !isAdvance && !isDueSoon && !isOverdue;
+  }
 
   /// Check if bill can be fully edited (unpaid only)
   bool get canEdit =>

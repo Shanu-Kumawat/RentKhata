@@ -341,7 +341,7 @@ abstract class AppLocalizations {
   /// No description provided for @reminderSettings.
   ///
   /// In en, this message translates to:
-  /// **'Reminder Settings'**
+  /// **'Notification Settings'**
   String get reminderSettings;
 
   /// No description provided for @dueDateAndOverdue.
@@ -2824,7 +2824,7 @@ abstract class AppLocalizations {
   /// No description provided for @aboutLabel.
   ///
   /// In en, this message translates to:
-  /// **'About Label'**
+  /// **'About'**
   String get aboutLabel;
 
   /// No description provided for @aboutRentKhataDescription.
@@ -2890,7 +2890,7 @@ abstract class AppLocalizations {
   /// No description provided for @billFullyPaidSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Bill Fully Paid Subtitle'**
+  /// **'Notify when a bill is fully paid'**
   String get billFullyPaidSubtitle;
 
   /// No description provided for @billingCycleEnding.
@@ -2926,7 +2926,7 @@ abstract class AppLocalizations {
   /// No description provided for @biometricLockSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Biometric Lock Subtitle'**
+  /// **'Require fingerprint or face scan to open the app'**
   String get biometricLockSubtitle;
 
   /// No description provided for @biometricsNotAvailable.
@@ -2968,7 +2968,7 @@ abstract class AppLocalizations {
   /// No description provided for @dataLabel.
   ///
   /// In en, this message translates to:
-  /// **'Data Label'**
+  /// **'Data'**
   String get dataLabel;
 
   /// No description provided for @daysCount.
@@ -3010,7 +3010,7 @@ abstract class AppLocalizations {
   /// No description provided for @dueSoonAlertSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Due Soon Alert Subtitle'**
+  /// **'Alert before a bill\'s due date'**
   String get dueSoonAlertSubtitle;
 
   /// No description provided for @editProfile.
@@ -3031,6 +3031,12 @@ abstract class AppLocalizations {
   /// **'Electricity Meter Bills'**
   String get electricityMeterBills;
 
+  /// No description provided for @electricityMeterReadings.
+  ///
+  /// In en, this message translates to:
+  /// **'Electricity Meter Readings'**
+  String get electricityMeterReadings;
+
   /// No description provided for @electricityRateInfoText.
   ///
   /// In en, this message translates to:
@@ -3040,7 +3046,7 @@ abstract class AppLocalizations {
   /// No description provided for @electricityRatesSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Electricity Rates Subtitle'**
+  /// **'Configure default rate per unit for electricity'**
   String get electricityRatesSubtitle;
 
   /// No description provided for @enableAppLock.
@@ -3088,7 +3094,7 @@ abstract class AppLocalizations {
   /// No description provided for @lockOnExitSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Lock On Exit Subtitle'**
+  /// **'Instantly lock the app when you leave it'**
   String get lockOnExitSubtitle;
 
   /// No description provided for @maintenanceCharges.
@@ -3106,7 +3112,7 @@ abstract class AppLocalizations {
   /// No description provided for @messageTemplatesSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Message Templates Subtitle'**
+  /// **'Customize WhatsApp and SMS templates'**
   String get messageTemplatesSubtitle;
 
   /// No description provided for @minutes.
@@ -3136,7 +3142,7 @@ abstract class AppLocalizations {
   /// No description provided for @monthlySummarySubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Monthly Summary Subtitle'**
+  /// **'Get a summary of collections and pending dues'**
   String get monthlySummarySubtitle;
 
   /// No description provided for @never.
@@ -3193,17 +3199,17 @@ abstract class AppLocalizations {
   /// **'One Day Overdue'**
   String get oneDayOverdue;
 
-  /// No description provided for @oneMinute.
-  ///
-  /// In en, this message translates to:
-  /// **'One Minute'**
-  String get oneMinute;
-
   /// No description provided for @oneWeekOverdue.
   ///
   /// In en, this message translates to:
   /// **'One Week Overdue'**
   String get oneWeekOverdue;
+
+  /// No description provided for @oneMinute.
+  ///
+  /// In en, this message translates to:
+  /// **'One Minute'**
+  String get oneMinute;
 
   /// No description provided for @overdueFollowUps.
   ///
@@ -3226,7 +3232,7 @@ abstract class AppLocalizations {
   /// No description provided for @paymentReceivedSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Payment Received Subtitle'**
+  /// **'Notify when a payment is logged'**
   String get paymentReceivedSubtitle;
 
   /// No description provided for @permissionDenied.
@@ -3292,7 +3298,7 @@ abstract class AppLocalizations {
   /// No description provided for @reminderSettingsSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Reminder Settings Subtitle'**
+  /// **'Configure smart alerts and notifications'**
   String get reminderSettingsSubtitle;
 
   /// No description provided for @requireBiometric.
@@ -3682,7 +3688,7 @@ abstract class AppLocalizations {
   /// No description provided for @agreementExpiredAlertSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Remind after {days} day(s) past agreement end date'**
+  /// **'Send daily alerts once an agreement has been expired for {days} day(s)'**
   String agreementExpiredAlertSubtitle(int days);
 
   /// No description provided for @billNotGeneratedAlert.
@@ -3694,7 +3700,7 @@ abstract class AppLocalizations {
   /// No description provided for @billNotGeneratedAlertSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Alert when cycle is overdue or within {days} day(s) of ending'**
+  /// **'Alert when cycle is overdue or within {days} day(s) of the expected due date'**
   String billNotGeneratedAlertSubtitle(int days);
 
   /// No description provided for @partialPaymentPauseAlert.
@@ -3766,7 +3772,7 @@ abstract class AppLocalizations {
   /// No description provided for @utilityAnomalyAlertSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Alerts when latest electricity usage spikes sharply'**
+  /// **'Alerts when latest electricity usage increases by 50% or more'**
   String get utilityAnomalyAlertSubtitle;
 
   /// No description provided for @sameAsMoveIn.
@@ -5304,6 +5310,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'OVERDUE'**
   String get statusOverdue;
+
+  /// No description provided for @statusDueSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Due Soon'**
+  String get statusDueSoon;
+
+  /// No description provided for @statusAdvance.
+  ///
+  /// In en, this message translates to:
+  /// **'Advance'**
+  String get statusAdvance;
+
+  /// No description provided for @statusPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get statusPending;
+
+  /// No description provided for @statusDueSoonCaps.
+  ///
+  /// In en, this message translates to:
+  /// **'DUE SOON'**
+  String get statusDueSoonCaps;
+
+  /// No description provided for @statusAdvanceCaps.
+  ///
+  /// In en, this message translates to:
+  /// **'ADVANCE'**
+  String get statusAdvanceCaps;
+
+  /// No description provided for @statusPendingCaps.
+  ///
+  /// In en, this message translates to:
+  /// **'PENDING'**
+  String get statusPendingCaps;
 
   /// No description provided for @amountSettled.
   ///

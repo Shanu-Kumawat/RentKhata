@@ -46,7 +46,7 @@ class NotificationSettingsState {
     NotificationType.overdue7Days: true,
     NotificationType.overdue14Days: false,
     NotificationType.agreementExpiringSoon: true,
-    NotificationType.agreementExpired: false,
+    NotificationType.agreementExpired: true,
     NotificationType.billNotGenerated: true,
     NotificationType.partialPaymentPause: true,
     NotificationType.depositSettlementDue: true,
@@ -57,7 +57,7 @@ class NotificationSettingsState {
     NotificationType.cycleEndingSoon: 3,
     NotificationType.billDueSoon: 3,
     NotificationType.agreementExpiringSoon: 30,
-    NotificationType.agreementExpired: 0,
+    NotificationType.agreementExpired: 7,
     NotificationType.billNotGenerated: 3,
     NotificationType.depositSettlementDue: 3,
   };

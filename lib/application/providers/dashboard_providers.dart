@@ -190,9 +190,11 @@ Future<FilteredFinancialSummary> filteredFinancials(Ref ref) async {
 
 /// Start of "Live Status" data structures
 enum RoomStatusType {
-  paid, // Green
-  dueSoon, // Yellow
-  overdue, // Red
+  paid,      // Green
+  advance,   // Theme Primary
+  pending,   // Standard (Text color)
+  dueSoon,   // Yellow
+  overdue,   // Red
 }
 
 class RoomStatusItem {
@@ -239,13 +241,23 @@ Future<List<RoomStatusItem>> roomStatusList(Ref ref) async {
     String label = 'Paid';
 
     if (roomBills.isNotEmpty) {
-      status = RoomStatusType.overdue; // Using overdue for "Red" generically
-      label = 'Due';
       if (roomBills.any((b) => b.isOverdue)) {
+        status = RoomStatusType.overdue;
         label = 'Overdue';
+      } else if (roomBills.any((b) => b.isDueSoon)) {
+        status = RoomStatusType.dueSoon;
+        label = 'Due Soon';
+      } else if (roomBills.any((b) => b.isPending)) {
+        status = RoomStatusType.pending;
+        label = 'Pending';
+      } else if (roomBills.every((b) => b.isAdvance)) {
+        status = RoomStatusType.advance;
+        label = 'Advance';
+      } else {
+        status = RoomStatusType.pending;
+        label = 'Pending';
       }
     } else {
-      // Logic for Yellow (Cycle ending soon) can be added here
       status = RoomStatusType.paid;
       label = 'Paid';
     }

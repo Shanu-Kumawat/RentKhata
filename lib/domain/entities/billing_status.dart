@@ -17,7 +17,10 @@ enum BillingCycleStatus {
   /// Bill exists for current cycle - no action needed
   upToDate,
 
-  /// Cycle ending soon (within threshold) - time to create bill
+  /// Cycle has ended, waiting for bill creation
+  pending,
+
+  /// Bill is due soon
   dueSoon,
 
   /// Cycle already ended without bill - action overdue
@@ -44,8 +47,8 @@ class BillingAttentionItem with _$BillingAttentionItem {
     /// The bill type that needs attention
     required BillType billType,
 
-    /// Days until cycle ends. Negative values mean cycle is overdue.
-    required int daysUntilCycleEnd,
+    /// Days until bill is due. Negative values mean cycle is overdue.
+    required int daysUntilDueDate,
 
     /// The agreed rent amount for pre-filling bill
     required double agreedRent,
@@ -62,6 +65,8 @@ class BillingAttentionItem with _$BillingAttentionItem {
     switch (status) {
       case BillingCycleStatus.upToDate:
         return 'Up to date';
+      case BillingCycleStatus.pending:
+        return 'Pending';
       case BillingCycleStatus.dueSoon:
         return 'Due soon';
       case BillingCycleStatus.overdue:
@@ -69,18 +74,18 @@ class BillingAttentionItem with _$BillingAttentionItem {
     }
   }
 
-  /// Human-readable cycle end description
-  String get cycleEndDescription {
-    if (daysUntilCycleEnd == 0) {
-      return 'Ends today';
-    } else if (daysUntilCycleEnd == 1) {
-      return 'Ends tomorrow';
-    } else if (daysUntilCycleEnd > 0) {
-      return 'Ends in $daysUntilCycleEnd days';
-    } else if (daysUntilCycleEnd == -1) {
-      return 'Ended yesterday';
+  /// Human-readable due description
+  String get dueDescription {
+    if (daysUntilDueDate == 0) {
+      return 'Due today';
+    } else if (daysUntilDueDate == 1) {
+      return 'Due tomorrow';
+    } else if (daysUntilDueDate > 0) {
+      return 'Due: in $daysUntilDueDate days';
+    } else if (daysUntilDueDate == -1) {
+      return 'Overdue: 1 day';
     } else {
-      return 'Ended ${-daysUntilCycleEnd} days ago';
+      return 'Overdue: ${-daysUntilDueDate} days';
     }
   }
 
