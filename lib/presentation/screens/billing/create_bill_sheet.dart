@@ -1238,7 +1238,7 @@ class _CreateBillSheetState extends ConsumerState<CreateBillSheet> {
                                                   ) ??
                                                   0))
                                           .toStringAsFixed(0),
-                                      formatCurrency(_electricityRate),
+                                      formatRate(_electricityRate),
                                     ),
                                     style: Theme.of(
                                       context,

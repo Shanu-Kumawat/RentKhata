@@ -115,7 +115,7 @@ class _ElectricityRatesScreenState
                   const SizedBox(height: 4),
                   currentRateAsync.when(
                     data: (rate) => Text(
-                      '${formatCurrency(rate)}/${l10n.unit}',
+                      '${formatRate(rate)}/${l10n.unit}',
                       style: Theme.of(context).textTheme.headlineMedium
                           ?.copyWith(
                             fontWeight: FontWeight.bold,
@@ -259,7 +259,7 @@ class _ElectricityRatesScreenState
                         ),
                       ),
                       title: Text(
-                        '${formatCurrency(rate.ratePerUnit)}/${l10n.unit}',
+                        '${formatRate(rate.ratePerUnit)}/${l10n.unit}',
                         style: Theme.of(context).textTheme.titleMedium
                             ?.copyWith(
                               fontWeight: isCurrentRate

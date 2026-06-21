@@ -6,7 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../domain/entities/occupancy.dart';
 import '../../domain/entities/bill.dart';
 import '../../data/database/app_database.dart';
-import 'repository_providers.dart';
+
 import 'database_provider.dart';
 import 'tenant_providers.dart';
 import 'billing_providers.dart';
@@ -36,7 +36,7 @@ class OccupancyDetail {
 @riverpod
 Future<Occupancy?> occupancy(Ref ref, int occupancyId) async {
   // Watch tenants stream to auto-update when occupancy, tenant, or property data changes
-  ref.watch(tenantsStreamProvider());
+  await ref.watch(tenantsStreamProvider().future);
 
   final db = ref.watch(appDatabaseProvider);
   final entity = await db.tenantDao.getOccupancyById(occupancyId);
@@ -82,13 +82,11 @@ Future<OccupancyDetail?> occupancyDetail(Ref ref, int occupancyId) async {
   if (occ == null) return null;
 
   final db = ref.watch(appDatabaseProvider);
-  final billingRepo = ref.watch(billingRepositoryProvider);
+
 
   // Watch bills stream to auto-refresh bills and totals when payments happen
-  ref.watch(billsForOccupancyStreamProvider(occupancyId));
-
-  // Get bills for this occupancy
-  final bills = await billingRepo.getBillsForOccupancy(occupancyId);
+  // Using .future ensures we wait for the first value and reuse the stream's result
+  final bills = await ref.watch(billsForOccupancyStreamProvider(occupancyId).future);
 
   // Get family members for this occupancy
   final familyMembers = await db.tenantDao.getFamilyMembersForOccupancy(

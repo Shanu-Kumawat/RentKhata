@@ -13,6 +13,16 @@ String formatCurrency(double amount) {
   return formatter.format(amount);
 }
 
+/// Format rate per unit, showing decimals only if present
+String formatRate(double rate) {
+  final formatter = NumberFormat.currency(
+    locale: 'en_IN',
+    symbol: '₹',
+    decimalDigits: rate == rate.truncateToDouble() ? 0 : 2,
+  );
+  return formatter.format(rate);
+}
+
 /// Format amount with decimals
 String formatCurrencyWithDecimals(double amount) {
   final formatter = NumberFormat.currency(

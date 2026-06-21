@@ -958,7 +958,10 @@ class _ElectricityDetailsCard extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    '${units.toStringAsFixed(0)} units @ ${formatCurrency(bill.electricityRateAtBilling ?? 0)}/unit',
+                    AppLocalizations.of(context)!.unitsConsumedRate(
+                      units.toStringAsFixed(0),
+                      formatRate(bill.electricityRateAtBilling ?? 0),
+                    ),
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: Colors.amber.shade900,
                     ),
