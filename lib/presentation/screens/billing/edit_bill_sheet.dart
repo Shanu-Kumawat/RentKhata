@@ -33,6 +33,11 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _amountController;
   late final TextEditingController _notesController;
+  
+  // Electricity specific controllers
+  late final TextEditingController _prevReadingController;
+  late final TextEditingController _currReadingController;
+  late final TextEditingController _rateController;
 
   DateTime? _dueDate;
   bool _isLoading = false;
@@ -56,14 +61,52 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
       text: widget.bill.amount.toStringAsFixed(0),
     );
     _notesController = TextEditingController(text: widget.bill.notes ?? '');
+    
+    // Init electricity controllers
+    _prevReadingController = TextEditingController(
+      text: widget.bill.electricityPrevReading?.toStringAsFixed(1) ?? '',
+    );
+    _currReadingController = TextEditingController(
+      text: widget.bill.electricityCurrReading?.toStringAsFixed(1) ?? '',
+    );
+    _rateController = TextEditingController(
+      text: widget.bill.electricityRateAtBilling?.toStringAsFixed(2) ?? '',
+    );
+
+    if (widget.bill.billType == BillType.electricity) {
+      _prevReadingController.addListener(_calculateElectricityAmount);
+      _currReadingController.addListener(_calculateElectricityAmount);
+      _rateController.addListener(_calculateElectricityAmount);
+    }
+
     _dueDate = widget.bill.dueDate;
     _existingPhotoPath = widget.bill.meterPhotoPath;
+  }
+
+  void _calculateElectricityAmount() {
+    if (widget.bill.billType != BillType.electricity) return;
+    
+    final prev = double.tryParse(_prevReadingController.text) ?? 0.0;
+    final curr = double.tryParse(_currReadingController.text) ?? 0.0;
+    final rate = double.tryParse(_rateController.text) ?? 0.0;
+    
+    if (curr >= prev) {
+      final units = curr - prev;
+      final total = units * rate;
+      // Update amount automatically
+      if (_amountController.text != total.toStringAsFixed(0)) {
+        _amountController.text = total.toStringAsFixed(0);
+      }
+    }
   }
 
   @override
   void dispose() {
     _amountController.dispose();
     _notesController.dispose();
+    _prevReadingController.dispose();
+    _currReadingController.dispose();
+    _rateController.dispose();
     super.dispose();
   }
 
@@ -142,6 +185,15 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
         meterPhotoPath:
             _meterPhoto ??
             _existingPhotoPath, // Use filename stored from new pick or existing
+        electricityPrevReading: widget.bill.billType == BillType.electricity
+            ? double.tryParse(_prevReadingController.text)
+            : widget.bill.electricityPrevReading,
+        electricityCurrReading: widget.bill.billType == BillType.electricity
+            ? double.tryParse(_currReadingController.text)
+            : widget.bill.electricityCurrReading,
+        electricityRateAtBilling: widget.bill.billType == BillType.electricity
+            ? double.tryParse(_rateController.text)
+            : widget.bill.electricityRateAtBilling,
         // Recalculate pending amount if amount changed
         pendingAmount: _canEditAmount
             ? amount - widget.bill.paidAmount
@@ -381,6 +433,48 @@ class _EditBillSheetState extends ConsumerState<EditBillSheet> {
                         ),
                       ),
                     ),
+                  const SizedBox(height: 24),
+                ],
+
+                // Electricity fields
+                if (widget.bill.billType == BillType.electricity) ...[
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: _prevReadingController,
+                          enabled: _canEditAmount,
+                          decoration: InputDecoration(
+                            labelText: AppLocalizations.of(context)!.previous,
+                            prefixIcon: const Icon(Icons.speed_outlined),
+                          ),
+                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: TextFormField(
+                          controller: _currReadingController,
+                          enabled: _canEditAmount,
+                          decoration: InputDecoration(
+                            labelText: AppLocalizations.of(context)!.current,
+                            prefixIcon: const Icon(Icons.speed),
+                          ),
+                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _rateController,
+                    enabled: _canEditAmount,
+                    decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context)!.ratePerUnit,
+                      prefixIcon: const Icon(Icons.currency_rupee),
+                    ),
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  ),
                   const SizedBox(height: 24),
                 ],
 

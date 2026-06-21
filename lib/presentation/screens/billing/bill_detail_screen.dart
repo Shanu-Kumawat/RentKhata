@@ -76,10 +76,7 @@ class _BillDetailContent extends ConsumerWidget {
           bill.billNumber ?? AppLocalizations.of(context)!.billDetails,
         ),
         actions: [
-          if (bill.canEdit ||
-              bill.canEditLimited ||
-              bill.canDelete ||
-              (!bill.isFullyPaid && bill.status != BillStatus.voided))
+          if (bill.status != BillStatus.voided)
             PopupMenuButton<String>(
               onSelected: (value) => _handleMenuAction(
                 context,
@@ -89,33 +86,43 @@ class _BillDetailContent extends ConsumerWidget {
                 landlordUpi,
               ),
               itemBuilder: (context) => [
-                if (bill.canEdit || bill.canEditLimited)
-                  PopupMenuItem(
-                    value: 'edit',
-                    child: ListTile(
-                      leading: const Icon(Icons.edit_outlined),
-                      title: Text(AppLocalizations.of(context)!.editBill),
-                      contentPadding: EdgeInsets.zero,
+                PopupMenuItem(
+                  value: 'edit',
+                  child: ListTile(
+                    leading: Icon(
+                      Icons.edit_outlined,
+                      color: (!bill.canEdit && !bill.canEditLimited)
+                          ? Colors.grey
+                          : null,
                     ),
-                  ),
-                if (bill.canDelete)
-                  PopupMenuItem(
-                    value: 'delete',
-                    child: ListTile(
-                      leading: const Icon(
-                        Icons.delete_outline,
-                        color: Colors.red,
+                    title: Text(
+                      AppLocalizations.of(context)!.editBill,
+                      style: TextStyle(
+                        color: (!bill.canEdit && !bill.canEditLimited)
+                            ? Colors.grey
+                            : null,
                       ),
-                      title: Text(
-                        AppLocalizations.of(context)!.deleteBill,
-                        style: const TextStyle(color: Colors.red),
-                      ),
-                      contentPadding: EdgeInsets.zero,
                     ),
+                    contentPadding: EdgeInsets.zero,
                   ),
-                if (bill.status != BillStatus.voided &&
-                    !bill.isFullyPaid &&
-                    bill.status != BillStatus.partial)
+                ),
+                PopupMenuItem(
+                  value: 'delete',
+                  child: ListTile(
+                    leading: Icon(
+                      Icons.delete_outline,
+                      color: !bill.canDelete ? Colors.grey : Colors.red,
+                    ),
+                    title: Text(
+                      AppLocalizations.of(context)!.deleteBill,
+                      style: TextStyle(
+                        color: !bill.canDelete ? Colors.grey : Colors.red,
+                      ),
+                    ),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
+                if (!bill.isFullyPaid && bill.status != BillStatus.partial)
                   PopupMenuItem(
                     value: 'void',
                     child: ListTile(
@@ -127,9 +134,7 @@ class _BillDetailContent extends ConsumerWidget {
                       contentPadding: EdgeInsets.zero,
                     ),
                   ),
-                if (!bill.isFullyPaid &&
-                    bill.status != BillStatus.draft &&
-                    bill.status != BillStatus.voided)
+                if (!bill.isFullyPaid && bill.status != BillStatus.draft)
                   PopupMenuItem(
                     value: 'reminder',
                     child: ListTile(
@@ -343,12 +348,30 @@ class _BillDetailContent extends ConsumerWidget {
   ) {
     switch (action) {
       case 'edit':
+        if (!bill.canEdit && !bill.canEditLimited) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.cannotEditPaidBill),
+              duration: const Duration(seconds: 4),
+            ),
+          );
+          return;
+        }
         _editBill(context);
         break;
       case 'void':
         _confirmVoid(context, ref);
         break;
       case 'delete':
+        if (!bill.canDelete) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.cannotDeletePaidBill),
+              duration: const Duration(seconds: 4),
+            ),
+          );
+          return;
+        }
         _confirmDeleteBill(context, ref);
         break;
       case 'reminder':
@@ -473,7 +496,10 @@ class _BillDetailContent extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        insetPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
+        insetPadding: const EdgeInsets.symmetric(
+          horizontal: 16.0,
+          vertical: 24.0,
+        ),
         title: Text(AppLocalizations.of(context)!.voidBillTitle),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -524,7 +550,10 @@ class _BillDetailContent extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        insetPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
+        insetPadding: const EdgeInsets.symmetric(
+          horizontal: 16.0,
+          vertical: 24.0,
+        ),
         title: Text(AppLocalizations.of(context)!.deleteBillTitle),
         content: Text(
           AppLocalizations.of(
@@ -986,7 +1015,10 @@ class _ElectricityDetailsCard extends ConsumerWidget {
                   showDialog(
                     context: context,
                     builder: (context) => Dialog(
-                      insetPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
+                      insetPadding: const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                        vertical: 24.0,
+                      ),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -1275,6 +1307,7 @@ class _PaymentTile extends ConsumerWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         leading: CircleAvatar(
           backgroundColor: AppColors.success.withValues(alpha: 0.1),
           child: Icon(
@@ -1293,27 +1326,38 @@ class _PaymentTile extends ConsumerWidget {
         subtitle: Text(
           '${_getPaymentModeLabel(context, payment.paymentMode)} • ${_formatDate(payment.paymentDate)}',
         ),
-        trailing: PopupMenuButton<String>(
-          icon: const Icon(Icons.more_vert, size: 20),
-          onSelected: (action) => _handleAction(context, ref, action),
-          itemBuilder: (context) => [
-            PopupMenuItem(
-              value: 'edit',
-              child: ListTile(
-                leading: const Icon(Icons.edit_outlined),
-                title: Text(AppLocalizations.of(context)!.editPayment),
-                contentPadding: EdgeInsets.zero,
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Tooltip(
+              message: AppLocalizations.of(context)!.editPayment,
+              child: InkWell(
+                onTap: () => _handleAction(context, ref, 'edit'),
+                borderRadius: BorderRadius.circular(20),
+                child: Padding(
+                  padding: const EdgeInsets.all(6),
+                  child: Icon(
+                    Icons.edit_outlined,
+                    size: 20,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
               ),
             ),
-            PopupMenuItem(
-              value: 'delete',
-              child: ListTile(
-                leading: const Icon(Icons.delete_outline, color: Colors.red),
-                title: Text(
-                  AppLocalizations.of(context)!.deletePayment,
-                  style: const TextStyle(color: Colors.red),
+            const SizedBox(width: 8),
+            Tooltip(
+              message: AppLocalizations.of(context)!.deletePayment,
+              child: InkWell(
+                onTap: () => _handleAction(context, ref, 'delete'),
+                borderRadius: BorderRadius.circular(20),
+                child: const Padding(
+                  padding: EdgeInsets.all(6),
+                  child: Icon(
+                    Icons.delete_outline,
+                    size: 20,
+                    color: Colors.red,
+                  ),
                 ),
-                contentPadding: EdgeInsets.zero,
               ),
             ),
           ],
@@ -1345,7 +1389,10 @@ class _PaymentTile extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        insetPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
+        insetPadding: const EdgeInsets.symmetric(
+          horizontal: 16.0,
+          vertical: 24.0,
+        ),
         title: Text(AppLocalizations.of(context)!.deletePaymentTitle),
         content: Text(
           AppLocalizations.of(context)!.confirmDeletePayment(

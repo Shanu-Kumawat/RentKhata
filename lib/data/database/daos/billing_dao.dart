@@ -297,6 +297,9 @@ class BillingDao extends DatabaseAccessor<AppDatabase> with _$BillingDaoMixin {
     final bill = await getBillById(billId);
     if (bill == null) return;
 
+    // Voided bills should never have their status recalculated
+    if (bill.status == BillStatus.voided) return;
+
     final paidAmount = await getTotalPaidForBill(billId);
     BillStatus newStatus;
 

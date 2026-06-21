@@ -312,6 +312,11 @@ class BillingRepositoryImpl implements BillingRepository {
     );
     final result = await _billingDao.updateBill(entity);
 
+    // If update was successful, recalculate status in case amount changed
+    if (result) {
+      await _billingDao.recalculateBillStatus(bill.id);
+    }
+
     // Log audit entry for bill update with diff
     if (result && oldBill != null) {
       final changes = <String>[];
@@ -320,6 +325,12 @@ class BillingRepositoryImpl implements BillingRepository {
       }
       if (oldBill.status != _billStatusToDb(bill.status)) {
         changes.add('status: ${oldBill.status.name} → ${bill.status.name}');
+      }
+      if (oldBill.electricityCurrReading != bill.electricityCurrReading) {
+        changes.add('reading: ${oldBill.electricityCurrReading} → ${bill.electricityCurrReading}');
+      }
+      if (oldBill.electricityRateAtBilling != bill.electricityRateAtBilling) {
+        changes.add('rate: ${oldBill.electricityRateAtBilling} → ${bill.electricityRateAtBilling}');
       }
       if (oldBill.notes != bill.notes) {
         changes.add('notes updated');

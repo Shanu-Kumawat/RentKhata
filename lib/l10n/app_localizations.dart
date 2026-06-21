@@ -5424,6 +5424,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Up to date'**
   String get statusUpToDate;
+
+  /// No description provided for @cannotEditPaidBill.
+  ///
+  /// In en, this message translates to:
+  /// **'This bill has payments. To edit it, please delete the payments from the Payment History below first.'**
+  String get cannotEditPaidBill;
+
+  /// No description provided for @cannotDeletePaidBill.
+  ///
+  /// In en, this message translates to:
+  /// **'This bill has payments. To delete it, please delete the payments from the Payment History below first.'**
+  String get cannotDeletePaidBill;
 }
 
 class _AppLocalizationsDelegate

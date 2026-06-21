@@ -2930,4 +2930,12 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get statusUpToDate => 'अद्यतित';
+
+  @override
+  String get cannotEditPaidBill =>
+      'इस बिल में भुगतान दर्ज हैं। इसे संपादित करने के लिए, कृपया पहले नीचे दिए गए भुगतान इतिहास से भुगतानों को हटाएं।';
+
+  @override
+  String get cannotDeletePaidBill =>
+      'इस बिल में भुगतान दर्ज हैं। इसे हटाने के लिए, कृपया पहले नीचे दिए गए भुगतान इतिहास से भुगतानों को हटाएं।';
 }

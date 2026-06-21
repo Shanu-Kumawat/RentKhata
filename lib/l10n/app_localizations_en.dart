@@ -2918,4 +2918,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get statusUpToDate => 'Up to date';
+
+  @override
+  String get cannotEditPaidBill =>
+      'This bill has payments. To edit it, please delete the payments from the Payment History below first.';
+
+  @override
+  String get cannotDeletePaidBill =>
+      'This bill has payments. To delete it, please delete the payments from the Payment History below first.';
 }

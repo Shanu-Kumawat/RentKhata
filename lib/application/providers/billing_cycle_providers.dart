@@ -58,9 +58,11 @@ Future<BillingCycle> nextBillingCycleFor(Ref ref, int occupancyId) async {
     return BillingCycle(start: now, end: now.add(const Duration(days: 30)));
   }
 
-  // Get all rent bills for this occupancy
+  // Get all rent bills for this occupancy, excluding voided ones
   final allBills = await billingRepo.getBillsForOccupancy(occupancyId);
-  final rentBills = allBills.where((b) => b.billType == BillType.rent).toList();
+  final rentBills = allBills.where(
+    (b) => b.billType == BillType.rent && b.status != BillStatus.voided
+  ).toList();
 
   // If no rent bills exist, return cycle 0 (first cycle from move-in)
   if (rentBills.isEmpty) {
@@ -70,18 +72,10 @@ Future<BillingCycle> nextBillingCycleFor(Ref ref, int occupancyId) async {
     );
   }
 
-  // Build a set of billed period start dates for quick lookup
-  final billedPeriodStarts = <DateTime>{};
+  // Build a set of billed months (Year-Month) for agnostic lookup
+  final billedMonths = <String>{};
   for (final bill in rentBills) {
-    if (bill.periodStartDate != null) {
-      billedPeriodStarts.add(
-        DateTime(
-          bill.periodStartDate!.year,
-          bill.periodStartDate!.month,
-          bill.periodStartDate!.day,
-        ),
-      );
-    }
+    billedMonths.add('${bill.billingYear}-${bill.billingMonth}');
   }
 
   // Iterate through cycles from 0 until we find one without a bill
@@ -95,15 +89,13 @@ Future<BillingCycle> nextBillingCycleFor(Ref ref, int occupancyId) async {
       cycleNum,
     );
 
-    // Normalize cycle start for comparison
-    final cycleStartNormalized = DateTime(
-      cycle.start.year,
-      cycle.start.month,
-      cycle.start.day,
-    );
+    // Identify the cycle's month and year
+    // If the cycle starts on Jan 15th, it's the January bill
+    final cycleMonth = cycle.start.month;
+    final cycleYear = cycle.start.year;
+    final cycleKey = '$cycleYear-$cycleMonth';
 
-    // Check if this cycle has a bill
-    if (!billedPeriodStarts.contains(cycleStartNormalized)) {
+    if (!billedMonths.contains(cycleKey)) {
       // No bill for this cycle - this is the one that needs a bill
       return cycle;
     }

@@ -1572,5 +1572,7 @@
   "statusUpToDate": "Up to date",
   "statusPending": "Pending",
   "statusDueSoon": "Due soon",
-  "statusOverdue": "Overdue"
+  "statusOverdue": "Overdue",
+  "cannotEditPaidBill": "This bill has payments. To edit it, please delete the payments from the Payment History below first.",
+  "cannotDeletePaidBill": "This bill has payments. To delete it, please delete the payments from the Payment History below first."
 }

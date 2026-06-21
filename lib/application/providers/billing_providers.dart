@@ -111,6 +111,8 @@ Future<Bill?> billById(Ref ref, int id) async {
 /// Get last electricity bill for auto-fill.
 @riverpod
 Future<Bill?> lastElectricityBill(Ref ref, int occupancyId) {
+  // Watch bills stream to auto-refresh when new electricity bill is generated
+  ref.watch(billsStreamProvider);
   final repo = ref.watch(billingRepositoryProvider);
   return repo.getLastElectricityBill(occupancyId);
 }
