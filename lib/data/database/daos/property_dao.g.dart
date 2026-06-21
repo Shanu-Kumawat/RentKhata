@@ -6,4 +6,6 @@ part of 'property_dao.dart';
 mixin _$PropertyDaoMixin on DatabaseAccessor<AppDatabase> {
   $PropertiesTable get properties => attachedDatabase.properties;
   $RoomsTable get rooms => attachedDatabase.rooms;
+  $TenantsTable get tenants => attachedDatabase.tenants;
+  $OccupanciesTable get occupancies => attachedDatabase.occupancies;
 }

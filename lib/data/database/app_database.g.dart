@@ -10008,7 +10008,7 @@ class $BillSettingsTable extends BillSettings
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'CHECK ("water_uses_date_to_date" IN (0, 1))',
     ),
-    defaultValue: const Constant(false),
+    defaultValue: const Constant(true),
   );
   static const VerificationMeta _maintenanceUsesDateToDateMeta =
       const VerificationMeta('maintenanceUsesDateToDate');
@@ -10252,7 +10252,7 @@ class BillSettingsEntity extends DataClass
   /// Whether electricity bills use date-to-date cycles (default: true)
   final bool electricityUsesDateToDate;
 
-  /// Whether water bills use date-to-date cycles (default: false)
+  /// Whether water bills use date-to-date cycles (default: true)
   final bool waterUsesDateToDate;
 
   /// Whether maintenance bills use date-to-date cycles (default: false)

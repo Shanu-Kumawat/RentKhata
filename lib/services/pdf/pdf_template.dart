@@ -2,7 +2,6 @@ import 'dart:typed_data';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:printing/printing.dart';
 
 import '../../../core/theme/app_colors.dart';
 
@@ -231,10 +230,18 @@ class PdfTemplate {
         mainAxisAlignment: pw.MainAxisAlignment.center,
         children: [
           pw.Text(
-            'Powered by RentKhata',
+            'Generated via ',
             style: const pw.TextStyle(
-              color: PdfColors.grey500,
-              fontSize: 8,
+              color: PdfColors.grey600,
+              fontSize: 9,
+            ),
+          ),
+          pw.Text(
+            'RentKhata',
+            style: pw.TextStyle(
+              color: primaryColor,
+              fontSize: 9,
+              fontWeight: pw.FontWeight.bold,
             ),
           ),
         ],

@@ -624,8 +624,6 @@ class InvoicePdfService {
                             [
                               l10n?.pdfTerm1 ?? '1. Please pay the bill before the due date to avoid late fees.',
                               l10n?.pdfTerm2 ?? '2. This is a computer-generated invoice and no signature is required unless specified.',
-                              if (landlordUpiId != null && landlordUpiId.isNotEmpty)
-                                l10n?.invoiceUpiTerms ?? '3. Make payments via UPI to the details mentioned above.',
                             ].join('\n'),
                             style: pw.TextStyle(
                               fontSize: 8,

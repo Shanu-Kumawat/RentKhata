@@ -2410,7 +2410,10 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get calculateBillsTenantDateText =>
-      'किरायेदार के विशिष्ट प्रवेश-तिथि के आधार पर बिल की गणना करें';
+      'पूरे कैलेंडर महीनों के बजाय किरायेदार के आने की तारीख (उदा. 5 से 4 तक) से बिलों की गणना करें।';
+
+  @override
+  String get changeLaterNotice => 'आप इसे बाद में सेटिंग्स में बदल सकते हैं।';
 
   @override
   String get saveAndContinueBtn => 'सहेजें और जारी रखें';

@@ -5,11 +5,12 @@ import 'package:drift/drift.dart';
 import '../app_database.dart';
 import '../tables/property_table.dart';
 import '../tables/room_table.dart';
+import '../tables/occupancy_table.dart';
 
 part 'property_dao.g.dart';
 
 /// DAO for property and room operations.
-@DriftAccessor(tables: [Properties, Rooms])
+@DriftAccessor(tables: [Properties, Rooms, Occupancies])
 class PropertyDao extends DatabaseAccessor<AppDatabase>
     with _$PropertyDaoMixin {
   PropertyDao(super.db);
@@ -24,12 +25,17 @@ class PropertyDao extends DatabaseAccessor<AppDatabase>
     return (select(properties)..where((p) => p.isArchived.equals(false))).get();
   }
 
-  /// Watch all properties (excluding archived by default)
+  /// Watch all properties (reacts to room and occupancy changes)
   Stream<List<PropertyEntity>> watchAllProperties({bool includeArchived = false}) {
-    if (includeArchived) {
-      return select(properties).watch();
+    final query = select(properties).join([
+      leftOuterJoin(rooms, rooms.propertyId.equalsExp(properties.id)),
+      leftOuterJoin(occupancies, occupancies.roomId.equalsExp(rooms.id)),
+    ]);
+    if (!includeArchived) {
+      query.where(properties.isArchived.equals(false));
     }
-    return (select(properties)..where((p) => p.isArchived.equals(false))).watch();
+    query.groupBy([properties.id]);
+    return query.watch().map((rows) => rows.map((r) => r.readTable(properties)).toList());
   }
 
   /// Get property by ID
@@ -66,11 +72,15 @@ class PropertyDao extends DatabaseAccessor<AppDatabase>
 
   /// Watch all rooms for a property
   Stream<List<RoomEntity>> watchRoomsForProperty(int propertyId, {bool includeArchived = false}) {
-    final query = select(rooms)..where((r) => r.propertyId.equals(propertyId));
+    final query = select(rooms).join([
+      leftOuterJoin(occupancies, occupancies.roomId.equalsExp(rooms.id))
+    ]);
+    query.where(rooms.propertyId.equals(propertyId));
     if (!includeArchived) {
-      query.where((r) => r.isArchived.equals(false));
+      query.where(rooms.isArchived.equals(false));
     }
-    return query.watch();
+    query.groupBy([rooms.id]);
+    return query.watch().map((rows) => rows.map((r) => r.readTable(rooms)).toList());
   }
 
   /// Get room by ID
@@ -93,14 +103,16 @@ class PropertyDao extends DatabaseAccessor<AppDatabase>
   /// Watch all rooms
   Stream<List<RoomEntity>> watchAllRooms({bool includeArchived = false}) {
     final query = select(rooms).join([
-      innerJoin(properties, properties.id.equalsExp(rooms.propertyId))
+      innerJoin(properties, properties.id.equalsExp(rooms.propertyId)),
+      leftOuterJoin(occupancies, occupancies.roomId.equalsExp(rooms.id))
     ]);
 
     if (!includeArchived) {
       query.where(rooms.isArchived.equals(false) & properties.isArchived.equals(false));
     }
-
-    return query.map((row) => row.readTable(rooms)).watch();
+    
+    query.groupBy([rooms.id]);
+    return query.watch().map((rows) => rows.map((r) => r.readTable(rooms)).toList());
   }
 
   /// Insert a room

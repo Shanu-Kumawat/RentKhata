@@ -4444,8 +4444,14 @@ abstract class AppLocalizations {
   /// No description provided for @calculateBillsTenantDateText.
   ///
   /// In en, this message translates to:
-  /// **'Calculate bills based on the tenant\'s specific move-in date'**
+  /// **'Calculate bills from the tenant\'s exact move-in date (e.g., 5th to 4th) instead of full calendar months.'**
   String get calculateBillsTenantDateText;
+
+  /// No description provided for @changeLaterNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'You can change this later in Settings.'**
+  String get changeLaterNotice;
 
   /// No description provided for @saveAndContinueBtn.
   ///

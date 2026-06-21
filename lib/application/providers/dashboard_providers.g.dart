@@ -106,7 +106,7 @@ final filteredFinancialsProvider =
 // ignore: unused_element
 typedef FilteredFinancialsRef =
     AutoDisposeFutureProviderRef<FilteredFinancialSummary>;
-String _$roomStatusListHash() => r'0ff67f44e637f4d50fd426faec8bcfb5c5b8dcf5';
+String _$roomStatusListHash() => r'3e9c5959874b5e29e8c28c64789bca55cb722ac4';
 
 /// Provides list of rooms with their status.
 ///

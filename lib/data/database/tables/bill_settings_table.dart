@@ -34,9 +34,9 @@ class BillSettings extends Table {
   BoolColumn get electricityUsesDateToDate =>
       boolean().withDefault(const Constant(true))();
 
-  /// Whether water bills use date-to-date cycles (default: false)
+  /// Whether water bills use date-to-date cycles (default: true)
   BoolColumn get waterUsesDateToDate =>
-      boolean().withDefault(const Constant(false))();
+      boolean().withDefault(const Constant(true))();
 
   /// Whether maintenance bills use date-to-date cycles (default: false)
   BoolColumn get maintenanceUsesDateToDate =>

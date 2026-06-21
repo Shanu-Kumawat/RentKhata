@@ -899,7 +899,7 @@ class _BillingStatusForProviderElement
 }
 
 String _$billingAttentionListHash() =>
-    r'6400ce35fd90b2449388dc856f3052a364d22987';
+    r'70ab1d171557f6828567d875d220979eb18bd1c6';
 
 /// Get all occupancies that need billing attention.
 ///

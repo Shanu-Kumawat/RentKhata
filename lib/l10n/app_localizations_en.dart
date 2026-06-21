@@ -2400,7 +2400,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get calculateBillsTenantDateText =>
-      'Calculate bills based on the tenant\'s specific move-in date';
+      'Calculate bills from the tenant\'s exact move-in date (e.g., 5th to 4th) instead of full calendar months.';
+
+  @override
+  String get changeLaterNotice => 'You can change this later in Settings.';
 
   @override
   String get saveAndContinueBtn => 'Save & Continue';

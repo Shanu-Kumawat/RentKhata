@@ -26,12 +26,19 @@ class TenantDao extends DatabaseAccessor<AppDatabase> with _$TenantDaoMixin {
     return (select(tenants)..where((t) => t.isArchived.equals(false))).get();
   }
 
-  /// Watch all tenants
+  /// Watch all tenants (reacts to occupancy changes too)
   Stream<List<TenantEntity>> watchAllTenants({bool includeArchived = false}) {
-    if (includeArchived) {
-      return select(tenants).watch();
+    final query = select(tenants).join([
+      leftOuterJoin(occupancies, occupancies.tenantId.equalsExp(tenants.id))
+    ]);
+    if (!includeArchived) {
+      query.where(tenants.isArchived.equals(false));
     }
-    return (select(tenants)..where((t) => t.isArchived.equals(false))).watch();
+    query.groupBy([tenants.id]);
+    
+    return query.watch().map((rows) {
+      return rows.map((row) => row.readTable(tenants)).toList();
+    });
   }
 
   /// Get tenant by ID

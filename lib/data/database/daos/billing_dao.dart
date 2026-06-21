@@ -21,7 +21,11 @@ class BillingDao extends DatabaseAccessor<AppDatabase> with _$BillingDaoMixin {
 
   /// Watch all bills
   Stream<List<BillEntity>> watchAllBills() {
-    return select(bills).watch();
+    final query = select(bills).join([
+      leftOuterJoin(payments, payments.billId.equalsExp(bills.id))
+    ]);
+    query.groupBy([bills.id]);
+    return query.watch().map((rows) => rows.map((r) => r.readTable(bills)).toList());
   }
 
   /// Get all bills
@@ -35,11 +39,15 @@ class BillingDao extends DatabaseAccessor<AppDatabase> with _$BillingDaoMixin {
           .get();
 
   /// Watch bills for an occupancy
-  Stream<List<BillEntity>> watchBillsForOccupancy(int occupancyId) =>
-      (select(bills)
-            ..where((b) => b.occupancyId.equals(occupancyId))
-            ..orderBy([(b) => OrderingTerm.desc(b.createdAt)]))
-          .watch();
+  Stream<List<BillEntity>> watchBillsForOccupancy(int occupancyId) {
+    final query = select(bills).join([
+      leftOuterJoin(payments, payments.billId.equalsExp(bills.id))
+    ]);
+    query.where(bills.occupancyId.equals(occupancyId));
+    query.orderBy([OrderingTerm.desc(bills.createdAt)]);
+    query.groupBy([bills.id]);
+    return query.watch().map((rows) => rows.map((r) => r.readTable(bills)).toList());
+  }
 
   /// Get bill by ID
   Future<BillEntity?> getBillById(int id) =>

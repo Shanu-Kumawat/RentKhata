@@ -20,7 +20,7 @@ class _DateToDateOnboardingSheetState extends ConsumerState<DateToDateOnboarding
   // Default values
   bool _rent = true;
   bool _electricity = true;
-  bool _water = false;
+  bool _water = true;
   bool _maintenance = false;
   bool _other = false;
 
@@ -212,7 +212,20 @@ class _DateToDateOnboardingSheetState extends ConsumerState<DateToDateOnboarding
                 ),
               ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.1),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: 16),
+              
+              Text(
+                l10n.changeLaterNotice,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+                  fontStyle: FontStyle.italic,
+                ),
+              )
+              .animate()
+              .fadeIn(delay: 450.ms),
+
+              const SizedBox(height: 16),
 
               // Actions Layout
               FilledButton(

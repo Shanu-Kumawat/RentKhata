@@ -235,6 +235,8 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
   }
 
   Future<void> _saveOccupancy() async {
+    FocusScope.of(context).unfocus();
+    
     if (!_formKey.currentState!.validate()) return;
 
     if (!_createNewTenant && _selectedTenant == null) {
@@ -389,8 +391,9 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
         child: Container(
           constraints: const BoxConstraints(maxWidth: 400),
           padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
             children: [
               // Header with warning icon
               Container(
@@ -515,6 +518,7 @@ class _MoveInSheetState extends ConsumerState<MoveInSheet> {
                 ],
               ),
             ],
+          ),
           ),
         ),
       ),
