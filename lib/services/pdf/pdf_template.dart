@@ -15,10 +15,13 @@ class PdfTemplate {
   static final successColor = PdfColor.fromInt(AppColors.success.toARGB32()); // Green
   static final errorColor = PdfColor.fromInt(AppColors.error.toARGB32()); // Red
 
-  /// Loads the standard theme with Roboto fonts
+  /// Loads the standard theme with bundled offline fonts
   static Future<pw.ThemeData> loadTheme() async {
-    final fontRegular = await PdfGoogleFonts.robotoRegular();
-    final fontBold = await PdfGoogleFonts.robotoBold();
+    final regularData = await rootBundle.load('assets/google_fonts/Inter-Regular.ttf');
+    final boldData = await rootBundle.load('assets/google_fonts/Inter-Bold.ttf');
+    
+    final fontRegular = pw.Font.ttf(regularData);
+    final fontBold = pw.Font.ttf(boldData);
 
     return pw.ThemeData.withFont(
       base: fontRegular,

@@ -53,7 +53,7 @@ class PdfService {
       '_',
     );
     final file = File('${output.path}/Ledger_$sanitizedTenantName.pdf');
-    await file.writeAsBytes(await pdf.save());
+    await file.writeAsBytes(await pdf.save(), flush: true);
     return file;
   }
 
@@ -134,6 +134,21 @@ class PdfService {
       l10n.paidLabel,
       l10n.balanceLabel,
     ];
+
+    if (entries.isEmpty) {
+      return pw.Container(
+        padding: const pw.EdgeInsets.all(32),
+        alignment: pw.Alignment.center,
+        child: pw.Text(
+          'No transactions found.',
+          style: pw.TextStyle(
+            fontSize: 14,
+            color: PdfColors.grey600,
+            fontStyle: pw.FontStyle.italic,
+          ),
+        ),
+      );
+    }
 
     final data = entries.map((e) {
       final dateStr = '${e.date.day}/${e.date.month}/${e.date.year}';
@@ -242,7 +257,7 @@ class PdfService {
       '_',
     );
     final file = File('${output.path}/Settlement_$sanitizedTenantName.pdf');
-    await file.writeAsBytes(await pdf.save());
+    await file.writeAsBytes(await pdf.save(), flush: true);
     return file;
   }
 
@@ -303,6 +318,10 @@ class PdfService {
         statement.manualDeductionReason ?? l10n.otherDeductionsTitle,
         '- ${formatCurrency(statement.manualDeduction)}',
       ]);
+    }
+
+    if (data.isEmpty) {
+      return pw.SizedBox.shrink();
     }
 
     return pw.Column(
