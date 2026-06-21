@@ -45,19 +45,50 @@ class AnimatedReviewDialog extends ConsumerStatefulWidget {
 }
 
 class _AnimatedReviewDialogState extends ConsumerState<AnimatedReviewDialog> with TickerProviderStateMixin {
-  late final AnimationController _starController;
-  late final List<Animation<double>> _starAnimations;
+  late final AnimationController _starController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1200),
+  )..forward();
+
+  late final List<Animation<double>> _starAnimations = List.generate(5, (index) {
+    final start = index * 0.1;
+    return Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _starController,
+        curve: Interval(start, start + 0.4, curve: Curves.elasticOut),
+      ),
+    );
+  });
 
   // Floating star animation
-  late final AnimationController _floatController;
-  late final AnimationController _sparkleController;
+  late final AnimationController _floatController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 2000),
+  )..repeat(reverse: true);
+
+  late final AnimationController _sparkleController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 8000), // Slower cycle
+  )..repeat();
 
   // Confetti controller
-  late final ConfettiController _confettiController;
+  late final ConfettiController _confettiController = ConfettiController(
+    duration: const Duration(seconds: 1),
+  )..play();
 
-  // Shimmer animation controller
-  late final AnimationController _shimmerController;
-  late final Animation<double> _shimmerAnimation;
+  // Premium Shimmer Animation (loops)
+  late final AnimationController _shimmerController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 2500),
+  )..repeat();
+
+  late final Animation<double> _shimmerAnimation = Tween<double>(begin: -2.0, end: 3.0).animate(
+    CurvedAnimation(
+      parent: _shimmerController,
+      // Wait for a bit before looping the shimmer
+      curve: const Interval(0.0, 0.7, curve: Curves.easeInOutSine),
+    ),
+  );
 
   @override
   void initState() {
@@ -67,54 +98,15 @@ class _AnimatedReviewDialogState extends ConsumerState<AnimatedReviewDialog> wit
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(analyticsServiceProvider).logReviewPromptShown(context: widget.triggerContext.name);
     });
-
-    // Staggered Stars Animation
-    _starController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1200),
-    );
-
-    _starAnimations = List.generate(5, (index) {
-      final start = index * 0.1;
-      return Tween<double>(begin: 0.0, end: 1.0).animate(
-        CurvedAnimation(
-          parent: _starController,
-          curve: Interval(start, start + 0.4, curve: Curves.elasticOut),
-        ),
-      );
-    });
-
-    // Continuous floating animation for stars
-    _floatController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 2000),
-    )..repeat(reverse: true);
-
-    _sparkleController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 8000), // Slower cycle
-    )..repeat();
-
-    // Premium Shimmer Animation (loops)
-    _shimmerController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 2500),
-    )..repeat();
-
-    _shimmerAnimation = Tween<double>(begin: -2.0, end: 3.0).animate(
-      CurvedAnimation(
-        parent: _shimmerController,
-        // Wait for a bit before looping the shimmer
-        curve: const Interval(0.0, 0.7, curve: Curves.easeInOutSine),
-      ),
-    );
-
-    // Setup confetti (short duration for a massive single burst)
-    _confettiController = ConfettiController(duration: const Duration(seconds: 1));
-
-    // Start animations immediately
-    _starController.forward();
-    _confettiController.play();
+    
+    // The controllers are initialized lazily when first accessed,
+    // but to ensure they start ticking immediately (like confetti),
+    // we can access them here so their lazy initializers run.
+    _starController;
+    _confettiController;
+    _floatController;
+    _sparkleController;
+    _shimmerController;
   }
 
   bool _actionTaken = false;
