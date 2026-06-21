@@ -77,6 +77,7 @@ class _PropertiesScreenState extends ConsumerState<PropertiesScreen> {
       ),
       floatingActionButton: (propertiesAsync.valueOrNull?.isNotEmpty == true)
           ? FloatingActionButton.extended(
+              heroTag: 'fab_properties',
               onPressed: () => context.push('/properties/add'),
               icon: const Icon(Icons.add),
               label: Text(AppLocalizations.of(context)!.addProperty),

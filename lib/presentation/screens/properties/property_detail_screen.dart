@@ -144,6 +144,7 @@ class _PropertyDetailScreenState extends ConsumerState<PropertyDetailScreen> {
           ),
           floatingActionButton: (roomsAsync.valueOrNull?.isNotEmpty == true)
               ? FloatingActionButton.extended(
+                  heroTag: 'fab_property_detail_${property.id}',
                   onPressed: () => _showAddRoom(context, property),
                   icon: const Icon(Icons.add),
                   label: Text(AppLocalizations.of(context)!.addRoom),

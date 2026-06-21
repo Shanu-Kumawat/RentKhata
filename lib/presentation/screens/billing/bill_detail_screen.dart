@@ -411,7 +411,7 @@ class _BillDetailContent extends ConsumerWidget {
         MaterialPageRoute(
           builder: (_) => PdfPreviewScreen(
             pdfFile: file,
-            title: AppLocalizations.of(context)!.invoicePreview,
+            title: l10n.invoicePreview,
             shareSubject: isPaid
                 ? 'Receipt #${latestPayment?.id}'
                 : l10n.invoiceNumber(bill.billNumber ?? ''),

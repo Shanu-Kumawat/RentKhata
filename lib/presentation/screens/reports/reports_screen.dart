@@ -134,6 +134,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
       floatingActionButton:
           (_tabController.index == 0 || _tabController.index == 3)
           ? FloatingActionButton.extended(
+              heroTag: 'fab_reports',
               onPressed: () {
                 HapticFeedback.mediumImpact();
                 showModalBottomSheet(

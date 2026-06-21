@@ -247,8 +247,8 @@ class ReceiptDialog extends StatelessWidget {
         MaterialPageRoute(
           builder: (innerContext) => PdfPreviewScreen(
             pdfFile: file,
-            title: AppLocalizations.of(context)!.paymentReceipt,
-            shareSubject: AppLocalizations.of(context)!.paymentReceipt,
+            title: l10n.paymentReceipt,
+            shareSubject: l10n.paymentReceipt,
             suggestedFileName: file.path.split('/').last,
             shareContentType: ShareContentType.receipt,
             onShareAsMessage: () => _shareReceiptAsMessage(context, payment),

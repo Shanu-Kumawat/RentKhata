@@ -40,7 +40,7 @@
   "messageTemplates": "संदेश टेम्पलेट",
   "customizeInvoice": "चालान और रसीद संदेशों को अनुकूलित करें",
   "notifications": "सूचनाएं",
-  "reminderSettings": "रिमाइंडर सेटिंग्स",
+  "reminderSettings": "नोटिफ़िकेशन सेटिंग्स",
   "dueDateAndOverdue": "नियत तिथि और अतिदेय रिमाइंडर",
   "data": "डेटा",
   "backupAndRestore": "बैकअप और रिस्टोर",

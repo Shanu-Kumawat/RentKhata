@@ -407,6 +407,7 @@ class _TenantDetailContent extends ConsumerWidget {
       // Move In Again FAB for past tenants
       floatingActionButton: !tenant.isCurrentlyOccupying
           ? FloatingActionButton.extended(
+              heroTag: 'fab_tenant_detail_${tenant.id}',
               onPressed: () => _showMoveInAgainSheet(context),
               icon: const Icon(Icons.home_outlined),
               label: Text(AppLocalizations.of(context)!.moveInAgainBtn),
