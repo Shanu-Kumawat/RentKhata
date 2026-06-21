@@ -17,7 +17,7 @@ _$BillingAttentionItemImpl _$$BillingAttentionItemImplFromJson(
   cycleEnd: DateTime.parse(json['cycleEnd'] as String),
   status: $enumDecode(_$BillingCycleStatusEnumMap, json['status']),
   billType: $enumDecode(_$BillTypeEnumMap, json['billType']),
-  daysUntilDueDate: (json['daysUntilDueDate'] as num).toInt(),
+  daysUntilDueDate: (json['daysUntilDueDate'] as num?)?.toInt(),
   agreedRent: (json['agreedRent'] as num).toDouble(),
   propertyName: json['propertyName'] as String?,
 );

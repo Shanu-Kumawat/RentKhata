@@ -184,7 +184,7 @@ Future<void> scheduleAllNotifications(Ref ref) async {
     for (final item in attentionItems) {
       final shouldAlert =
           item.status == BillingCycleStatus.overdue ||
-          item.daysUntilDueDate <= leadDays;
+          (item.daysUntilDueDate ?? 0) <= leadDays;
       if (!shouldAlert) continue;
 
       // Avoid duplicate alerts for multiple missed cycles of same type.
@@ -197,7 +197,7 @@ Future<void> scheduleAllNotifications(Ref ref) async {
         tenantName: item.tenantName,
         roomNumber: item.roomNumber,
         cycleEndDate: item.cycleEnd,
-        daysUntilDueDate: item.daysUntilDueDate,
+        daysUntilDueDate: item.daysUntilDueDate ?? 0,
         notificationHour: settings.notificationHour,
       );
     }

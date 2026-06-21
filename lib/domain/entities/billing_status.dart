@@ -1,6 +1,7 @@
 /// Billing status entities for cycle-based billing tracking.
 library;
 
+import 'package:rent_khata/l10n/app_localizations.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'bill.dart';
 
@@ -48,7 +49,7 @@ class BillingAttentionItem with _$BillingAttentionItem {
     required BillType billType,
 
     /// Days until bill is due. Negative values mean cycle is overdue.
-    required int daysUntilDueDate,
+    int? daysUntilDueDate,
 
     /// The agreed rent amount for pre-filling bill
     required double agreedRent,
@@ -61,31 +62,35 @@ class BillingAttentionItem with _$BillingAttentionItem {
       _$BillingAttentionItemFromJson(json);
 
   /// Human-readable status label
-  String get statusLabel {
+  String statusLabel(AppLocalizations l10n) {
     switch (status) {
       case BillingCycleStatus.upToDate:
-        return 'Up to date';
+        return l10n.statusUpToDate;
       case BillingCycleStatus.pending:
-        return 'Pending';
+        return l10n.statusPending;
       case BillingCycleStatus.dueSoon:
-        return 'Due soon';
+        return l10n.statusDueSoon;
       case BillingCycleStatus.overdue:
-        return 'Overdue';
+        return l10n.statusOverdue;
     }
   }
 
   /// Human-readable due description
-  String get dueDescription {
-    if (daysUntilDueDate == 0) {
-      return 'Due today';
-    } else if (daysUntilDueDate == 1) {
-      return 'Due tomorrow';
-    } else if (daysUntilDueDate > 0) {
-      return 'Due: in $daysUntilDueDate days';
-    } else if (daysUntilDueDate == -1) {
-      return 'Overdue: 1 day';
+  String dueDescription(AppLocalizations l10n) {
+    final days = daysUntilDueDate;
+    if (days == null) {
+      return statusLabel(l10n);
+    }
+    if (days == 0) {
+      return l10n.dueToday;
+    } else if (days == 1) {
+      return l10n.dueTomorrow;
+    } else if (days > 0) {
+      return l10n.dueInDays(days);
+    } else if (days == -1) {
+      return l10n.overdueOneDay;
     } else {
-      return 'Overdue: ${-daysUntilDueDate} days';
+      return l10n.overdueDays(-days);
     }
   }
 

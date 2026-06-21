@@ -1172,5 +1172,14 @@
   "expiredDaysAgo": "{days} दिन पहले समाप्त हो गया",
   "expiringInDays": "{days} दिनों में समाप्त हो रहा है",
   "fieldRequired": "आवश्यक",
-  "financialYearPrefix": "वि.व. "
+  "financialYearPrefix": "वि.व. ",
+  "dueToday": "आज देय",
+  "dueTomorrow": "कल देय",
+  "dueInDays": "{days} दिन में देय",
+  "overdueOneDay": "1 दिन से अतिदेय",
+  "overdueDays": "{days} दिन से अतिदेय",
+  "statusUpToDate": "अद्यतित",
+  "statusPending": "लंबित",
+  "statusDueSoon": "जल्द देय",
+  "statusOverdue": "अतिदेय"
 }

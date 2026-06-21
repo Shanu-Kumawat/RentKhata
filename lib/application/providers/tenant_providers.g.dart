@@ -163,7 +163,7 @@ class _TenantsStreamProviderElement
   bool get includeArchived => (origin as TenantsStreamProvider).includeArchived;
 }
 
-String _$tenantsHash() => r'7babaef629690f48e4764a0852be4fa490ca2268';
+String _$tenantsHash() => r'3d0db37d3a8defffcb2de29ec7bcc47726f88ae0';
 
 /// Get all tenants (future).
 ///
@@ -292,7 +292,7 @@ class _TenantsProviderElement
   bool get includeArchived => (origin as TenantsProvider).includeArchived;
 }
 
-String _$tenantHash() => r'e540cb9c25ef1267afd97979a63f46b45bc064bd';
+String _$tenantHash() => r'6ec4dd88edfb1edbf148ef7ae7a27ec357503db1';
 
 /// Get a single tenant by ID.
 /// This provider auto-refreshes when tenantsStream emits new data.
@@ -424,7 +424,7 @@ class _TenantProviderElement extends AutoDisposeFutureProviderElement<Tenant?>
   int get id => (origin as TenantProvider).id;
 }
 
-String _$searchTenantsHash() => r'91ed5da9d6d3686a2640c44475334f041faf347e';
+String _$searchTenantsHash() => r'063d1763eae59c28d6c73388c039ca8da62f5261';
 
 /// Search tenants.
 ///
@@ -573,7 +573,7 @@ class _SearchTenantsProviderElement
 }
 
 String _$customFieldsForTenantHash() =>
-    r'92fc7169c6eecc7de4b877f94e754932946a9472';
+    r'f7f33b686ed2aacb5ce3daeeac9ab100e162f061';
 
 /// Get custom fields for a tenant.
 /// This auto-refreshes when tenants change.
@@ -738,7 +738,7 @@ final activeOccupanciesStreamProvider =
 // ignore: unused_element
 typedef ActiveOccupanciesStreamRef =
     AutoDisposeStreamProviderRef<List<Occupancy>>;
-String _$activeOccupanciesHash() => r'5ce64fc0a8e5e36b06a61ae45468ad8e3fdd768f';
+String _$activeOccupanciesHash() => r'd2828b272449a2a7de18b130a972e6aff3c5cbe1';
 
 /// Get active occupancies.
 ///
@@ -1005,7 +1005,7 @@ class _TenantDocumentsProviderElement
   int get tenantId => (origin as TenantDocumentsProvider).tenantId;
 }
 
-String _$occupancyForRoomHash() => r'a1f004987a9967048321fc7a173f7310a4d62ea8';
+String _$occupancyForRoomHash() => r'7d8a62a588739284a43b49cebb82aad33fe9b28f';
 
 /// Get active occupancy for a room.
 /// This provider auto-refreshes when occupancy data changes.
@@ -1143,7 +1143,7 @@ class _OccupancyForRoomProviderElement
   int get roomId => (origin as OccupancyForRoomProvider).roomId;
 }
 
-String _$tenantForRoomHash() => r'e980bd6eb4dc968c47af7deecc30f809ea3a36d7';
+String _$tenantForRoomHash() => r'8821feb2110a7b2376d5995ffa7a78345174b892';
 
 /// Get tenant for a room.
 /// This provider auto-refreshes when tenant data changes.
@@ -1573,7 +1573,7 @@ class _FamilyMembersForOccupancyProviderElement
 }
 
 String _$occupanciesForTenantHash() =>
-    r'459231a24cc3b246ad862bb413a01988cae48cbf';
+    r'cc0913e5310a2e83c3db3a5968e4cafc4e1e348d';
 
 /// Get all occupancies (history) for a tenant.
 ///

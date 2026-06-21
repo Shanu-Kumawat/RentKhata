@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rent_khata/l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../domain/entities/billing_status.dart';
 import '../../../../domain/entities/bill.dart';
@@ -139,7 +140,7 @@ class _BillingAttentionTile extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
       ),
       subtitle: Text(
-        item.dueDescription,
+        item.dueDescription(AppLocalizations.of(context)!),
         style: TextStyle(
           fontSize: 12,
           color: statusTextColor,

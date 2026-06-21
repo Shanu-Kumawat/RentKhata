@@ -2902,7 +2902,7 @@ abstract class AppLocalizations {
   /// No description provided for @billingLabel.
   ///
   /// In en, this message translates to:
-  /// **'Billing Label'**
+  /// **'Billing'**
   String get billingLabel;
 
   /// No description provided for @billingReminders.
@@ -3040,7 +3040,7 @@ abstract class AppLocalizations {
   /// No description provided for @electricityRateInfoText.
   ///
   /// In en, this message translates to:
-  /// **'Electricity Rate Info Text'**
+  /// **'Set the default electricity rate applied to new bills.'**
   String get electricityRateInfoText;
 
   /// No description provided for @electricityRatesSubtitle.
@@ -3070,7 +3070,7 @@ abstract class AppLocalizations {
   /// No description provided for @generalSettingsLabel.
   ///
   /// In en, this message translates to:
-  /// **'General Settings Label'**
+  /// **'General Settings'**
   String get generalSettingsLabel;
 
   /// No description provided for @localBackups.
@@ -3262,7 +3262,7 @@ abstract class AppLocalizations {
   /// No description provided for @ratePerUnitLabel.
   ///
   /// In en, this message translates to:
-  /// **'Rate Per Unit Label'**
+  /// **'Rate Per Unit (₹)'**
   String get ratePerUnitLabel;
 
   /// No description provided for @rateUpdated.
@@ -3274,7 +3274,7 @@ abstract class AppLocalizations {
   /// No description provided for @receiptLabel.
   ///
   /// In en, this message translates to:
-  /// **'Receipt Label'**
+  /// **'Receipt'**
   String get receiptLabel;
 
   /// No description provided for @remindDaysBeforeCycleEnds.
@@ -3292,7 +3292,7 @@ abstract class AppLocalizations {
   /// No description provided for @reminderLabel.
   ///
   /// In en, this message translates to:
-  /// **'Reminder Label'**
+  /// **'Reminder'**
   String get reminderLabel;
 
   /// No description provided for @reminderSettingsSubtitle.
@@ -3484,7 +3484,7 @@ abstract class AppLocalizations {
   /// No description provided for @upiIdHelperText.
   ///
   /// In en, this message translates to:
-  /// **'Upi Id Helper Text'**
+  /// **'For receiving rent payments'**
   String get upiIdHelperText;
 
   /// No description provided for @upiIdHint.
@@ -5308,13 +5308,13 @@ abstract class AppLocalizations {
   /// No description provided for @statusOverdue.
   ///
   /// In en, this message translates to:
-  /// **'OVERDUE'**
+  /// **'Overdue'**
   String get statusOverdue;
 
   /// No description provided for @statusDueSoon.
   ///
   /// In en, this message translates to:
-  /// **'Due Soon'**
+  /// **'Due soon'**
   String get statusDueSoon;
 
   /// No description provided for @statusAdvance.
@@ -5382,6 +5382,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'FY '**
   String get financialYearPrefix;
+
+  /// No description provided for @dueToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Due today'**
+  String get dueToday;
+
+  /// No description provided for @dueTomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Due tomorrow'**
+  String get dueTomorrow;
+
+  /// No description provided for @dueInDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Due: in {days} days'**
+  String dueInDays(int days);
+
+  /// No description provided for @overdueOneDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue: 1 day'**
+  String get overdueOneDay;
+
+  /// No description provided for @overdueDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue: {days} days'**
+  String overdueDays(int days);
+
+  /// No description provided for @statusUpToDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Up to date'**
+  String get statusUpToDate;
 }
 
 class _AppLocalizationsDelegate

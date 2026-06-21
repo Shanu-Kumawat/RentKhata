@@ -1548,5 +1548,28 @@
     }
   },
   "fieldRequired": "Required",
-  "financialYearPrefix": "FY "
+  "financialYearPrefix": "FY ",
+  "dueToday": "Due today",
+  "dueTomorrow": "Due tomorrow",
+  "dueInDays": "Due: in {days} days",
+  "@dueInDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "overdueOneDay": "Overdue: 1 day",
+  "overdueDays": "Overdue: {days} days",
+  "@overdueDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "statusUpToDate": "Up to date",
+  "statusPending": "Pending",
+  "statusDueSoon": "Due soon",
+  "statusOverdue": "Overdue"
 }

@@ -137,7 +137,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get notifications => 'सूचनाएं';
 
   @override
-  String get reminderSettings => 'रिमाइंडर सेटिंग्स';
+  String get reminderSettings => 'नोटिफ़िकेशन सेटिंग्स';
 
   @override
   String get dueDateAndOverdue => 'नियत तिथि और अतिदेय रिमाइंडर';
@@ -2864,7 +2864,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get statusPaid => 'भुगतान किया';
 
   @override
-  String get statusOverdue => 'बकाया';
+  String get statusOverdue => 'अतिदेय';
 
   @override
   String get statusDueSoon => 'जल्द देय';
@@ -2905,4 +2905,26 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get financialYearPrefix => 'वि.व. ';
+
+  @override
+  String get dueToday => 'आज देय';
+
+  @override
+  String get dueTomorrow => 'कल देय';
+
+  @override
+  String dueInDays(int days) {
+    return '$days दिन में देय';
+  }
+
+  @override
+  String get overdueOneDay => '1 दिन से अतिदेय';
+
+  @override
+  String overdueDays(int days) {
+    return '$days दिन से अतिदेय';
+  }
+
+  @override
+  String get statusUpToDate => 'अद्यतित';
 }

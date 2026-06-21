@@ -416,7 +416,9 @@ Future<List<BillingAttentionItem>> billingAttentionList(Ref ref) async {
       return 1;
     }
     // Then by days until due (most urgent first)
-    return a.daysUntilDueDate.compareTo(b.daysUntilDueDate);
+    final daysA = a.daysUntilDueDate ?? 0;
+    final daysB = b.daysUntilDueDate ?? 0;
+    return daysA.compareTo(daysB);
   });
 
   return attentionItems;

@@ -808,7 +808,7 @@ class _RoomStatusTile extends StatelessWidget {
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        item.statusLabel,
+                        item.statusLabel(AppLocalizations.of(context)!),
                         style: TextStyle(
                           color: _getStatusTextColor(context, item.status),
                           fontWeight: FontWeight.bold,

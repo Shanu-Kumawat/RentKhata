@@ -1,6 +1,7 @@
 /// Dashboard-related providers.
 library;
 
+import 'package:rent_khata/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../domain/entities/landlord.dart';
@@ -203,16 +204,28 @@ class RoomStatusItem {
   final String tenantName;
   final String propertyName;
   final RoomStatusType status;
-  final String statusLabel;
-
   const RoomStatusItem({
     required this.roomId,
     required this.roomNumber,
     required this.tenantName,
     required this.propertyName,
     required this.status,
-    required this.statusLabel,
   });
+
+  String statusLabel(AppLocalizations l10n) {
+    switch (status) {
+      case RoomStatusType.paid:
+        return l10n.paid;
+      case RoomStatusType.advance:
+        return l10n.statusAdvanceCaps;
+      case RoomStatusType.pending:
+        return l10n.statusPending;
+      case RoomStatusType.dueSoon:
+        return l10n.statusDueSoon;
+      case RoomStatusType.overdue:
+        return l10n.overdue;
+    }
+  }
 }
 
 /// Provides list of rooms with their status.
@@ -238,28 +251,20 @@ Future<List<RoomStatusItem>> roomStatusList(Ref ref) async {
         .toList();
 
     RoomStatusType status = RoomStatusType.paid;
-    String label = 'Paid';
-
     if (roomBills.isNotEmpty) {
       if (roomBills.any((b) => b.isOverdue)) {
         status = RoomStatusType.overdue;
-        label = 'Overdue';
       } else if (roomBills.any((b) => b.isDueSoon)) {
         status = RoomStatusType.dueSoon;
-        label = 'Due Soon';
       } else if (roomBills.any((b) => b.isPending)) {
         status = RoomStatusType.pending;
-        label = 'Pending';
       } else if (roomBills.every((b) => b.isAdvance)) {
         status = RoomStatusType.advance;
-        label = 'Advance';
       } else {
         status = RoomStatusType.pending;
-        label = 'Pending';
       }
     } else {
       status = RoomStatusType.paid;
-      label = 'Paid';
     }
 
     return RoomStatusItem(
@@ -268,7 +273,6 @@ Future<List<RoomStatusItem>> roomStatusList(Ref ref) async {
       tenantName: room.currentTenantName ?? 'Unknown',
       propertyName: room.propertyName ?? 'Unknown',
       status: status,
-      statusLabel: label,
     );
   }).toList();
 }

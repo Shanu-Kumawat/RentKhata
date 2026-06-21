@@ -1528,7 +1528,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get billingCycleEnding => 'Billing Cycle Ending';
 
   @override
-  String get billingLabel => 'Billing Label';
+  String get billingLabel => 'Billing';
 
   @override
   String get billingReminders => 'Billing Reminders';
@@ -1606,7 +1606,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get electricityMeterReadings => 'Electricity Meter Readings';
 
   @override
-  String get electricityRateInfoText => 'Electricity Rate Info Text';
+  String get electricityRateInfoText =>
+      'Set the default electricity rate applied to new bills.';
 
   @override
   String get electricityRatesSubtitle =>
@@ -1622,7 +1623,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get firstReminderAfterDueDate => 'First Reminder After Due Date';
 
   @override
-  String get generalSettingsLabel => 'General Settings Label';
+  String get generalSettingsLabel => 'General Settings';
 
   @override
   String get localBackups => 'Local Backups';
@@ -1721,13 +1722,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get rateHistory => 'Rate History';
 
   @override
-  String get ratePerUnitLabel => 'Rate Per Unit Label';
+  String get ratePerUnitLabel => 'Rate Per Unit (₹)';
 
   @override
   String get rateUpdated => 'Rate Updated';
 
   @override
-  String get receiptLabel => 'Receipt Label';
+  String get receiptLabel => 'Receipt';
 
   @override
   String remindDaysBeforeCycleEnds(int days) {
@@ -1740,7 +1741,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get reminderLabel => 'Reminder Label';
+  String get reminderLabel => 'Reminder';
 
   @override
   String get reminderSettingsSubtitle =>
@@ -1841,7 +1842,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get upiId => 'Upi Id';
 
   @override
-  String get upiIdHelperText => 'Upi Id Helper Text';
+  String get upiIdHelperText => 'For receiving rent payments';
 
   @override
   String get upiIdHint => 'e.g. yourname@upi';
@@ -2851,10 +2852,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statusPaid => 'PAID';
 
   @override
-  String get statusOverdue => 'OVERDUE';
+  String get statusOverdue => 'Overdue';
 
   @override
-  String get statusDueSoon => 'Due Soon';
+  String get statusDueSoon => 'Due soon';
 
   @override
   String get statusAdvance => 'Advance';
@@ -2892,4 +2893,26 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get financialYearPrefix => 'FY ';
+
+  @override
+  String get dueToday => 'Due today';
+
+  @override
+  String get dueTomorrow => 'Due tomorrow';
+
+  @override
+  String dueInDays(int days) {
+    return 'Due: in $days days';
+  }
+
+  @override
+  String get overdueOneDay => 'Overdue: 1 day';
+
+  @override
+  String overdueDays(int days) {
+    return 'Overdue: $days days';
+  }
+
+  @override
+  String get statusUpToDate => 'Up to date';
 }
