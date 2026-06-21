@@ -242,6 +242,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
             pdfFileName: widget.suggestedFileName,
             allowPrinting: false,
             allowSharing: false,
+            useActions: false, // Disable default FAB to prevent Hero tag collisions
           );
         },
       ),
